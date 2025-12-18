@@ -17,12 +17,17 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
 import org.joml.Matrix4f;
 
 public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockEntity> {
+
+    // Plunger position constants - the plunger presses down into the basin
+    private static final float PLUNGER_MAX_Y = 0.7F;     // Highest position (not pressing)
+    private static final float PLUNGER_MIN_Y = 0.2F;     // Lowest position (fully pressed into basin)
 
     private final ItemRenderer itemRenderer;
     private final Font font;
@@ -46,23 +51,26 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
         ItemStack output = blockEntity.getItem(1);
         FluidTank tank = blockEntity.getTank();
 
+        // Render animated plunger
+        renderPlunger(blockEntity, poseStack, bufferSource, packedLight, packedOverlay);
+
         // Render input items on the press plate
         if (!input.isEmpty()) {
             poseStack.pushPose();
-            poseStack.translate(0.5D, 1.1D, 0.5D);
+            poseStack.translate(0.5D, 0.35D, 0.5D);  // Lower position - inside basin
             poseStack.scale(0.5F, 0.5F, 0.5F);
             poseStack.mulPose(Axis.XP.rotationDegrees(90));
 
             itemRenderer.renderStatic(input, ItemDisplayContext.FIXED, packedLight, packedOverlay,
                     poseStack, bufferSource, blockEntity.getLevel(), 0);
 
-            if (input.getCount() > 1 && Configs.renderItemAmount.get()) {
-                poseStack.mulPose(Axis.XP.rotationDegrees(-90));
-                poseStack.translate(0.0D, 0.0D, -0.4D);
-                renderItemCount(poseStack, bufferSource, packedLight, input.getCount());
-            }
-
             poseStack.popPose();
+
+            // Render count as billboard if more than 1
+            if (input.getCount() > 1 && Configs.renderItemAmount.get()) {
+                RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight,
+                        input.getCount(), 0.5D, 0.65D, 0.5D);
+            }
         }
 
         // Render output item
@@ -75,19 +83,55 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
             itemRenderer.renderStatic(output, ItemDisplayContext.FIXED, packedLight, packedOverlay,
                     poseStack, bufferSource, blockEntity.getLevel(), 0);
 
-            if (output.getCount() > 1 && Configs.renderItemAmount.get()) {
-                poseStack.mulPose(Axis.XP.rotationDegrees(-90));
-                poseStack.translate(0.0D, 0.0D, -0.3D);
-                renderItemCount(poseStack, bufferSource, packedLight, output.getCount());
-            }
-
             poseStack.popPose();
+
+            // Render count as billboard if more than 1
+            if (output.getCount() > 1 && Configs.renderItemAmount.get()) {
+                RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight,
+                        output.getCount(), 0.5D, 0.55D, 0.5D);
+            }
         }
 
         // Render fluid in tank
         if (!tank.isEmpty()) {
             renderFluid(poseStack, bufferSource, packedLight, tank);
         }
+    }
+
+    private void renderPlunger(PressBlockEntity blockEntity, PoseStack poseStack,
+                               MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
+        // Get press progress from block entity
+        int currentPress = blockEntity.getCurrentPressStatus();
+        int totalPress = Configs.pointsForPress.get();
+        if (totalPress <= 0) totalPress = 1;
+
+        // Calculate plunger Y position based on progress
+        float progress = (float) currentPress / totalPress;
+        float plungerTravel = PLUNGER_MAX_Y - PLUNGER_MIN_Y;
+        float plungerY = PLUNGER_MAX_Y - (progress * plungerTravel);
+
+        // Get oak planks texture for plunger
+        TextureAtlasSprite sprite = Minecraft.getInstance()
+                .getBlockRenderer()
+                .getBlockModel(Blocks.OAK_PLANKS.defaultBlockState())
+                .getParticleIcon();
+
+        poseStack.pushPose();
+
+        VertexConsumer builder = bufferSource.getBuffer(RenderType.solid());
+
+        // Plunger dimensions (square plate that fits inside the basin)
+        float plungerMinX = 0.15F;
+        float plungerMaxX = 0.85F;
+        float plungerMinZ = 0.15F;
+        float plungerMaxZ = 0.85F;
+        float plungerHeight = 0.15F;
+
+        RenderUtils.renderTexturedBox(poseStack, builder, sprite, packedLight,
+                plungerMinX, plungerY, plungerMinZ,
+                plungerMaxX, plungerY + plungerHeight, plungerMaxZ);
+
+        poseStack.popPose();
     }
 
     private void renderFluid(PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, FluidTank tank) {
@@ -127,20 +171,6 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
         builder.vertex(matrix, 0, fluidHeight, width).color(r, g, b, a).uv(u1, v2).uv2(packedLight).normal(0, 1, 0).endVertex();
         builder.vertex(matrix, width, fluidHeight, width).color(r, g, b, a).uv(u2, v2).uv2(packedLight).normal(0, 1, 0).endVertex();
         builder.vertex(matrix, width, fluidHeight, 0).color(r, g, b, a).uv(u2, v1).uv2(packedLight).normal(0, 1, 0).endVertex();
-
-        poseStack.popPose();
-    }
-
-    private void renderItemCount(PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int count) {
-        poseStack.pushPose();
-        poseStack.scale(0.025F, -0.025F, 0.025F);
-
-        String text = String.valueOf(count);
-        float x = -font.width(text) / 2.0F;
-
-        Matrix4f matrix = poseStack.last().pose();
-        font.drawInBatch(text, x, 0, 0xFFFFFF, false, matrix, bufferSource,
-                Font.DisplayMode.NORMAL, 0, packedLight);
 
         poseStack.popPose();
     }

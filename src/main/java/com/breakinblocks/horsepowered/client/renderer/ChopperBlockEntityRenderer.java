@@ -4,20 +4,27 @@ import com.breakinblocks.horsepowered.Configs;
 import com.breakinblocks.horsepowered.blocks.BlockChopper;
 import com.breakinblocks.horsepowered.blockentity.ChopperBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import org.joml.Matrix4f;
 
 public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBlockEntity> {
+
+    // Blade position constants - the blade sits on an oak slab base
+    private static final float BLADE_MIN_Y = 0.5F;     // Lowest position (at chopping surface)
+    private static final float BLADE_MAX_Y = 1.25F;    // Highest position (raised)
 
     private final ItemRenderer itemRenderer;
     private final Font font;
@@ -44,10 +51,13 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
         Direction facing = state.getValue(BlockChopper.FACING);
         float rotation = getRotation(facing);
 
-        // Render input item on the chopping surface
+        // Render animated blade
+        renderBlade(blockEntity, poseStack, bufferSource, packedLight, packedOverlay, rotation);
+
+        // Render input item on the chopping surface (on top of the oak slab base)
         if (!input.isEmpty()) {
             poseStack.pushPose();
-            poseStack.translate(0.5D, 1.02D, 0.5D);
+            poseStack.translate(0.5D, 0.52D, 0.5D);  // Lower position - on slab surface
             poseStack.scale(0.6F, 0.6F, 0.6F);
             poseStack.mulPose(Axis.YP.rotationDegrees(rotation));
             poseStack.mulPose(Axis.XP.rotationDegrees(90));
@@ -55,13 +65,13 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
             itemRenderer.renderStatic(input, ItemDisplayContext.FIXED, packedLight, packedOverlay,
                     poseStack, bufferSource, blockEntity.getLevel(), 0);
 
-            if (input.getCount() > 1 && Configs.renderItemAmount.get()) {
-                poseStack.mulPose(Axis.XP.rotationDegrees(-90));
-                poseStack.translate(0.0D, 0.0D, -0.3D);
-                renderItemCount(poseStack, bufferSource, packedLight, input.getCount());
-            }
-
             poseStack.popPose();
+
+            // Render count as billboard if more than 1
+            if (input.getCount() > 1 && Configs.renderItemAmount.get()) {
+                RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight,
+                        input.getCount(), 0.5D, 0.85D, 0.5D);
+            }
         }
 
         // Render output item
@@ -75,14 +85,57 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
             itemRenderer.renderStatic(output, ItemDisplayContext.FIXED, packedLight, packedOverlay,
                     poseStack, bufferSource, blockEntity.getLevel(), 0);
 
-            if (output.getCount() > 1 && Configs.renderItemAmount.get()) {
-                poseStack.mulPose(Axis.XP.rotationDegrees(-90));
-                poseStack.translate(0.0D, 0.0D, -0.3D);
-                renderItemCount(poseStack, bufferSource, packedLight, output.getCount());
-            }
-
             poseStack.popPose();
+
+            // Render count as billboard if more than 1
+            if (output.getCount() > 1 && Configs.renderItemAmount.get()) {
+                RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight,
+                        output.getCount(), 0.5D, 0.55D, 0.5D);
+            }
         }
+    }
+
+    private void renderBlade(ChopperBlockEntity blockEntity, PoseStack poseStack,
+                             MultiBufferSource bufferSource, int packedLight, int packedOverlay, float rotation) {
+        // Get visual windup from block entity (-0.74 to 0)
+        float visualWindup = blockEntity.getVisualWindup();
+
+        // Convert to blade Y position (0.74 range mapped to blade travel distance)
+        float bladeTravel = BLADE_MAX_Y - BLADE_MIN_Y;
+        // visualWindup: -0.74 = down (min), 0 = up (max)
+        float normalizedProgress = (visualWindup + 0.74F) / 0.74F; // 0 to 1
+        float bladeY = BLADE_MIN_Y + (normalizedProgress * bladeTravel);
+
+        // Get iron block texture for blade
+        TextureAtlasSprite sprite = Minecraft.getInstance()
+                .getBlockRenderer()
+                .getBlockModel(Blocks.IRON_BLOCK.defaultBlockState())
+                .getParticleIcon();
+
+        poseStack.pushPose();
+
+        // Rotate blade to match block facing
+        poseStack.translate(0.5, 0, 0.5);
+        poseStack.mulPose(Axis.YP.rotationDegrees(rotation));
+        poseStack.translate(-0.5, 0, -0.5);
+
+        VertexConsumer builder = bufferSource.getBuffer(RenderType.solid());
+
+        // Blade dimensions (vertical blade - thin in Z, tall in Y)
+        float bladeMinX = 0.1F;
+        float bladeMaxX = 0.9F;
+        float bladeThickness = 0.05F;  // Thin blade
+        float bladeHeight = 0.5F;      // Tall blade
+
+        // Center the blade in Z
+        float bladeMinZ = 0.5F - (bladeThickness / 2);
+        float bladeMaxZ = 0.5F + (bladeThickness / 2);
+
+        RenderUtils.renderTexturedBox(poseStack, builder, sprite, packedLight,
+                bladeMinX, bladeY, bladeMinZ,
+                bladeMaxX, bladeY + bladeHeight, bladeMaxZ);
+
+        poseStack.popPose();
     }
 
     private float getRotation(Direction facing) {
@@ -93,20 +146,6 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
             case EAST -> 270;
             default -> 0;
         };
-    }
-
-    private void renderItemCount(PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int count) {
-        poseStack.pushPose();
-        poseStack.scale(0.025F, -0.025F, 0.025F);
-
-        String text = String.valueOf(count);
-        float x = -font.width(text) / 2.0F;
-
-        Matrix4f matrix = poseStack.last().pose();
-        font.drawInBatch(text, x, 0, 0xFFFFFF, false, matrix, bufferSource,
-                Font.DisplayMode.NORMAL, 0, packedLight);
-
-        poseStack.popPose();
     }
 
     @Override
