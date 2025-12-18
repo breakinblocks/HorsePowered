@@ -45,7 +45,52 @@ Recipes can be viewed in-game using JEI (Just Enough Items). The mod includes re
 - Chopping logs into planks
 - Pressing various items into fluids
 
-These recipes exist as place holder exampls since this mod is primarily aimed at modpack makers, additional recipes can be added via datapacks.
+These recipes exist as placeholder examples since this mod is primarily aimed at modpack makers. Additional recipes can be added via datapacks.
+
+## For Modpack Makers
+
+### Custom Recipes
+
+Horse Powered uses data-driven JSON recipes that can be added or modified via datapacks. Recipe types include:
+
+- `horsepowered:grinding` - Grindstone recipes
+- `horsepowered:chopping` - Chopping block recipes
+- `horsepowered:pressing` - Press recipes (supports item and fluid outputs)
+
+Example grinding recipe (`data/yourpack/recipes/grinding/custom_recipe.json`):
+```json
+{
+  "type": "horsepowered:grinding",
+  "ingredient": { "item": "minecraft:wheat" },
+  "result": { "item": "yourmod:flour", "count": 1 },
+  "time": 12
+}
+```
+
+### Custom Worker Mobs
+
+By default, the following vanilla mobs can power horse-powered machines:
+- Horse
+- Donkey
+- Mule
+- Llama
+- Trader Llama
+
+To add additional mobs as valid workers, create an entity type tag file at:
+`data/horsepowered/tags/entity_types/valid_worker.json`
+
+Example (adding modded horses):
+```json
+{
+  "replace": false,
+  "values": [
+    "alexsmobs:elephant",
+    "somemod:custom_horse"
+  ]
+}
+```
+
+**Note:** Only PathfinderMob entities (entities with AI that can navigate) will work properly with the pathing system.
 
 ## Mod Integrations
 
@@ -59,7 +104,7 @@ The mod includes several configuration options:
 
 - Hunger exhaustion rates for manual machines
 - Whether axes take damage when using the chopping block
-- Creature whitelist for horse-powered machines
+- Points required for various machine operations
 - Item rendering options
 
 ## Requirements

@@ -1,0 +1,36 @@
+{
+  "itemGroup.horsepowered": "Horse Powered",
+
+  "item.horsepowered.flour": "Flour",
+  "item.horsepowered.dough": "Dough",
+  "item.horsepowered.guide": "Horse Powered Guide",
+
+  "block.horsepowered.hand_grindstone": "Hand Grindstone",
+  "block.horsepowered.grindstone": "Horse Grindstone",
+  "block.horsepowered.chopping_block": "Chopping Block",
+  "block.horsepowered.chopper": "Horse Chopper",
+  "block.horsepowered.press": "Horse Press",
+  "block.horsepowered.filler": "Filler",
+
+  "gui.horsepowered.jei.grinding": "Horse Grinding",
+  "gui.horsepowered.jei.chopping": "Horse Chopping",
+  "gui.horsepowered.jei.pressing": "Horse Pressing",
+  "gui.horsepowered.jei.time": "Time: %s",
+  "gui.horsepowered.jei.chops": "Chops: %s",
+  "gui.horsepowered.jei.chance": "%s%% chance",
+
+  "config.jade.plugin_horsepowered.grindstone": "Horse Grindstone",
+  "config.jade.plugin_horsepowered.chopper": "Horse Chopper",
+  "config.jade.plugin_horsepowered.press": "Horse Press",
+  "config.jade.plugin_horsepowered.manual": "Manual Blocks",
+
+  "jade.horsepowered.input": "Input: %s x%s",
+  "jade.horsepowered.output": "Output: %s x%s",
+  "jade.horsepowered.secondary": "Secondary: %s x%s",
+  "jade.horsepowered.fluid": "Fluid: %s %s/%s mB",
+  "jade.horsepowered.progress": "Progress: %s%%",
+  "jade.horsepowered.worker": "Worker: %s",
+  "jade.horsepowered.worker_attached": "Worker attached (loading...)",
+  "jade.horsepowered.no_worker": "No worker attached",
+  "jade.horsepowered.obstructed": "Area obstructed!"
+}

@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "horsepowered:block/chopper"
+    },
+    "facing=south": {
+      "model": "horsepowered:block/chopper",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "horsepowered:block/chopper",
+      "y": 90
+    },
+    "facing=west": {
+      "model": "horsepowered:block/chopper",
+      "y": 270
+    }
+  }
+}

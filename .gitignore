@@ -1,0 +1,61 @@
+# Gradle
+.gradle/
+build/
+out/
+classes/
+
+# Gradle Wrapper (optional - some prefer to commit these)
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+.idea_modules/
+
+# Eclipse
+.classpath
+.project
+.settings/
+bin/
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# Minecraft mod development
+run/
+runs/
+logs/
+*.log
+crash-reports/
+
+# Forge/NeoForge specific
+src/generated/
+!src/generated/resources/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Java
+*.class
+hs_err_pid*
+replay_pid*
+
+# Misc
+*.bak
+*.tmp
+*.swp
+*~
+local.properties
+
+gradle/wrapper/

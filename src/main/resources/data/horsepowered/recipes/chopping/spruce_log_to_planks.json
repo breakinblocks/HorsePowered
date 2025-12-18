@@ -1,0 +1,11 @@
+{
+  "type": "horsepowered:chopping",
+  "ingredient": {
+    "tag": "minecraft:spruce_logs"
+  },
+  "result": {
+    "item": "minecraft:spruce_planks",
+    "count": 4
+  },
+  "time": 1
+}

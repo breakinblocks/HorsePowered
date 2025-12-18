@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "filled=false": {
+      "model": "horsepowered:block/grindstone"
+    },
+    "filled=true": {
+      "model": "horsepowered:block/grindstone"
+    }
+  }
+}

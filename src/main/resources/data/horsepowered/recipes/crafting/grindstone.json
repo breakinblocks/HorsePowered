@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "SLS",
+    "SGS",
+    "PPP"
+  ],
+  "key": {
+    "S": {
+      "item": "minecraft:stone"
+    },
+    "L": {
+      "item": "minecraft:lead"
+    },
+    "G": {
+      "item": "horsepowered:hand_grindstone"
+    },
+    "P": {
+      "tag": "minecraft:planks"
+    }
+  },
+  "result": {
+    "item": "horsepowered:grindstone",
+    "count": 1
+  }
+}

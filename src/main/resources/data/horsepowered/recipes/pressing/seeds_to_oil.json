@@ -1,0 +1,11 @@
+{
+  "type": "horsepowered:pressing",
+  "ingredient": {
+    "item": "minecraft:wheat_seeds"
+  },
+  "inputCount": 12,
+  "fluidResult": {
+    "FluidName": "minecraft:water",
+    "Amount": 100
+  }
+}

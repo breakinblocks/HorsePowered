@@ -1,0 +1,11 @@
+{
+  "type": "horsepowered:pressing",
+  "ingredient": {
+    "item": "minecraft:sugar_cane"
+  },
+  "inputCount": 3,
+  "result": {
+    "item": "minecraft:paper",
+    "count": 3
+  }
+}
