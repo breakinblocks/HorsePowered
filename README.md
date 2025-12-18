@@ -2,6 +2,8 @@
   <img src="metadata/images/logo.png" alt="Horse Powered Logo" width="400">
 </p>
 
+[![Discord](https://img.shields.io/discord/123194979509207040?logo=discord&label=Discord&color=5865F2)](https://discord.gg/TRxaXaYy42)
+
 # Horse Powered
 
 A Minecraft Forge mod that adds horse-powered machinery for grinding, chopping, and pressing items. Process materials the old-fashioned way, with animal power!
