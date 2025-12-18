@@ -1,14 +1,14 @@
 package com.breakinblocks.horsepowered.compat.jei;
 
+import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
-import com.breakinblocks.horsepowered.lib.Reference;
 import com.breakinblocks.horsepowered.recipes.PressRecipe;
 import mezz.jei.api.constants.VanillaTypes;
-import mezz.jei.api.forge.ForgeTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
+import mezz.jei.api.neoforge.NeoForgeTypes;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
@@ -23,21 +23,21 @@ import java.util.Arrays;
 
 public class HorsePowerPressCategory implements IRecipeCategory<PressRecipe> {
 
-    public static final ResourceLocation UID = new ResourceLocation(Reference.MODID, "pressing");
+    public static final ResourceLocation UID = ResourceLocation.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "pressing");
 
-    private final IDrawable background;
+    private static final int WIDTH = 82;
+    private static final int HEIGHT = 50;
+
     private final IDrawable icon;
     private final IDrawable slot;
     private final IDrawable arrow;
     private final Component title;
 
     public HorsePowerPressCategory(IGuiHelper guiHelper) {
-        // Use blank background - we'll draw slots and arrow programmatically
-        this.background = guiHelper.createBlankDrawable(82, 50);
         this.icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(ModBlocks.PRESS.get()));
         this.slot = guiHelper.getSlotDrawable();
-        this.arrow = guiHelper.drawableBuilder(new ResourceLocation("jei", "textures/jei/gui/gui_vanilla.png"), 82, 128, 24, 17).build();
-        this.title = Component.translatable("gui." + Reference.MODID + ".jei.pressing");
+        this.arrow = guiHelper.drawableBuilder(ResourceLocation.fromNamespaceAndPath("jei", "textures/jei/gui/gui_vanilla.png"), 82, 128, 24, 17).build();
+        this.title = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.pressing");
     }
 
     @Override
@@ -51,8 +51,13 @@ public class HorsePowerPressCategory implements IRecipeCategory<PressRecipe> {
     }
 
     @Override
-    public IDrawable getBackground() {
-        return background;
+    public int getWidth() {
+        return WIDTH;
+    }
+
+    @Override
+    public int getHeight() {
+        return HEIGHT;
     }
 
     @Override
@@ -77,7 +82,7 @@ public class HorsePowerPressCategory implements IRecipeCategory<PressRecipe> {
         if (recipe.hasFluidOutput()) {
             builder.addSlot(RecipeIngredientRole.OUTPUT, 61, 1)
                     .setFluidRenderer(recipe.getFluidResult().getAmount(), false, 16, 32)
-                    .addIngredient(ForgeTypes.FLUID_STACK, recipe.getFluidResult());
+                    .addIngredient(NeoForgeTypes.FLUID_STACK, recipe.getFluidResult());
         } else {
             builder.addSlot(RecipeIngredientRole.OUTPUT, 61, 1)
                     .addItemStack(recipe.getResult())

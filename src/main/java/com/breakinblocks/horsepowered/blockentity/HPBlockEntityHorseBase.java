@@ -2,6 +2,7 @@ package com.breakinblocks.horsepowered.blockentity;
 
 import com.breakinblocks.horsepowered.util.Utils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.PathfinderMob;
@@ -17,6 +18,7 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
@@ -68,8 +70,8 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
     public abstract int getPositionOffset();
 
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
 
         target = tag.getInt("target");
         origin = tag.getInt("origin");
@@ -84,8 +86,8 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag) {
-        super.saveAdditional(tag);
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
 
         tag.putInt("target", target);
         tag.putInt("origin", origin);
@@ -162,7 +164,7 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
      * Releases the worker back to a player with a lead
      */
     public void setWorkerToPlayer(Player player) {
-        if (hasWorker() && worker.canBeLeashed(player)) {
+        if (hasWorker() && worker.canBeLeashed()) {
             hasWorker = false;
             worker.clearRestriction();
             worker.setLeashedTo(player, true);
@@ -233,8 +235,8 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
      * Gets the list of positions that need to be clear for the working area.
      * Returns a list of pairs: BlockPos and boolean (true = clear, false = obstructed)
      */
-    public List<java.util.Map.Entry<BlockPos, Boolean>> getWorkingAreaPositions() {
-        List<java.util.Map.Entry<BlockPos, Boolean>> positions = new ArrayList<>();
+    public List<Map.Entry<BlockPos, Boolean>> getWorkingAreaPositions() {
+        List<Map.Entry<BlockPos, Boolean>> positions = new ArrayList<>();
         if (level == null) return positions;
 
         // Build positions if not already cached
@@ -246,7 +248,7 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
             for (BlockPos pos : searchPos) {
                 BlockState state = level.getBlockState(pos);
                 boolean isClear = state.canBeReplaced();
-                positions.add(java.util.Map.entry(pos, isClear));
+                positions.add(Map.entry(pos, isClear));
             }
         }
         return positions;

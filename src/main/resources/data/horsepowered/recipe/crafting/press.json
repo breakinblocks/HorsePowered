@@ -20,7 +20,7 @@
     }
   },
   "result": {
-    "item": "horsepowered:press",
+    "id": "horsepowered:press",
     "count": 1
   }
 }

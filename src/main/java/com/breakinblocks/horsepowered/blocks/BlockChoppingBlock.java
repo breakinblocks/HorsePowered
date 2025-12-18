@@ -1,11 +1,12 @@
 package com.breakinblocks.horsepowered.blocks;
 
-import com.breakinblocks.horsepowered.Configs;
 import com.breakinblocks.horsepowered.blockentity.ManualChopperBlockEntity;
+import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -28,32 +29,31 @@ public class BlockChoppingBlock extends BlockHPBase {
     }
 
     @Override
-    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return SHAPE;
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         BlockEntity be = level.getBlockEntity(pos);
         if (be instanceof ManualChopperBlockEntity chopper) {
-            ItemStack held = player.getItemInHand(hand);
-
             // Check if player is holding an axe
-            if (held.is(ItemTags.AXES) && chopper.canWork()) {
+            if (stack.is(ItemTags.AXES) && chopper.canWork()) {
                 if (!level.isClientSide) {
-                    if (chopper.chop(player, held)) {
+                    if (chopper.chop(player, stack)) {
                         // Damage the axe if configured
-                        if (Configs.shouldDamageAxe.get()) {
-                            held.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(hand));
+                        if (HorsePowerConfig.shouldDamageAxe.get()) {
+                            EquipmentSlot slot = hand == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
+                            stack.hurtAndBreak(1, player, slot);
                         }
                     }
-                    player.causeFoodExhaustion(Configs.choppingBlockExhaustion.get().floatValue());
+                    player.causeFoodExhaustion(HorsePowerConfig.choppingBlockExhaustion.get().floatValue());
                 }
-                return InteractionResult.sidedSuccess(level.isClientSide);
+                return ItemInteractionResult.sidedSuccess(level.isClientSide);
             }
         }
 
-        return super.use(state, level, pos, player, hand, hit);
+        return super.useItemOn(stack, state, level, pos, player, hand, hit);
     }
 
     @Override

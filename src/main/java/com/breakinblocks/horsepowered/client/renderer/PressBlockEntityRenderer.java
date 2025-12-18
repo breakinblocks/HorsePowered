@@ -1,7 +1,7 @@
 package com.breakinblocks.horsepowered.client.renderer;
 
-import com.breakinblocks.horsepowered.Configs;
 import com.breakinblocks.horsepowered.blockentity.PressBlockEntity;
+import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
@@ -17,9 +17,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.templates.FluidTank;
+import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 import org.joml.Matrix4f;
 
 public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockEntity> {
@@ -56,7 +56,7 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
             itemRenderer.renderStatic(input, ItemDisplayContext.FIXED, packedLight, packedOverlay,
                     poseStack, bufferSource, blockEntity.getLevel(), 0);
 
-            if (input.getCount() > 1 && Configs.renderItemAmount.get()) {
+            if (input.getCount() > 1 && HorsePowerConfig.renderItemAmount.get()) {
                 poseStack.mulPose(Axis.XP.rotationDegrees(-90));
                 poseStack.translate(0.0D, 0.0D, -0.4D);
                 renderItemCount(poseStack, bufferSource, packedLight, input.getCount());
@@ -75,7 +75,7 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
             itemRenderer.renderStatic(output, ItemDisplayContext.FIXED, packedLight, packedOverlay,
                     poseStack, bufferSource, blockEntity.getLevel(), 0);
 
-            if (output.getCount() > 1 && Configs.renderItemAmount.get()) {
+            if (output.getCount() > 1 && HorsePowerConfig.renderItemAmount.get()) {
                 poseStack.mulPose(Axis.XP.rotationDegrees(-90));
                 poseStack.translate(0.0D, 0.0D, -0.3D);
                 renderItemCount(poseStack, bufferSource, packedLight, output.getCount());
@@ -123,10 +123,10 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
         float v2 = sprite.getV1();
 
         // Top face
-        builder.vertex(matrix, 0, fluidHeight, 0).color(r, g, b, a).uv(u1, v1).uv2(packedLight).normal(0, 1, 0).endVertex();
-        builder.vertex(matrix, 0, fluidHeight, width).color(r, g, b, a).uv(u1, v2).uv2(packedLight).normal(0, 1, 0).endVertex();
-        builder.vertex(matrix, width, fluidHeight, width).color(r, g, b, a).uv(u2, v2).uv2(packedLight).normal(0, 1, 0).endVertex();
-        builder.vertex(matrix, width, fluidHeight, 0).color(r, g, b, a).uv(u2, v1).uv2(packedLight).normal(0, 1, 0).endVertex();
+        builder.addVertex(matrix, 0, fluidHeight, 0).setColor(r, g, b, a).setUv(u1, v1).setLight(packedLight).setNormal(0, 1, 0);
+        builder.addVertex(matrix, 0, fluidHeight, width).setColor(r, g, b, a).setUv(u1, v2).setLight(packedLight).setNormal(0, 1, 0);
+        builder.addVertex(matrix, width, fluidHeight, width).setColor(r, g, b, a).setUv(u2, v2).setLight(packedLight).setNormal(0, 1, 0);
+        builder.addVertex(matrix, width, fluidHeight, 0).setColor(r, g, b, a).setUv(u2, v1).setLight(packedLight).setNormal(0, 1, 0);
 
         poseStack.popPose();
     }

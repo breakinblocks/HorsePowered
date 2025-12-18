@@ -1,26 +1,26 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "SLS",
-    "SGS",
+    "ILI",
+    "ICI",
     "PPP"
   ],
   "key": {
-    "S": {
-      "item": "minecraft:stone"
+    "I": {
+      "item": "minecraft:iron_ingot"
     },
     "L": {
       "item": "minecraft:lead"
     },
-    "G": {
-      "item": "horsepowered:hand_grindstone"
+    "C": {
+      "item": "horsepowered:chopping_block"
     },
     "P": {
       "tag": "minecraft:planks"
     }
   },
   "result": {
-    "item": "horsepowered:grindstone",
+    "id": "horsepowered:chopper",
     "count": 1
   }
 }

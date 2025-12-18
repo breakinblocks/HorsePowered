@@ -2,6 +2,7 @@ package com.breakinblocks.horsepowered.blockentity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
@@ -135,11 +136,11 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
 
     // NBT serialization
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
 
         itemStacks = NonNullList.withSize(getContainerSize(), ItemStack.EMPTY);
-        ContainerHelper.loadAllItems(tag, itemStacks);
+        ContainerHelper.loadAllItems(tag, itemStacks, registries);
 
         if (canBeRotated() && tag.contains("forward")) {
             forward = Direction.byName(tag.getString("forward"));
@@ -148,9 +149,9 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag) {
-        super.saveAdditional(tag);
-        ContainerHelper.saveAllItems(tag, itemStacks);
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        ContainerHelper.saveAllItems(tag, itemStacks, registries);
 
         if (canBeRotated()) {
             tag.putString("forward", forward.getName());
@@ -159,9 +160,9 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
 
     // Sync to client
     @Override
-    public CompoundTag getUpdateTag() {
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag tag = new CompoundTag();
-        saveAdditional(tag);
+        saveAdditional(tag, registries);
         return tag;
     }
 
@@ -247,7 +248,7 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
 
     public static boolean canCombine(ItemStack stack1, ItemStack stack2) {
         if (stack1.isEmpty() || stack2.isEmpty()) return true;
-        return ItemStack.isSameItemSameTags(stack1, stack2) && stack1.getCount() <= stack1.getMaxStackSize();
+        return ItemStack.isSameItemSameComponents(stack1, stack2) && stack1.getCount() <= stack1.getMaxStackSize();
     }
 
     // Rotation support

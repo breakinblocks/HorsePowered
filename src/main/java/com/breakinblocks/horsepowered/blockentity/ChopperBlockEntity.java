@@ -1,14 +1,16 @@
 package com.breakinblocks.horsepowered.blockentity;
 
-import com.breakinblocks.horsepowered.Configs;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
+import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import com.breakinblocks.horsepowered.recipes.ChoppingRecipe;
+import com.breakinblocks.horsepowered.recipes.HPRecipeInput;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
 import com.google.common.collect.Lists;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Optional;
@@ -25,16 +27,16 @@ public class ChopperBlockEntity extends HPBlockEntityHorseBase {
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag) {
-        super.saveAdditional(tag);
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
         tag.putInt("currentWindup", currentWindup);
         tag.putInt("chopTime", currentItemChopTime);
         tag.putInt("totalChopTime", totalItemChopTime);
     }
 
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
         currentWindup = tag.getInt("currentWindup");
 
         if (!getItem(0).isEmpty()) {
@@ -57,9 +59,9 @@ public class ChopperBlockEntity extends HPBlockEntityHorseBase {
         if (!getItem(1).isEmpty() || !getItem(0).isEmpty()) return false;
         if (level == null) return false;
 
-        SimpleContainer container = new SimpleContainer(stack);
+        HPRecipeInput input = new HPRecipeInput(stack);
         return level.getRecipeManager()
-                .getRecipeFor(HPRecipes.CHOPPING_TYPE.get(), container, level)
+                .getRecipeFor(HPRecipes.CHOPPING_TYPE.get(), input, level)
                 .isPresent();
     }
 
@@ -96,7 +98,7 @@ public class ChopperBlockEntity extends HPBlockEntityHorseBase {
         super.tickServer();
 
         // Update visual windup
-        float windup = Configs.pointsForWindup.get() > 0 ? Configs.pointsForWindup.get() : 1;
+        float windup = HorsePowerConfig.pointsForWindup.get() > 0 ? HorsePowerConfig.pointsForWindup.get() : 1;
         visualWindup = -0.74F + (0.74F * (((float) currentWindup) / (windup - 1)));
     }
 
@@ -104,7 +106,7 @@ public class ChopperBlockEntity extends HPBlockEntityHorseBase {
     public boolean targetReached() {
         currentWindup++;
 
-        if (currentWindup >= Configs.pointsForWindup.get()) {
+        if (currentWindup >= HorsePowerConfig.pointsForWindup.get()) {
             currentWindup = 0;
             currentItemChopTime++;
 
@@ -124,7 +126,7 @@ public class ChopperBlockEntity extends HPBlockEntityHorseBase {
         ItemStack oldStack = getItem(slot);
         super.setItem(slot, stack);
 
-        boolean isSameItem = !stack.isEmpty() && ItemStack.isSameItemSameTags(stack, oldStack);
+        boolean isSameItem = !stack.isEmpty() && ItemStack.isSameItemSameComponents(stack, oldStack);
         if (slot == 0 && !isSameItem) {
             totalItemChopTime = getRecipeTime();
             currentItemChopTime = 0;
@@ -140,7 +142,7 @@ public class ChopperBlockEntity extends HPBlockEntityHorseBase {
 
             if (output.isEmpty()) {
                 setItem(1, result.copy());
-            } else if (ItemStack.isSameItemSameTags(output, result)) {
+            } else if (ItemStack.isSameItemSameComponents(output, result)) {
                 output.grow(result.getCount());
             }
 
@@ -151,19 +153,19 @@ public class ChopperBlockEntity extends HPBlockEntityHorseBase {
 
     @Override
     public ItemStack getRecipeOutput() {
-        return getRecipe().map(r -> r.getResult().copy()).orElse(ItemStack.EMPTY);
+        return getRecipe().map(r -> r.value().getResult().copy()).orElse(ItemStack.EMPTY);
     }
 
     @Override
     public int getRecipeTime() {
-        return getRecipe().map(ChoppingRecipe::getTime).orElse(1);
+        return getRecipe().map(r -> r.value().getTime()).orElse(1);
     }
 
-    public Optional<ChoppingRecipe> getRecipe() {
+    public Optional<RecipeHolder<ChoppingRecipe>> getRecipe() {
         if (level == null) return Optional.empty();
-        SimpleContainer container = new SimpleContainer(getItem(0));
+        HPRecipeInput input = new HPRecipeInput(getItem(0));
         return level.getRecipeManager()
-                .getRecipeFor(HPRecipes.CHOPPING_TYPE.get(), container, level);
+                .getRecipeFor(HPRecipes.CHOPPING_TYPE.get(), input, level);
     }
 
     @Override

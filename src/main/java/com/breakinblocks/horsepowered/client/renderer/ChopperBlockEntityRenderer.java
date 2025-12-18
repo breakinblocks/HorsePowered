@@ -1,8 +1,8 @@
 package com.breakinblocks.horsepowered.client.renderer;
 
-import com.breakinblocks.horsepowered.Configs;
-import com.breakinblocks.horsepowered.blocks.BlockChopper;
 import com.breakinblocks.horsepowered.blockentity.ChopperBlockEntity;
+import com.breakinblocks.horsepowered.blocks.BlockChopper;
+import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
@@ -55,7 +55,7 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
             itemRenderer.renderStatic(input, ItemDisplayContext.FIXED, packedLight, packedOverlay,
                     poseStack, bufferSource, blockEntity.getLevel(), 0);
 
-            if (input.getCount() > 1 && Configs.renderItemAmount.get()) {
+            if (input.getCount() > 1 && HorsePowerConfig.renderItemAmount.get()) {
                 poseStack.mulPose(Axis.XP.rotationDegrees(-90));
                 poseStack.translate(0.0D, 0.0D, -0.3D);
                 renderItemCount(poseStack, bufferSource, packedLight, input.getCount());
@@ -75,7 +75,7 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
             itemRenderer.renderStatic(output, ItemDisplayContext.FIXED, packedLight, packedOverlay,
                     poseStack, bufferSource, blockEntity.getLevel(), 0);
 
-            if (output.getCount() > 1 && Configs.renderItemAmount.get()) {
+            if (output.getCount() > 1 && HorsePowerConfig.renderItemAmount.get()) {
                 poseStack.mulPose(Axis.XP.rotationDegrees(-90));
                 poseStack.translate(0.0D, 0.0D, -0.3D);
                 renderItemCount(poseStack, bufferSource, packedLight, output.getCount());

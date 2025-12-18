@@ -1,10 +1,9 @@
 package com.breakinblocks.horsepowered.blocks;
 
-import com.breakinblocks.horsepowered.Configs;
 import com.breakinblocks.horsepowered.blockentity.HandGrindstoneBlockEntity;
+import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -58,31 +57,31 @@ public class BlockHandGrindstone extends BlockHPBase {
     }
 
     @Override
-    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return SHAPE;
     }
 
     @Override
-    public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+    protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return COLLISION_SHAPE;
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         BlockEntity be = level.getBlockEntity(pos);
         if (be instanceof HandGrindstoneBlockEntity grindstone) {
-            // If player is sneaking or holding an empty hand and grindstone can work, turn it
+            // If grindstone can work and player isn't sneaking, turn it
             if (grindstone.canWork() && !player.isShiftKeyDown()) {
                 if (!level.isClientSide) {
                     if (grindstone.turn()) {
-                        player.causeFoodExhaustion(Configs.grindstoneExhaustion.get().floatValue());
+                        player.causeFoodExhaustion(HorsePowerConfig.grindstoneExhaustion.get().floatValue());
                     }
                 }
                 return InteractionResult.sidedSuccess(level.isClientSide);
             }
         }
 
-        return super.use(state, level, pos, player, hand, hit);
+        return super.useWithoutItem(state, level, pos, player, hit);
     }
 
     @Override

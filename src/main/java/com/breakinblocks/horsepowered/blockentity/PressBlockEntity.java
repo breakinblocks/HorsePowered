@@ -1,18 +1,20 @@
 package com.breakinblocks.horsepowered.blockentity;
 
-import com.breakinblocks.horsepowered.Configs;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
+import com.breakinblocks.horsepowered.config.HorsePowerConfig;
+import com.breakinblocks.horsepowered.recipes.HPRecipeInput;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
 import com.breakinblocks.horsepowered.recipes.PressRecipe;
 import com.google.common.collect.Lists;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.templates.FluidTank;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 
 import java.util.Optional;
 
@@ -23,7 +25,7 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
 
     public PressBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlocks.PRESS_BE.get(), pos, state, 2);
-        this.tank = new FluidTank(Configs.pressFluidTankSize.get()) {
+        this.tank = new FluidTank(HorsePowerConfig.pressFluidTankSize.get()) {
             @Override
             protected void onContentsChanged() {
                 setChanged();
@@ -32,16 +34,16 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag) {
-        super.saveAdditional(tag);
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
         tag.putInt("currentPressStatus", currentPressStatus);
-        tag.put("fluid", tank.writeToNBT(new CompoundTag()));
+        tag.put("fluid", tank.writeToNBT(registries, new CompoundTag()));
     }
 
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
-        tank.readFromNBT(tag.getCompound("fluid"));
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
+        tank.readFromNBT(registries, tag.getCompound("fluid"));
 
         if (!getItem(0).isEmpty()) {
             currentPressStatus = tag.getInt("currentPressStatus");
@@ -90,7 +92,7 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
     public boolean targetReached() {
         currentPressStatus++;
 
-        int totalPress = Configs.pointsForPress.get();
+        int totalPress = HorsePowerConfig.pointsForPress.get();
         if (currentPressStatus >= (totalPress <= 0 ? 1 : totalPress)) {
             currentPressStatus = 0;
             pressItem();
@@ -102,19 +104,19 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
 
     @Override
     public ItemStack getRecipeOutput() {
-        return getRecipe().map(r -> r.getResult().copy()).orElse(ItemStack.EMPTY);
+        return getRecipe().map(r -> r.value().getResult().copy()).orElse(ItemStack.EMPTY);
     }
 
     @Override
     public int getRecipeInputCount() {
-        return getRecipe().map(PressRecipe::getInputCount).orElse(1);
+        return getRecipe().map(r -> r.value().getInputCount()).orElse(1);
     }
 
-    public Optional<PressRecipe> getRecipe() {
+    public Optional<RecipeHolder<PressRecipe>> getRecipe() {
         if (level == null) return Optional.empty();
-        SimpleContainer container = new SimpleContainer(getItem(0));
+        HPRecipeInput input = new HPRecipeInput(getItem(0));
         return level.getRecipeManager()
-                .getRecipeFor(HPRecipes.PRESSING_TYPE.get(), container, level);
+                .getRecipeFor(HPRecipes.PRESSING_TYPE.get(), input, level);
     }
 
     @Override
@@ -124,10 +126,10 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
 
     private void pressItem() {
         if (canWork()) {
-            Optional<PressRecipe> recipeOpt = getRecipe();
+            Optional<RecipeHolder<PressRecipe>> recipeOpt = getRecipe();
             if (recipeOpt.isEmpty()) return;
 
-            PressRecipe recipe = recipeOpt.get();
+            PressRecipe recipe = recipeOpt.get().value();
             ItemStack result = recipe.getResult();
             FluidStack fluidResult = recipe.getFluidResult();
 
@@ -139,7 +141,7 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
             } else {
                 if (output.isEmpty()) {
                     setItem(1, result.copy());
-                } else if (ItemStack.isSameItemSameTags(output, result)) {
+                } else if (ItemStack.isSameItemSameComponents(output, result)) {
                     output.grow(result.getCount());
                 }
             }
@@ -154,7 +156,7 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
         ItemStack oldStack = getItem(slot);
         super.setItem(slot, stack);
 
-        boolean isSameItem = !stack.isEmpty() && ItemStack.isSameItemSameTags(stack, oldStack);
+        boolean isSameItem = !stack.isEmpty() && ItemStack.isSameItemSameComponents(stack, oldStack);
         if (slot == 0 && !isSameItem) {
             currentPressStatus = 0;
         }
@@ -166,10 +168,10 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
             return false;
         }
 
-        Optional<PressRecipe> recipeOpt = getRecipe();
+        Optional<RecipeHolder<PressRecipe>> recipeOpt = getRecipe();
         if (recipeOpt.isEmpty()) return false;
 
-        PressRecipe recipe = recipeOpt.get();
+        PressRecipe recipe = recipeOpt.get().value();
         ItemStack result = recipe.getResult();
         FluidStack fluidOutput = recipe.getFluidResult();
 
@@ -189,7 +191,7 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
         } else {
             // For item output, tank must be empty and output slot must have room
             return tank.getFluidAmount() == 0 &&
-                    (output.isEmpty() || (ItemStack.isSameItemSameTags(output, result) &&
+                    (output.isEmpty() || (ItemStack.isSameItemSameComponents(output, result) &&
                             output.getCount() + result.getCount() <= output.getMaxStackSize()));
         }
     }
@@ -198,11 +200,11 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
     public int getInventoryStackLimit(ItemStack stack) {
         if (level == null) return getInventoryStackLimit();
 
-        SimpleContainer container = new SimpleContainer(stack);
-        Optional<PressRecipe> recipeOpt = level.getRecipeManager()
-                .getRecipeFor(HPRecipes.PRESSING_TYPE.get(), container, level);
+        HPRecipeInput input = new HPRecipeInput(stack);
+        Optional<RecipeHolder<PressRecipe>> recipeOpt = level.getRecipeManager()
+                .getRecipeFor(HPRecipes.PRESSING_TYPE.get(), input, level);
 
-        return recipeOpt.map(PressRecipe::getInputCount).orElse(getInventoryStackLimit());
+        return recipeOpt.map(r -> r.value().getInputCount()).orElse(getInventoryStackLimit());
     }
 
     @Override
@@ -212,7 +214,7 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
 
     @Override
     public int getInventoryStackLimit() {
-        return getRecipe().map(PressRecipe::getInputCount).orElse(64);
+        return getRecipe().map(r -> r.value().getInputCount()).orElse(64);
     }
 
     @Override
@@ -227,7 +229,7 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
         return level.getRecipeManager()
                 .getAllRecipesFor(HPRecipes.PRESSING_TYPE.get())
                 .stream()
-                .anyMatch(recipe -> recipe.getIngredient().test(stack));
+                .anyMatch(recipe -> recipe.value().getIngredient().test(stack));
     }
 
     public FluidTank getTank() {
@@ -236,6 +238,11 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
 
     public int getCurrentPressStatus() {
         return currentPressStatus;
+    }
+
+    public int getTotalPressPoints() {
+        int total = HorsePowerConfig.pointsForPress.get();
+        return total <= 0 ? 1 : total;
     }
 
     @Override

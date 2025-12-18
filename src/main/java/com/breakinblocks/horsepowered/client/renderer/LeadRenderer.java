@@ -77,10 +77,6 @@ public class LeadRenderer {
         float horizontalDist = Mth.sqrt((float)(dx * dx + dz * dz));
         float totalDist = Mth.sqrt((float)(dx * dx + dy * dy + dz * dz));
 
-        // Calculate rotation
-        float yaw = (float)(Mth.atan2(dz, dx));
-        float pitch = (float)(Mth.atan2(dy, horizontalDist));
-
         // Lead color (brownish like vanilla)
         float r1 = 0.553F;
         float g1 = 0.380F;
@@ -91,7 +87,6 @@ public class LeadRenderer {
         float b2 = 0.043F;
 
         int segments = 24;
-        float segmentLength = totalDist / segments;
 
         for (int i = 0; i < segments; i++) {
             float t1 = (float) i / segments;
@@ -121,16 +116,16 @@ public class LeadRenderer {
             float width = 0.025F;
 
             // Top surface
-            vertexConsumer.vertex(matrix, x1 - width, y1, z1).color(r1, g1, b1, 1.0F).uv2(light1).endVertex();
-            vertexConsumer.vertex(matrix, x2 - width, y2, z2).color(r1, g1, b1, 1.0F).uv2(light2).endVertex();
-            vertexConsumer.vertex(matrix, x2 + width, y2, z2).color(r1, g1, b1, 1.0F).uv2(light2).endVertex();
-            vertexConsumer.vertex(matrix, x1 + width, y1, z1).color(r1, g1, b1, 1.0F).uv2(light1).endVertex();
+            vertexConsumer.addVertex(matrix, x1 - width, y1, z1).setColor(r1, g1, b1, 1.0F).setLight(light1);
+            vertexConsumer.addVertex(matrix, x2 - width, y2, z2).setColor(r1, g1, b1, 1.0F).setLight(light2);
+            vertexConsumer.addVertex(matrix, x2 + width, y2, z2).setColor(r1, g1, b1, 1.0F).setLight(light2);
+            vertexConsumer.addVertex(matrix, x1 + width, y1, z1).setColor(r1, g1, b1, 1.0F).setLight(light1);
 
             // Bottom surface (darker)
-            vertexConsumer.vertex(matrix, x1 - width, y1 - width, z1).color(r2, g2, b2, 1.0F).uv2(light1).endVertex();
-            vertexConsumer.vertex(matrix, x2 - width, y2 - width, z2).color(r2, g2, b2, 1.0F).uv2(light2).endVertex();
-            vertexConsumer.vertex(matrix, x2 + width, y2 - width, z2).color(r2, g2, b2, 1.0F).uv2(light2).endVertex();
-            vertexConsumer.vertex(matrix, x1 + width, y1 - width, z1).color(r2, g2, b2, 1.0F).uv2(light1).endVertex();
+            vertexConsumer.addVertex(matrix, x1 - width, y1 - width, z1).setColor(r2, g2, b2, 1.0F).setLight(light1);
+            vertexConsumer.addVertex(matrix, x2 - width, y2 - width, z2).setColor(r2, g2, b2, 1.0F).setLight(light2);
+            vertexConsumer.addVertex(matrix, x2 + width, y2 - width, z2).setColor(r2, g2, b2, 1.0F).setLight(light2);
+            vertexConsumer.addVertex(matrix, x1 + width, y1 - width, z1).setColor(r2, g2, b2, 1.0F).setLight(light1);
         }
     }
 

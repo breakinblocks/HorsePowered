@@ -1,29 +1,29 @@
-package com.breakinblocks.horsepowered;
+package com.breakinblocks.horsepowered.config;
 
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
-public class Configs {
+public class HorsePowerConfig {
 
-    public static final ForgeConfigSpec SPEC;
+    public static final ModConfigSpec SPEC;
 
     // Client settings
-    public static ForgeConfigSpec.BooleanValue renderItemAmount;
-    public static ForgeConfigSpec.BooleanValue mustLookAtBlock;
-    public static ForgeConfigSpec.BooleanValue showObstructedPlace;
+    public static ModConfigSpec.BooleanValue renderItemAmount;
+    public static ModConfigSpec.BooleanValue mustLookAtBlock;
+    public static ModConfigSpec.BooleanValue showObstructedPlace;
 
     // Common settings
-    public static ForgeConfigSpec.BooleanValue shouldDamageAxe;
-    public static ForgeConfigSpec.BooleanValue choppingBlockDrop;
-    public static ForgeConfigSpec.IntValue pointsForWindup;
-    public static ForgeConfigSpec.IntValue pointsPerRotation;
-    public static ForgeConfigSpec.IntValue pointsForPress;
-    public static ForgeConfigSpec.IntValue choppingMultiplier;
-    public static ForgeConfigSpec.IntValue pressFluidTankSize;
-    public static ForgeConfigSpec.DoubleValue grindstoneExhaustion;
-    public static ForgeConfigSpec.DoubleValue choppingBlockExhaustion;
+    public static ModConfigSpec.BooleanValue shouldDamageAxe;
+    public static ModConfigSpec.BooleanValue choppingBlockDrop;
+    public static ModConfigSpec.IntValue pointsForWindup;
+    public static ModConfigSpec.IntValue pointsPerRotation;
+    public static ModConfigSpec.IntValue pointsForPress;
+    public static ModConfigSpec.IntValue choppingMultiplier;
+    public static ModConfigSpec.IntValue pressFluidTankSize;
+    public static ModConfigSpec.DoubleValue grindstoneExhaustion;
+    public static ModConfigSpec.DoubleValue choppingBlockExhaustion;
 
     static {
-        ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
+        ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
 
         builder.comment("Client settings").push("client");
         {

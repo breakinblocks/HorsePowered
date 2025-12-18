@@ -1,10 +1,11 @@
 package com.breakinblocks.horsepowered.compat.jei;
 
+import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
-import com.breakinblocks.horsepowered.lib.Reference;
 import com.breakinblocks.horsepowered.recipes.GrindstoneRecipe;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
+import mezz.jei.api.gui.builder.ITooltipBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
@@ -20,21 +21,21 @@ import net.minecraft.world.item.ItemStack;
 
 public class HorsePowerGrindingCategory implements IRecipeCategory<GrindstoneRecipe> {
 
-    public static final ResourceLocation UID = new ResourceLocation(Reference.MODID, "grinding");
+    public static final ResourceLocation UID = ResourceLocation.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "grinding");
 
-    private final IDrawable background;
+    private static final int WIDTH = 100;
+    private static final int HEIGHT = 36;
+
     private final IDrawable icon;
     private final IDrawable slot;
     private final IDrawable arrow;
     private final Component title;
 
     public HorsePowerGrindingCategory(IGuiHelper guiHelper) {
-        // Use blank background - we'll draw slots and arrow programmatically
-        this.background = guiHelper.createBlankDrawable(100, 36);
         this.icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(ModBlocks.GRINDSTONE.get()));
         this.slot = guiHelper.getSlotDrawable();
-        this.arrow = guiHelper.drawableBuilder(new ResourceLocation("jei", "textures/jei/gui/gui_vanilla.png"), 82, 128, 24, 17).build();
-        this.title = Component.translatable("gui." + Reference.MODID + ".jei.grinding");
+        this.arrow = guiHelper.drawableBuilder(ResourceLocation.fromNamespaceAndPath("jei", "textures/jei/gui/gui_vanilla.png"), 82, 128, 24, 17).build();
+        this.title = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.grinding");
     }
 
     @Override
@@ -48,8 +49,13 @@ public class HorsePowerGrindingCategory implements IRecipeCategory<GrindstoneRec
     }
 
     @Override
-    public IDrawable getBackground() {
-        return background;
+    public int getWidth() {
+        return WIDTH;
+    }
+
+    @Override
+    public int getHeight() {
+        return HEIGHT;
     }
 
     @Override
@@ -74,8 +80,8 @@ public class HorsePowerGrindingCategory implements IRecipeCategory<GrindstoneRec
             builder.addSlot(RecipeIngredientRole.OUTPUT, 81, 1)
                     .addItemStack(recipe.getSecondary())
                     .setBackground(slot, -1, -1)
-                    .addTooltipCallback((slotView, tooltip) -> {
-                        tooltip.add(Component.translatable("gui." + Reference.MODID + ".jei.chance",
+                    .addRichTooltipCallback((slotView, tooltip) -> {
+                        tooltip.add(Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.chance",
                                 recipe.getSecondaryChance()));
                     });
         }
@@ -87,7 +93,7 @@ public class HorsePowerGrindingCategory implements IRecipeCategory<GrindstoneRec
         arrow.draw(guiGraphics, 26, 1);
 
         // Draw time info below
-        Component timeText = Component.translatable("gui." + Reference.MODID + ".jei.time", recipe.getTime());
+        Component timeText = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.time", recipe.getTime());
         guiGraphics.drawString(Minecraft.getInstance().font, timeText, 1, 24, 0x808080, false);
 
         // Draw secondary chance if applicable

@@ -5,7 +5,7 @@
   },
   "inputCount": 3,
   "result": {
-    "item": "minecraft:paper",
+    "id": "minecraft:paper",
     "count": 3
   }
 }

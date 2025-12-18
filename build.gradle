@@ -1,8 +1,9 @@
 plugins {
+    id 'java-library'
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.minecraftforge.gradle' version '6.0.+'
+    id 'net.neoforged.moddev' version '2.0.42-beta'
 }
 
 version = mod_version
@@ -12,39 +13,37 @@ base {
     archivesName = mod_id
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
-minecraft {
-    mappings channel: mapping_channel, version: mapping_version
+neoForge {
+    version = neoforge_version
 
-    copyIdeResources = true
+    parchment {
+        mappingsVersion = "2024.11.17"
+        minecraftVersion = "1.21.1"
+    }
 
     runs {
-        configureEach {
-            workingDirectory project.file('run')
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'debug'
-            mods {
-                "${mod_id}" {
-                    source sourceSets.main
-                }
-            }
-        }
-
         client {
-            property 'forge.enabledGameTestNamespaces', mod_id
-            // Mixin compatibility fix for Jade
-            property 'mixin.env.remapRefMap', 'true'
-            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+            client()
+            systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
         }
 
         server {
-            property 'forge.enabledGameTestNamespaces', mod_id
-            args '--nogui'
+            server()
+            programArgument '--nogui'
+            systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
         }
 
         data {
-            args '--mod', mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+            data()
+            programArguments.addAll '--mod', mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet sourceSets.main
         }
     }
 }
@@ -52,6 +51,10 @@ minecraft {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
+    maven {
+        name = "BlameJared"
+        url = "https://maven.blamejared.com"
+    }
     maven {
         name = "Progwml6 maven"
         url = "https://dvs1.progwml6.com/files/maven/"
@@ -73,27 +76,22 @@ repositories {
 }
 
 dependencies {
-    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    // JEI
+    compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
+    compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
+    runtimeOnly "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
 
-    // JEI (via CurseForge Maven - file ID 4712868 is JEI 15.3.0.4 for Forge 1.20.1)
-    compileOnly fg.deobf("curse.maven:jei-238222:4712868")
-    runtimeOnly fg.deobf("curse.maven:jei-238222:4712868")
-
-    // Jade (via CurseForge Maven - file ID 6855440 is Jade 11.13.2 for Forge 1.20.1)
-    compileOnly fg.deobf("curse.maven:jade-324717:6855440")
-    runtimeOnly fg.deobf("curse.maven:jade-324717:6855440")
-
-    // GuideME (via Modrinth Maven - optional documentation mod)
-    compileOnly fg.deobf("maven.modrinth:guideme:${guideme_version}")
-    runtimeOnly fg.deobf("maven.modrinth:guideme:${guideme_version}")
+    // Jade
+    compileOnly "maven.modrinth:jade:${jade_version}+neoforge"
+    runtimeOnly "maven.modrinth:jade:${jade_version}+neoforge"
 }
 
 tasks.named('processResources', ProcessResources).configure {
     var replaceProperties = [
             minecraft_version: minecraft_version,
             minecraft_version_range: minecraft_version_range,
-            forge_version: forge_version,
-            forge_version_range: forge_version_range,
+            neoforge_version: neoforge_version,
+            neoforge_version_range: neoforge_version_range,
             loader_version_range: loader_version_range,
             mod_id: mod_id,
             mod_name: mod_name,
@@ -105,30 +103,15 @@ tasks.named('processResources', ProcessResources).configure {
 
     inputs.properties replaceProperties
 
-    filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
+    filesMatching(['META-INF/neoforge.mods.toml', 'pack.mcmeta']) {
         expand replaceProperties + [project: project]
     }
-}
-
-tasks.named('jar', Jar).configure {
-    manifest {
-        attributes([
-                'Specification-Title'     : mod_id,
-                'Specification-Vendor'    : mod_authors,
-                'Specification-Version'   : '1',
-                'Implementation-Title'    : project.name,
-                'Implementation-Version'  : project.jar.archiveVersion,
-                'Implementation-Vendor'   : mod_authors,
-                'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
-        ])
-    }
-    finalizedBy 'reobfJar'
 }
 
 publishing {
     publications {
         register('mavenJava', MavenPublication) {
-            artifact jar
+            from components.java
         }
     }
     repositories {
@@ -140,4 +123,5 @@ publishing {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+    options.compilerArgs << '-Xlint:deprecation'
 }

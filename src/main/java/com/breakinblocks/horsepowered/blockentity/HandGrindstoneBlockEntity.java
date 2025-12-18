@@ -1,13 +1,15 @@
 package com.breakinblocks.horsepowered.blockentity;
 
-import com.breakinblocks.horsepowered.Configs;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
+import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import com.breakinblocks.horsepowered.recipes.GrindstoneRecipe;
+import com.breakinblocks.horsepowered.recipes.HPRecipeInput;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -28,16 +30,16 @@ public class HandGrindstoneBlockEntity extends HPBlockEntityBase {
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag) {
-        super.saveAdditional(tag);
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
         tag.putInt("millTime", currentItemMillTime);
         tag.putInt("totalMillTime", totalItemMillTime);
         tag.putInt("currentRotation", rotation);
     }
 
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
 
         if (!getItem(0).isEmpty()) {
             currentItemMillTime = tag.getInt("millTime");
@@ -52,37 +54,37 @@ public class HandGrindstoneBlockEntity extends HPBlockEntityBase {
 
     @Override
     public ItemStack getRecipeOutput() {
-        return getRecipe().map(r -> r.getResult().copy()).orElse(ItemStack.EMPTY);
+        return getRecipe().map(r -> r.value().getResult().copy()).orElse(ItemStack.EMPTY);
     }
 
     @Override
     public ItemStack getRecipeSecondary() {
-        return getRecipe().map(r -> r.getSecondary().copy()).orElse(ItemStack.EMPTY);
+        return getRecipe().map(r -> r.value().getSecondary().copy()).orElse(ItemStack.EMPTY);
     }
 
     @Override
     public int getRecipeSecondaryChance() {
-        return getRecipe().map(GrindstoneRecipe::getSecondaryChance).orElse(0);
+        return getRecipe().map(r -> r.value().getSecondaryChance()).orElse(0);
     }
 
     @Override
     public int getRecipeTime() {
-        return getRecipe().map(GrindstoneRecipe::getTime).orElse(0);
+        return getRecipe().map(r -> r.value().getTime()).orElse(0);
     }
 
-    public Optional<GrindstoneRecipe> getRecipe() {
+    public Optional<RecipeHolder<GrindstoneRecipe>> getRecipe() {
         if (level == null) return Optional.empty();
-        SimpleContainer container = new SimpleContainer(getItem(0));
+        HPRecipeInput input = new HPRecipeInput(getItem(0));
         return level.getRecipeManager()
-                .getRecipeFor(HPRecipes.GRINDING_TYPE.get(), container, level);
+                .getRecipeFor(HPRecipes.GRINDING_TYPE.get(), input, level);
     }
 
     private void millItem() {
         if (level != null && !level.isClientSide && canWork()) {
-            Optional<GrindstoneRecipe> recipeOpt = getRecipe();
+            Optional<RecipeHolder<GrindstoneRecipe>> recipeOpt = getRecipe();
             if (recipeOpt.isEmpty()) return;
 
-            GrindstoneRecipe recipe = recipeOpt.get();
+            GrindstoneRecipe recipe = recipeOpt.get().value();
             ItemStack result = recipe.getResult();
             ItemStack secondary = recipe.getSecondary();
 
@@ -93,7 +95,7 @@ public class HandGrindstoneBlockEntity extends HPBlockEntityBase {
             // Process main output
             if (output.isEmpty()) {
                 setItem(1, result.copy());
-            } else if (ItemStack.isSameItemSameTags(output, result)) {
+            } else if (ItemStack.isSameItemSameComponents(output, result)) {
                 output.grow(result.getCount());
             }
 
@@ -110,7 +112,7 @@ public class HandGrindstoneBlockEntity extends HPBlockEntityBase {
             if (chance >= 100 || world.random.nextInt(100) < chance) {
                 if (secondaryOutput.isEmpty()) {
                     setItem(2, secondary.copy());
-                } else if (ItemStack.isSameItemSameTags(secondaryOutput, secondary)) {
+                } else if (ItemStack.isSameItemSameComponents(secondaryOutput, secondary)) {
                     secondaryOutput.grow(secondary.getCount());
                 }
             }
@@ -130,7 +132,7 @@ public class HandGrindstoneBlockEntity extends HPBlockEntityBase {
         ItemStack oldStack = getItem(slot);
         super.setItem(slot, stack);
 
-        boolean isSameItem = !stack.isEmpty() && ItemStack.isSameItemSameTags(stack, oldStack);
+        boolean isSameItem = !stack.isEmpty() && ItemStack.isSameItemSameComponents(stack, oldStack);
         if (slot == 0 && !isSameItem) {
             totalItemMillTime = getRecipeTime();
             currentItemMillTime = 0;
@@ -147,9 +149,9 @@ public class HandGrindstoneBlockEntity extends HPBlockEntityBase {
         if (index != 0) return false;
         if (level == null) return false;
 
-        SimpleContainer container = new SimpleContainer(stack);
+        HPRecipeInput input = new HPRecipeInput(stack);
         return level.getRecipeManager()
-                .getRecipeFor(HPRecipes.GRINDING_TYPE.get(), container, level)
+                .getRecipeFor(HPRecipes.GRINDING_TYPE.get(), input, level)
                 .isPresent();
     }
 
@@ -195,7 +197,7 @@ public class HandGrindstoneBlockEntity extends HPBlockEntityBase {
             if (currentTicks >= TICKS_PER_ROTATION) {
                 currentTicks -= TICKS_PER_ROTATION;
 
-                currentItemMillTime += Configs.pointsPerRotation.get();
+                currentItemMillTime += HorsePowerConfig.pointsPerRotation.get();
 
                 if (currentItemMillTime >= totalItemMillTime) {
                     currentItemMillTime = 0;

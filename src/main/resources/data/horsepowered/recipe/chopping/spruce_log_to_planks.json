@@ -1,10 +1,10 @@
 {
   "type": "horsepowered:chopping",
   "ingredient": {
-    "tag": "minecraft:oak_logs"
+    "tag": "minecraft:spruce_logs"
   },
   "result": {
-    "item": "minecraft:oak_planks",
+    "id": "minecraft:spruce_planks",
     "count": 4
   },
   "time": 1

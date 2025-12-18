@@ -1,17 +1,17 @@
 package com.breakinblocks.horsepowered.client;
 
+import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.client.renderer.ChopperBlockEntityRenderer;
 import com.breakinblocks.horsepowered.client.renderer.GrindstoneBlockEntityRenderer;
 import com.breakinblocks.horsepowered.client.renderer.PressBlockEntityRenderer;
-import com.breakinblocks.horsepowered.lib.Reference;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 
-@Mod.EventBusSubscriber(modid = Reference.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-public class ClientHandler {
+@EventBusSubscriber(modid = HorsePowerMod.MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+public class HorsePowerClient {
 
     @SubscribeEvent
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {

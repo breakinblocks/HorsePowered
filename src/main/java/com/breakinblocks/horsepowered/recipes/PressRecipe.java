@@ -1,35 +1,29 @@
 package com.breakinblocks.horsepowered.recipes;
 
-import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
-import net.minecraft.world.Container;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.material.Fluids;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.neoforge.fluids.FluidStack;
 
-public class PressRecipe implements Recipe<Container> {
+public class PressRecipe implements Recipe<HPRecipeInput> {
 
-    private final ResourceLocation id;
     private final Ingredient ingredient;
     private final int inputCount;
     private final ItemStack result;
     private final FluidStack fluidResult;
 
-    public PressRecipe(ResourceLocation id, Ingredient ingredient, int inputCount, ItemStack result, FluidStack fluidResult) {
-        this.id = id;
+    public PressRecipe(Ingredient ingredient, int inputCount, ItemStack result, FluidStack fluidResult) {
         this.ingredient = ingredient;
         this.inputCount = inputCount;
         this.result = result;
@@ -37,13 +31,13 @@ public class PressRecipe implements Recipe<Container> {
     }
 
     @Override
-    public boolean matches(Container container, Level level) {
-        ItemStack input = container.getItem(0);
-        return ingredient.test(input) && input.getCount() >= inputCount;
+    public boolean matches(HPRecipeInput input, Level level) {
+        ItemStack inputItem = input.getItem(0);
+        return ingredient.test(inputItem) && inputItem.getCount() >= inputCount;
     }
 
     @Override
-    public ItemStack assemble(Container container, RegistryAccess registryAccess) {
+    public ItemStack assemble(HPRecipeInput input, HolderLookup.Provider registries) {
         return result.copy();
     }
 
@@ -53,7 +47,7 @@ public class PressRecipe implements Recipe<Container> {
     }
 
     @Override
-    public ItemStack getResultItem(RegistryAccess registryAccess) {
+    public ItemStack getResultItem(HolderLookup.Provider registries) {
         return result.copy();
     }
 
@@ -62,11 +56,6 @@ public class PressRecipe implements Recipe<Container> {
         NonNullList<Ingredient> list = NonNullList.create();
         list.add(ingredient);
         return list;
-    }
-
-    @Override
-    public ResourceLocation getId() {
-        return id;
     }
 
     @Override
@@ -102,41 +91,31 @@ public class PressRecipe implements Recipe<Container> {
 
     public static class Serializer implements RecipeSerializer<PressRecipe> {
 
+        public static final MapCodec<PressRecipe> CODEC = RecordCodecBuilder.mapCodec(instance ->
+                instance.group(
+                        Ingredient.CODEC_NONEMPTY.fieldOf("ingredient").forGetter(PressRecipe::getIngredient),
+                        Codec.INT.optionalFieldOf("inputCount", 1).forGetter(PressRecipe::getInputCount),
+                        ItemStack.OPTIONAL_CODEC.optionalFieldOf("result", ItemStack.EMPTY).forGetter(PressRecipe::getResult),
+                        FluidStack.OPTIONAL_CODEC.optionalFieldOf("fluidResult", FluidStack.EMPTY).forGetter(PressRecipe::getFluidResult)
+                ).apply(instance, PressRecipe::new)
+        );
+
+        public static final StreamCodec<RegistryFriendlyByteBuf, PressRecipe> STREAM_CODEC = StreamCodec.composite(
+                Ingredient.CONTENTS_STREAM_CODEC, PressRecipe::getIngredient,
+                ByteBufCodecs.VAR_INT, PressRecipe::getInputCount,
+                ItemStack.OPTIONAL_STREAM_CODEC, PressRecipe::getResult,
+                FluidStack.OPTIONAL_STREAM_CODEC, PressRecipe::getFluidResult,
+                PressRecipe::new
+        );
+
         @Override
-        public PressRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
-            Ingredient ingredient = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "ingredient"));
-            int inputCount = GsonHelper.getAsInt(json, "inputCount", 1);
-            ItemStack result = json.has("result")
-                ? ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "result"))
-                : ItemStack.EMPTY;
-            FluidStack fluidResult = FluidStack.EMPTY;
-            if (json.has("fluidResult")) {
-                JsonObject fluidJson = GsonHelper.getAsJsonObject(json, "fluidResult");
-                String fluidName = GsonHelper.getAsString(fluidJson, "FluidName");
-                int amount = GsonHelper.getAsInt(fluidJson, "Amount");
-                Fluid fluid = ForgeRegistries.FLUIDS.getValue(new ResourceLocation(fluidName));
-                if (fluid != null && fluid != Fluids.EMPTY) {
-                    fluidResult = new FluidStack(fluid, amount);
-                }
-            }
-            return new PressRecipe(recipeId, ingredient, inputCount, result, fluidResult);
+        public MapCodec<PressRecipe> codec() {
+            return CODEC;
         }
 
         @Override
-        public PressRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
-            Ingredient ingredient = Ingredient.fromNetwork(buffer);
-            int inputCount = buffer.readInt();
-            ItemStack result = buffer.readItem();
-            FluidStack fluidResult = buffer.readFluidStack();
-            return new PressRecipe(recipeId, ingredient, inputCount, result, fluidResult);
-        }
-
-        @Override
-        public void toNetwork(FriendlyByteBuf buffer, PressRecipe recipe) {
-            recipe.ingredient.toNetwork(buffer);
-            buffer.writeInt(recipe.inputCount);
-            buffer.writeItem(recipe.result);
-            buffer.writeFluidStack(recipe.fluidResult);
+        public StreamCodec<RegistryFriendlyByteBuf, PressRecipe> streamCodec() {
+            return STREAM_CODEC;
         }
     }
 }

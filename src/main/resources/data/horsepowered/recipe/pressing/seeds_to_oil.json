@@ -5,7 +5,7 @@
   },
   "inputCount": 12,
   "fluidResult": {
-    "FluidName": "minecraft:water",
-    "Amount": 100
+    "id": "minecraft:water",
+    "amount": 100
   }
 }

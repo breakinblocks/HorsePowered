@@ -1,6 +1,5 @@
 package com.breakinblocks.horsepowered.blocks;
 
-import com.breakinblocks.horsepowered.Configs;
 import com.breakinblocks.horsepowered.blockentity.HPBlockEntityBase;
 import com.breakinblocks.horsepowered.blockentity.HPBlockEntityHorseBase;
 import com.breakinblocks.horsepowered.util.Utils;
@@ -8,6 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -23,7 +23,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.items.ItemHandlerHelper;
+import net.neoforged.neoforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -58,7 +58,7 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
     }
 
     @Override
-    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
         if (!state.is(newState.getBlock())) {
             BlockEntity blockEntity = level.getBlockEntity(pos);
             if (blockEntity instanceof HPBlockEntityBase te) {
@@ -75,23 +75,14 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        ItemStack stack = player.getItemInHand(hand);
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         BlockEntity blockEntity = level.getBlockEntity(pos);
 
         if (!(blockEntity instanceof HPBlockEntityBase te)) {
-            return InteractionResult.PASS;
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
 
         HPBlockEntityHorseBase horseTE = te instanceof HPBlockEntityHorseBase ? (HPBlockEntityHorseBase) te : null;
-
-        // Show working area highlight on shift+right-click with empty hand
-        if (horseTE != null && player.isShiftKeyDown() && stack.isEmpty() && hand == InteractionHand.MAIN_HAND) {
-            if (level.isClientSide) {
-                horseTE.showWorkingAreaHighlight();
-            }
-            return InteractionResult.sidedSuccess(level.isClientSide);
-        }
 
         // Check for leashed creatures nearby (for horse-powered blocks)
         PathfinderMob creature = null;
@@ -121,9 +112,9 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
                 }
                 horseTE.setWorker(creature);
                 onWorkerAttached(player, creature);
-                return InteractionResult.sidedSuccess(level.isClientSide);
+                return ItemInteractionResult.sidedSuccess(level.isClientSide);
             }
-            return InteractionResult.FAIL;
+            return ItemInteractionResult.FAIL;
         }
 
         // Handle inserting items
@@ -133,16 +124,37 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
             if (inputSlot.isEmpty()) {
                 te.setItem(0, stack.copy());
                 stack.setCount(stack.getCount() - te.getMaxStackSize(stack));
-                return InteractionResult.sidedSuccess(level.isClientSide);
+                return ItemInteractionResult.sidedSuccess(level.isClientSide);
             } else if (HPBlockEntityBase.canCombine(inputSlot, stack)) {
                 int maxTransfer = Math.min(te.getMaxStackSize(stack), stack.getMaxStackSize()) - inputSlot.getCount();
                 int transferAmount = Math.min(stack.getCount(), maxTransfer);
                 if (transferAmount > 0) {
                     stack.shrink(transferAmount);
                     inputSlot.grow(transferAmount);
-                    return InteractionResult.sidedSuccess(level.isClientSide);
+                    return ItemInteractionResult.sidedSuccess(level.isClientSide);
                 }
             }
+        }
+
+        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+    }
+
+    @Override
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+        BlockEntity blockEntity = level.getBlockEntity(pos);
+
+        if (!(blockEntity instanceof HPBlockEntityBase te)) {
+            return InteractionResult.PASS;
+        }
+
+        HPBlockEntityHorseBase horseTE = te instanceof HPBlockEntityHorseBase ? (HPBlockEntityHorseBase) te : null;
+
+        // Show working area highlight on shift+right-click with empty hand
+        if (horseTE != null && player.isShiftKeyDown()) {
+            if (level.isClientSide) {
+                horseTE.showWorkingAreaHighlight();
+            }
+            return InteractionResult.sidedSuccess(level.isClientSide);
         }
 
         // Handle extracting items
@@ -158,7 +170,7 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
             result = te.removeItem(1, te.getItem(1).getCount());
             if (result.isEmpty()) {
                 result = te.removeItem(2, te.getItem(2).getCount());
-                if (result.isEmpty() && stack.isEmpty() && hand != InteractionHand.OFF_HAND) {
+                if (result.isEmpty()) {
                     result = te.removeItem(0, te.getItem(0).getCount());
                 }
             }
@@ -168,9 +180,6 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
         }
 
         if (result.isEmpty()) {
-            if (!stack.isEmpty()) {
-                return InteractionResult.PASS;
-            }
             // Release worker if no other action
             if (horseTE != null) {
                 horseTE.setWorkerToPlayer(player);

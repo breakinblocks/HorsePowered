@@ -1,7 +1,7 @@
 package com.breakinblocks.horsepowered.compat.jei;
 
+import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
-import com.breakinblocks.horsepowered.lib.Reference;
 import com.breakinblocks.horsepowered.recipes.ChoppingRecipe;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
@@ -20,21 +20,21 @@ import net.minecraft.world.item.ItemStack;
 
 public class HPChoppingCategory implements IRecipeCategory<ChoppingRecipe> {
 
-    public static final ResourceLocation UID = new ResourceLocation(Reference.MODID, "chopping");
+    public static final ResourceLocation UID = ResourceLocation.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "chopping");
 
-    private final IDrawable background;
+    private static final int WIDTH = 82;
+    private static final int HEIGHT = 36;
+
     private final IDrawable icon;
     private final IDrawable slot;
     private final IDrawable arrow;
     private final Component title;
 
     public HPChoppingCategory(IGuiHelper guiHelper) {
-        // Use blank background - we'll draw slots and arrow programmatically
-        this.background = guiHelper.createBlankDrawable(82, 36);
         this.icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(ModBlocks.CHOPPER.get()));
         this.slot = guiHelper.getSlotDrawable();
-        this.arrow = guiHelper.drawableBuilder(new ResourceLocation("jei", "textures/jei/gui/gui_vanilla.png"), 82, 128, 24, 17).build();
-        this.title = Component.translatable("gui." + Reference.MODID + ".jei.chopping");
+        this.arrow = guiHelper.drawableBuilder(ResourceLocation.fromNamespaceAndPath("jei", "textures/jei/gui/gui_vanilla.png"), 82, 128, 24, 17).build();
+        this.title = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.chopping");
     }
 
     @Override
@@ -48,8 +48,13 @@ public class HPChoppingCategory implements IRecipeCategory<ChoppingRecipe> {
     }
 
     @Override
-    public IDrawable getBackground() {
-        return background;
+    public int getWidth() {
+        return WIDTH;
+    }
+
+    @Override
+    public int getHeight() {
+        return HEIGHT;
     }
 
     @Override
@@ -76,7 +81,7 @@ public class HPChoppingCategory implements IRecipeCategory<ChoppingRecipe> {
         arrow.draw(guiGraphics, 26, 1);
 
         // Draw chop count (time = number of chops)
-        Component timeText = Component.translatable("gui." + Reference.MODID + ".jei.chops", recipe.getTime());
+        Component timeText = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.chops", recipe.getTime());
         guiGraphics.drawString(Minecraft.getInstance().font, timeText, 26, 24, 0x808080, false);
     }
 }

@@ -59,3 +59,7 @@ replay_pid*
 local.properties
 
 gradle/wrapper/
+
+*.bat
+
+gradlew

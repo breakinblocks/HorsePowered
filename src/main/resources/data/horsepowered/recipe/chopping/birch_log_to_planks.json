@@ -4,7 +4,7 @@
     "tag": "minecraft:birch_logs"
   },
   "result": {
-    "item": "minecraft:birch_planks",
+    "id": "minecraft:birch_planks",
     "count": 4
   },
   "time": 1

@@ -2,9 +2,13 @@
   <img src="metadata/images/logo.png" alt="Horse Powered Logo" width="400">
 </p>
 
+<p align="center">
+  <a href="https://discord.gg/TRxaXaYy42"><img src="https://img.shields.io/discord/81809085686611968?logo=discord&label=Discord&color=5865F2" alt="Discord"></a>
+</p>
+
 # Horse Powered
 
-A Minecraft Forge mod that adds horse-powered machinery for grinding, chopping, and pressing items. Process materials the old-fashioned way, with animal power!
+A Minecraft NeoForge mod that adds horse-powered machinery for grinding, chopping, and pressing items. Process materials the old-fashioned way, with animal power!
 
 ## Features
 
@@ -109,8 +113,8 @@ The mod includes several configuration options:
 
 ## Requirements
 
-- Minecraft 1.20.1
-- Forge 47.2.0+
+- Minecraft 1.21.1
+- NeoForge 21.1.0+
 
 ## License
 
