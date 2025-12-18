@@ -116,26 +116,9 @@ public class GrindstoneBlockEntity extends HPBlockEntityHorseBase {
 
     public Optional<GrindstoneRecipe> getRecipe() {
         if (level == null) return Optional.empty();
-        ItemStack inputStack = getItem(0);
-        SimpleContainer container = new SimpleContainer(inputStack);
-
-        var recipeManager = level.getRecipeManager();
-        var allGrindingRecipes = recipeManager.getAllRecipesFor(HPRecipes.GRINDING_TYPE.get());
-        var result = recipeManager.getRecipeFor(HPRecipes.GRINDING_TYPE.get(), container, level);
-
-        // Debug logging for recipe lookup
-        if (result.isEmpty() && !inputStack.isEmpty()) {
-            com.breakinblocks.horsepowered.HorsePowerMod.LOGGER.info(
-                "[HP Debug] Recipe lookup failed for input: {}. Total grinding recipes loaded: {}",
-                inputStack, allGrindingRecipes.size());
-            for (var recipe : allGrindingRecipes) {
-                com.breakinblocks.horsepowered.HorsePowerMod.LOGGER.info(
-                    "[HP Debug]   Recipe '{}': ingredient={}, matches={}",
-                    recipe.getId(), recipe.getIngredient(), recipe.matches(container, level));
-            }
-        }
-
-        return result;
+        SimpleContainer container = new SimpleContainer(getItem(0));
+        return level.getRecipeManager()
+                .getRecipeFor(HPRecipes.GRINDING_TYPE.get(), container, level);
     }
 
     @Override

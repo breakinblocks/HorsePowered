@@ -1,6 +1,5 @@
 package com.breakinblocks.horsepowered.blockentity;
 
-import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.util.Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -48,10 +47,6 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
     protected int highlightTimer = 0;
     public static final int HIGHLIGHT_DURATION = 100; // 5 seconds
 
-    // Debug logging
-    protected int debugTimer = 0;
-    private static final int DEBUG_INTERVAL = 100; // Log every 5 seconds
-
     public HPBlockEntityHorseBase(BlockEntityType<?> type, BlockPos pos, BlockState state, int inventorySize) {
         super(type, pos, state, inventorySize);
     }
@@ -85,10 +80,6 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
         // but we can still try to find the worker by UUID
         if (tag.contains("leash")) {
             nbtWorker = tag.getCompound("leash");
-            UUID loadedUUID = nbtWorker.contains("UUID") ? nbtWorker.getUUID("UUID") : null;
-            HorsePowerMod.LOGGER.info("[HP Debug] load: pos={}, hasWorker={}, workerUUID={}", worldPosition, hasWorker, loadedUUID);
-        } else {
-            HorsePowerMod.LOGGER.info("[HP Debug] load: pos={}, hasWorker={}, no leash tag found", worldPosition, hasWorker);
         }
     }
 
@@ -129,29 +120,19 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
 
         AABB searchArea = new AABB(x - 7.0D, y - 7.0D, z - 7.0D, x + 7.0D, y + 7.0D, z + 7.0D);
 
-        // First, search all PathfinderMobs by UUID (ignoring tag for reconnection)
+        // Search all PathfinderMobs by UUID (ignoring tag for reconnection)
         List<PathfinderMob> allCreatures = level.getEntitiesOfClass(PathfinderMob.class, searchArea);
-        HorsePowerMod.LOGGER.info("[HP Debug] findWorker: searching for UUID={}, found {} PathfinderMobs in area", uuid, allCreatures.size());
 
         for (PathfinderMob creature : allCreatures) {
-            boolean isValidTag = Utils.isValidWorker(creature);
-            HorsePowerMod.LOGGER.info("[HP Debug] findWorker: checking {} (type={}, uuid={}, isValidTag={})",
-                    creature.getName().getString(), creature.getType(), creature.getUUID(), isValidTag);
-
             if (creature.getUUID().equals(uuid)) {
                 // Found the worker by UUID - reconnect even if tag check fails
                 // (the tag might not be loaded yet, or modpack removed the entity from tag)
-                if (!isValidTag) {
-                    HorsePowerMod.LOGGER.warn("[HP Debug] findWorker: Found worker by UUID but tag check failed! Reconnecting anyway.");
-                }
                 setWorker(creature);
                 creature.setPersistenceRequired();
-                HorsePowerMod.LOGGER.info("[HP Debug] findWorker: Successfully reconnected to worker!");
                 return true;
             }
         }
 
-        HorsePowerMod.LOGGER.info("[HP Debug] findWorker: Worker with UUID {} not found in search area", uuid);
         return false;
     }
 
@@ -375,36 +356,10 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
             locateHorseTimer--;
         }
         if (!hasWorkerNow && nbtWorker != null && locateHorseTimer <= 0) {
-            HorsePowerMod.LOGGER.info("[HP Debug] tickServer: Attempting to find worker. nbtWorker UUID={}",
-                    nbtWorker.contains("UUID") ? nbtWorker.getUUID("UUID") : "null");
             flag = findWorker();
-            if (!flag) {
-                HorsePowerMod.LOGGER.info("[HP Debug] tickServer: findWorker returned false, will retry in 6 seconds");
-            }
         }
         if (locateHorseTimer <= 0) {
             locateHorseTimer = 120;
-        }
-
-        // Debug logging every 5 seconds (using INFO for visibility)
-        debugTimer--;
-        if (debugTimer <= 0) {
-            debugTimer = DEBUG_INTERVAL;
-            // Check worker status without side effects first
-            boolean workerExists = worker != null && worker.isAlive();
-            boolean canWorkResult = canWork();
-            HorsePowerMod.LOGGER.info("[HP Debug] pos={}, valid={}, workerExists={}, hasWorkerFlag={}, canWork={}, running={}, target={}, origin={}",
-                    worldPosition, valid, workerExists, hasWorker, canWorkResult, running, target, origin);
-            if (worker != null) {
-                HorsePowerMod.LOGGER.info("[HP Debug] worker: name={}, pos={}, isLeashed={}, distSq={}, nav.isDone={}, nav.isInProgress={}",
-                        worker.getName().getString(), worker.position(), worker.isLeashed(),
-                        worker.distanceToSqr(Vec3.atCenterOf(worldPosition)),
-                        worker.getNavigation().isDone(), worker.getNavigation().isInProgress());
-            }
-            if (!canWorkResult) {
-                HorsePowerMod.LOGGER.info("[HP Debug] canWork=false: input={}, output={}, recipeOutput={}",
-                        getItem(0), getItem(1), getRecipeOutput());
-            }
         }
 
         if (valid) {
@@ -442,7 +397,6 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
                         if (origin != target && target != previous) {
                             origin = target;
                             flag = targetReached();
-                            HorsePowerMod.LOGGER.info("[HP Debug] targetReached! origin={}, result={}", origin, flag);
                         }
                         target = next;
                     }
