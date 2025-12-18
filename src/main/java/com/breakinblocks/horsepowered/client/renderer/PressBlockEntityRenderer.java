@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
@@ -23,6 +24,17 @@ import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 import org.joml.Matrix4f;
 
 public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockEntity> {
+
+    private static final ResourceLocation PLANK_TEXTURE = ResourceLocation.withDefaultNamespace("block/oak_planks");
+
+    // Plunger dimensions (in blocks) - wide flat lid that presses down
+    private static final float PLUNGER_WIDTH = 0.75F;    // 12/16 - wide to cover press area
+    private static final float PLUNGER_DEPTH = 0.75F;    // 12/16 - deep to cover press area
+    private static final float PLUNGER_HEIGHT = 0.125F;  // 2/16 - thin like a plank lid
+
+    // Plunger position constants
+    private static final float PLUNGER_MAX_Y = 0.7F;     // Highest position (not pressing)
+    private static final float PLUNGER_MIN_Y = 0.2F;     // Lowest position (fully pressed into basin)
 
     private final ItemRenderer itemRenderer;
     private final Font font;
@@ -42,27 +54,27 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
         // Render lead to attached worker
         LeadRenderer.renderLead(blockEntity, partialTick, poseStack, bufferSource);
 
+        // Render the pressing plunger
+        renderPlunger(blockEntity, poseStack, bufferSource, packedLight, packedOverlay);
+
         ItemStack input = blockEntity.getItem(0);
         ItemStack output = blockEntity.getItem(1);
         FluidTank tank = blockEntity.getTank();
 
-        // Render input items on the press plate
+        // Render input items in the press basin
         if (!input.isEmpty()) {
             poseStack.pushPose();
-            poseStack.translate(0.5D, 1.1D, 0.5D);
+            poseStack.translate(0.5D, 0.35D, 0.5D);
             poseStack.scale(0.5F, 0.5F, 0.5F);
             poseStack.mulPose(Axis.XP.rotationDegrees(90));
 
             itemRenderer.renderStatic(input, ItemDisplayContext.FIXED, packedLight, packedOverlay,
                     poseStack, bufferSource, blockEntity.getLevel(), 0);
+            poseStack.popPose();
 
             if (input.getCount() > 1 && HorsePowerConfig.renderItemAmount.get()) {
-                poseStack.mulPose(Axis.XP.rotationDegrees(-90));
-                poseStack.translate(0.0D, 0.0D, -0.4D);
-                renderItemCount(poseStack, bufferSource, packedLight, input.getCount());
+                RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, input.getCount(), 0.5D, 0.65D, 0.5D);
             }
-
-            poseStack.popPose();
         }
 
         // Render output item
@@ -74,14 +86,11 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
 
             itemRenderer.renderStatic(output, ItemDisplayContext.FIXED, packedLight, packedOverlay,
                     poseStack, bufferSource, blockEntity.getLevel(), 0);
+            poseStack.popPose();
 
             if (output.getCount() > 1 && HorsePowerConfig.renderItemAmount.get()) {
-                poseStack.mulPose(Axis.XP.rotationDegrees(-90));
-                poseStack.translate(0.0D, 0.0D, -0.3D);
-                renderItemCount(poseStack, bufferSource, packedLight, output.getCount());
+                RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, output.getCount(), 0.5D, 0.55D, 0.5D);
             }
-
-            poseStack.popPose();
         }
 
         // Render fluid in tank
@@ -131,16 +140,77 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
         poseStack.popPose();
     }
 
-    private void renderItemCount(PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int count) {
+    @SuppressWarnings("deprecation")
+    private void renderPlunger(PressBlockEntity blockEntity, PoseStack poseStack,
+                               MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
+        // Get the visual progress (0.0 to 1.0, where 1.0 is fully pressed)
+        float progress = blockEntity.getVisualProgress();
+
+        // Plunger moves DOWN as progress increases (opposite of chopper blade)
+        // At progress 0: plunger at MAX_Y (raised)
+        // At progress 1: plunger at MIN_Y (pressed down)
+        float plungerY = PLUNGER_MAX_Y - (PLUNGER_MAX_Y - PLUNGER_MIN_Y) * progress;
+
+        // Get oak planks texture from block atlas
+        TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(PLANK_TEXTURE);
+        VertexConsumer builder = bufferSource.getBuffer(RenderType.solid());
+
         poseStack.pushPose();
-        poseStack.scale(0.025F, -0.025F, 0.025F);
 
-        String text = String.valueOf(count);
-        float x = -font.width(text) / 2.0F;
+        // Center the plunger
+        float halfWidth = PLUNGER_WIDTH / 2;
+        float halfDepth = PLUNGER_DEPTH / 2;
 
-        Matrix4f matrix = poseStack.last().pose();
-        font.drawInBatch(text, x, 0, 0xFFFFFF, false, matrix, bufferSource,
-                Font.DisplayMode.NORMAL, 0, packedLight);
+        float minX = 0.5F - halfWidth;
+        float maxX = 0.5F + halfWidth;
+        float minY = plungerY;
+        float maxY = plungerY + PLUNGER_HEIGHT;
+        float minZ = 0.5F - halfDepth;
+        float maxZ = 0.5F + halfDepth;
+
+        Matrix4f pose = poseStack.last().pose();
+
+        // Get UV coordinates for the full texture
+        float u0 = sprite.getU0();
+        float u1 = sprite.getU1();
+        float v0 = sprite.getV0();
+        float v1 = sprite.getV1();
+
+        // Top face (Y+)
+        RenderUtils.addVertex(builder, pose, maxX, maxY, minZ, u1, v0, 0, 1, 0, packedLight, packedOverlay);
+        RenderUtils.addVertex(builder, pose, minX, maxY, minZ, u0, v0, 0, 1, 0, packedLight, packedOverlay);
+        RenderUtils.addVertex(builder, pose, minX, maxY, maxZ, u0, v1, 0, 1, 0, packedLight, packedOverlay);
+        RenderUtils.addVertex(builder, pose, maxX, maxY, maxZ, u1, v1, 0, 1, 0, packedLight, packedOverlay);
+
+        // Bottom face (Y-)
+        RenderUtils.addVertex(builder, pose, minX, minY, minZ, u0, v0, 0, -1, 0, packedLight, packedOverlay);
+        RenderUtils.addVertex(builder, pose, maxX, minY, minZ, u1, v0, 0, -1, 0, packedLight, packedOverlay);
+        RenderUtils.addVertex(builder, pose, maxX, minY, maxZ, u1, v1, 0, -1, 0, packedLight, packedOverlay);
+        RenderUtils.addVertex(builder, pose, minX, minY, maxZ, u0, v1, 0, -1, 0, packedLight, packedOverlay);
+
+        // North face (Z-)
+        RenderUtils.addVertex(builder, pose, minX, maxY, minZ, u0, v0, 0, 0, -1, packedLight, packedOverlay);
+        RenderUtils.addVertex(builder, pose, maxX, maxY, minZ, u1, v0, 0, 0, -1, packedLight, packedOverlay);
+        RenderUtils.addVertex(builder, pose, maxX, minY, minZ, u1, v1, 0, 0, -1, packedLight, packedOverlay);
+        RenderUtils.addVertex(builder, pose, minX, minY, minZ, u0, v1, 0, 0, -1, packedLight, packedOverlay);
+
+        // South face (Z+)
+        RenderUtils.addVertex(builder, pose, maxX, maxY, maxZ, u1, v0, 0, 0, 1, packedLight, packedOverlay);
+        RenderUtils.addVertex(builder, pose, minX, maxY, maxZ, u0, v0, 0, 0, 1, packedLight, packedOverlay);
+        RenderUtils.addVertex(builder, pose, minX, minY, maxZ, u0, v1, 0, 0, 1, packedLight, packedOverlay);
+        RenderUtils.addVertex(builder, pose, maxX, minY, maxZ, u1, v1, 0, 0, 1, packedLight, packedOverlay);
+
+        // West face (X-)
+        RenderUtils.addVertex(builder, pose, minX, maxY, maxZ, u1, v0, -1, 0, 0, packedLight, packedOverlay);
+        RenderUtils.addVertex(builder, pose, minX, maxY, minZ, u0, v0, -1, 0, 0, packedLight, packedOverlay);
+        RenderUtils.addVertex(builder, pose, minX, minY, minZ, u0, v1, -1, 0, 0, packedLight, packedOverlay);
+        RenderUtils.addVertex(builder, pose, minX, minY, maxZ, u1, v1, -1, 0, 0, packedLight, packedOverlay);
+
+        // East face (X+)
+        RenderUtils.addVertex(builder, pose, maxX, maxY, minZ, u0, v0, 1, 0, 0, packedLight, packedOverlay);
+        RenderUtils.addVertex(builder, pose, maxX, maxY, maxZ, u1, v0, 1, 0, 0, packedLight, packedOverlay);
+        RenderUtils.addVertex(builder, pose, maxX, minY, maxZ, u1, v1, 1, 0, 0, packedLight, packedOverlay);
+        RenderUtils.addVertex(builder, pose, maxX, minY, minZ, u0, v1, 1, 0, 0, packedLight, packedOverlay);
 
         poseStack.popPose();
     }

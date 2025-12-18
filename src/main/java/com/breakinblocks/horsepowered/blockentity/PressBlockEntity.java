@@ -245,6 +245,16 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
         return total <= 0 ? 1 : total;
     }
 
+    /**
+     * Gets the visual press progress as a value from 0.0 (not pressed) to 1.0 (fully pressed).
+     * Used by the renderer to animate the plunger.
+     */
+    public float getVisualProgress() {
+        int total = getTotalPressPoints();
+        if (total <= 0) return 0;
+        return (float) currentPressStatus / total;
+    }
+
     @Override
     public int getOutputSlot() {
         return 1;

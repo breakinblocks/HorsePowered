@@ -1,7 +1,6 @@
 package com.breakinblocks.horsepowered;
 
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
-import com.breakinblocks.horsepowered.client.HorsePowerClient;
 import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import com.breakinblocks.horsepowered.items.ModItems;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
@@ -16,8 +15,7 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.neoforge.client.gui.ConfigurationScreen;
-import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
+import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -70,10 +68,9 @@ public class HorsePowerMod {
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::buildCreativeContents);
 
-        // Client-only setup
+        // Client-only setup - registration is handled by @EventBusSubscriber in HorsePowerClient
         if (dist.isClient()) {
-            container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
-            // Client renderer registration is handled by @EventBusSubscriber in HorsePowerClient
+            registerClientExtensions(container);
         }
     }
 
@@ -83,5 +80,14 @@ public class HorsePowerMod {
 
     private void buildCreativeContents(final BuildCreativeModeTabContentsEvent event) {
         // Items are added via the creative tab builder
+    }
+
+    /**
+     * Client-only extension registration.
+     * This method is only called on the client side to avoid loading client classes on server.
+     */
+    private static void registerClientExtensions(ModContainer container) {
+        // Delegate to client helper class - this defers class loading of client-only classes
+        com.breakinblocks.horsepowered.client.ClientExtensions.register(container);
     }
 }

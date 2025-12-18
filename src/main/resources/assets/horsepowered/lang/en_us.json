@@ -10,10 +10,11 @@
   "block.horsepowered.chopping_block": "Chopping Block",
   "block.horsepowered.chopper": "Horse Chopper",
   "block.horsepowered.press": "Horse Press",
-  "block.horsepowered.filler": "Filler",
+  "block.horsepowered.filler": "Horse Chopper",
 
   "gui.horsepowered.jei.grinding": "Horse Grinding",
   "gui.horsepowered.jei.chopping": "Horse Chopping",
+  "gui.horsepowered.jei.manual_chopping": "Manual Chopping",
   "gui.horsepowered.jei.pressing": "Horse Pressing",
   "gui.horsepowered.jei.time": "Time: %s",
   "gui.horsepowered.jei.chops": "Chops: %s",
@@ -23,6 +24,7 @@
   "config.jade.plugin_horsepowered.chopper": "Horse Chopper",
   "config.jade.plugin_horsepowered.press": "Horse Press",
   "config.jade.plugin_horsepowered.manual": "Manual Blocks",
+  "config.jade.plugin_horsepowered.filler": "Multi-block Extension",
 
   "jade.horsepowered.input": "Input: %s x%s",
   "jade.horsepowered.output": "Output: %s x%s",

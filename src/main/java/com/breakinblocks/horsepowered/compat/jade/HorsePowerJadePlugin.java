@@ -3,6 +3,7 @@ package com.breakinblocks.horsepowered.compat.jade;
 import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.blocks.*;
 import com.breakinblocks.horsepowered.blockentity.*;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -17,6 +18,133 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
     public static final ResourceLocation CHOPPER = ResourceLocation.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "chopper");
     public static final ResourceLocation PRESS = ResourceLocation.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "press");
     public static final ResourceLocation MANUAL = ResourceLocation.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "manual");
+    public static final ResourceLocation FILLER = ResourceLocation.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "filler");
+
+    // NBT keys for server data
+    private static final String KEY_CURRENT = "hp_current";
+    private static final String KEY_TOTAL = "hp_total";
+    private static final String KEY_HAS_WORKER = "hp_has_worker";
+    private static final String KEY_WORKER_NAME = "hp_worker_name";
+    private static final String KEY_IS_VALID = "hp_is_valid";
+    private static final String KEY_FLUID_NAME = "hp_fluid_name";
+    private static final String KEY_FLUID_AMOUNT = "hp_fluid_amount";
+    private static final String KEY_FLUID_CAPACITY = "hp_fluid_capacity";
+
+    @Override
+    public void register(IWailaCommonRegistration registration) {
+        // Register server data providers to sync progress from server
+        registration.registerBlockDataProvider(new IServerDataProvider<BlockAccessor>() {
+            @Override
+            public void appendServerData(CompoundTag data, BlockAccessor accessor) {
+                if (accessor.getBlockEntity() instanceof GrindstoneBlockEntity te) {
+                    data.putInt(KEY_CURRENT, te.getCurrentMillTime());
+                    data.putInt(KEY_TOTAL, te.getTotalMillTime());
+                    data.putBoolean(KEY_HAS_WORKER, te.hasWorkerForDisplay());
+                    if (te.getWorker() != null) {
+                        data.putString(KEY_WORKER_NAME, te.getWorker().getDisplayName().getString());
+                    }
+                    data.putBoolean(KEY_IS_VALID, te.isValid());
+                }
+            }
+
+            @Override
+            public ResourceLocation getUid() {
+                return GRINDSTONE;
+            }
+        }, GrindstoneBlockEntity.class);
+
+        registration.registerBlockDataProvider(new IServerDataProvider<BlockAccessor>() {
+            @Override
+            public void appendServerData(CompoundTag data, BlockAccessor accessor) {
+                if (accessor.getBlockEntity() instanceof ChopperBlockEntity te) {
+                    data.putInt(KEY_CURRENT, te.getCurrentChopTime());
+                    data.putInt(KEY_TOTAL, te.getTotalChopTime());
+                    data.putBoolean(KEY_HAS_WORKER, te.hasWorkerForDisplay());
+                    if (te.getWorker() != null) {
+                        data.putString(KEY_WORKER_NAME, te.getWorker().getDisplayName().getString());
+                    }
+                    data.putBoolean(KEY_IS_VALID, te.isValid());
+                }
+            }
+
+            @Override
+            public ResourceLocation getUid() {
+                return CHOPPER;
+            }
+        }, ChopperBlockEntity.class);
+
+        registration.registerBlockDataProvider(new IServerDataProvider<BlockAccessor>() {
+            @Override
+            public void appendServerData(CompoundTag data, BlockAccessor accessor) {
+                if (accessor.getBlockEntity() instanceof PressBlockEntity te) {
+                    data.putInt(KEY_CURRENT, te.getCurrentPressStatus());
+                    data.putInt(KEY_TOTAL, te.getTotalPressPoints());
+                    data.putBoolean(KEY_HAS_WORKER, te.hasWorkerForDisplay());
+                    if (te.getWorker() != null) {
+                        data.putString(KEY_WORKER_NAME, te.getWorker().getDisplayName().getString());
+                    }
+                    data.putBoolean(KEY_IS_VALID, te.isValid());
+                    FluidStack fluid = te.getTank().getFluid();
+                    if (!fluid.isEmpty()) {
+                        data.putString(KEY_FLUID_NAME, fluid.getHoverName().getString());
+                        data.putInt(KEY_FLUID_AMOUNT, fluid.getAmount());
+                        data.putInt(KEY_FLUID_CAPACITY, te.getTank().getCapacity());
+                    }
+                }
+            }
+
+            @Override
+            public ResourceLocation getUid() {
+                return PRESS;
+            }
+        }, PressBlockEntity.class);
+
+        // Server data provider for filler blocks - get data from the main block
+        registration.registerBlockDataProvider(new IServerDataProvider<BlockAccessor>() {
+            @Override
+            public void appendServerData(CompoundTag data, BlockAccessor accessor) {
+                if (accessor.getBlockEntity() instanceof FillerBlockEntity filler) {
+                    HPBlockEntityBase mainTe = filler.getFilledTileEntity();
+                    if (mainTe instanceof ChopperBlockEntity te) {
+                        data.putInt(KEY_CURRENT, te.getCurrentChopTime());
+                        data.putInt(KEY_TOTAL, te.getTotalChopTime());
+                        data.putBoolean(KEY_HAS_WORKER, te.hasWorkerForDisplay());
+                        if (te.getWorker() != null) {
+                            data.putString(KEY_WORKER_NAME, te.getWorker().getDisplayName().getString());
+                        }
+                        data.putBoolean(KEY_IS_VALID, te.isValid());
+                    } else if (mainTe instanceof PressBlockEntity te) {
+                        data.putInt(KEY_CURRENT, te.getCurrentPressStatus());
+                        data.putInt(KEY_TOTAL, te.getTotalPressPoints());
+                        data.putBoolean(KEY_HAS_WORKER, te.hasWorkerForDisplay());
+                        if (te.getWorker() != null) {
+                            data.putString(KEY_WORKER_NAME, te.getWorker().getDisplayName().getString());
+                        }
+                        data.putBoolean(KEY_IS_VALID, te.isValid());
+                        FluidStack fluid = te.getTank().getFluid();
+                        if (!fluid.isEmpty()) {
+                            data.putString(KEY_FLUID_NAME, fluid.getHoverName().getString());
+                            data.putInt(KEY_FLUID_AMOUNT, fluid.getAmount());
+                            data.putInt(KEY_FLUID_CAPACITY, te.getTank().getCapacity());
+                        }
+                    } else if (mainTe instanceof GrindstoneBlockEntity te) {
+                        data.putInt(KEY_CURRENT, te.getCurrentMillTime());
+                        data.putInt(KEY_TOTAL, te.getTotalMillTime());
+                        data.putBoolean(KEY_HAS_WORKER, te.hasWorkerForDisplay());
+                        if (te.getWorker() != null) {
+                            data.putString(KEY_WORKER_NAME, te.getWorker().getDisplayName().getString());
+                        }
+                        data.putBoolean(KEY_IS_VALID, te.isValid());
+                    }
+                }
+            }
+
+            @Override
+            public ResourceLocation getUid() {
+                return FILLER;
+            }
+        }, FillerBlockEntity.class);
+    }
 
     @Override
     public void registerClient(IWailaClientRegistration registration) {
@@ -28,8 +156,11 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
                     appendItemInfo(tooltip, te.getItem(0), "input");
                     appendItemInfo(tooltip, te.getItem(1), "output");
                     appendItemInfo(tooltip, te.getItem(2), "secondary");
-                    appendProgress(tooltip, te.getCurrentMillTime(), te.getTotalMillTime());
-                    appendWorkerInfo(tooltip, te);
+
+                    // Use server data for progress
+                    CompoundTag data = accessor.getServerData();
+                    appendProgressFromData(tooltip, data);
+                    appendWorkerInfoFromData(tooltip, data);
                 }
             }
 
@@ -46,8 +177,11 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
                 if (accessor.getBlockEntity() instanceof ChopperBlockEntity te) {
                     appendItemInfo(tooltip, te.getItem(0), "input");
                     appendItemInfo(tooltip, te.getItem(1), "output");
-                    appendProgress(tooltip, te.getCurrentChopTime(), te.getTotalChopTime());
-                    appendWorkerInfo(tooltip, te);
+
+                    // Use server data for progress
+                    CompoundTag data = accessor.getServerData();
+                    appendProgressFromData(tooltip, data);
+                    appendWorkerInfoFromData(tooltip, data);
                 }
             }
 
@@ -64,9 +198,18 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
                 if (accessor.getBlockEntity() instanceof PressBlockEntity te) {
                     appendItemInfo(tooltip, te.getItem(0), "input");
                     appendItemInfo(tooltip, te.getItem(1), "output");
-                    appendFluidInfo(tooltip, te.getTank().getFluid(), te.getTank().getCapacity());
-                    appendProgress(tooltip, te.getCurrentPressStatus(), te.getTotalPressPoints());
-                    appendWorkerInfo(tooltip, te);
+
+                    // Use server data for fluid info
+                    CompoundTag data = accessor.getServerData();
+                    if (data.contains(KEY_FLUID_NAME)) {
+                        tooltip.add(Component.translatable("jade." + HorsePowerMod.MOD_ID + ".fluid",
+                                data.getString(KEY_FLUID_NAME),
+                                data.getInt(KEY_FLUID_AMOUNT),
+                                data.getInt(KEY_FLUID_CAPACITY)));
+                    }
+
+                    appendProgressFromData(tooltip, data);
+                    appendWorkerInfoFromData(tooltip, data);
                 }
             }
 
@@ -75,6 +218,43 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
                 return PRESS;
             }
         }, BlockPress.class);
+
+        // Filler block - show info from the main block
+        registration.registerBlockComponent(new IBlockComponentProvider() {
+            @Override
+            public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
+                if (accessor.getBlockEntity() instanceof FillerBlockEntity filler) {
+                    HPBlockEntityBase mainTe = filler.getFilledTileEntity();
+                    if (mainTe instanceof ChopperBlockEntity te) {
+                        appendItemInfo(tooltip, te.getItem(0), "input");
+                        appendItemInfo(tooltip, te.getItem(1), "output");
+                    } else if (mainTe instanceof PressBlockEntity te) {
+                        appendItemInfo(tooltip, te.getItem(0), "input");
+                        appendItemInfo(tooltip, te.getItem(1), "output");
+                    } else if (mainTe instanceof GrindstoneBlockEntity te) {
+                        appendItemInfo(tooltip, te.getItem(0), "input");
+                        appendItemInfo(tooltip, te.getItem(1), "output");
+                        appendItemInfo(tooltip, te.getItem(2), "secondary");
+                    }
+
+                    // Use server data for progress
+                    CompoundTag data = accessor.getServerData();
+                    if (data.contains(KEY_FLUID_NAME)) {
+                        tooltip.add(Component.translatable("jade." + HorsePowerMod.MOD_ID + ".fluid",
+                                data.getString(KEY_FLUID_NAME),
+                                data.getInt(KEY_FLUID_AMOUNT),
+                                data.getInt(KEY_FLUID_CAPACITY)));
+                    }
+                    appendProgressFromData(tooltip, data);
+                    appendWorkerInfoFromData(tooltip, data);
+                }
+            }
+
+            @Override
+            public ResourceLocation getUid() {
+                return FILLER;
+            }
+        }, BlockFiller.class);
 
         // Manual blocks (hand grindstone and chopping block)
         registration.registerBlockComponent(new IBlockComponentProvider() {
@@ -119,36 +299,32 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
         }
     }
 
-    private static void appendFluidInfo(ITooltip tooltip, FluidStack fluid, int capacity) {
-        if (!fluid.isEmpty()) {
-            tooltip.add(Component.translatable("jade." + HorsePowerMod.MOD_ID + ".fluid",
-                    fluid.getHoverName(), fluid.getAmount(), capacity));
-        }
-    }
-
-    private static void appendProgress(ITooltip tooltip, int current, int total) {
-        if (total > 0) {
-            int percent = (current * 100) / total;
-            tooltip.add(Component.translatable("jade." + HorsePowerMod.MOD_ID + ".progress", percent));
-        }
-    }
-
-    private static void appendWorkerInfo(ITooltip tooltip, HPBlockEntityHorseBase te) {
-        // Use hasWorkerForDisplay() to avoid side effects on client
-        if (te.hasWorkerForDisplay()) {
-            var worker = te.getWorker();
-            if (worker != null) {
-                tooltip.add(Component.translatable("jade." + HorsePowerMod.MOD_ID + ".worker",
-                        worker.getDisplayName()));
-            } else {
-                // Worker is attached but entity not found yet (loading)
-                tooltip.add(Component.translatable("jade." + HorsePowerMod.MOD_ID + ".worker_attached"));
+    private static void appendProgressFromData(ITooltip tooltip, CompoundTag data) {
+        if (data.contains(KEY_TOTAL)) {
+            int total = data.getInt(KEY_TOTAL);
+            if (total > 0) {
+                int current = data.getInt(KEY_CURRENT);
+                int percent = (current * 100) / total;
+                tooltip.add(Component.translatable("jade." + HorsePowerMod.MOD_ID + ".progress", percent));
             }
-        } else {
-            tooltip.add(Component.translatable("jade." + HorsePowerMod.MOD_ID + ".no_worker"));
+        }
+    }
+
+    private static void appendWorkerInfoFromData(ITooltip tooltip, CompoundTag data) {
+        if (data.contains(KEY_HAS_WORKER)) {
+            if (data.getBoolean(KEY_HAS_WORKER)) {
+                if (data.contains(KEY_WORKER_NAME)) {
+                    tooltip.add(Component.translatable("jade." + HorsePowerMod.MOD_ID + ".worker",
+                            data.getString(KEY_WORKER_NAME)));
+                } else {
+                    tooltip.add(Component.translatable("jade." + HorsePowerMod.MOD_ID + ".worker_attached"));
+                }
+            } else {
+                tooltip.add(Component.translatable("jade." + HorsePowerMod.MOD_ID + ".no_worker"));
+            }
         }
 
-        if (!te.isValid()) {
+        if (data.contains(KEY_IS_VALID) && !data.getBoolean(KEY_IS_VALID)) {
             tooltip.add(Component.translatable("jade." + HorsePowerMod.MOD_ID + ".obstructed")
                     .withStyle(style -> style.withColor(0xFF5555)));
         }

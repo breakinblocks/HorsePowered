@@ -32,6 +32,9 @@ public class HorsePowerPlugin implements IModPlugin {
     public static final RecipeType<ChoppingRecipe> CHOPPING_TYPE =
             RecipeType.create(HorsePowerMod.MOD_ID, "chopping", ChoppingRecipe.class);
 
+    public static final RecipeType<ChoppingRecipe> MANUAL_CHOPPING_TYPE =
+            RecipeType.create(HorsePowerMod.MOD_ID, "manual_chopping", ChoppingRecipe.class);
+
     public static final RecipeType<PressRecipe> PRESSING_TYPE =
             RecipeType.create(HorsePowerMod.MOD_ID, "pressing", PressRecipe.class);
 
@@ -47,6 +50,7 @@ public class HorsePowerPlugin implements IModPlugin {
         registration.addRecipeCategories(
                 new HorsePowerGrindingCategory(guiHelper),
                 new HPChoppingCategory(guiHelper),
+                new HPManualChoppingCategory(guiHelper),
                 new HorsePowerPressCategory(guiHelper)
         );
     }
@@ -69,6 +73,9 @@ public class HorsePowerPlugin implements IModPlugin {
                 .toList();
         registration.addRecipes(CHOPPING_TYPE, choppingRecipes);
 
+        // Manual chopping uses the same recipes
+        registration.addRecipes(MANUAL_CHOPPING_TYPE, choppingRecipes);
+
         // Pressing recipes - unwrap from RecipeHolder
         List<PressRecipe> pressingRecipes = recipeManager.getAllRecipesFor(HPRecipes.PRESSING_TYPE.get())
                 .stream()
@@ -83,8 +90,8 @@ public class HorsePowerPlugin implements IModPlugin {
         registration.addRecipeCatalyst(new ItemStack(ModBlocks.HAND_GRINDSTONE.get()), GRINDING_TYPE);
         registration.addRecipeCatalyst(new ItemStack(ModBlocks.GRINDSTONE.get()), GRINDING_TYPE);
 
-        // Chopping catalysts
-        registration.addRecipeCatalyst(new ItemStack(ModBlocks.CHOPPING_BLOCK.get()), CHOPPING_TYPE);
+        // Chopping catalysts - manual chopping block shows axe, horse chopper doesn't
+        registration.addRecipeCatalyst(new ItemStack(ModBlocks.CHOPPING_BLOCK.get()), MANUAL_CHOPPING_TYPE);
         registration.addRecipeCatalyst(new ItemStack(ModBlocks.CHOPPER.get()), CHOPPING_TYPE);
 
         // Pressing catalysts

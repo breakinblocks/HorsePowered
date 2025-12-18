@@ -12,7 +12,6 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import org.joml.Matrix4f;
 
 public class GrindstoneBlockEntityRenderer implements BlockEntityRenderer<GrindstoneBlockEntity> {
 
@@ -47,15 +46,12 @@ public class GrindstoneBlockEntityRenderer implements BlockEntityRenderer<Grinds
 
             itemRenderer.renderStatic(input, ItemDisplayContext.FIXED, packedLight, packedOverlay,
                     poseStack, bufferSource, blockEntity.getLevel(), 0);
-
-            // Render count if more than 1
-            if (input.getCount() > 1 && HorsePowerConfig.renderItemAmount.get()) {
-                poseStack.mulPose(Axis.XP.rotationDegrees(-90));
-                poseStack.translate(0.0D, 0.0D, -0.4D);
-                renderItemCount(poseStack, bufferSource, packedLight, input.getCount());
-            }
-
             poseStack.popPose();
+
+            // Render count billboard-style above the item
+            if (input.getCount() > 1 && HorsePowerConfig.renderItemAmount.get()) {
+                RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, input.getCount(), 0.5D, 1.4D, 0.5D);
+            }
         }
 
         // Render output item
@@ -67,14 +63,11 @@ public class GrindstoneBlockEntityRenderer implements BlockEntityRenderer<Grinds
 
             itemRenderer.renderStatic(output, ItemDisplayContext.FIXED, packedLight, packedOverlay,
                     poseStack, bufferSource, blockEntity.getLevel(), 0);
+            poseStack.popPose();
 
             if (output.getCount() > 1 && HorsePowerConfig.renderItemAmount.get()) {
-                poseStack.mulPose(Axis.XP.rotationDegrees(-90));
-                poseStack.translate(0.0D, 0.0D, -0.3D);
-                renderItemCount(poseStack, bufferSource, packedLight, output.getCount());
+                RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, output.getCount(), 0.5D, 0.55D, 0.25D);
             }
-
-            poseStack.popPose();
         }
 
         // Render secondary output
@@ -86,29 +79,12 @@ public class GrindstoneBlockEntityRenderer implements BlockEntityRenderer<Grinds
 
             itemRenderer.renderStatic(secondary, ItemDisplayContext.FIXED, packedLight, packedOverlay,
                     poseStack, bufferSource, blockEntity.getLevel(), 0);
+            poseStack.popPose();
 
             if (secondary.getCount() > 1 && HorsePowerConfig.renderItemAmount.get()) {
-                poseStack.mulPose(Axis.XP.rotationDegrees(-90));
-                poseStack.translate(0.0D, 0.0D, -0.3D);
-                renderItemCount(poseStack, bufferSource, packedLight, secondary.getCount());
+                RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, secondary.getCount(), 0.5D, 0.55D, 0.75D);
             }
-
-            poseStack.popPose();
         }
-    }
-
-    private void renderItemCount(PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int count) {
-        poseStack.pushPose();
-        poseStack.scale(0.025F, -0.025F, 0.025F);
-
-        String text = String.valueOf(count);
-        float x = -font.width(text) / 2.0F;
-
-        Matrix4f matrix = poseStack.last().pose();
-        font.drawInBatch(text, x, 0, 0xFFFFFF, false, matrix, bufferSource,
-                Font.DisplayMode.NORMAL, 0, packedLight);
-
-        poseStack.popPose();
     }
 
     @Override
