@@ -2,7 +2,7 @@
   <img src="metadata/images/logo.png" alt="Horse Powered Logo" width="400">
 </p>
 
-[![Discord](https://img.shields.io/discord/123194979509207040?logo=discord&label=Discord&color=5865F2)](https://discord.gg/TRxaXaYy42)
+[![Discord](https://img.shields.io/discord/123194979509207040?style=flat&logo=discord&logoColor=white&label=Discord&color=5865F2)](https://discord.gg/TRxaXaYy42)
 
 # Horse Powered
 
