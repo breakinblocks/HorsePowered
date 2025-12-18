@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <a href="https://discord.gg/TRxaXaYy42"><img src="https://img.shields.io/discord/81809085686611968?logo=discord&label=Discord&color=5865F2" alt="Discord"></a>
+  <a href="https://discord.gg/TRxaXaYy42"><img src="https://img.shields.io/discord/123194979509207040?style=flat&logo=discord&logoColor=white&label=Discord&color=5865F2" alt="Discord"></a>
 </p>
 
 # Horse Powered
