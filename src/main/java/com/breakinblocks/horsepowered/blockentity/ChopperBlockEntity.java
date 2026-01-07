@@ -1,16 +1,17 @@
 package com.breakinblocks.horsepowered.blockentity;
 
-import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import com.breakinblocks.horsepowered.recipes.ChoppingRecipe;
 import com.breakinblocks.horsepowered.recipes.HPRecipeInput;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
 import com.google.common.collect.Lists;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Optional;
@@ -23,25 +24,25 @@ public class ChopperBlockEntity extends HPBlockEntityHorseBase {
     private float visualWindup = 0;
 
     public ChopperBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlocks.CHOPPER_BE.get(), pos, state, 2);
+        super(ModBlockEntities.CHOPPER.get(), pos, state, 2);
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.putInt("currentWindup", currentWindup);
-        tag.putInt("chopTime", currentItemChopTime);
-        tag.putInt("totalChopTime", totalItemChopTime);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        output.putInt("currentWindup", currentWindup);
+        output.putInt("chopTime", currentItemChopTime);
+        output.putInt("totalChopTime", totalItemChopTime);
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        currentWindup = tag.getInt("currentWindup");
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        currentWindup = input.getIntOr("currentWindup", 0);
 
         if (!getItem(0).isEmpty()) {
-            currentItemChopTime = tag.getInt("chopTime");
-            totalItemChopTime = tag.getInt("totalChopTime");
+            currentItemChopTime = input.getIntOr("chopTime", 0);
+            totalItemChopTime = input.getIntOr("totalChopTime", 1);
         } else {
             currentItemChopTime = 0;
             totalItemChopTime = 1;
@@ -57,11 +58,11 @@ public class ChopperBlockEntity extends HPBlockEntityHorseBase {
     public boolean isItemValidForSlot(int index, ItemStack stack) {
         if (index != 0) return false;
         if (!getItem(1).isEmpty() || !getItem(0).isEmpty()) return false;
-        if (level == null) return false;
+        if (!(level instanceof ServerLevel serverLevel)) return false;
 
-        HPRecipeInput input = new HPRecipeInput(stack);
-        return level.getRecipeManager()
-                .getRecipeFor(HPRecipes.CHOPPING_TYPE.get(), input, level)
+        HPRecipeInput recipeInput = new HPRecipeInput(stack);
+        return ((RecipeManager) serverLevel.recipeAccess())
+                .getRecipeFor(HPRecipes.CHOPPING_TYPE.get(), recipeInput, serverLevel)
                 .isPresent();
     }
 
@@ -171,10 +172,10 @@ public class ChopperBlockEntity extends HPBlockEntityHorseBase {
     }
 
     public Optional<RecipeHolder<ChoppingRecipe>> getRecipe() {
-        if (level == null) return Optional.empty();
-        HPRecipeInput input = new HPRecipeInput(getItem(0));
-        return level.getRecipeManager()
-                .getRecipeFor(HPRecipes.CHOPPING_TYPE.get(), input, level);
+        if (!(level instanceof ServerLevel serverLevel)) return Optional.empty();
+        HPRecipeInput recipeInput = new HPRecipeInput(getItem(0));
+        return ((RecipeManager) serverLevel.recipeAccess())
+                .getRecipeFor(HPRecipes.CHOPPING_TYPE.get(), recipeInput, serverLevel);
     }
 
     @Override

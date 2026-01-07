@@ -11,8 +11,10 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeBookCategory;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.PlacementInfo;
 import net.minecraft.world.level.Level;
 
 public class GrindstoneRecipe implements Recipe<HPRecipeInput> {
@@ -41,17 +43,17 @@ public class GrindstoneRecipe implements Recipe<HPRecipeInput> {
         return result.copy();
     }
 
-    @Override
+    // No longer part of Recipe interface in 1.21.11
     public boolean canCraftInDimensions(int width, int height) {
         return true;
     }
 
-    @Override
+    // No longer part of Recipe interface in 1.21.11
     public ItemStack getResultItem(HolderLookup.Provider registries) {
         return result.copy();
     }
 
-    @Override
+    // No longer part of Recipe interface in 1.21.11
     public NonNullList<Ingredient> getIngredients() {
         NonNullList<Ingredient> list = NonNullList.create();
         list.add(ingredient);
@@ -59,13 +61,23 @@ public class GrindstoneRecipe implements Recipe<HPRecipeInput> {
     }
 
     @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<GrindstoneRecipe> getSerializer() {
         return HPRecipes.GRINDING_SERIALIZER.get();
     }
 
     @Override
-    public RecipeType<?> getType() {
+    public RecipeType<GrindstoneRecipe> getType() {
         return HPRecipes.GRINDING_TYPE.get();
+    }
+
+    @Override
+    public RecipeBookCategory recipeBookCategory() {
+        return HPRecipes.GRINDING_CATEGORY.get();
+    }
+
+    @Override
+    public PlacementInfo placementInfo() {
+        return PlacementInfo.NOT_PLACEABLE;
     }
 
     // Accessors
@@ -93,7 +105,7 @@ public class GrindstoneRecipe implements Recipe<HPRecipeInput> {
 
         public static final MapCodec<GrindstoneRecipe> CODEC = RecordCodecBuilder.mapCodec(instance ->
                 instance.group(
-                        Ingredient.CODEC_NONEMPTY.fieldOf("ingredient").forGetter(GrindstoneRecipe::getIngredient),
+                        Ingredient.CODEC.fieldOf("ingredient").forGetter(GrindstoneRecipe::getIngredient),
                         ItemStack.STRICT_CODEC.fieldOf("result").forGetter(GrindstoneRecipe::getResult),
                         ItemStack.OPTIONAL_CODEC.optionalFieldOf("secondary", ItemStack.EMPTY).forGetter(GrindstoneRecipe::getSecondary),
                         Codec.INT.optionalFieldOf("secondaryChance", 0).forGetter(GrindstoneRecipe::getSecondaryChance),

@@ -1,12 +1,13 @@
 package com.breakinblocks.horsepowered;
 
+import com.breakinblocks.horsepowered.blockentity.ModBlockEntities;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import com.breakinblocks.horsepowered.items.ModItems;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
 import com.mojang.logging.LogUtils;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
@@ -15,7 +16,7 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -35,6 +36,10 @@ public class HorsePowerMod {
                     .title(Component.translatable("itemGroup." + MOD_ID))
                     .icon(() -> new ItemStack(ModBlocks.HAND_GRINDSTONE.get()))
                     .displayItems((parameters, output) -> {
+                        // Guide book (only if GuideME is loaded)
+                        if (ModList.get().isLoaded("guideme")) {
+                            output.accept(com.breakinblocks.horsepowered.compat.guideme.GuideMECompat.createGuideItem());
+                        }
                         // Items
                         output.accept(ModItems.FLOUR.get());
                         output.accept(ModItems.DOUGH.get());
@@ -48,17 +53,18 @@ public class HorsePowerMod {
                     .build()
     );
 
-    public static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
+    public static Identifier id(String path) {
+        return Identifier.fromNamespaceAndPath(MOD_ID, path);
     }
 
     public HorsePowerMod(IEventBus modEventBus, ModContainer container, Dist dist) {
-        // Register items and blocks
-        ModItems.ITEMS.register(modEventBus);
+        // Register blocks first, then items (block items depend on blocks), then block entities
         ModBlocks.BLOCKS.register(modEventBus);
-        ModBlocks.BLOCK_ENTITIES.register(modEventBus);
+        ModItems.ITEMS.register(modEventBus);
+        ModBlockEntities.BLOCK_ENTITIES.register(modEventBus);
         HPRecipes.RECIPE_TYPES.register(modEventBus);
         HPRecipes.RECIPE_SERIALIZERS.register(modEventBus);
+        HPRecipes.RECIPE_BOOK_CATEGORIES.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);
 
         // Register config

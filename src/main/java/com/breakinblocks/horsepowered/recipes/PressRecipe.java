@@ -11,8 +11,10 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeBookCategory;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.PlacementInfo;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.fluids.FluidStack;
 
@@ -41,17 +43,17 @@ public class PressRecipe implements Recipe<HPRecipeInput> {
         return result.copy();
     }
 
-    @Override
+    // No longer part of Recipe interface in 1.21.11
     public boolean canCraftInDimensions(int width, int height) {
         return true;
     }
 
-    @Override
+    // No longer part of Recipe interface in 1.21.11
     public ItemStack getResultItem(HolderLookup.Provider registries) {
         return result.copy();
     }
 
-    @Override
+    // No longer part of Recipe interface in 1.21.11
     public NonNullList<Ingredient> getIngredients() {
         NonNullList<Ingredient> list = NonNullList.create();
         list.add(ingredient);
@@ -59,13 +61,23 @@ public class PressRecipe implements Recipe<HPRecipeInput> {
     }
 
     @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<PressRecipe> getSerializer() {
         return HPRecipes.PRESSING_SERIALIZER.get();
     }
 
     @Override
-    public RecipeType<?> getType() {
+    public RecipeType<PressRecipe> getType() {
         return HPRecipes.PRESSING_TYPE.get();
+    }
+
+    @Override
+    public RecipeBookCategory recipeBookCategory() {
+        return HPRecipes.PRESSING_CATEGORY.get();
+    }
+
+    @Override
+    public PlacementInfo placementInfo() {
+        return PlacementInfo.NOT_PLACEABLE;
     }
 
     // Accessors
@@ -93,7 +105,7 @@ public class PressRecipe implements Recipe<HPRecipeInput> {
 
         public static final MapCodec<PressRecipe> CODEC = RecordCodecBuilder.mapCodec(instance ->
                 instance.group(
-                        Ingredient.CODEC_NONEMPTY.fieldOf("ingredient").forGetter(PressRecipe::getIngredient),
+                        Ingredient.CODEC.fieldOf("ingredient").forGetter(PressRecipe::getIngredient),
                         Codec.INT.optionalFieldOf("inputCount", 1).forGetter(PressRecipe::getInputCount),
                         ItemStack.OPTIONAL_CODEC.optionalFieldOf("result", ItemStack.EMPTY).forGetter(PressRecipe::getResult),
                         FluidStack.OPTIONAL_CODEC.optionalFieldOf("fluidResult", FluidStack.EMPTY).forGetter(PressRecipe::getFluidResult)

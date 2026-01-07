@@ -2,17 +2,17 @@ package com.breakinblocks.horsepowered.blockentity;
 
 import com.breakinblocks.horsepowered.util.Utils;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.PathfinderMob;
-import net.minecraft.world.entity.animal.horse.AbstractHorse;
+import net.minecraft.world.entity.animal.equine.AbstractHorse;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
@@ -37,7 +37,10 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
 
     protected boolean hasWorker = false;
     protected PathfinderMob worker;
-    protected CompoundTag nbtWorker;
+    // UUID storage (replacing CompoundTag nbtWorker)
+    protected long workerUuidMost = 0L;
+    protected long workerUuidLeast = 0L;
+    protected boolean hasStoredWorkerUuid = false;
 
     protected boolean valid = false;
     protected int validationTimer = 0;
@@ -51,6 +54,16 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
 
     public HPBlockEntityHorseBase(BlockEntityType<?> type, BlockPos pos, BlockState state, int inventorySize) {
         super(type, pos, state, inventorySize);
+    }
+
+    @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+        // Drop lead if horse was attached
+        if (hasWorkerForDisplay() && level != null) {
+            Containers.dropItemStack(level, pos.getX(), pos.getY() + 1, pos.getZ(), new ItemStack(Items.LEAD));
+        }
+        // Parent handles container contents
+        super.preRemoveSideEffects(pos, state);
     }
 
     /**
@@ -70,42 +83,43 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
     public abstract int getPositionOffset();
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
 
-        target = tag.getInt("target");
-        origin = tag.getInt("origin");
-        hasWorker = tag.getBoolean("hasWorker");
-        valid = tag.getBoolean("valid");
+        target = input.getIntOr("target", -1);
+        origin = input.getIntOr("origin", -1);
+        hasWorker = input.getBooleanOr("hasWorker", false);
+        valid = input.getBooleanOr("valid", false);
 
         // Always load the worker UUID if present - hasWorker flag may be stale
         // but we can still try to find the worker by UUID
-        if (tag.contains("leash")) {
-            nbtWorker = tag.getCompound("leash");
+        workerUuidMost = input.getLongOr("workerUuidMost", 0L);
+        workerUuidLeast = input.getLongOr("workerUuidLeast", 0L);
+        if (workerUuidMost != 0L || workerUuidLeast != 0L) {
+            hasStoredWorkerUuid = true;
         }
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
 
-        tag.putInt("target", target);
-        tag.putInt("origin", origin);
-        tag.putBoolean("hasWorker", hasWorker);
-        tag.putBoolean("valid", valid);
+        output.putInt("target", target);
+        output.putInt("origin", origin);
+        output.putBoolean("hasWorker", hasWorker);
+        output.putBoolean("valid", valid);
 
-        // Update nbtWorker from current worker if available
+        // Update stored UUID from current worker if available
         if (worker != null) {
-            if (nbtWorker == null) {
-                CompoundTag workerTag = new CompoundTag();
-                workerTag.putUUID("UUID", worker.getUUID());
-                nbtWorker = workerTag;
-            }
+            workerUuidMost = worker.getUUID().getMostSignificantBits();
+            workerUuidLeast = worker.getUUID().getLeastSignificantBits();
+            hasStoredWorkerUuid = true;
         }
-        // Always save the leash tag if we have worker data (preserves UUID across reloads
+        // Always save the worker UUID if we have one (preserves UUID across reloads
         // even when the worker entity reference hasn't been restored yet)
-        if (nbtWorker != null) {
-            tag.put("leash", nbtWorker);
+        if (hasStoredWorkerUuid) {
+            output.putLong("workerUuidMost", workerUuidMost);
+            output.putLong("workerUuidLeast", workerUuidLeast);
         }
     }
 
@@ -113,9 +127,9 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
      * Attempts to find the worker entity by UUID
      */
     private boolean findWorker() {
-        if (nbtWorker == null || level == null) return false;
+        if (!hasStoredWorkerUuid || level == null) return false;
 
-        UUID uuid = nbtWorker.getUUID("UUID");
+        UUID uuid = new UUID(workerUuidMost, workerUuidLeast);
         int x = worldPosition.getX();
         int y = worldPosition.getY();
         int z = worldPosition.getZ();
@@ -144,18 +158,17 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
     public void setWorker(PathfinderMob newWorker) {
         hasWorker = true;
         worker = newWorker;
-        // Path positions can be up to ~4.24 blocks from center (corners at -3,-3)
-        // Use radius of 5 to allow navigation to all path points
-        worker.restrictTo(worldPosition, 5);
+        // Note: restrictTo was removed in 1.21.11, but we use direct position control
+        // in tickServer() anyway, so restriction is not needed
         // Prevent the worker from despawning naturally while attached
         // Note: PathfinderMob extends Mob, so we can call this directly
         worker.setPersistenceRequired();
         target = getClosestTarget();
 
         if (worker != null) {
-            CompoundTag workerTag = new CompoundTag();
-            workerTag.putUUID("UUID", worker.getUUID());
-            nbtWorker = workerTag;
+            workerUuidMost = worker.getUUID().getMostSignificantBits();
+            workerUuidLeast = worker.getUUID().getLeastSignificantBits();
+            hasStoredWorkerUuid = true;
         }
         setChanged();
     }
@@ -166,10 +179,13 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
     public void setWorkerToPlayer(Player player) {
         if (hasWorker() && worker.canBeLeashed()) {
             hasWorker = false;
-            worker.clearRestriction();
+            // Note: clearRestriction was removed in 1.21.11, but we use direct position control
+            // so the worker will naturally be free once detached
             worker.setLeashedTo(player, true);
             worker = null;
-            nbtWorker = null;
+            workerUuidMost = 0L;
+            workerUuidLeast = 0L;
+            hasStoredWorkerUuid = false;
             setChanged();
         }
     }
@@ -185,11 +201,13 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
         } else {
             if (worker != null) {
                 // Only drop lead on server side
-                if (level != null && !level.isClientSide) {
+                if (level != null && !level.isClientSide()) {
                     Containers.dropItemStack(level, worldPosition.getX(), worldPosition.getY() + 1, worldPosition.getZ(), new ItemStack(Items.LEAD));
                 }
                 worker = null;
-                nbtWorker = null;
+                workerUuidMost = 0L;
+                workerUuidLeast = 0L;
+                hasStoredWorkerUuid = false;
             }
             hasWorker = false;
             return false;
@@ -206,7 +224,7 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
             return true;
         }
         // Otherwise, return the stored flag (may be true if we haven't found the entity yet)
-        return hasWorker || nbtWorker != null;
+        return hasWorker || hasStoredWorkerUuid;
     }
 
     public PathfinderMob getWorker() {
@@ -309,7 +327,7 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
         }
 
         // Try to find worker entity on client for rendering
-        if (worker == null && nbtWorker != null && level != null) {
+        if (worker == null && hasStoredWorkerUuid && level != null) {
             findWorkerClient();
         }
     }
@@ -319,9 +337,9 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
      * This doesn't set up navigation or persistence, just finds the entity reference.
      */
     private void findWorkerClient() {
-        if (nbtWorker == null || level == null || !nbtWorker.contains("UUID")) return;
+        if (!hasStoredWorkerUuid || level == null) return;
 
-        UUID uuid = nbtWorker.getUUID("UUID");
+        UUID uuid = new UUID(workerUuidMost, workerUuidLeast);
         int x = worldPosition.getX();
         int y = worldPosition.getY();
         int z = worldPosition.getZ();
@@ -357,7 +375,7 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
         if (!hasWorkerNow) {
             locateHorseTimer--;
         }
-        if (!hasWorkerNow && nbtWorker != null && locateHorseTimer <= 0) {
+        if (!hasWorkerNow && hasStoredWorkerUuid && locateHorseTimer <= 0) {
             flag = findWorker();
         }
         if (locateHorseTimer <= 0) {

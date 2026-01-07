@@ -1,19 +1,20 @@
 package com.breakinblocks.horsepowered.blockentity;
 
-import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import com.breakinblocks.horsepowered.recipes.ChoppingRecipe;
 import com.breakinblocks.horsepowered.recipes.HPRecipeInput;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Optional;
@@ -24,23 +25,23 @@ public class ManualChopperBlockEntity extends HPBlockEntityBase {
     private int totalItemChopAmount;
 
     public ManualChopperBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlocks.CHOPPING_BLOCK_BE.get(), pos, state, 2);
+        super(ModBlockEntities.CHOPPING_BLOCK.get(), pos, state, 2);
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.putInt("chopTime", currentItemChopAmount);
-        tag.putInt("totalChopTime", totalItemChopAmount);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        output.putInt("chopTime", currentItemChopAmount);
+        output.putInt("totalChopTime", totalItemChopAmount);
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
 
         if (!getItem(0).isEmpty()) {
-            currentItemChopAmount = tag.getInt("chopTime");
-            totalItemChopAmount = tag.getInt("totalChopTime");
+            currentItemChopAmount = input.getIntOr("chopTime", 0);
+            totalItemChopAmount = input.getIntOr("totalChopTime", 1);
         } else {
             currentItemChopAmount = 0;
             totalItemChopAmount = 1;
@@ -51,11 +52,11 @@ public class ManualChopperBlockEntity extends HPBlockEntityBase {
     public boolean isItemValidForSlot(int index, ItemStack stack) {
         if (index != 0) return false;
         if (!getItem(1).isEmpty() || !getItem(0).isEmpty()) return false;
-        if (level == null) return false;
+        if (!(level instanceof ServerLevel serverLevel)) return false;
 
-        HPRecipeInput input = new HPRecipeInput(stack);
-        return level.getRecipeManager()
-                .getRecipeFor(HPRecipes.CHOPPING_TYPE.get(), input, level)
+        HPRecipeInput recipeInput = new HPRecipeInput(stack);
+        return ((RecipeManager) serverLevel.recipeAccess())
+                .getRecipeFor(HPRecipes.CHOPPING_TYPE.get(), recipeInput, serverLevel)
                 .isPresent();
     }
 
@@ -94,7 +95,7 @@ public class ManualChopperBlockEntity extends HPBlockEntityBase {
         if (level == null || !canWork()) return;
 
         ItemStack input = getItem(0);
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             ItemStack result = getRecipeOutput();
             ItemStack output = getItem(1);
 
@@ -125,10 +126,10 @@ public class ManualChopperBlockEntity extends HPBlockEntityBase {
     }
 
     public Optional<RecipeHolder<ChoppingRecipe>> getRecipe() {
-        if (level == null) return Optional.empty();
-        HPRecipeInput input = new HPRecipeInput(getItem(0));
-        return level.getRecipeManager()
-                .getRecipeFor(HPRecipes.CHOPPING_TYPE.get(), input, level);
+        if (!(level instanceof ServerLevel serverLevel)) return Optional.empty();
+        HPRecipeInput recipeInput = new HPRecipeInput(getItem(0));
+        return ((RecipeManager) serverLevel.recipeAccess())
+                .getRecipeFor(HPRecipes.CHOPPING_TYPE.get(), recipeInput, serverLevel);
     }
 
     @Override

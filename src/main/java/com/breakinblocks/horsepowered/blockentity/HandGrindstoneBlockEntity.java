@@ -1,16 +1,17 @@
 package com.breakinblocks.horsepowered.blockentity;
 
-import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import com.breakinblocks.horsepowered.recipes.GrindstoneRecipe;
 import com.breakinblocks.horsepowered.recipes.HPRecipeInput;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Optional;
@@ -26,25 +27,25 @@ public class HandGrindstoneBlockEntity extends HPBlockEntityBase {
     private int rotation = 0;
 
     public HandGrindstoneBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlocks.HAND_GRINDSTONE_BE.get(), pos, state, 3);
+        super(ModBlockEntities.HAND_GRINDSTONE.get(), pos, state, 3);
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.putInt("millTime", currentItemMillTime);
-        tag.putInt("totalMillTime", totalItemMillTime);
-        tag.putInt("currentRotation", rotation);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        output.putInt("millTime", currentItemMillTime);
+        output.putInt("totalMillTime", totalItemMillTime);
+        output.putInt("currentRotation", rotation);
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
 
         if (!getItem(0).isEmpty()) {
-            currentItemMillTime = tag.getInt("millTime");
-            totalItemMillTime = tag.getInt("totalMillTime");
-            rotation = tag.getInt("currentRotation");
+            currentItemMillTime = input.getIntOr("millTime", 0);
+            totalItemMillTime = input.getIntOr("totalMillTime", 1);
+            rotation = input.getIntOr("currentRotation", 0);
         } else {
             currentItemMillTime = 0;
             totalItemMillTime = 1;
@@ -73,14 +74,14 @@ public class HandGrindstoneBlockEntity extends HPBlockEntityBase {
     }
 
     public Optional<RecipeHolder<GrindstoneRecipe>> getRecipe() {
-        if (level == null) return Optional.empty();
-        HPRecipeInput input = new HPRecipeInput(getItem(0));
-        return level.getRecipeManager()
-                .getRecipeFor(HPRecipes.GRINDING_TYPE.get(), input, level);
+        if (!(level instanceof ServerLevel serverLevel)) return Optional.empty();
+        HPRecipeInput recipeInput = new HPRecipeInput(getItem(0));
+        return ((RecipeManager) serverLevel.recipeAccess())
+                .getRecipeFor(HPRecipes.GRINDING_TYPE.get(), recipeInput, serverLevel);
     }
 
     private void millItem() {
-        if (level != null && !level.isClientSide && canWork()) {
+        if (level != null && !level.isClientSide() && canWork()) {
             Optional<RecipeHolder<GrindstoneRecipe>> recipeOpt = getRecipe();
             if (recipeOpt.isEmpty()) return;
 
@@ -147,11 +148,11 @@ public class HandGrindstoneBlockEntity extends HPBlockEntityBase {
     @Override
     public boolean isItemValidForSlot(int index, ItemStack stack) {
         if (index != 0) return false;
-        if (level == null) return false;
+        if (!(level instanceof ServerLevel serverLevel)) return false;
 
-        HPRecipeInput input = new HPRecipeInput(stack);
-        return level.getRecipeManager()
-                .getRecipeFor(HPRecipes.GRINDING_TYPE.get(), input, level)
+        HPRecipeInput recipeInput = new HPRecipeInput(stack);
+        return ((RecipeManager) serverLevel.recipeAccess())
+                .getRecipeFor(HPRecipes.GRINDING_TYPE.get(), recipeInput, serverLevel)
                 .isPresent();
     }
 
@@ -173,7 +174,7 @@ public class HandGrindstoneBlockEntity extends HPBlockEntityBase {
      * @return true if the grindstone was turned
      */
     public boolean turn() {
-        if (level == null || level.isClientSide) return false;
+        if (level == null || level.isClientSide()) return false;
 
         if (rotation < 3 && canWork()) {
             rotation += TICKS_PER_ROTATION;

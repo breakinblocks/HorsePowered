@@ -68,7 +68,7 @@ public class BlockGrindstone extends BlockHPBase {
     @Nullable
     @Override
     protected <T extends BlockEntity> BlockEntityTicker<T> createTicker(Level level, BlockState state) {
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             return (lvl, pos, st, be) -> HPBlockEntityHorseBase.clientTick(lvl, pos, st, (GrindstoneBlockEntity) be);
         } else {
             return (lvl, pos, st, be) -> HPBlockEntityHorseBase.serverTick(lvl, pos, st, (GrindstoneBlockEntity) be);

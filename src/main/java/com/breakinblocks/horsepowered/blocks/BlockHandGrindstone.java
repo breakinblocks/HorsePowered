@@ -17,7 +17,7 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -25,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class BlockHandGrindstone extends BlockHPBase {
 
-    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     private static final VoxelShape SHAPE = Block.box(1, 0, 1, 15, 14, 15);
     private static final VoxelShape COLLISION_SHAPE = Block.box(1, 0, 1, 15, 10, 15);
@@ -72,12 +72,12 @@ public class BlockHandGrindstone extends BlockHPBase {
         if (be instanceof HandGrindstoneBlockEntity grindstone) {
             // If grindstone can work and player isn't sneaking, turn it
             if (grindstone.canWork() && !player.isShiftKeyDown()) {
-                if (!level.isClientSide) {
+                if (!level.isClientSide()) {
                     if (grindstone.turn()) {
                         player.causeFoodExhaustion(HorsePowerConfig.grindstoneExhaustion.get().floatValue());
                     }
                 }
-                return InteractionResult.sidedSuccess(level.isClientSide);
+                return InteractionResult.SUCCESS;
             }
         }
 
@@ -116,7 +116,7 @@ public class BlockHandGrindstone extends BlockHPBase {
     @Nullable
     @Override
     protected <T extends BlockEntity> BlockEntityTicker<T> createTicker(Level level, BlockState state) {
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             return (lvl, pos, st, be) -> HandGrindstoneBlockEntity.clientTick(lvl, pos, st, (HandGrindstoneBlockEntity) be);
         } else {
             return (lvl, pos, st, be) -> HandGrindstoneBlockEntity.serverTick(lvl, pos, st, (HandGrindstoneBlockEntity) be);

@@ -1,9 +1,0 @@
-{
-  "type": "minecraft:smelting",
-  "ingredient": {
-    "item": "horsepowered:dough"
-  },
-  "result": "minecraft:bread",
-  "experience": 0.35,
-  "cookingtime": 200
-}

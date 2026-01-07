@@ -5,7 +5,7 @@ import com.breakinblocks.horsepowered.blocks.*;
 import com.breakinblocks.horsepowered.blockentity.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.FluidStack;
 import snownee.jade.api.*;
@@ -14,11 +14,11 @@ import snownee.jade.api.config.IPluginConfig;
 @WailaPlugin
 public class HorsePowerJadePlugin implements IWailaPlugin {
 
-    public static final ResourceLocation GRINDSTONE = ResourceLocation.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "grindstone");
-    public static final ResourceLocation CHOPPER = ResourceLocation.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "chopper");
-    public static final ResourceLocation PRESS = ResourceLocation.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "press");
-    public static final ResourceLocation MANUAL = ResourceLocation.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "manual");
-    public static final ResourceLocation FILLER = ResourceLocation.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "filler");
+    public static final Identifier GRINDSTONE = Identifier.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "grindstone");
+    public static final Identifier CHOPPER = Identifier.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "chopper");
+    public static final Identifier PRESS = Identifier.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "press");
+    public static final Identifier MANUAL = Identifier.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "manual");
+    public static final Identifier FILLER = Identifier.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "filler");
 
     // NBT keys for server data
     private static final String KEY_CURRENT = "hp_current";
@@ -48,7 +48,7 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
             }
 
             @Override
-            public ResourceLocation getUid() {
+            public Identifier getUid() {
                 return GRINDSTONE;
             }
         }, GrindstoneBlockEntity.class);
@@ -68,7 +68,7 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
             }
 
             @Override
-            public ResourceLocation getUid() {
+            public Identifier getUid() {
                 return CHOPPER;
             }
         }, ChopperBlockEntity.class);
@@ -94,7 +94,7 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
             }
 
             @Override
-            public ResourceLocation getUid() {
+            public Identifier getUid() {
                 return PRESS;
             }
         }, PressBlockEntity.class);
@@ -140,7 +140,7 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
             }
 
             @Override
-            public ResourceLocation getUid() {
+            public Identifier getUid() {
                 return FILLER;
             }
         }, FillerBlockEntity.class);
@@ -165,7 +165,7 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
             }
 
             @Override
-            public ResourceLocation getUid() {
+            public Identifier getUid() {
                 return GRINDSTONE;
             }
         }, BlockGrindstone.class);
@@ -186,7 +186,7 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
             }
 
             @Override
-            public ResourceLocation getUid() {
+            public Identifier getUid() {
                 return CHOPPER;
             }
         }, BlockChopper.class);
@@ -201,12 +201,7 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
 
                     // Use server data for fluid info
                     CompoundTag data = accessor.getServerData();
-                    if (data.contains(KEY_FLUID_NAME)) {
-                        tooltip.add(Component.translatable("jade." + HorsePowerMod.MOD_ID + ".fluid",
-                                data.getString(KEY_FLUID_NAME),
-                                data.getInt(KEY_FLUID_AMOUNT),
-                                data.getInt(KEY_FLUID_CAPACITY)));
-                    }
+                    appendFluidInfoFromData(tooltip, data);
 
                     appendProgressFromData(tooltip, data);
                     appendWorkerInfoFromData(tooltip, data);
@@ -214,7 +209,7 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
             }
 
             @Override
-            public ResourceLocation getUid() {
+            public Identifier getUid() {
                 return PRESS;
             }
         }, BlockPress.class);
@@ -239,19 +234,14 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
 
                     // Use server data for progress
                     CompoundTag data = accessor.getServerData();
-                    if (data.contains(KEY_FLUID_NAME)) {
-                        tooltip.add(Component.translatable("jade." + HorsePowerMod.MOD_ID + ".fluid",
-                                data.getString(KEY_FLUID_NAME),
-                                data.getInt(KEY_FLUID_AMOUNT),
-                                data.getInt(KEY_FLUID_CAPACITY)));
-                    }
+                    appendFluidInfoFromData(tooltip, data);
                     appendProgressFromData(tooltip, data);
                     appendWorkerInfoFromData(tooltip, data);
                 }
             }
 
             @Override
-            public ResourceLocation getUid() {
+            public Identifier getUid() {
                 return FILLER;
             }
         }, BlockFiller.class);
@@ -271,7 +261,7 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
             }
 
             @Override
-            public ResourceLocation getUid() {
+            public Identifier getUid() {
                 return MANUAL;
             }
         }, BlockHandGrindstone.class);
@@ -286,7 +276,7 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
             }
 
             @Override
-            public ResourceLocation getUid() {
+            public Identifier getUid() {
                 return MANUAL;
             }
         }, BlockChoppingBlock.class);
@@ -299,34 +289,42 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
         }
     }
 
+    private static void appendFluidInfoFromData(ITooltip tooltip, CompoundTag data) {
+        data.getString(KEY_FLUID_NAME).ifPresent(fluidName -> {
+            int amount = data.getInt(KEY_FLUID_AMOUNT).orElse(0);
+            int capacity = data.getInt(KEY_FLUID_CAPACITY).orElse(0);
+            tooltip.add(Component.translatable("jade." + HorsePowerMod.MOD_ID + ".fluid",
+                    fluidName, amount, capacity));
+        });
+    }
+
     private static void appendProgressFromData(ITooltip tooltip, CompoundTag data) {
-        if (data.contains(KEY_TOTAL)) {
-            int total = data.getInt(KEY_TOTAL);
+        data.getInt(KEY_TOTAL).ifPresent(total -> {
             if (total > 0) {
-                int current = data.getInt(KEY_CURRENT);
+                int current = data.getInt(KEY_CURRENT).orElse(0);
                 int percent = (current * 100) / total;
                 tooltip.add(Component.translatable("jade." + HorsePowerMod.MOD_ID + ".progress", percent));
             }
-        }
+        });
     }
 
     private static void appendWorkerInfoFromData(ITooltip tooltip, CompoundTag data) {
-        if (data.contains(KEY_HAS_WORKER)) {
-            if (data.getBoolean(KEY_HAS_WORKER)) {
-                if (data.contains(KEY_WORKER_NAME)) {
-                    tooltip.add(Component.translatable("jade." + HorsePowerMod.MOD_ID + ".worker",
-                            data.getString(KEY_WORKER_NAME)));
-                } else {
-                    tooltip.add(Component.translatable("jade." + HorsePowerMod.MOD_ID + ".worker_attached"));
-                }
+        data.getBoolean(KEY_HAS_WORKER).ifPresent(hasWorker -> {
+            if (hasWorker) {
+                data.getString(KEY_WORKER_NAME).ifPresentOrElse(
+                        workerName -> tooltip.add(Component.translatable("jade." + HorsePowerMod.MOD_ID + ".worker", workerName)),
+                        () -> tooltip.add(Component.translatable("jade." + HorsePowerMod.MOD_ID + ".worker_attached"))
+                );
             } else {
                 tooltip.add(Component.translatable("jade." + HorsePowerMod.MOD_ID + ".no_worker"));
             }
-        }
+        });
 
-        if (data.contains(KEY_IS_VALID) && !data.getBoolean(KEY_IS_VALID)) {
-            tooltip.add(Component.translatable("jade." + HorsePowerMod.MOD_ID + ".obstructed")
-                    .withStyle(style -> style.withColor(0xFF5555)));
-        }
+        data.getBoolean(KEY_IS_VALID).ifPresent(isValid -> {
+            if (!isValid) {
+                tooltip.add(Component.translatable("jade." + HorsePowerMod.MOD_ID + ".obstructed")
+                        .withStyle(style -> style.withColor(0xFF5555)));
+            }
+        });
     }
 }

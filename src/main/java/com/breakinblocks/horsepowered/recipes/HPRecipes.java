@@ -2,6 +2,7 @@ package com.breakinblocks.horsepowered.recipes;
 
 import com.breakinblocks.horsepowered.HorsePowerMod;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.world.item.crafting.RecipeBookCategory;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -14,6 +15,9 @@ public class HPRecipes {
 
     public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS =
             DeferredRegister.create(Registries.RECIPE_SERIALIZER, HorsePowerMod.MOD_ID);
+
+    public static final DeferredRegister<RecipeBookCategory> RECIPE_BOOK_CATEGORIES =
+            DeferredRegister.create(Registries.RECIPE_BOOK_CATEGORY, HorsePowerMod.MOD_ID);
 
     // Recipe Types
     public static final DeferredHolder<RecipeType<?>, RecipeType<GrindstoneRecipe>> GRINDING_TYPE =
@@ -49,4 +53,14 @@ public class HPRecipes {
 
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<PressRecipe>> PRESSING_SERIALIZER =
             RECIPE_SERIALIZERS.register("pressing", PressRecipe.Serializer::new);
+
+    // Recipe Book Categories
+    public static final DeferredHolder<RecipeBookCategory, RecipeBookCategory> GRINDING_CATEGORY =
+            RECIPE_BOOK_CATEGORIES.register("grinding", RecipeBookCategory::new);
+
+    public static final DeferredHolder<RecipeBookCategory, RecipeBookCategory> CHOPPING_CATEGORY =
+            RECIPE_BOOK_CATEGORIES.register("chopping", RecipeBookCategory::new);
+
+    public static final DeferredHolder<RecipeBookCategory, RecipeBookCategory> PRESSING_CATEGORY =
+            RECIPE_BOOK_CATEGORIES.register("pressing", RecipeBookCategory::new);
 }

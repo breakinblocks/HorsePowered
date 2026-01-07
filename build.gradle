@@ -3,7 +3,7 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.moddev' version '2.0.42-beta'
+    id 'net.neoforged.moddev' version '2.0.131'
 }
 
 version = mod_version
@@ -19,8 +19,8 @@ neoForge {
     version = neoforge_version
 
     parchment {
-        mappingsVersion = "2024.11.17"
-        minecraftVersion = "1.21.1"
+        mappingsVersion = "2025.07.18"
+        minecraftVersion = "1.21.8"
     }
 
     runs {
@@ -36,7 +36,7 @@ neoForge {
         }
 
         data {
-            data()
+            serverData()
             programArguments.addAll '--mod', mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
         }
     }
@@ -84,6 +84,10 @@ dependencies {
     // Jade
     compileOnly "maven.modrinth:jade:${jade_version}+neoforge"
     runtimeOnly "maven.modrinth:jade:${jade_version}+neoforge"
+
+    // GuideME - guidebook framework
+    compileOnly "org.appliedenergistics:guideme:${guideme_version}:api"
+    runtimeOnly "org.appliedenergistics:guideme:${guideme_version}"
 }
 
 tasks.named('processResources', ProcessResources).configure {

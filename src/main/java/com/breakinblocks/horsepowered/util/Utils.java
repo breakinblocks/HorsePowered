@@ -2,7 +2,7 @@ package com.breakinblocks.horsepowered.util;
 
 import com.breakinblocks.horsepowered.HorsePowerMod;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -21,7 +21,7 @@ public class Utils {
      */
     public static final TagKey<EntityType<?>> VALID_WORKER_TAG = TagKey.create(
             Registries.ENTITY_TYPE,
-            ResourceLocation.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "valid_worker")
+            Identifier.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "valid_worker")
     );
 
     /**

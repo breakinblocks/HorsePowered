@@ -8,6 +8,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.WorldlyContainer;
@@ -136,34 +138,33 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
 
     // NBT serialization
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
 
         itemStacks = NonNullList.withSize(getContainerSize(), ItemStack.EMPTY);
-        ContainerHelper.loadAllItems(tag, itemStacks, registries);
+        ContainerHelper.loadAllItems(input, itemStacks);
 
-        if (canBeRotated() && tag.contains("forward")) {
-            forward = Direction.byName(tag.getString("forward"));
-            if (forward == null) forward = Direction.NORTH;
+        if (canBeRotated()) {
+            String forwardName = input.getStringOr("forward", "north");
+            Direction dir = Direction.byName(forwardName);
+            forward = dir != null ? dir : Direction.NORTH;
         }
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        ContainerHelper.saveAllItems(tag, itemStacks, registries);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        ContainerHelper.saveAllItems(output, itemStacks);
 
         if (canBeRotated()) {
-            tag.putString("forward", forward.getName());
+            output.putString("forward", forward.getName());
         }
     }
 
     // Sync to client
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        CompoundTag tag = new CompoundTag();
-        saveAdditional(tag, registries);
-        return tag;
+        return this.saveWithoutMetadata(registries);
     }
 
     @Nullable
@@ -175,7 +176,7 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
     @Override
     public void setChanged() {
         super.setChanged();
-        if (level != null && !level.isClientSide) {
+        if (level != null && !level.isClientSide()) {
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 2);
         }
     }

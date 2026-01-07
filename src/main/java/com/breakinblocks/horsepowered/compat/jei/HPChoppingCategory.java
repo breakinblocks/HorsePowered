@@ -15,12 +15,14 @@ import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
+// TODO: Update to non-deprecated JEI API when available
+@SuppressWarnings("removal")
 public class HPChoppingCategory implements IRecipeCategory<ChoppingRecipe> {
 
-    public static final ResourceLocation UID = ResourceLocation.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "chopping");
+    public static final Identifier UID = Identifier.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "chopping");
 
     private static final int WIDTH = 82;
     private static final int HEIGHT = 36;

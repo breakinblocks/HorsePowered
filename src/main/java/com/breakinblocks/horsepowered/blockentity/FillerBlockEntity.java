@@ -1,7 +1,6 @@
 package com.breakinblocks.horsepowered.blockentity;
 
 import com.breakinblocks.horsepowered.blocks.BlockFiller;
-import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -14,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 public class FillerBlockEntity extends BlockEntity {
 
     public FillerBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlocks.FILLER_BE.get(), pos, state);
+        super(ModBlockEntities.FILLER.get(), pos, state);
     }
 
     /**

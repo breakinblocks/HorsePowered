@@ -16,14 +16,17 @@ import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
-import java.util.Arrays;
+import net.minecraft.world.item.Item;
+import net.minecraft.core.Holder;
 
+// TODO: Update to non-deprecated JEI API when available
+@SuppressWarnings({"removal", "deprecation"})
 public class HorsePowerPressCategory implements IRecipeCategory<PressRecipe> {
 
-    public static final ResourceLocation UID = ResourceLocation.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "pressing");
+    public static final Identifier UID = Identifier.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "pressing");
 
     private static final int WIDTH = 82;
     private static final int HEIGHT = 50;
@@ -69,11 +72,12 @@ public class HorsePowerPressCategory implements IRecipeCategory<PressRecipe> {
     public void setRecipe(IRecipeLayoutBuilder builder, PressRecipe recipe, IFocusGroup focuses) {
         // Input slot with count - left side
         builder.addSlot(RecipeIngredientRole.INPUT, 1, 1)
-                .addItemStacks(Arrays.stream(recipe.getIngredient().getItems())
-                        .map(stack -> {
-                            ItemStack copy = stack.copy();
-                            copy.setCount(recipe.getInputCount());
-                            return copy;
+                .addItemStacks(recipe.getIngredient().items()
+                        .map(Holder::value)
+                        .map(item -> {
+                            ItemStack stack = new ItemStack(item);
+                            stack.setCount(recipe.getInputCount());
+                            return stack;
                         })
                         .toList())
                 .setBackground(slot, -1, -1);

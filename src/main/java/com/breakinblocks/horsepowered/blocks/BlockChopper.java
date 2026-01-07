@@ -15,14 +15,14 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 public class BlockChopper extends BlockHPBase {
 
-    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     // Bottom block shape only - filler block handles the top
     private static final VoxelShape SHAPE = Block.box(0, 0, 0, 16, 16, 16);
@@ -43,7 +43,7 @@ public class BlockChopper extends BlockHPBase {
         BlockPos pos = context.getClickedPos();
         Level level = context.getLevel();
         // Check if there's room for the filler block above
-        if (pos.getY() < level.getMaxBuildHeight() - 1 && level.getBlockState(pos.above()).canBeReplaced(context)) {
+        if (pos.getY() < level.getMaxY() - 1 && level.getBlockState(pos.above()).canBeReplaced(context)) {
             return defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
         }
         return null; // Can't place - no room for top block
@@ -84,7 +84,7 @@ public class BlockChopper extends BlockHPBase {
     @Nullable
     @Override
     protected <T extends BlockEntity> BlockEntityTicker<T> createTicker(Level level, BlockState state) {
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             return (lvl, pos, st, be) -> HPBlockEntityHorseBase.clientTick(lvl, pos, st, (ChopperBlockEntity) be);
         } else {
             return (lvl, pos, st, be) -> HPBlockEntityHorseBase.serverTick(lvl, pos, st, (ChopperBlockEntity) be);

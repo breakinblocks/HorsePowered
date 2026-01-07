@@ -11,8 +11,10 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeBookCategory;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.PlacementInfo;
 import net.minecraft.world.level.Level;
 
 public class ChoppingRecipe implements Recipe<HPRecipeInput> {
@@ -37,17 +39,17 @@ public class ChoppingRecipe implements Recipe<HPRecipeInput> {
         return result.copy();
     }
 
-    @Override
+    // No longer part of Recipe interface in 1.21.11
     public boolean canCraftInDimensions(int width, int height) {
         return true;
     }
 
-    @Override
+    // No longer part of Recipe interface in 1.21.11
     public ItemStack getResultItem(HolderLookup.Provider registries) {
         return result.copy();
     }
 
-    @Override
+    // No longer part of Recipe interface in 1.21.11
     public NonNullList<Ingredient> getIngredients() {
         NonNullList<Ingredient> list = NonNullList.create();
         list.add(ingredient);
@@ -55,13 +57,23 @@ public class ChoppingRecipe implements Recipe<HPRecipeInput> {
     }
 
     @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<ChoppingRecipe> getSerializer() {
         return HPRecipes.CHOPPING_SERIALIZER.get();
     }
 
     @Override
-    public RecipeType<?> getType() {
+    public RecipeType<ChoppingRecipe> getType() {
         return HPRecipes.CHOPPING_TYPE.get();
+    }
+
+    @Override
+    public RecipeBookCategory recipeBookCategory() {
+        return HPRecipes.CHOPPING_CATEGORY.get();
+    }
+
+    @Override
+    public PlacementInfo placementInfo() {
+        return PlacementInfo.NOT_PLACEABLE;
     }
 
     // Accessors
@@ -81,7 +93,7 @@ public class ChoppingRecipe implements Recipe<HPRecipeInput> {
 
         public static final MapCodec<ChoppingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance ->
                 instance.group(
-                        Ingredient.CODEC_NONEMPTY.fieldOf("ingredient").forGetter(ChoppingRecipe::getIngredient),
+                        Ingredient.CODEC.fieldOf("ingredient").forGetter(ChoppingRecipe::getIngredient),
                         ItemStack.STRICT_CODEC.fieldOf("result").forGetter(ChoppingRecipe::getResult),
                         Codec.INT.fieldOf("time").forGetter(ChoppingRecipe::getTime)
                 ).apply(instance, ChoppingRecipe::new)

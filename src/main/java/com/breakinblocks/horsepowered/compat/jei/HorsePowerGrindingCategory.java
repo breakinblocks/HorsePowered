@@ -16,12 +16,14 @@ import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
+// TODO: Update to non-deprecated JEI API when available
+@SuppressWarnings("removal")
 public class HorsePowerGrindingCategory implements IRecipeCategory<GrindstoneRecipe> {
 
-    public static final ResourceLocation UID = ResourceLocation.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "grinding");
+    public static final Identifier UID = Identifier.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "grinding");
 
     private static final int WIDTH = 100;
     private static final int HEIGHT = 36;

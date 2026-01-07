@@ -1,16 +1,19 @@
 package com.breakinblocks.horsepowered.blockentity;
 
-import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import com.breakinblocks.horsepowered.recipes.HPRecipeInput;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
 import com.breakinblocks.horsepowered.recipes.PressRecipe;
 import com.google.common.collect.Lists;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
@@ -18,13 +21,15 @@ import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 
 import java.util.Optional;
 
+// TODO: Migrate to ResourceHandler<FluidResource> when FluidTank is removed in NeoForge 21.10+
+@SuppressWarnings("removal")
 public class PressBlockEntity extends HPBlockEntityHorseBase {
 
     private final FluidTank tank;
     private int currentPressStatus;
 
     public PressBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlocks.PRESS_BE.get(), pos, state, 2);
+        super(ModBlockEntities.PRESS.get(), pos, state, 2);
         this.tank = new FluidTank(HorsePowerConfig.pressFluidTankSize.get()) {
             @Override
             protected void onContentsChanged() {
@@ -34,19 +39,33 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.putInt("currentPressStatus", currentPressStatus);
-        tag.put("fluid", tank.writeToNBT(registries, new CompoundTag()));
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        output.putInt("currentPressStatus", currentPressStatus);
+        // Save fluid as CompoundTag using codec
+        if (!tank.isEmpty()) {
+            FluidStack.CODEC.encodeStart(NbtOps.INSTANCE, tank.getFluid())
+                    .resultOrPartial(e -> {})
+                    .ifPresent(tag -> {
+                        if (tag instanceof CompoundTag compoundTag) {
+                            output.store("fluid", CompoundTag.CODEC, compoundTag);
+                        }
+                    });
+        }
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        tank.readFromNBT(registries, tag.getCompound("fluid"));
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        // Load fluid from CompoundTag using codec
+        input.read("fluid", CompoundTag.CODEC).ifPresent(tag -> {
+            FluidStack.CODEC.parse(NbtOps.INSTANCE, tag)
+                    .resultOrPartial(e -> {})
+                    .ifPresent(fluidStack -> tank.setFluid(fluidStack));
+        });
 
         if (!getItem(0).isEmpty()) {
-            currentPressStatus = tag.getInt("currentPressStatus");
+            currentPressStatus = input.getIntOr("currentPressStatus", 0);
         } else {
             currentPressStatus = 0;
         }
@@ -113,10 +132,10 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
     }
 
     public Optional<RecipeHolder<PressRecipe>> getRecipe() {
-        if (level == null) return Optional.empty();
-        HPRecipeInput input = new HPRecipeInput(getItem(0));
-        return level.getRecipeManager()
-                .getRecipeFor(HPRecipes.PRESSING_TYPE.get(), input, level);
+        if (!(level instanceof ServerLevel serverLevel)) return Optional.empty();
+        HPRecipeInput recipeInput = new HPRecipeInput(getItem(0));
+        return ((RecipeManager) serverLevel.recipeAccess())
+                .getRecipeFor(HPRecipes.PRESSING_TYPE.get(), recipeInput, serverLevel);
     }
 
     @Override
@@ -198,11 +217,11 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
 
     @Override
     public int getInventoryStackLimit(ItemStack stack) {
-        if (level == null) return getInventoryStackLimit();
+        if (!(level instanceof ServerLevel serverLevel)) return getInventoryStackLimit();
 
-        HPRecipeInput input = new HPRecipeInput(stack);
-        Optional<RecipeHolder<PressRecipe>> recipeOpt = level.getRecipeManager()
-                .getRecipeFor(HPRecipes.PRESSING_TYPE.get(), input, level);
+        HPRecipeInput recipeInput = new HPRecipeInput(stack);
+        Optional<RecipeHolder<PressRecipe>> recipeOpt = ((RecipeManager) serverLevel.recipeAccess())
+                .getRecipeFor(HPRecipes.PRESSING_TYPE.get(), recipeInput, serverLevel);
 
         return recipeOpt.map(r -> r.value().getInputCount()).orElse(getInventoryStackLimit());
     }
@@ -222,12 +241,12 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
         if (index != 0) return false;
         // Only reject if pressing is in progress (don't reject just because output has items)
         if (currentPressStatus != 0) return false;
-        if (level == null) return false;
+        if (!(level instanceof ServerLevel serverLevel)) return false;
 
         // Check if ANY press recipe accepts this item type (ignore count requirement)
         // This allows hoppers to insert items one at a time
-        return level.getRecipeManager()
-                .getAllRecipesFor(HPRecipes.PRESSING_TYPE.get())
+        return ((RecipeManager) serverLevel.recipeAccess())
+                .recipeMap().byType(HPRecipes.PRESSING_TYPE.get())
                 .stream()
                 .anyMatch(recipe -> recipe.value().getIngredient().test(stack));
     }

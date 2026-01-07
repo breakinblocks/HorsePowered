@@ -5,7 +5,7 @@ import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -34,12 +34,12 @@ public class BlockChoppingBlock extends BlockHPBase {
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         BlockEntity be = level.getBlockEntity(pos);
         if (be instanceof ManualChopperBlockEntity chopper) {
             // Check if player is holding an axe
             if (stack.is(ItemTags.AXES) && chopper.canWork()) {
-                if (!level.isClientSide) {
+                if (!level.isClientSide()) {
                     if (chopper.chop(player, stack)) {
                         // Damage the axe if configured
                         if (HorsePowerConfig.shouldDamageAxe.get()) {
@@ -49,7 +49,7 @@ public class BlockChoppingBlock extends BlockHPBase {
                     }
                     player.causeFoodExhaustion(HorsePowerConfig.choppingBlockExhaustion.get().floatValue());
                 }
-                return ItemInteractionResult.sidedSuccess(level.isClientSide);
+                return InteractionResult.SUCCESS;
             }
         }
 

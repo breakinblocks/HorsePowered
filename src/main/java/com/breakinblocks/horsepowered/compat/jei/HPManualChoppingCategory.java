@@ -16,15 +16,17 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 
+// TODO: Update to non-deprecated JEI/Minecraft API when available
+@SuppressWarnings({"removal", "deprecation"})
 public class HPManualChoppingCategory implements IRecipeCategory<ChoppingRecipe> {
 
-    public static final ResourceLocation UID = ResourceLocation.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "manual_chopping");
+    public static final Identifier UID = Identifier.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "manual_chopping");
 
     private static final int WIDTH = 100;
     private static final int HEIGHT = 60;
@@ -42,9 +44,10 @@ public class HPManualChoppingCategory implements IRecipeCategory<ChoppingRecipe>
         this.title = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.manual_chopping");
 
         // Get all axes from the axes tag
-        this.axes = BuiltInRegistries.ITEM.getTag(ItemTags.AXES)
-                .map(tag -> tag.stream().map(holder -> new ItemStack(holder.value())).toList())
-                .orElse(List.of());
+        this.axes = BuiltInRegistries.ITEM.stream()
+                .filter(item -> item.builtInRegistryHolder().is(ItemTags.AXES))
+                .map(ItemStack::new)
+                .toList();
     }
 
     @Override
@@ -74,8 +77,8 @@ public class HPManualChoppingCategory implements IRecipeCategory<ChoppingRecipe>
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, ChoppingRecipe recipe, IFocusGroup focuses) {
-        // Axe slot - top center (catalyst, not consumed)
-        builder.addSlot(RecipeIngredientRole.CATALYST, 42, 1)
+        // Axe slot - top center (crafting station, not consumed)
+        builder.addSlot(RecipeIngredientRole.CRAFTING_STATION, 42, 1)
                 .addItemStacks(axes)
                 .setBackground(slot, -1, -1);
 

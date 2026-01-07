@@ -14,17 +14,19 @@ import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
 
 import java.util.List;
 
+// TODO: Update to non-deprecated JEI API when available
+@SuppressWarnings("removal")
 @JeiPlugin
 public class HorsePowerPlugin implements IModPlugin {
 
-    public static final ResourceLocation UID = ResourceLocation.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "jei_plugin");
+    public static final Identifier UID = Identifier.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "jei_plugin");
 
     public static final RecipeType<GrindstoneRecipe> GRINDING_TYPE =
             RecipeType.create(HorsePowerMod.MOD_ID, "grinding", GrindstoneRecipe.class);
@@ -39,7 +41,7 @@ public class HorsePowerPlugin implements IModPlugin {
             RecipeType.create(HorsePowerMod.MOD_ID, "pressing", PressRecipe.class);
 
     @Override
-    public ResourceLocation getPluginUid() {
+    public Identifier getPluginUid() {
         return UID;
     }
 
@@ -57,17 +59,18 @@ public class HorsePowerPlugin implements IModPlugin {
 
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
-        RecipeManager recipeManager = Minecraft.getInstance().level.getRecipeManager();
+        if (Minecraft.getInstance().level == null) return;
+        RecipeManager recipeManager = (RecipeManager) Minecraft.getInstance().level.recipeAccess();
 
         // Grinding recipes - unwrap from RecipeHolder
-        List<GrindstoneRecipe> grindingRecipes = recipeManager.getAllRecipesFor(HPRecipes.GRINDING_TYPE.get())
+        List<GrindstoneRecipe> grindingRecipes = recipeManager.recipeMap().byType(HPRecipes.GRINDING_TYPE.get())
                 .stream()
                 .map(RecipeHolder::value)
                 .toList();
         registration.addRecipes(GRINDING_TYPE, grindingRecipes);
 
         // Chopping recipes - unwrap from RecipeHolder
-        List<ChoppingRecipe> choppingRecipes = recipeManager.getAllRecipesFor(HPRecipes.CHOPPING_TYPE.get())
+        List<ChoppingRecipe> choppingRecipes = recipeManager.recipeMap().byType(HPRecipes.CHOPPING_TYPE.get())
                 .stream()
                 .map(RecipeHolder::value)
                 .toList();
@@ -77,7 +80,7 @@ public class HorsePowerPlugin implements IModPlugin {
         registration.addRecipes(MANUAL_CHOPPING_TYPE, choppingRecipes);
 
         // Pressing recipes - unwrap from RecipeHolder
-        List<PressRecipe> pressingRecipes = recipeManager.getAllRecipesFor(HPRecipes.PRESSING_TYPE.get())
+        List<PressRecipe> pressingRecipes = recipeManager.recipeMap().byType(HPRecipes.PRESSING_TYPE.get())
                 .stream()
                 .map(RecipeHolder::value)
                 .toList();
