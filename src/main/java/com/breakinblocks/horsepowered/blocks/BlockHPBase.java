@@ -90,19 +90,20 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
             }
         }
 
-        // Handle attaching a leashed creature
-        if (horseTE != null && ((stack.getItem() instanceof LeadItem && creature != null) || creature != null)) {
+        // Handle attaching a leashed creature (server-side only to prevent sync issues)
+        if (horseTE != null && creature != null && !level.isClientSide()) {
             if (!horseTE.hasWorker()) {
-                // Detach leash but don't drop it - give the lead back to the player
+                // Use dropLeash() to properly clear leash data AND broadcast to clients
+                // This also drops the lead as an item entity, so no need to give it back manually
                 creature.dropLeash();
-                if (!level.isClientSide()) {
-                    player.getInventory().placeItemBackInInventory(new ItemStack(Items.LEAD));
-                }
                 horseTE.setWorker(creature);
                 onWorkerAttached(player, creature);
                 return InteractionResult.SUCCESS;
             }
             return InteractionResult.FAIL;
+        } else if (horseTE != null && creature != null && level.isClientSide()) {
+            // Client-side: just return success to show animation, server handles the logic
+            return InteractionResult.SUCCESS;
         }
 
         // Handle inserting items
@@ -124,7 +125,12 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
             }
         }
 
-        return InteractionResult.TRY_WITH_EMPTY_HAND;
+        // Only try empty-hand interaction if the player's hand is actually empty
+        // Otherwise, just consume the interaction to prevent accidental worker release
+        if (stack.isEmpty()) {
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
+        }
+        return InteractionResult.PASS;
     }
 
     @Override

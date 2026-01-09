@@ -6,13 +6,10 @@
     }
   ],
   "type": "minecraft:crafting_shapeless",
+  "category": "misc",
   "ingredients": [
-    {
-      "item": "minecraft:book"
-    },
-    {
-      "item": "minecraft:lead"
-    }
+    "minecraft:book",
+    "minecraft:lead"
   ],
   "result": {
     "id": "guideme:guide",

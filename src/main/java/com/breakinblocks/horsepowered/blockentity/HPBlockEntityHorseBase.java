@@ -1,8 +1,11 @@
 package com.breakinblocks.horsepowered.blockentity;
 
+import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.util.Utils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.Containers;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.animal.equine.AbstractHorse;
 import net.minecraft.world.entity.player.Player;
@@ -15,6 +18,8 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +27,11 @@ import java.util.Map;
 import java.util.UUID;
 
 public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(HPBlockEntityHorseBase.class);
+
+    // NBT tag key used to mark entities as horse-powered workers (persists with entity like a name tag)
+    private static final String WORKER_TAG = HorsePowerMod.MOD_ID + ":worker";
 
     // 8-point square path around the block (symmetric)
     // Values are multiplied by 2 in getPathPosition(), so 1.5 = 3 blocks from center
@@ -47,6 +57,13 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
     protected int locateHorseTimer = 0;
     protected boolean running = true;
     protected boolean wasRunning = false;
+
+    // Grace period after finding worker to prevent false "permanently lost" triggers
+    // during world load when entities might not be fully initialized
+    protected int workerGracePeriod = 0;
+    private static final int WORKER_GRACE_TICKS = 200; // 10 seconds grace period
+    private static final int LOCATE_TIMER_FAST = 20;   // During grace period, search every second
+    private static final int LOCATE_TIMER_SLOW = 120;  // After grace period, search every 6 seconds
 
     // Client-side highlight rendering
     protected int highlightTimer = 0;
@@ -97,6 +114,13 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
         workerUuidLeast = input.getLongOr("workerUuidLeast", 0L);
         if (workerUuidMost != 0L || workerUuidLeast != 0L) {
             hasStoredWorkerUuid = true;
+            // Set grace period on load to prevent false "worker lost" triggers
+            // during world load when entities might not be fully initialized yet
+            workerGracePeriod = WORKER_GRACE_TICKS;
+            UUID uuid = new UUID(workerUuidMost, workerUuidLeast);
+            LOGGER.info("[HorsePowered] loadAdditional at {}: Loaded worker UUID={}, hasWorker={}", worldPosition, uuid, hasWorker);
+        } else {
+            LOGGER.info("[HorsePowered] loadAdditional at {}: No worker UUID found, hasWorker={}", worldPosition, hasWorker);
         }
     }
 
@@ -106,7 +130,6 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
 
         output.putInt("target", target);
         output.putInt("origin", origin);
-        output.putBoolean("hasWorker", hasWorker);
         output.putBoolean("valid", valid);
 
         // Update stored UUID from current worker if available
@@ -115,11 +138,17 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
             workerUuidLeast = worker.getUUID().getLeastSignificantBits();
             hasStoredWorkerUuid = true;
         }
+        // Save hasWorker based on whether we have a stored UUID (more reliable than the flag)
+        output.putBoolean("hasWorker", hasStoredWorkerUuid);
         // Always save the worker UUID if we have one (preserves UUID across reloads
         // even when the worker entity reference hasn't been restored yet)
         if (hasStoredWorkerUuid) {
             output.putLong("workerUuidMost", workerUuidMost);
             output.putLong("workerUuidLeast", workerUuidLeast);
+            UUID uuid = new UUID(workerUuidMost, workerUuidLeast);
+            LOGGER.info("[HorsePowered] saveAdditional at {}: Saving worker UUID={}", worldPosition, uuid);
+        } else {
+            LOGGER.info("[HorsePowered] saveAdditional at {}: No worker UUID to save", worldPosition);
         }
     }
 
@@ -134,21 +163,38 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
         int y = worldPosition.getY();
         int z = worldPosition.getZ();
 
-        AABB searchArea = new AABB(x - 7.0D, y - 7.0D, z - 7.0D, x + 7.0D, y + 7.0D, z + 7.0D);
+        // Search in a large radius - entities might spawn offset after world reload,
+        // or be pushed by other entities during chunk loading
+        AABB searchArea = new AABB(x - 48.0D, y - 16.0D, z - 48.0D, x + 48.0D, y + 16.0D, z + 48.0D);
 
         // Search all PathfinderMobs by UUID (ignoring tag for reconnection)
         List<PathfinderMob> allCreatures = level.getEntitiesOfClass(PathfinderMob.class, searchArea);
+
+        // Log what entities we found for debugging
+        if (allCreatures.isEmpty()) {
+            LOGGER.info("[HorsePowered] findWorker at {}: Searching for UUID={}, NO creatures found in area!", worldPosition, uuid);
+        } else {
+            StringBuilder sb = new StringBuilder();
+            for (PathfinderMob c : allCreatures) {
+                if (sb.length() > 0) sb.append(", ");
+                sb.append(c.getClass().getSimpleName()).append("(").append(c.getUUID().toString().substring(0, 8)).append("...)");
+            }
+            LOGGER.info("[HorsePowered] findWorker at {}: Searching for UUID={}, found {} creatures: {}", worldPosition, uuid, allCreatures.size(), sb);
+        }
 
         for (PathfinderMob creature : allCreatures) {
             if (creature.getUUID().equals(uuid)) {
                 // Found the worker by UUID - reconnect even if tag check fails
                 // (the tag might not be loaded yet, or modpack removed the entity from tag)
+                LOGGER.info("[HorsePowered] findWorker at {}: FOUND worker {} with UUID={}", worldPosition, creature.getClass().getSimpleName(), uuid);
                 setWorker(creature);
-                creature.setPersistenceRequired();
+                // setWorker already calls markWorkerPersistent which sets setPersistenceRequired
+                // and stores our marker in the entity's persistent data
                 return true;
             }
         }
 
+        LOGGER.warn("[HorsePowered] findWorker at {}: Worker with UUID={} NOT FOUND!", worldPosition, uuid);
         return false;
     }
 
@@ -160,17 +206,76 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
         worker = newWorker;
         // Note: restrictTo was removed in 1.21.11, but we use direct position control
         // in tickServer() anyway, so restriction is not needed
-        // Prevent the worker from despawning naturally while attached
-        // Note: PathfinderMob extends Mob, so we can call this directly
-        worker.setPersistenceRequired();
         target = getClosestTarget();
+
+        // Mark the worker as persistent (like a name tag) - this survives world saves
+        markWorkerPersistent(worker);
+
+        // Set grace period to prevent false "permanently lost" triggers
+        // This is especially important during world load when entities might not be fully initialized
+        workerGracePeriod = WORKER_GRACE_TICKS;
 
         if (worker != null) {
             workerUuidMost = worker.getUUID().getMostSignificantBits();
             workerUuidLeast = worker.getUUID().getLeastSignificantBits();
             hasStoredWorkerUuid = true;
+            LOGGER.info("[HorsePowered] setWorker at {}: Worker set to {} with UUID={}", worldPosition, worker.getClass().getSimpleName(), worker.getUUID());
         }
         setChanged();
+    }
+
+    /**
+     * Marks a worker entity as persistent so it won't despawn (like a name tag).
+     * This stores data in the entity's persistent NBT which survives world saves.
+     */
+    private void markWorkerPersistent(PathfinderMob mob) {
+        if (mob == null) return;
+        // Set the vanilla persistence flag - prevents despawning
+        mob.setPersistenceRequired();
+
+        // CRITICAL: Also set a custom name if the entity doesn't have one.
+        // In Minecraft, entities with custom names are ALWAYS saved to disk.
+        // setPersistenceRequired() only prevents despawning, it doesn't guarantee disk persistence.
+        // This is the same mechanism that name tags use to make entities permanent.
+        if (!mob.hasCustomName()) {
+            // Use an empty text component - this marks it as "has custom name" for persistence
+            // but won't display anything visible to the player
+            mob.setCustomName(net.minecraft.network.chat.Component.literal(""));
+            mob.setCustomNameVisible(false);
+            LOGGER.info("[HorsePowered] markWorkerPersistent: Set empty custom name on {} to ensure disk persistence", mob.getClass().getSimpleName());
+        }
+
+        // Also store our own marker in the entity's persistent data
+        // This data is saved with the entity and survives world reloads
+        CompoundTag persistentData = mob.getPersistentData();
+        persistentData.putBoolean(WORKER_TAG, true);
+        persistentData.putLong(WORKER_TAG + "_machine_x", worldPosition.getX());
+        persistentData.putLong(WORKER_TAG + "_machine_y", worldPosition.getY());
+        persistentData.putLong(WORKER_TAG + "_machine_z", worldPosition.getZ());
+    }
+
+    /**
+     * Removes the persistent worker marker from an entity when it's released.
+     */
+    private void clearWorkerPersistentMarker(PathfinderMob mob) {
+        if (mob == null) return;
+        CompoundTag persistentData = mob.getPersistentData();
+        persistentData.remove(WORKER_TAG);
+        persistentData.remove(WORKER_TAG + "_machine_x");
+        persistentData.remove(WORKER_TAG + "_machine_y");
+        persistentData.remove(WORKER_TAG + "_machine_z");
+        // Note: We don't clear setPersistenceRequired - the entity can keep that
+        // (it doesn't hurt, and the player might want it to stay)
+
+        // Clear the empty custom name we set for persistence if it's still empty
+        // (don't clear if the player gave it a real name)
+        if (mob.hasCustomName()) {
+            net.minecraft.network.chat.Component name = mob.getCustomName();
+            if (name != null && name.getString().isEmpty()) {
+                mob.setCustomName(null);
+                LOGGER.info("[HorsePowered] clearWorkerPersistentMarker: Cleared empty custom name from {}", mob.getClass().getSimpleName());
+            }
+        }
     }
 
     /**
@@ -181,6 +286,8 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
             hasWorker = false;
             // Note: clearRestriction was removed in 1.21.11, but we use direct position control
             // so the worker will naturally be free once detached
+            // Clear our persistent marker before releasing
+            clearWorkerPersistentMarker(worker);
             worker.setLeashedTo(player, true);
             worker = null;
             workerUuidMost = 0L;
@@ -192,22 +299,49 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
 
     /**
      * Checks if the worker is still valid and working.
-     * This method has side effects on the server (drops lead if worker lost).
+     * This method has side effects on the server (drops lead if worker permanently lost).
      * For display purposes only, use hasWorkerForDisplay() instead.
      */
     public boolean hasWorker() {
-        if (worker != null && worker.isAlive() && !worker.isLeashed() && worker.distanceToSqr(Vec3.atCenterOf(worldPosition)) < 45) {
+        // Allow worker to be up to 20 blocks away (400 squared) - entities might load at slightly
+        // different positions after world reload
+        if (worker != null && worker.isAlive() && !worker.isLeashed() && worker.distanceToSqr(Vec3.atCenterOf(worldPosition)) < 400) {
             return true;
         } else {
             if (worker != null) {
-                // Only drop lead on server side
-                if (level != null && !level.isClientSide()) {
-                    Containers.dropItemStack(level, worldPosition.getX(), worldPosition.getY() + 1, worldPosition.getZ(), new ItemStack(Items.LEAD));
+                // Worker entity reference is invalid - but DON'T clear the UUID yet!
+                // The entity might just need to be re-found after a world reload.
+                // Only drop lead if the worker is confirmed dead or leashed to something else.
+                boolean workerPermanentlyLost = !worker.isAlive() || worker.isLeashed();
+
+                LOGGER.debug("[HorsePowered] hasWorker at {}: Worker invalid - alive={}, leashed={}, gracePeriod={}",
+                        worldPosition, worker.isAlive(), worker.isLeashed(), workerGracePeriod);
+
+                // Don't consider permanently lost if we're still in the grace period
+                // This prevents false triggers during world load when entities might not be fully initialized
+                if (workerPermanentlyLost && workerGracePeriod <= 0) {
+                    LOGGER.warn("[HorsePowered] hasWorker at {}: Worker PERMANENTLY LOST - dropping lead", worldPosition);
+                    // Only drop lead on server side when worker is permanently lost
+                    if (level != null && !level.isClientSide()) {
+                        Containers.dropItemStack(level, worldPosition.getX(), worldPosition.getY() + 1, worldPosition.getZ(), new ItemStack(Items.LEAD));
+                    }
+                    // Clear UUID only when permanently lost
+                    workerUuidMost = 0L;
+                    workerUuidLeast = 0L;
+                    hasStoredWorkerUuid = false;
+                    // Sync the cleared worker state to clients
+                    setChanged();
+                    worker = null;
+                } else if (workerPermanentlyLost) {
+                    // Still in grace period - don't clear anything, just null the reference
+                    // We'll try to find the worker again by UUID
+                    LOGGER.debug("[HorsePowered] hasWorker at {}: Worker lost but in grace period - will retry", worldPosition);
+                    worker = null;
+                } else {
+                    // Worker is too far but not permanently lost - just null the reference
+                    LOGGER.debug("[HorsePowered] hasWorker at {}: Worker too far - clearing reference", worldPosition);
+                    worker = null;
                 }
-                worker = null;
-                workerUuidMost = 0L;
-                workerUuidLeast = 0L;
-                hasStoredWorkerUuid = false;
             }
             hasWorker = false;
             return false;
@@ -344,7 +478,8 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
         int y = worldPosition.getY();
         int z = worldPosition.getZ();
 
-        AABB searchArea = new AABB(x - 10.0D, y - 10.0D, z - 10.0D, x + 10.0D, y + 10.0D, z + 10.0D);
+        // Use same search radius as server for consistency
+        AABB searchArea = new AABB(x - 48.0D, y - 16.0D, z - 48.0D, x + 48.0D, y + 16.0D, z + 48.0D);
         List<PathfinderMob> creatures = level.getEntitiesOfClass(PathfinderMob.class, searchArea);
 
         for (PathfinderMob creature : creatures) {
@@ -356,6 +491,15 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
     }
 
     protected void tickServer() {
+        // Decrement grace period (protects against false "worker lost" triggers during world load)
+        if (workerGracePeriod > 0) {
+            workerGracePeriod--;
+            if (workerGracePeriod == 0 && hasStoredWorkerUuid && worker == null) {
+                UUID uuid = new UUID(workerUuidMost, workerUuidLeast);
+                LOGGER.warn("[HorsePowered] tickServer at {}: Grace period EXPIRED, worker UUID={} still not found!", worldPosition, uuid);
+            }
+        }
+
         // Validation timer
         validationTimer--;
         if (validationTimer <= 0) {
@@ -376,10 +520,16 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
             locateHorseTimer--;
         }
         if (!hasWorkerNow && hasStoredWorkerUuid && locateHorseTimer <= 0) {
+            UUID uuid = new UUID(workerUuidMost, workerUuidLeast);
+            LOGGER.info("[HorsePowered] tickServer at {}: Attempting to find worker UUID={}, gracePeriod={}", worldPosition, uuid, workerGracePeriod);
             flag = findWorker();
+            if (!flag) {
+                LOGGER.info("[HorsePowered] tickServer at {}: Worker NOT FOUND, will retry in {} ticks", worldPosition, workerGracePeriod > 0 ? LOCATE_TIMER_FAST : LOCATE_TIMER_SLOW);
+            }
         }
         if (locateHorseTimer <= 0) {
-            locateHorseTimer = 120;
+            // Search more frequently during grace period (entities may still be loading)
+            locateHorseTimer = workerGracePeriod > 0 ? LOCATE_TIMER_FAST : LOCATE_TIMER_SLOW;
         }
 
         if (valid) {
@@ -396,6 +546,10 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
             }
 
             if (hasWorker()) {
+                // Ensure worker stays persistent every tick (belt and suspenders approach)
+                // This guarantees the entity won't despawn even if something else clears the flag
+                worker.setPersistenceRequired();
+
                 if (running) {
                     Vec3 pathPos = getPathPosition(target);
                     double x = pathPos.x;

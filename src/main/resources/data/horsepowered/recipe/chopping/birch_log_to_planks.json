@@ -1,8 +1,6 @@
 {
   "type": "horsepowered:chopping",
-  "ingredient": {
-    "tag": "minecraft:birch_logs"
-  },
+  "ingredient": "#minecraft:birch_logs",
   "result": {
     "id": "minecraft:birch_planks",
     "count": 4

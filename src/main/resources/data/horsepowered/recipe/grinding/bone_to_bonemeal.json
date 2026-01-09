@@ -1,8 +1,6 @@
 {
   "type": "horsepowered:grinding",
-  "ingredient": {
-    "item": "minecraft:bone"
-  },
+  "ingredient": "minecraft:bone",
   "result": {
     "id": "minecraft:bone_meal",
     "count": 3

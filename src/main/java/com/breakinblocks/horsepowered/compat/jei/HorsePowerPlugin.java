@@ -13,11 +13,11 @@ import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
-import net.minecraft.client.Minecraft;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import java.util.List;
 
@@ -59,8 +59,13 @@ public class HorsePowerPlugin implements IModPlugin {
 
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
-        if (Minecraft.getInstance().level == null) return;
-        RecipeManager recipeManager = (RecipeManager) Minecraft.getInstance().level.recipeAccess();
+        // Since 1.21.2, recipes are server-side only - use ServerLifecycleHooks to get RecipeManager
+        var server = ServerLifecycleHooks.getCurrentServer();
+        if (server == null) {
+            // In dedicated server multiplayer without integrated server, JEI handles syncing
+            return;
+        }
+        RecipeManager recipeManager = server.getRecipeManager();
 
         // Grinding recipes - unwrap from RecipeHolder
         List<GrindstoneRecipe> grindingRecipes = recipeManager.recipeMap().byType(HPRecipes.GRINDING_TYPE.get())

@@ -51,7 +51,13 @@ public class ManualChopperBlockEntity extends HPBlockEntityBase {
     @Override
     public boolean isItemValidForSlot(int index, ItemStack stack) {
         if (index != 0) return false;
-        if (!getItem(1).isEmpty() || !getItem(0).isEmpty()) return false;
+        // Only check input slot - output slot state shouldn't block insertion
+        ItemStack inputSlot = getItem(0);
+        if (!inputSlot.isEmpty()) {
+            // Input slot has items - check if we can combine
+            if (!ItemStack.isSameItemSameComponents(inputSlot, stack)) return false;
+            if (inputSlot.getCount() >= getInventoryStackLimit()) return false;
+        }
         if (!(level instanceof ServerLevel serverLevel)) return false;
 
         HPRecipeInput recipeInput = new HPRecipeInput(stack);

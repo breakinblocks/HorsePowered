@@ -77,7 +77,7 @@ public class PressRecipe implements Recipe<HPRecipeInput> {
 
     @Override
     public PlacementInfo placementInfo() {
-        return PlacementInfo.NOT_PLACEABLE;
+        return PlacementInfo.create(ingredient);
     }
 
     // Accessors
