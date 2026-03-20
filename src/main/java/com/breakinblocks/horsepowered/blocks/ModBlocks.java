@@ -51,6 +51,5 @@ public class ModBlocks {
             registryName -> new BlockFiller(BlockBehaviour.Properties.of()
                     .setId(ResourceKey.create(Registries.BLOCK, registryName))
                     .mapColor(MapColor.WOOD)
-                    .strength(5.0F)
-                    .noOcclusion()));
+                    .strength(5.0F)));
 }

@@ -2,7 +2,6 @@ package com.breakinblocks.horsepowered.client.renderer;
 
 import com.breakinblocks.horsepowered.blockentity.GrindstoneBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
@@ -11,7 +10,6 @@ import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.state.CameraRenderState;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -110,34 +108,13 @@ public class GrindstoneBlockEntityRenderer implements BlockEntityRenderer<Grinds
                 state.blockPos, poseStack, collector);
 
         // Render input item on top of the grinder (grinder top at Y = 8/16 = 0.5)
-        if (!state.inputItem.isEmpty()) {
-            poseStack.pushPose();
-            poseStack.translate(0.5D, 0.55D, 0.5D);
-            poseStack.scale(0.4F, 0.4F, 0.4F);
-            poseStack.mulPose(Axis.XP.rotationDegrees(90));
-            state.inputItem.submit(poseStack, collector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
-            poseStack.popPose();
-        }
+        RenderUtils.renderFlatItem(state.inputItem, poseStack, collector, state.lightCoords, 0.5D, 0.55D, 0.5D, 0.4F);
 
         // Render output item in front of grindstone
-        if (!state.outputItem.isEmpty()) {
-            poseStack.pushPose();
-            poseStack.translate(0.5D, 0.2D, -0.1D);
-            poseStack.scale(0.3F, 0.3F, 0.3F);
-            poseStack.mulPose(Axis.XP.rotationDegrees(90));
-            state.outputItem.submit(poseStack, collector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
-            poseStack.popPose();
-        }
+        RenderUtils.renderFlatItem(state.outputItem, poseStack, collector, state.lightCoords, 0.5D, 0.2D, -0.1D, 0.3F);
 
         // Render secondary output behind grindstone
-        if (!state.secondaryItem.isEmpty()) {
-            poseStack.pushPose();
-            poseStack.translate(0.5D, 0.2D, 1.1D);
-            poseStack.scale(0.3F, 0.3F, 0.3F);
-            poseStack.mulPose(Axis.XP.rotationDegrees(90));
-            state.secondaryItem.submit(poseStack, collector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
-            poseStack.popPose();
-        }
+        RenderUtils.renderFlatItem(state.secondaryItem, poseStack, collector, state.lightCoords, 0.5D, 0.2D, 1.1D, 0.3F);
     }
 
     @Override

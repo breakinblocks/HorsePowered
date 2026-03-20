@@ -51,8 +51,8 @@ public class HorsePowerPlugin implements IModPlugin {
 
         registration.addRecipeCategories(
                 new HorsePowerGrindingCategory(guiHelper),
-                new HPChoppingCategory(guiHelper),
-                new HPManualChoppingCategory(guiHelper),
+                new HorsePowerChoppingCategory(guiHelper),
+                new HorsePowerManualChoppingCategory(guiHelper),
                 new HorsePowerPressCategory(guiHelper)
         );
     }

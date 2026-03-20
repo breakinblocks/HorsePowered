@@ -24,7 +24,7 @@ import java.util.List;
 
 // TODO: Update to non-deprecated JEI/Minecraft API when available
 @SuppressWarnings({"removal", "deprecation"})
-public class HPManualChoppingCategory implements IRecipeCategory<ChoppingRecipe> {
+public class HorsePowerManualChoppingCategory implements IRecipeCategory<ChoppingRecipe> {
 
     public static final Identifier UID = Identifier.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "manual_chopping");
 
@@ -37,7 +37,7 @@ public class HPManualChoppingCategory implements IRecipeCategory<ChoppingRecipe>
     private final Component title;
     private final List<ItemStack> axes;
 
-    public HPManualChoppingCategory(IGuiHelper guiHelper) {
+    public HorsePowerManualChoppingCategory(IGuiHelper guiHelper) {
         this.icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(ModBlocks.CHOPPING_BLOCK.get()));
         this.slot = guiHelper.getSlotDrawable();
         this.arrow = guiHelper.getRecipeArrow();

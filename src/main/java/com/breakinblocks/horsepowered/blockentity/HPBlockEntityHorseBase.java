@@ -21,6 +21,8 @@ import net.minecraft.world.phys.Vec3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Lists;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -84,9 +86,34 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
     }
 
     /**
-     * Validates that the area around the block is clear for the horse to walk
+     * Validates that the area around the block is clear for the horse to walk.
+     * Default implementation checks a 7x7 area (excluding center 3x3) at Y=0 and Y=1.
      */
-    public abstract boolean validateArea();
+    public boolean validateArea() {
+        if (level == null) return false;
+
+        if (searchPos == null) {
+            searchPos = Lists.newArrayList();
+
+            for (int x = -3; x <= 3; x++) {
+                for (int z = -3; z <= 3; z++) {
+                    if ((x <= 1 && x >= -1) && (z <= 1 && z >= -1)) {
+                        continue;
+                    }
+                    searchPos.add(worldPosition.offset(x, 0, z));
+                    searchPos.add(worldPosition.offset(x, 1, z));
+                }
+            }
+        }
+
+        for (BlockPos pos : searchPos) {
+            BlockState state = level.getBlockState(pos);
+            if (!state.canBeReplaced()) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     /**
      * Called when the horse reaches a target point in the path

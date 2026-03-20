@@ -4,7 +4,8 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class HorsePowerConfig {
 
-    public static final ModConfigSpec SPEC;
+    public static final ModConfigSpec COMMON_SPEC;
+    public static final ModConfigSpec CLIENT_SPEC;
 
     // Client settings
     public static ModConfigSpec.BooleanValue renderItemAmount;
@@ -23,64 +24,70 @@ public class HorsePowerConfig {
     public static ModConfigSpec.DoubleValue choppingBlockExhaustion;
 
     static {
-        ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
+        // Client config
+        ModConfigSpec.Builder clientBuilder = new ModConfigSpec.Builder();
 
-        builder.comment("Client settings").push("client");
+        clientBuilder.comment("Client settings").push("client");
         {
-            renderItemAmount = builder
+            renderItemAmount = clientBuilder
                     .comment("If the amount text on how many items is in a stack in a grindstone should render")
                     .define("renderItemAmount", true);
 
-            mustLookAtBlock = builder
+            mustLookAtBlock = clientBuilder
                     .comment("Must look at the block to show the amount in it")
                     .define("mustLookAtBlock", true);
 
-            showObstructedPlace = builder
+            showObstructedPlace = clientBuilder
                     .comment("If true will show the area needed when placing a HP block")
                     .define("showObstructedPlace", true);
         }
-        builder.pop();
+        clientBuilder.pop();
 
-        builder.comment("General settings").push("general");
+        CLIENT_SPEC = clientBuilder.build();
+
+        // Common config
+        ModConfigSpec.Builder commonBuilder = new ModConfigSpec.Builder();
+
+        commonBuilder.comment("General settings").push("general");
         {
-            shouldDamageAxe = builder
+            shouldDamageAxe = commonBuilder
                     .comment("If the item used as an axe for the manual chopping block should be damaged")
                     .define("shouldDamageAxe", true);
 
-            choppingBlockDrop = builder
+            choppingBlockDrop = commonBuilder
                     .comment("If true the manual chopping block will drop the result items. If false it will put them in internal inventory.")
                     .define("choppingBlockDrop", true);
 
-            pointsForWindup = builder
+            pointsForWindup = commonBuilder
                     .comment("The amount of points for the chopper to do windup and do a chop. One lap around the chopping block is 8 points.")
                     .defineInRange("pointsForWindup", 8, 1, Integer.MAX_VALUE);
 
-            pointsPerRotation = builder
+            pointsPerRotation = commonBuilder
                     .comment("The amount of points per rotation with a hand grindstone")
                     .defineInRange("pointsPerRotation", 2, 1, Integer.MAX_VALUE);
 
-            pointsForPress = builder
+            pointsForPress = commonBuilder
                     .comment("The amount of points needed for a full press")
                     .defineInRange("pointsForPress", 16, 1, Integer.MAX_VALUE);
 
-            choppingMultiplier = builder
+            choppingMultiplier = commonBuilder
                     .comment("The multiplier for manual chopping time when recipes aren't separated")
                     .defineInRange("choppingMultiplier", 4, 1, Integer.MAX_VALUE);
 
-            pressFluidTankSize = builder
+            pressFluidTankSize = commonBuilder
                     .comment("The tank size of the press in mb (1000mb = 1 bucket)")
                     .defineInRange("pressFluidTankSize", 3000, 1000, Integer.MAX_VALUE);
 
-            grindstoneExhaustion = builder
+            grindstoneExhaustion = commonBuilder
                     .comment("The exhaustion amount added to the player when using the hand grindstone (0 to disable)")
                     .defineInRange("grindstoneExhaustion", 0.1D, 0.0D, 40.0D);
 
-            choppingBlockExhaustion = builder
+            choppingBlockExhaustion = commonBuilder
                     .comment("The exhaustion amount added to the player when using the chopping block (0 to disable)")
                     .defineInRange("choppingBlockExhaustion", 0.1D, 0.0D, 40.0D);
         }
-        builder.pop();
+        commonBuilder.pop();
 
-        SPEC = builder.build();
+        COMMON_SPEC = commonBuilder.build();
     }
 }

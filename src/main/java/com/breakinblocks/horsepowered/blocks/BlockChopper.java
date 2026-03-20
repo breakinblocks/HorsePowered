@@ -2,6 +2,7 @@ package com.breakinblocks.horsepowered.blocks;
 
 import com.breakinblocks.horsepowered.blockentity.ChopperBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.HPBlockEntityHorseBase;
+import com.breakinblocks.horsepowered.blockentity.ModBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.LivingEntity;
@@ -12,6 +13,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -83,11 +85,11 @@ public class BlockChopper extends BlockHPBase {
 
     @Nullable
     @Override
-    protected <T extends BlockEntity> BlockEntityTicker<T> createTicker(Level level, BlockState state) {
+    protected <T extends BlockEntity> BlockEntityTicker<T> createTicker(Level level, BlockState state, BlockEntityType<T> type) {
         if (level.isClientSide()) {
-            return (lvl, pos, st, be) -> HPBlockEntityHorseBase.clientTick(lvl, pos, st, (ChopperBlockEntity) be);
+            return checkType(type, ModBlockEntities.CHOPPER.get(), HPBlockEntityHorseBase::clientTick);
         } else {
-            return (lvl, pos, st, be) -> HPBlockEntityHorseBase.serverTick(lvl, pos, st, (ChopperBlockEntity) be);
+            return checkType(type, ModBlockEntities.CHOPPER.get(), HPBlockEntityHorseBase::serverTick);
         }
     }
 }

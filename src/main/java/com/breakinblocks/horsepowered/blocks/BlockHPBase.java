@@ -47,12 +47,18 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
     }
 
     @Nullable
-    protected abstract <T extends BlockEntity> BlockEntityTicker<T> createTicker(Level level, BlockState state);
+    protected abstract <T extends BlockEntity> BlockEntityTicker<T> createTicker(Level level, BlockState state, BlockEntityType<T> type);
 
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        return createTicker(level, state);
+        return createTicker(level, state, type);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Nullable
+    protected static <E extends BlockEntity, A extends BlockEntity> BlockEntityTicker<A> checkType(BlockEntityType<A> actual, BlockEntityType<E> expected, BlockEntityTicker<? super E> ticker) {
+        return expected == actual ? (BlockEntityTicker<A>) ticker : null;
     }
 
     @Override
@@ -178,9 +184,7 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
             if (horseTE != null) {
                 horseTE.setWorkerToPlayer(player);
             }
-        }
-
-        if (!result.isEmpty()) {
+        } else {
             player.getInventory().placeItemBackInInventory(result);
         }
 

@@ -20,7 +20,7 @@ import net.minecraft.world.item.ItemStack;
 
 // TODO: Update to non-deprecated JEI API when available
 @SuppressWarnings("removal")
-public class HPChoppingCategory implements IRecipeCategory<ChoppingRecipe> {
+public class HorsePowerChoppingCategory implements IRecipeCategory<ChoppingRecipe> {
 
     public static final Identifier UID = Identifier.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "chopping");
 
@@ -32,7 +32,7 @@ public class HPChoppingCategory implements IRecipeCategory<ChoppingRecipe> {
     private final IDrawable arrow;
     private final Component title;
 
-    public HPChoppingCategory(IGuiHelper guiHelper) {
+    public HorsePowerChoppingCategory(IGuiHelper guiHelper) {
         this.icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(ModBlocks.CHOPPER.get()));
         this.slot = guiHelper.getSlotDrawable();
         this.arrow = guiHelper.getRecipeArrow();

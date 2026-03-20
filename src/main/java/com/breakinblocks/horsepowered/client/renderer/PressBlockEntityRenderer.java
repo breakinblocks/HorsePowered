@@ -2,7 +2,6 @@ package com.breakinblocks.horsepowered.client.renderer;
 
 import com.breakinblocks.horsepowered.blockentity.PressBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
@@ -11,7 +10,6 @@ import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.state.CameraRenderState;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -113,24 +111,10 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
         PlungerRenderer.renderPlunger(poseStack, collector, state.visualProgress, state.lightCoords);
 
         // Render input item inside the press basin (floor at Y = 1/16 = 0.0625)
-        if (!state.inputItem.isEmpty()) {
-            poseStack.pushPose();
-            poseStack.translate(0.5D, 0.15D, 0.5D);
-            poseStack.scale(0.5F, 0.5F, 0.5F);
-            poseStack.mulPose(Axis.XP.rotationDegrees(90));
-            state.inputItem.submit(poseStack, collector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
-            poseStack.popPose();
-        }
+        RenderUtils.renderFlatItem(state.inputItem, poseStack, collector, state.lightCoords, 0.5D, 0.15D, 0.5D, 0.5F);
 
         // Render output item beside the press
-        if (!state.outputItem.isEmpty()) {
-            poseStack.pushPose();
-            poseStack.translate(0.5D, 0.2D, 1.1D);
-            poseStack.scale(0.3F, 0.3F, 0.3F);
-            poseStack.mulPose(Axis.XP.rotationDegrees(90));
-            state.outputItem.submit(poseStack, collector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
-            poseStack.popPose();
-        }
+        RenderUtils.renderFlatItem(state.outputItem, poseStack, collector, state.lightCoords, 0.5D, 0.2D, 1.1D, 0.3F);
 
         // Render fluid in tank
         if (!state.fluidStack.isEmpty()) {

@@ -2,12 +2,14 @@ package com.breakinblocks.horsepowered.blocks;
 
 import com.breakinblocks.horsepowered.blockentity.GrindstoneBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.HPBlockEntityHorseBase;
+import com.breakinblocks.horsepowered.blockentity.ModBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
@@ -67,11 +69,11 @@ public class BlockGrindstone extends BlockHPBase {
 
     @Nullable
     @Override
-    protected <T extends BlockEntity> BlockEntityTicker<T> createTicker(Level level, BlockState state) {
+    protected <T extends BlockEntity> BlockEntityTicker<T> createTicker(Level level, BlockState state, BlockEntityType<T> type) {
         if (level.isClientSide()) {
-            return (lvl, pos, st, be) -> HPBlockEntityHorseBase.clientTick(lvl, pos, st, (GrindstoneBlockEntity) be);
+            return checkType(type, ModBlockEntities.GRINDSTONE.get(), HPBlockEntityHorseBase::clientTick);
         } else {
-            return (lvl, pos, st, be) -> HPBlockEntityHorseBase.serverTick(lvl, pos, st, (GrindstoneBlockEntity) be);
+            return checkType(type, ModBlockEntities.GRINDSTONE.get(), HPBlockEntityHorseBase::serverTick);
         }
     }
 }
