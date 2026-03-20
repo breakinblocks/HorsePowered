@@ -4,7 +4,8 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class HorsePowerConfig {
 
-    public static final ModConfigSpec SPEC;
+    public static final ModConfigSpec COMMON_SPEC;
+    public static final ModConfigSpec CLIENT_SPEC;
 
     // Client settings
     public static ModConfigSpec.BooleanValue renderItemAmount;
@@ -23,24 +24,27 @@ public class HorsePowerConfig {
     public static ModConfigSpec.DoubleValue choppingBlockExhaustion;
 
     static {
-        ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
-
-        builder.comment("Client settings").push("client");
+        // Client config
+        ModConfigSpec.Builder clientBuilder = new ModConfigSpec.Builder();
+        clientBuilder.comment("Client settings").push("client");
         {
-            renderItemAmount = builder
+            renderItemAmount = clientBuilder
                     .comment("If the amount text on how many items is in a stack in a grindstone should render")
                     .define("renderItemAmount", true);
 
-            mustLookAtBlock = builder
+            mustLookAtBlock = clientBuilder
                     .comment("Must look at the block to show the amount in it")
                     .define("mustLookAtBlock", true);
 
-            showObstructedPlace = builder
+            showObstructedPlace = clientBuilder
                     .comment("If true will show the area needed when placing a HP block")
                     .define("showObstructedPlace", true);
         }
-        builder.pop();
+        clientBuilder.pop();
+        CLIENT_SPEC = clientBuilder.build();
 
+        // Common config
+        ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
         builder.comment("General settings").push("general");
         {
             shouldDamageAxe = builder
@@ -80,7 +84,6 @@ public class HorsePowerConfig {
                     .defineInRange("choppingBlockExhaustion", 0.1D, 0.0D, 40.0D);
         }
         builder.pop();
-
-        SPEC = builder.build();
+        COMMON_SPEC = builder.build();
     }
 }

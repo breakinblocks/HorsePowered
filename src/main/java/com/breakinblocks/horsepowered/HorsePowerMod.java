@@ -61,8 +61,9 @@ public class HorsePowerMod {
         HPRecipes.RECIPE_SERIALIZERS.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);
 
-        // Register config
-        container.registerConfig(ModConfig.Type.COMMON, HorsePowerConfig.SPEC);
+        // Register configs
+        container.registerConfig(ModConfig.Type.COMMON, HorsePowerConfig.COMMON_SPEC);
+        container.registerConfig(ModConfig.Type.CLIENT, HorsePowerConfig.CLIENT_SPEC);
 
         // Register common setup listener
         modEventBus.addListener(this::commonSetup);

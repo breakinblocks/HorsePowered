@@ -5,7 +5,6 @@ import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import com.breakinblocks.horsepowered.recipes.ChoppingRecipe;
 import com.breakinblocks.horsepowered.recipes.HPRecipeInput;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
-import com.google.common.collect.Lists;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -66,34 +65,6 @@ public class ChopperBlockEntity extends HPBlockEntityHorseBase {
     }
 
     @Override
-    public boolean validateArea() {
-        if (level == null) return false;
-
-        if (searchPos == null) {
-            searchPos = Lists.newArrayList();
-
-            for (int x = -3; x <= 3; x++) {
-                for (int z = -3; z <= 3; z++) {
-                    // Skip center area
-                    if ((x <= 1 && x >= -1) && (z <= 1 && z >= -1)) {
-                        continue;
-                    }
-                    searchPos.add(worldPosition.offset(x, 0, z));
-                    searchPos.add(worldPosition.offset(x, 1, z));
-                }
-            }
-        }
-
-        for (BlockPos pos : searchPos) {
-            BlockState state = level.getBlockState(pos);
-            if (!state.canBeReplaced()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    @Override
     protected void tickServer() {
         super.tickServer();
         updateVisualWindup();
@@ -131,31 +102,16 @@ public class ChopperBlockEntity extends HPBlockEntityHorseBase {
     }
 
     @Override
-    public void setItem(int slot, ItemStack stack) {
-        ItemStack oldStack = getItem(slot);
-        super.setItem(slot, stack);
-
-        boolean isSameItem = !stack.isEmpty() && ItemStack.isSameItemSameComponents(stack, oldStack);
-        if (slot == 0 && !isSameItem) {
-            totalItemChopTime = getRecipeTime();
-            currentItemChopTime = 0;
-            currentWindup = 0;
-        }
+    protected void onInputChanged() {
+        totalItemChopTime = getRecipeTime();
+        currentItemChopTime = 0;
+        currentWindup = 0;
     }
 
     private void chopItem() {
         if (canWork()) {
-            ItemStack input = getItem(0);
-            ItemStack result = getRecipeOutput();
-            ItemStack output = getItem(1);
-
-            if (output.isEmpty()) {
-                setItem(1, result.copy());
-            } else if (ItemStack.isSameItemSameComponents(output, result)) {
-                output.grow(result.getCount());
-            }
-
-            input.shrink(1);
+            mergeOutput(1, getRecipeOutput());
+            getItem(0).shrink(1);
             setChanged();
         }
     }

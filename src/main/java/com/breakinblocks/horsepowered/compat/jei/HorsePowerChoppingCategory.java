@@ -18,7 +18,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
-public class HPChoppingCategory implements IRecipeCategory<ChoppingRecipe> {
+public class HorsePowerChoppingCategory implements IRecipeCategory<ChoppingRecipe> {
 
     public static final ResourceLocation UID = ResourceLocation.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "chopping");
 
@@ -30,7 +30,7 @@ public class HPChoppingCategory implements IRecipeCategory<ChoppingRecipe> {
     private final IDrawable arrow;
     private final Component title;
 
-    public HPChoppingCategory(IGuiHelper guiHelper) {
+    public HorsePowerChoppingCategory(IGuiHelper guiHelper) {
         this.icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(ModBlocks.CHOPPER.get()));
         this.slot = guiHelper.getSlotDrawable();
         this.arrow = guiHelper.getRecipeArrow();

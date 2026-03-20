@@ -14,6 +14,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -115,11 +116,10 @@ public class BlockHandGrindstone extends BlockHPBase {
 
     @Nullable
     @Override
-    protected <T extends BlockEntity> BlockEntityTicker<T> createTicker(Level level, BlockState state) {
+    protected <T extends BlockEntity> BlockEntityTicker<T> createTicker(Level level, BlockState state, BlockEntityType<T> type) {
         if (level.isClientSide) {
-            return (lvl, pos, st, be) -> HandGrindstoneBlockEntity.clientTick(lvl, pos, st, (HandGrindstoneBlockEntity) be);
-        } else {
-            return (lvl, pos, st, be) -> HandGrindstoneBlockEntity.serverTick(lvl, pos, st, (HandGrindstoneBlockEntity) be);
+            return checkType(type, ModBlocks.HAND_GRINDSTONE_BE.get(), HandGrindstoneBlockEntity::clientTick);
         }
+        return checkType(type, ModBlocks.HAND_GRINDSTONE_BE.get(), HandGrindstoneBlockEntity::serverTick);
     }
 }

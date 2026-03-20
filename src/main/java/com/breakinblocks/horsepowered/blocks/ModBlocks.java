@@ -53,8 +53,7 @@ public class ModBlocks {
     public static final DeferredBlock<Block> FILLER = BLOCKS.register("filler",
             () -> new BlockFiller(BlockBehaviour.Properties.of()
                     .mapColor(MapColor.WOOD)
-                    .strength(5.0F)
-                    .noOcclusion()));
+                    .strength(5.0F)));
 
     // Block Entities
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<HandGrindstoneBlockEntity>> HAND_GRINDSTONE_BE =

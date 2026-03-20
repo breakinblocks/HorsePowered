@@ -85,37 +85,10 @@ public class HandGrindstoneBlockEntity extends HPBlockEntityBase {
             if (recipeOpt.isEmpty()) return;
 
             GrindstoneRecipe recipe = recipeOpt.get().value();
-            ItemStack result = recipe.getResult();
-            ItemStack secondary = recipe.getSecondary();
-
-            ItemStack input = getItem(0);
-            ItemStack output = getItem(1);
-            ItemStack secondaryOutput = getItem(2);
-
-            // Process main output
-            if (output.isEmpty()) {
-                setItem(1, result.copy());
-            } else if (ItemStack.isSameItemSameComponents(output, result)) {
-                output.grow(result.getCount());
-            }
-
-            // Process secondary output
-            processSecondaries(level, secondary, secondaryOutput, recipe.getSecondaryChance());
-
-            input.shrink(1);
+            mergeOutput(1, recipe.getResult());
+            processSecondary(recipe.getSecondary(), recipe.getSecondaryChance());
+            getItem(0).shrink(1);
             setChanged();
-        }
-    }
-
-    private void processSecondaries(Level world, ItemStack secondary, ItemStack secondaryOutput, int chance) {
-        if (!secondary.isEmpty()) {
-            if (chance >= 100 || world.random.nextInt(100) < chance) {
-                if (secondaryOutput.isEmpty()) {
-                    setItem(2, secondary.copy());
-                } else if (ItemStack.isSameItemSameComponents(secondaryOutput, secondary)) {
-                    secondaryOutput.grow(secondary.getCount());
-                }
-            }
         }
     }
 
@@ -128,15 +101,9 @@ public class HandGrindstoneBlockEntity extends HPBlockEntityBase {
     }
 
     @Override
-    public void setItem(int slot, ItemStack stack) {
-        ItemStack oldStack = getItem(slot);
-        super.setItem(slot, stack);
-
-        boolean isSameItem = !stack.isEmpty() && ItemStack.isSameItemSameComponents(stack, oldStack);
-        if (slot == 0 && !isSameItem) {
-            totalItemMillTime = getRecipeTime();
-            currentItemMillTime = 0;
-        }
+    protected void onInputChanged() {
+        totalItemMillTime = getRecipeTime();
+        currentItemMillTime = 0;
     }
 
     @Override

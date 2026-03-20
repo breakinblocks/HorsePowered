@@ -20,6 +20,10 @@ import org.jetbrains.annotations.Nullable;
 
 public abstract class HPBlockEntityBase extends BlockEntity implements Container, WorldlyContainer {
 
+    private static final int[] SLOTS_DOWN_DUAL = {1, 2};
+    private static final int[] SLOTS_DOWN_SINGLE = {1};
+    private static final int[] SLOTS_INPUT = {0};
+
     protected NonNullList<ItemStack> itemStacks;
     protected Direction forward = Direction.NORTH;
 
@@ -77,13 +81,29 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
 
     @Override
     public void setItem(int slot, ItemStack stack) {
+        ItemStack oldStack = getItem(slot);
         itemStacks.set(slot, stack);
 
         if (slot == 0 && stack.getCount() > getMaxStackSize(stack)) {
             stack.setCount(getMaxStackSize(stack));
         }
 
+        if (slot == 0) {
+            boolean isSameItem = !stack.isEmpty() && ItemStack.isSameItemSameComponents(stack, oldStack);
+            if (!isSameItem) {
+                onInputChanged();
+            }
+        }
+
         setChanged();
+    }
+
+    /**
+     * Called when the input slot (slot 0) changes to a different item type.
+     * Subclasses should override this to reset progress timers.
+     */
+    protected void onInputChanged() {
+        // Default: no-op. Subclasses override to reset progress.
     }
 
     public int getMaxStackSize(ItemStack stack) {
@@ -112,16 +132,9 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
     @Override
     public int[] getSlotsForFace(Direction side) {
         if (side == Direction.DOWN) {
-            // Output slots (1 and 2 for secondary)
-            int outputSlot = getOutputSlot();
-            if (outputSlot == 2) {
-                return new int[]{1, 2};
-            }
-            return new int[]{1};
-        } else {
-            // Input slot
-            return new int[]{0};
+            return getOutputSlot() == 2 ? SLOTS_DOWN_DUAL : SLOTS_DOWN_SINGLE;
         }
+        return SLOTS_INPUT;
     }
 
     @Override
@@ -248,7 +261,34 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
 
     public static boolean canCombine(ItemStack stack1, ItemStack stack2) {
         if (stack1.isEmpty() || stack2.isEmpty()) return true;
-        return ItemStack.isSameItemSameComponents(stack1, stack2) && stack1.getCount() <= stack1.getMaxStackSize();
+        return ItemStack.isSameItemSameComponents(stack1, stack2);
+    }
+
+    /**
+     * Merges a result stack into the given output slot.
+     * @return true if the merge was successful
+     */
+    protected boolean mergeOutput(int slot, ItemStack result) {
+        ItemStack existing = getItem(slot);
+        if (existing.isEmpty()) {
+            setItem(slot, result.copy());
+            return true;
+        } else if (ItemStack.isSameItemSameComponents(existing, result)) {
+            existing.grow(result.getCount());
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Processes a secondary output with a chance roll.
+     */
+    protected void processSecondary(ItemStack secondary, int chance) {
+        if (!secondary.isEmpty() && level != null) {
+            if (chance >= 100 || level.random.nextInt(100) < chance) {
+                mergeOutput(2, secondary);
+            }
+        }
     }
 
     // Rotation support

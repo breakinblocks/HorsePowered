@@ -8,6 +8,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
@@ -67,11 +68,10 @@ public class BlockGrindstone extends BlockHPBase {
 
     @Nullable
     @Override
-    protected <T extends BlockEntity> BlockEntityTicker<T> createTicker(Level level, BlockState state) {
+    protected <T extends BlockEntity> BlockEntityTicker<T> createTicker(Level level, BlockState state, BlockEntityType<T> type) {
         if (level.isClientSide) {
-            return (lvl, pos, st, be) -> HPBlockEntityHorseBase.clientTick(lvl, pos, st, (GrindstoneBlockEntity) be);
-        } else {
-            return (lvl, pos, st, be) -> HPBlockEntityHorseBase.serverTick(lvl, pos, st, (GrindstoneBlockEntity) be);
+            return checkType(type, ModBlocks.GRINDSTONE_BE.get(), HPBlockEntityHorseBase::clientTick);
         }
+        return checkType(type, ModBlocks.GRINDSTONE_BE.get(), HPBlockEntityHorseBase::serverTick);
     }
 }

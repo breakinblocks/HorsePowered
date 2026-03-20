@@ -4,7 +4,6 @@ import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.recipes.GrindstoneRecipe;
 import com.breakinblocks.horsepowered.recipes.HPRecipeInput;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
-import com.google.common.collect.Lists;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -18,9 +17,6 @@ public class GrindstoneBlockEntity extends HPBlockEntityHorseBase {
 
     private int currentItemMillTime;
     private int totalItemMillTime;
-
-    // Client-side rendering
-    public ItemStack renderStack = ItemStack.EMPTY;
 
     public GrindstoneBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlocks.GRINDSTONE_BE.get(), pos, state, 3);
@@ -52,35 +48,6 @@ public class GrindstoneBlockEntity extends HPBlockEntityHorseBase {
             currentItemMillTime = 0;
         }
         super.setChanged();
-    }
-
-    @Override
-    public boolean validateArea() {
-        if (level == null) return false;
-
-        if (searchPos == null) {
-            searchPos = Lists.newArrayList();
-
-            for (int x = -3; x <= 3; x++) {
-                for (int z = -3; z <= 3; z++) {
-                    // Skip center area (3x3 around the grindstone)
-                    if ((x <= 1 && x >= -1) && (z <= 1 && z >= -1)) {
-                        continue;
-                    }
-                    // Check Y=0 (where horse walks) and Y=1 (horse head clearance)
-                    searchPos.add(worldPosition.offset(x, 0, z));
-                    searchPos.add(worldPosition.offset(x, 1, z));
-                }
-            }
-        }
-
-        for (BlockPos pos : searchPos) {
-            BlockState state = level.getBlockState(pos);
-            if (!state.canBeReplaced()) {
-                return false;
-            }
-        }
-        return true;
     }
 
     @Override
@@ -135,50 +102,17 @@ public class GrindstoneBlockEntity extends HPBlockEntityHorseBase {
             if (recipeOpt.isEmpty()) return;
 
             GrindstoneRecipe recipe = recipeOpt.get().value();
-            ItemStack result = recipe.getResult();
-            ItemStack secondary = recipe.getSecondary();
-
-            ItemStack input = getItem(0);
-            ItemStack output = getItem(1);
-            ItemStack secondaryOutput = getItem(2);
-
-            // Process main output
-            if (output.isEmpty()) {
-                setItem(1, result.copy());
-            } else if (ItemStack.isSameItemSameComponents(output, result)) {
-                output.grow(result.getCount());
-            }
-
-            // Process secondary output
-            processSecondaries(secondary, secondaryOutput, recipe.getSecondaryChance());
-
-            input.shrink(1);
+            mergeOutput(1, recipe.getResult());
+            processSecondary(recipe.getSecondary(), recipe.getSecondaryChance());
+            getItem(0).shrink(1);
             setChanged();
         }
     }
 
-    private void processSecondaries(ItemStack secondary, ItemStack secondaryOutput, int chance) {
-        if (!secondary.isEmpty() && level != null) {
-            if (chance >= 100 || level.random.nextInt(100) < chance) {
-                if (secondaryOutput.isEmpty()) {
-                    setItem(2, secondary.copy());
-                } else if (ItemStack.isSameItemSameComponents(secondaryOutput, secondary)) {
-                    secondaryOutput.grow(secondary.getCount());
-                }
-            }
-        }
-    }
-
     @Override
-    public void setItem(int slot, ItemStack stack) {
-        ItemStack oldStack = getItem(slot);
-        super.setItem(slot, stack);
-
-        boolean isSameItem = !stack.isEmpty() && ItemStack.isSameItemSameComponents(stack, oldStack);
-        if (slot == 0 && !isSameItem) {
-            totalItemMillTime = getRecipeTime();
-            currentItemMillTime = 0;
-        }
+    protected void onInputChanged() {
+        totalItemMillTime = getRecipeTime();
+        currentItemMillTime = 0;
     }
 
     @Override
