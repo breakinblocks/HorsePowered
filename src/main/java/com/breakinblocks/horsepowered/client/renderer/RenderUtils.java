@@ -1,11 +1,17 @@
 package com.breakinblocks.horsepowered.client.renderer;
 
+import com.breakinblocks.horsepowered.Configs;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import org.joml.Matrix4f;
 
 /**
@@ -49,6 +55,49 @@ public final class RenderUtils {
                 Font.DisplayMode.NORMAL, 0x40000000, packedLight);
 
         poseStack.popPose();
+    }
+
+    /**
+     * Renders an item stack flat on a surface with optional billboard count text.
+     *
+     * @param poseStack     The pose stack for transformations
+     * @param bufferSource  The buffer source for rendering
+     * @param itemRenderer  The item renderer instance
+     * @param font          The font for count text
+     * @param stack         The item stack to render
+     * @param x             X offset from block entity position
+     * @param y             Y offset from block entity position
+     * @param z             Z offset from block entity position
+     * @param scale         Scale of the rendered item
+     * @param yRotation     Y-axis rotation in degrees (0 for no rotation)
+     * @param packedLight   The packed light value
+     * @param packedOverlay The packed overlay value
+     * @param level         The level (for item renderer seed)
+     * @param countY        Y offset for the count billboard (only used if count > 1)
+     */
+    public static void renderFlatItem(PoseStack poseStack, MultiBufferSource bufferSource,
+                                       ItemRenderer itemRenderer, Font font, ItemStack stack,
+                                       double x, double y, double z, float scale, float yRotation,
+                                       int packedLight, int packedOverlay, Level level, double countY) {
+        if (stack.isEmpty()) return;
+
+        poseStack.pushPose();
+        poseStack.translate(x, y, z);
+        poseStack.scale(scale, scale, scale);
+        if (yRotation != 0) {
+            poseStack.mulPose(Axis.YP.rotationDegrees(yRotation));
+        }
+        poseStack.mulPose(Axis.XP.rotationDegrees(90));
+
+        itemRenderer.renderStatic(stack, ItemDisplayContext.FIXED, packedLight, packedOverlay,
+                poseStack, bufferSource, level, 0);
+
+        poseStack.popPose();
+
+        if (stack.getCount() > 1 && Configs.renderItemAmount.get()) {
+            renderItemCountBillboard(poseStack, bufferSource, font, packedLight,
+                    stack.getCount(), x, countY, z);
+        }
     }
 
     /**

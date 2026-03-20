@@ -54,8 +54,9 @@ public class HorsePowerMod {
         HPRecipes.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);
 
-        // Register config
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Configs.SPEC);
+        // Register configs
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Configs.COMMON_SPEC);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, Configs.CLIENT_SPEC);
 
         // Register common setup listener
         modEventBus.addListener(this::commonSetup);

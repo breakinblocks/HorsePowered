@@ -1,17 +1,13 @@
 package com.breakinblocks.horsepowered.client.renderer;
 
-import com.breakinblocks.horsepowered.Configs;
 import com.breakinblocks.horsepowered.blockentity.GrindstoneBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
-import net.minecraft.world.item.ItemDisplayContext;
-import net.minecraft.world.item.ItemStack;
 
 public class GrindstoneBlockEntityRenderer implements BlockEntityRenderer<GrindstoneBlockEntity> {
 
@@ -33,66 +29,20 @@ public class GrindstoneBlockEntityRenderer implements BlockEntityRenderer<Grinds
         // Render lead to attached worker
         LeadRenderer.renderLead(blockEntity, partialTick, poseStack, bufferSource);
 
-        ItemStack input = blockEntity.getItem(0);
-        ItemStack output = blockEntity.getItem(1);
-        ItemStack secondary = blockEntity.getItem(2);
-
         // Render input item on top
-        if (!input.isEmpty()) {
-            poseStack.pushPose();
-            poseStack.translate(0.5D, 1.1D, 0.5D);
-            poseStack.scale(0.5F, 0.5F, 0.5F);
-            poseStack.mulPose(Axis.XP.rotationDegrees(90));
-
-            itemRenderer.renderStatic(input, ItemDisplayContext.FIXED, packedLight, packedOverlay,
-                    poseStack, bufferSource, blockEntity.getLevel(), 0);
-
-            poseStack.popPose();
-
-            // Render count as billboard if more than 1
-            if (input.getCount() > 1 && Configs.renderItemAmount.get()) {
-                RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight,
-                        input.getCount(), 0.5D, 1.4D, 0.5D);
-            }
-        }
+        RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer, font,
+                blockEntity.getItem(0), 0.5, 1.1, 0.5, 0.5F, 0, packedLight, packedOverlay,
+                blockEntity.getLevel(), 1.4);
 
         // Render output item
-        if (!output.isEmpty()) {
-            poseStack.pushPose();
-            poseStack.translate(0.5D, 0.3D, 0.25D);
-            poseStack.scale(0.3F, 0.3F, 0.3F);
-            poseStack.mulPose(Axis.XP.rotationDegrees(90));
-
-            itemRenderer.renderStatic(output, ItemDisplayContext.FIXED, packedLight, packedOverlay,
-                    poseStack, bufferSource, blockEntity.getLevel(), 0);
-
-            poseStack.popPose();
-
-            // Render count as billboard if more than 1
-            if (output.getCount() > 1 && Configs.renderItemAmount.get()) {
-                RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight,
-                        output.getCount(), 0.5D, 0.55D, 0.25D);
-            }
-        }
+        RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer, font,
+                blockEntity.getItem(1), 0.5, 0.3, 0.25, 0.3F, 0, packedLight, packedOverlay,
+                blockEntity.getLevel(), 0.55);
 
         // Render secondary output
-        if (!secondary.isEmpty()) {
-            poseStack.pushPose();
-            poseStack.translate(0.5D, 0.3D, 0.75D);
-            poseStack.scale(0.3F, 0.3F, 0.3F);
-            poseStack.mulPose(Axis.XP.rotationDegrees(90));
-
-            itemRenderer.renderStatic(secondary, ItemDisplayContext.FIXED, packedLight, packedOverlay,
-                    poseStack, bufferSource, blockEntity.getLevel(), 0);
-
-            poseStack.popPose();
-
-            // Render count as billboard if more than 1
-            if (secondary.getCount() > 1 && Configs.renderItemAmount.get()) {
-                RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight,
-                        secondary.getCount(), 0.5D, 0.55D, 0.75D);
-            }
-        }
+        RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer, font,
+                blockEntity.getItem(2), 0.5, 0.3, 0.75, 0.3F, 0, packedLight, packedOverlay,
+                blockEntity.getLevel(), 0.55);
     }
 
     @Override

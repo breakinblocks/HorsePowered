@@ -77,38 +77,25 @@ public class ManualChopperBlockEntity extends HPBlockEntityBase {
     }
 
     @Override
-    public void setItem(int slot, ItemStack stack) {
-        ItemStack oldStack = getItem(slot);
-        super.setItem(slot, stack);
-
-        boolean isSameItem = !stack.isEmpty() && ItemStack.isSameItemSameTags(stack, oldStack);
-        if (slot == 0 && !isSameItem) {
-            totalItemChopAmount = getRecipeTime() * Configs.choppingMultiplier.get();
-            currentItemChopAmount = 0;
-        }
+    protected void onInputChanged() {
+        totalItemChopAmount = getRecipeTime() * Configs.choppingMultiplier.get();
+        currentItemChopAmount = 0;
     }
 
     private void chopItem(Player player) {
         if (level == null || !canWork()) return;
 
-        ItemStack input = getItem(0);
         if (!level.isClientSide) {
             ItemStack result = getRecipeOutput();
-            ItemStack output = getItem(1);
-
             if (Configs.choppingBlockDrop.get()) {
                 Containers.dropItemStack(level, worldPosition.getX(), worldPosition.getY() + 0.5, worldPosition.getZ(), result.copy());
             } else {
-                if (output.isEmpty()) {
-                    setItem(1, result.copy());
-                } else if (ItemStack.isSameItemSameTags(output, result)) {
-                    output.grow(result.getCount());
-                }
+                mergeOutput(1, result);
             }
         }
 
         level.playSound(player, worldPosition, SoundEvents.WOOD_BREAK, SoundSource.BLOCKS, 1.0f, 1.0f);
-        input.shrink(1);
+        getItem(0).shrink(1);
         setChanged();
     }
 

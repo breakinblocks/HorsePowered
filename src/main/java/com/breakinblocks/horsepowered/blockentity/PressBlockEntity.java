@@ -4,7 +4,6 @@ import com.breakinblocks.horsepowered.Configs;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
 import com.breakinblocks.horsepowered.recipes.PressRecipe;
-import com.google.common.collect.Lists;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.SimpleContainer;
@@ -59,34 +58,6 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
     }
 
     @Override
-    public boolean validateArea() {
-        if (level == null) return false;
-
-        if (searchPos == null) {
-            searchPos = Lists.newArrayList();
-
-            for (int x = -3; x <= 3; x++) {
-                for (int z = -3; z <= 3; z++) {
-                    // Skip center area
-                    if ((x <= 1 && x >= -1) && (z <= 1 && z >= -1)) {
-                        continue;
-                    }
-                    searchPos.add(worldPosition.offset(x, 0, z));
-                    searchPos.add(worldPosition.offset(x, 1, z));
-                }
-            }
-        }
-
-        for (BlockPos pos : searchPos) {
-            BlockState state = level.getBlockState(pos);
-            if (!state.canBeReplaced()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    @Override
     public boolean targetReached() {
         currentPressStatus++;
 
@@ -128,36 +99,21 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
             if (recipeOpt.isEmpty()) return;
 
             PressRecipe recipe = recipeOpt.get();
-            ItemStack result = recipe.getResult();
-            FluidStack fluidResult = recipe.getFluidResult();
-
-            ItemStack input = getItem(0);
-            ItemStack output = getItem(1);
 
             if (recipe.hasFluidOutput()) {
-                tank.fill(fluidResult.copy(), IFluidHandler.FluidAction.EXECUTE);
+                tank.fill(recipe.getFluidResult().copy(), IFluidHandler.FluidAction.EXECUTE);
             } else {
-                if (output.isEmpty()) {
-                    setItem(1, result.copy());
-                } else if (ItemStack.isSameItemSameTags(output, result)) {
-                    output.grow(result.getCount());
-                }
+                mergeOutput(1, recipe.getResult());
             }
 
-            input.shrink(recipe.getInputCount());
+            getItem(0).shrink(recipe.getInputCount());
             setChanged();
         }
     }
 
     @Override
-    public void setItem(int slot, ItemStack stack) {
-        ItemStack oldStack = getItem(slot);
-        super.setItem(slot, stack);
-
-        boolean isSameItem = !stack.isEmpty() && ItemStack.isSameItemSameTags(stack, oldStack);
-        if (slot == 0 && !isSameItem) {
-            currentPressStatus = 0;
-        }
+    protected void onInputChanged() {
+        currentPressStatus = 0;
     }
 
     @Override

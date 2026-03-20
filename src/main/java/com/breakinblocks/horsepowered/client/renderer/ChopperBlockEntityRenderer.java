@@ -1,6 +1,5 @@
 package com.breakinblocks.horsepowered.client.renderer;
 
-import com.breakinblocks.horsepowered.Configs;
 import com.breakinblocks.horsepowered.blocks.BlockChopper;
 import com.breakinblocks.horsepowered.blockentity.ChopperBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -15,8 +14,6 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
-import net.minecraft.world.item.ItemDisplayContext;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -44,9 +41,6 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
         // Render lead to attached worker
         LeadRenderer.renderLead(blockEntity, partialTick, poseStack, bufferSource);
 
-        ItemStack input = blockEntity.getItem(0);
-        ItemStack output = blockEntity.getItem(1);
-
         BlockState state = blockEntity.getBlockState();
         Direction facing = state.getValue(BlockChopper.FACING);
         float rotation = getRotation(facing);
@@ -54,45 +48,15 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
         // Render animated blade
         renderBlade(blockEntity, poseStack, bufferSource, packedLight, packedOverlay, rotation);
 
-        // Render input item on the chopping surface (on top of the oak slab base)
-        if (!input.isEmpty()) {
-            poseStack.pushPose();
-            poseStack.translate(0.5D, 0.52D, 0.5D);  // Lower position - on slab surface
-            poseStack.scale(0.6F, 0.6F, 0.6F);
-            poseStack.mulPose(Axis.YP.rotationDegrees(rotation));
-            poseStack.mulPose(Axis.XP.rotationDegrees(90));
-
-            itemRenderer.renderStatic(input, ItemDisplayContext.FIXED, packedLight, packedOverlay,
-                    poseStack, bufferSource, blockEntity.getLevel(), 0);
-
-            poseStack.popPose();
-
-            // Render count as billboard if more than 1
-            if (input.getCount() > 1 && Configs.renderItemAmount.get()) {
-                RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight,
-                        input.getCount(), 0.5D, 0.85D, 0.5D);
-            }
-        }
+        // Render input item on the chopping surface
+        RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer, font,
+                blockEntity.getItem(0), 0.5, 0.52, 0.5, 0.6F, rotation, packedLight, packedOverlay,
+                blockEntity.getLevel(), 0.85);
 
         // Render output item
-        if (!output.isEmpty()) {
-            poseStack.pushPose();
-            poseStack.translate(0.5D, 0.3D, 0.5D);
-            poseStack.scale(0.4F, 0.4F, 0.4F);
-            poseStack.mulPose(Axis.YP.rotationDegrees(rotation + 45));
-            poseStack.mulPose(Axis.XP.rotationDegrees(90));
-
-            itemRenderer.renderStatic(output, ItemDisplayContext.FIXED, packedLight, packedOverlay,
-                    poseStack, bufferSource, blockEntity.getLevel(), 0);
-
-            poseStack.popPose();
-
-            // Render count as billboard if more than 1
-            if (output.getCount() > 1 && Configs.renderItemAmount.get()) {
-                RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight,
-                        output.getCount(), 0.5D, 0.55D, 0.5D);
-            }
-        }
+        RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer, font,
+                blockEntity.getItem(1), 0.5, 0.3, 0.5, 0.4F, rotation + 45, packedLight, packedOverlay,
+                blockEntity.getLevel(), 0.55);
     }
 
     private void renderBlade(ChopperBlockEntity blockEntity, PoseStack poseStack,

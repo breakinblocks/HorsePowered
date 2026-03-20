@@ -11,7 +11,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Utils {
 
@@ -39,6 +38,6 @@ public class Utils {
         return level.getEntitiesOfClass(PathfinderMob.class, searchArea)
                 .stream()
                 .filter(Utils::isValidWorker)
-                .collect(Collectors.toList());
+                .toList();
     }
 }

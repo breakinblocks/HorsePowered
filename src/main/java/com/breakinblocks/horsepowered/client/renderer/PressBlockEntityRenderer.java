@@ -4,7 +4,6 @@ import com.breakinblocks.horsepowered.Configs;
 import com.breakinblocks.horsepowered.blockentity.PressBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -15,8 +14,6 @@ import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
-import net.minecraft.world.item.ItemDisplayContext;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.fluids.FluidStack;
@@ -47,52 +44,21 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
         // Render lead to attached worker
         LeadRenderer.renderLead(blockEntity, partialTick, poseStack, bufferSource);
 
-        ItemStack input = blockEntity.getItem(0);
-        ItemStack output = blockEntity.getItem(1);
-        FluidTank tank = blockEntity.getTank();
-
         // Render animated plunger
         renderPlunger(blockEntity, poseStack, bufferSource, packedLight, packedOverlay);
 
         // Render input items on the press plate
-        if (!input.isEmpty()) {
-            poseStack.pushPose();
-            poseStack.translate(0.5D, 0.35D, 0.5D);  // Lower position - inside basin
-            poseStack.scale(0.5F, 0.5F, 0.5F);
-            poseStack.mulPose(Axis.XP.rotationDegrees(90));
-
-            itemRenderer.renderStatic(input, ItemDisplayContext.FIXED, packedLight, packedOverlay,
-                    poseStack, bufferSource, blockEntity.getLevel(), 0);
-
-            poseStack.popPose();
-
-            // Render count as billboard if more than 1
-            if (input.getCount() > 1 && Configs.renderItemAmount.get()) {
-                RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight,
-                        input.getCount(), 0.5D, 0.65D, 0.5D);
-            }
-        }
+        RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer, font,
+                blockEntity.getItem(0), 0.5, 0.35, 0.5, 0.5F, 0, packedLight, packedOverlay,
+                blockEntity.getLevel(), 0.65);
 
         // Render output item
-        if (!output.isEmpty()) {
-            poseStack.pushPose();
-            poseStack.translate(0.5D, 0.3D, 0.5D);
-            poseStack.scale(0.35F, 0.35F, 0.35F);
-            poseStack.mulPose(Axis.XP.rotationDegrees(90));
-
-            itemRenderer.renderStatic(output, ItemDisplayContext.FIXED, packedLight, packedOverlay,
-                    poseStack, bufferSource, blockEntity.getLevel(), 0);
-
-            poseStack.popPose();
-
-            // Render count as billboard if more than 1
-            if (output.getCount() > 1 && Configs.renderItemAmount.get()) {
-                RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight,
-                        output.getCount(), 0.5D, 0.55D, 0.5D);
-            }
-        }
+        RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer, font,
+                blockEntity.getItem(1), 0.5, 0.3, 0.5, 0.35F, 0, packedLight, packedOverlay,
+                blockEntity.getLevel(), 0.55);
 
         // Render fluid in tank
+        FluidTank tank = blockEntity.getTank();
         if (!tank.isEmpty()) {
             renderFluid(poseStack, bufferSource, packedLight, tank);
         }
