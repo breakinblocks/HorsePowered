@@ -174,10 +174,30 @@ publishMods {
     }
 }
 
-// Include Maven publish when running publishMods
+// Include Maven publish when running publishMods.
+// Failures (e.g. HTTP 409 if the version already exists on the Maven repo) are logged
+// but do not fail the overall publishMods invocation, so CurseForge/Modrinth/GitHub
+// publishing can still continue.
 tasks.named('publishMods') {
     def mavenUser = providers.environmentVariable("MAVEN_USER")
     if (mavenUser.isPresent()) {
         dependsOn 'publishMavenJavaPublicationToBreakInBlocksRepository'
+    }
+}
+
+afterEvaluate {
+    def mavenTask = tasks.findByName('publishMavenJavaPublicationToBreakInBlocksRepository')
+    if (mavenTask != null) {
+        def originalActions = new ArrayList<>(mavenTask.actions)
+        mavenTask.actions.clear()
+        mavenTask.doLast('Tolerant Maven publish') {
+            originalActions.each { action ->
+                try {
+                    action.execute(mavenTask)
+                } catch (Exception e) {
+                    logger.warn("Maven publish failed (continuing anyway): ${e.message}")
+                }
+            }
+        }
     }
 }
