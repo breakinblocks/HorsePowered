@@ -72,9 +72,9 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
                 Containers.dropContents(level, pos, te);
                 level.updateNeighbourForOutputSignal(pos, this);
 
-                // Drop lead if horse was attached
-                if (te instanceof HPBlockEntityHorseBase horseTe && horseTe.hasWorker()) {
-                    Containers.dropItemStack(level, pos.getX(), pos.getY() + 1, pos.getZ(), new ItemStack(Items.LEAD));
+                // Respawn the virtual worker and drop a lead if one was attached
+                if (te instanceof HPBlockEntityHorseBase horseTe) {
+                    horseTe.onBlockRemoved();
                 }
             }
             super.onRemove(state, level, pos, newState, isMoving);

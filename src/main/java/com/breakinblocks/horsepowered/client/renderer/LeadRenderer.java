@@ -8,51 +8,49 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
-import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 
 /**
- * Renders a lead (rope) between a horse-powered block and its attached worker mob.
+ * Renders a lead (rope) between a horse-powered block and its attached virtual worker.
  * Uses similar technique to vanilla mob leash rendering.
  */
 public class LeadRenderer {
 
     /**
-     * Renders a lead from the block entity to its worker if present.
-     *
-     * @param blockEntity   The horse-powered block entity
-     * @param partialTick   Partial tick for smooth rendering
-     * @param poseStack     The pose stack
-     * @param bufferSource  The buffer source
+     * Renders a lead from the block entity to its virtual worker if present.
      */
     public static void renderLead(HPBlockEntityHorseBase blockEntity, float partialTick,
                                    PoseStack poseStack, MultiBufferSource bufferSource) {
-        PathfinderMob worker = blockEntity.getWorker();
-        if (worker == null || !blockEntity.hasWorkerForDisplay()) {
+        if (!blockEntity.hasWorkerForDisplay()) {
             return;
         }
+        Level level = blockEntity.getLevel();
+        if (level == null) return;
 
-        // Calculate block attach point (center of block, slightly above)
+        // Block attach point (center of block, slightly above)
         BlockPos blockPos = blockEntity.getBlockPos();
-        double blockX = 0.5; // Center of block relative to block position
-        double blockY = 1.0; // Slightly above the block
+        double blockX = 0.5;
+        double blockY = 1.0;
         double blockZ = 0.5;
 
-        // Calculate worker position (interpolated for smooth rendering)
-        Vec3 workerPos = worker.getRopeHoldPosition(partialTick);
+        // Interpolated virtual worker position (smooth rendering)
+        double workerX = Mth.lerp(partialTick, blockEntity.getPrevVirtualX(), blockEntity.getVirtualX());
+        double workerZ = Mth.lerp(partialTick, blockEntity.getPrevVirtualZ(), blockEntity.getVirtualZ());
+        double workerY = blockEntity.getVirtualY() + blockEntity.getWorkerEntityHeight() * 0.7;
 
         // Offset from block entity position
-        double dx = workerPos.x - blockPos.getX() - blockX;
-        double dy = workerPos.y - blockPos.getY() - blockY;
-        double dz = workerPos.z - blockPos.getZ() - blockZ;
+        double dx = workerX - blockPos.getX() - blockX;
+        double dy = workerY - blockPos.getY() - blockY;
+        double dz = workerZ - blockPos.getZ() - blockZ;
 
         // Get light levels
-        int blockLight = worker.level().getBrightness(LightLayer.BLOCK, blockEntity.getBlockPos().above());
-        int skyLight = worker.level().getBrightness(LightLayer.SKY, blockEntity.getBlockPos().above());
-        int workerBlockLight = worker.level().getBrightness(LightLayer.BLOCK, worker.blockPosition());
-        int workerSkyLight = worker.level().getBrightness(LightLayer.SKY, worker.blockPosition());
+        BlockPos workerBlockPos = BlockPos.containing(workerX, workerY, workerZ);
+        int blockLight = level.getBrightness(LightLayer.BLOCK, blockPos.above());
+        int skyLight = level.getBrightness(LightLayer.SKY, blockPos.above());
+        int workerBlockLight = level.getBrightness(LightLayer.BLOCK, workerBlockPos);
+        int workerSkyLight = level.getBrightness(LightLayer.SKY, workerBlockPos);
 
         poseStack.pushPose();
         poseStack.translate(blockX, blockY, blockZ);

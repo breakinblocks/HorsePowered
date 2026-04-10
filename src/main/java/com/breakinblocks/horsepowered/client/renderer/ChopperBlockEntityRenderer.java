@@ -15,11 +15,13 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import org.joml.Matrix4f;
 
 public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBlockEntity> {
@@ -49,6 +51,9 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
 
         // Render working area highlight if active
         WorkingAreaRenderer.renderIfActive(blockEntity, poseStack, bufferSource);
+
+        // Render virtual worker entity
+        VirtualWorkerRenderer.renderWorker(blockEntity, partialTick, poseStack, bufferSource, packedLight);
 
         // Render lead to attached worker
         LeadRenderer.renderLead(blockEntity, partialTick, poseStack, bufferSource);
@@ -191,5 +196,12 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
     @Override
     public int getViewDistance() {
         return 64;
+    }
+
+    @Override
+    public AABB getRenderBoundingBox(ChopperBlockEntity blockEntity) {
+        BlockPos pos = blockEntity.getBlockPos();
+        return new AABB(pos.getX() - 3, pos.getY(), pos.getZ() - 3,
+                        pos.getX() + 4, pos.getY() + 4, pos.getZ() + 4);
     }
 }

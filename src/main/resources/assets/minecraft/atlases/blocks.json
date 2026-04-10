@@ -1,0 +1,12 @@
+{
+  "sources": [
+    {
+      "type": "minecraft:single",
+      "resource": "horsepowered:block/seed_oil_still"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "horsepowered:block/seed_oil_flow"
+    }
+  ]
+}

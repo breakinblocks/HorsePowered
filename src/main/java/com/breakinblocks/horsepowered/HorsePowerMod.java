@@ -2,6 +2,7 @@ package com.breakinblocks.horsepowered;
 
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.config.HorsePowerConfig;
+import com.breakinblocks.horsepowered.fluids.ModFluids;
 import com.breakinblocks.horsepowered.items.ModItems;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
 import com.mojang.logging.LogUtils;
@@ -38,6 +39,7 @@ public class HorsePowerMod {
                         // Items
                         output.accept(ModItems.FLOUR.get());
                         output.accept(ModItems.DOUGH.get());
+                        output.accept(ModItems.SEED_OIL_BUCKET.get());
                         // Blocks
                         output.accept(ModBlocks.HAND_GRINDSTONE.get());
                         output.accept(ModBlocks.GRINDSTONE.get());
@@ -57,6 +59,8 @@ public class HorsePowerMod {
         ModItems.ITEMS.register(modEventBus);
         ModBlocks.BLOCKS.register(modEventBus);
         ModBlocks.BLOCK_ENTITIES.register(modEventBus);
+        ModFluids.FLUID_TYPES.register(modEventBus);
+        ModFluids.FLUIDS.register(modEventBus);
         HPRecipes.RECIPE_TYPES.register(modEventBus);
         HPRecipes.RECIPE_SERIALIZERS.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);
@@ -77,6 +81,30 @@ public class HorsePowerMod {
 
     private void commonSetup(final FMLCommonSetupEvent event) {
         LOGGER.info("Horse Powered common setup");
+        event.enqueueWork(() -> {
+            var lavaType = net.neoforged.neoforge.common.NeoForgeMod.LAVA_TYPE.value();
+            var oilType = ModFluids.SEED_OIL_TYPE.get();
+            var fire = net.minecraft.world.level.block.Blocks.FIRE.defaultBlockState();
+
+            // Seed oil + adjacent lava → fire
+            net.neoforged.neoforge.fluids.FluidInteractionRegistry.addInteraction(oilType,
+                    new net.neoforged.neoforge.fluids.FluidInteractionRegistry.InteractionInformation(
+                            lavaType, fluidState -> fire));
+
+            // Seed oil + adjacent fire block → fire
+            net.neoforged.neoforge.fluids.FluidInteractionRegistry.addInteraction(oilType,
+                    new net.neoforged.neoforge.fluids.FluidInteractionRegistry.InteractionInformation(
+                            (level, currentPos, relativePos, currentState) ->
+                                    level.getBlockState(relativePos).is(net.minecraft.world.level.block.Blocks.FIRE),
+                            fluidState -> fire));
+
+            // Lava + adjacent seed oil → fire
+            net.neoforged.neoforge.fluids.FluidInteractionRegistry.addInteraction(lavaType,
+                    new net.neoforged.neoforge.fluids.FluidInteractionRegistry.InteractionInformation(
+                            oilType, fluidState -> fire));
+
+            LOGGER.info("Registered seed oil fluid interactions");
+        });
     }
 
     private void buildCreativeContents(final BuildCreativeModeTabContentsEvent event) {

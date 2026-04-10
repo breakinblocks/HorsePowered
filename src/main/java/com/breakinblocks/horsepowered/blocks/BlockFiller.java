@@ -36,7 +36,7 @@ public class BlockFiller extends Block implements EntityBlock {
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
 
     public BlockFiller(Properties properties) {
-        super(properties.noOcclusion().noLootTable());
+        super(properties.noOcclusion().noLootTable().noTerrainParticles());
         registerDefaultState(stateDefinition.any().setValue(FACING, Direction.DOWN));
     }
 

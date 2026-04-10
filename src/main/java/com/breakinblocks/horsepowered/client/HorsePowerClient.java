@@ -5,10 +5,14 @@ import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.client.renderer.ChopperBlockEntityRenderer;
 import com.breakinblocks.horsepowered.client.renderer.GrindstoneBlockEntityRenderer;
 import com.breakinblocks.horsepowered.client.renderer.PressBlockEntityRenderer;
+import com.breakinblocks.horsepowered.fluids.ModFluids;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
+import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 
 @EventBusSubscriber(modid = HorsePowerMod.MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class HorsePowerClient {
@@ -18,5 +22,26 @@ public class HorsePowerClient {
         event.registerBlockEntityRenderer(ModBlocks.GRINDSTONE_BE.get(), GrindstoneBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(ModBlocks.CHOPPER_BE.get(), ChopperBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(ModBlocks.PRESS_BE.get(), PressBlockEntityRenderer::new);
+    }
+
+    @SubscribeEvent
+    public static void registerClientExtensions(RegisterClientExtensionsEvent event) {
+        // Color is baked into the texture — no tint needed
+        event.registerFluidType(new IClientFluidTypeExtensions() {
+            @Override
+            public ResourceLocation getStillTexture() {
+                return HorsePowerMod.id("block/seed_oil_still");
+            }
+
+            @Override
+            public ResourceLocation getFlowingTexture() {
+                return HorsePowerMod.id("block/seed_oil_flow");
+            }
+
+            @Override
+            public ResourceLocation getOverlayTexture() {
+                return HorsePowerMod.id("block/seed_oil_still");
+            }
+        }, ModFluids.SEED_OIL_TYPE.get());
     }
 }

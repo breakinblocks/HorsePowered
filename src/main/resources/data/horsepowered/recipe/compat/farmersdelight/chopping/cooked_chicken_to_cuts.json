@@ -1,0 +1,7 @@
+{
+  "neoforge:conditions": [{"type": "neoforge:mod_loaded", "modid": "farmersdelight"}],
+  "type": "horsepowered:chopping",
+  "ingredient": {"item": "minecraft:cooked_chicken"},
+  "result": {"id": "farmersdelight:cooked_chicken_cuts", "count": 2},
+  "time": 1
+}

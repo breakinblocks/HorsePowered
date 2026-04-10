@@ -3,7 +3,8 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.moddev' version '2.0.42-beta'
+    id 'net.neoforged.moddev' version '2.0.141'
+    id 'me.modmuss50.mod-publish-plugin' version '1.1.0'
 }
 
 version = mod_version
@@ -116,7 +117,14 @@ publishing {
     }
     repositories {
         maven {
-            url "file://${project.projectDir}/mcmodsrepo"
+            name = "BreakInBlocks"
+            url = version.toString().endsWith("-SNAPSHOT") ?
+                "https://maven.breakinblocks.com/snapshots" :
+                "https://maven.breakinblocks.com/releases"
+            credentials {
+                username = System.getenv("MAVEN_USER") ?: ""
+                password = System.getenv("MAVEN_TOKEN") ?: ""
+            }
         }
     }
 }
@@ -124,4 +132,65 @@ publishing {
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
     options.compilerArgs << '-Xlint:deprecation'
+}
+
+// Mod publishing to CurseForge, Modrinth, and GitHub
+// Pass -PdryRun=true to test publishing without actually uploading
+publishMods {
+    dryRun = project.hasProperty("dryRun") && project.property("dryRun") == "true"
+    file = jar.archiveFile
+    def changelogFile = file("metadata/changelogs/${mod_version}.md")
+    changelog = changelogFile.exists() ? changelogFile.text : "Release ${version}"
+    type = STABLE
+    modLoaders.add("neoforge")
+
+    curseforge {
+        projectId = "1408330"
+        projectSlug = "horsepowered"
+        accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
+        minecraftVersions.add(minecraft_version)
+        optional("jei", "jade", "guideme")
+    }
+
+    modrinth {
+        projectId = "cZml36tg"
+        accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+        minecraftVersions.add(minecraft_version)
+        optional("jei", "jade", "guideme")
+    }
+
+    def githubToken = providers.environmentVariable("GITHUB_TOKEN")
+    if (githubToken.isPresent()) {
+        github {
+            repository = "breakinblocks/HorsePowered"
+            accessToken = githubToken
+            commitish = "main"
+        }
+    }
+}
+
+// Include Maven publish when running publishMods.
+// Failures (e.g. HTTP 409 if the version already exists) are logged but non-fatal.
+tasks.named('publishMods') {
+    def mavenUser = providers.environmentVariable("MAVEN_USER")
+    if (mavenUser.isPresent()) {
+        dependsOn 'publishMavenJavaPublicationToBreakInBlocksRepository'
+    }
+}
+
+afterEvaluate {
+    def mavenTask = tasks.findByName('publishMavenJavaPublicationToBreakInBlocksRepository')
+    if (mavenTask != null) {
+        def originalActions = new ArrayList<>(mavenTask.actions)
+        mavenTask.actions.clear()
+        mavenTask.doLast('Tolerant Maven publish') {
+            originalActions.each { action ->
+                try {
+                    action.execute(mavenTask)
+                } catch (Exception e) {
+                    logger.warn("Maven publish failed (continuing anyway): ${e.message}")
+                }
+            }
+        }
+    }
 }

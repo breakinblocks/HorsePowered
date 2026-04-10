@@ -52,14 +52,6 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
     }
 
     @Override
-    public void setChanged() {
-        if (getItem(0).isEmpty()) {
-            currentPressStatus = 0;
-        }
-        super.setChanged();
-    }
-
-    @Override
     public boolean targetReached() {
         currentPressStatus++;
 

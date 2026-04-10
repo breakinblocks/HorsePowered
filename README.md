@@ -8,20 +8,30 @@
 
 # Horse Powered
 
-A Minecraft NeoForge mod that adds horse-powered machinery for grinding, chopping, and pressing items. Process materials the old-fashioned way, with animal power!
+A Minecraft NeoForge mod that adds horse-powered machinery for grinding, chopping, and pressing items. Process materials the old-fashioned way — with animal power!
 
 ## Features
 
 ### Manual Machines
 
-- **Hand Grindstone** - Grind items by hand. Right-click to turn the wheel and process materials.
-- **Chopping Block** - Chop logs into planks using an axe. A simple early-game wood processing solution.
+- **Hand Grindstone** — Grind items by hand. Right-click to turn the wheel and process materials.
+- **Chopping Block** — Chop logs into planks using an axe. A simple early-game wood processing solution.
 
 ### Horse-Powered Machines
 
-- **Horse Grindstone** - An automated grindstone powered by a horse walking in circles. Continuously grinds items without manual intervention.
-- **Horse Chopper** - An automated chopping machine. Attach a horse to chop logs into planks automatically.
-- **Horse Press** - Press items to extract fluids or produce other outputs. Perfect for making oils, juices, and other liquids.
+- **Horse Grindstone** — An automated grindstone powered by a horse walking in circles. Continuously grinds items without manual intervention.
+- **Horse Chopper** — An automated chopping machine. Attach a horse to chop logs into planks automatically.
+- **Horse Press** — Press items to extract fluids or produce other outputs. Squeeze flowers for dye, press seeds for oil, and more.
+
+### Seed Oil
+
+Pressing seeds (wheat, melon, pumpkin, beetroot, or torchflower) in the Horse Press produces **Seed Oil** — a viscous, flammable plant-based fluid.
+
+- Flows slowly and doesn't spread far (half the range of water)
+- Can be picked up with a bucket
+- **Burns as furnace fuel** — a bucket of seed oil lasts nearly as long as a bucket of lava
+- **Flammable** — contact with lava or fire ignites it, and flames spread rapidly through connected oil
+- Tagged as `c:plantoil` for cross-mod compatibility
 
 ## Getting Started
 
@@ -29,61 +39,135 @@ A Minecraft NeoForge mod that adds horse-powered machinery for grinding, choppin
 2. Upgrade to horse-powered machines for automation
 3. Lead a horse (or other valid creature) to the machine with a lead
 4. Right-click the machine while holding the lead to attach the creature
-5. The creature will walk in circles, powering the machine automatically
+5. Insert items by right-clicking the machine while holding the input material
+6. Extract finished products by right-clicking with an empty hand
 
-## Working Area
+**Tip:** Shift+Right-click a horse-powered machine with an empty hand to visualize the required 7x7 working area. Green = clear, Red = obstructed.
 
-Horse-powered machines require a clear 7x7 area around them for the animal to walk.
+## Included Recipes
 
-**Tip:** Shift+Right-click a horse-powered machine with an empty hand to visualize the required working area:
+Horse Powered ships with a comprehensive set of vanilla recipes out of the box. All recipes are viewable in-game with JEI.
 
-- **Green boxes** indicate clear areas
-- **Red boxes** indicate obstructed blocks that need to be removed
+### Chopping (25 recipes)
+- **All log types to planks** — oak, birch, spruce, jungle, acacia, dark oak, mangrove, cherry, crimson, warped, bamboo
+- **Planks to sticks** — works with all plank types
+- **Food** — melon to slices, pumpkin to seeds
+- **Wood recycling** — doors, trapdoors, fences, gates, slabs, stairs, buttons, signs, ladders all break down into sticks
 
-## Recipes
+### Grinding (22 recipes)
+- **Bone processing** — bone to bone meal (with 25% bonus chance), bone block to 9 bone meal
+- **Flour** — wheat to flour (craft dough with a water bucket, then smelt into bread)
+- **Stone chain** — stone to cobblestone, cobblestone to gravel (with flint chance), gravel to sand (with flint chance)
+- **Blaze/Breeze** — blaze rod to 4 powder, breeze rod to 5 wind charges
+- **Block decomposition** — bricks, clay, glowstone, honeycomb block, dripstone, prismarine, quartz block all break into their components
+- **Ore processing** — raw iron/gold to nuggets with 25% bonus, raw copper to ingots with 25% bonus
+- **Miscellaneous** — wool to string, sandstone to sand, flint to gunpowder, sugar cane to sugar, soul soil to soul sand
 
-Recipes can be viewed in-game using JEI (Just Enough Items). The mod includes recipes for:
+### Pressing (33 recipes)
+- **Seeds to Seed Oil** — all seed types (wheat, melon, pumpkin, beetroot, torchflower)
+- **Flowers to dye** — all 19 flower types, small flowers yield 4 dye, tall flowers yield 8
+- **Water extraction** — ice, snow, snowball, packed ice, wet sponge, mud, pointed dripstone
+- **Other** — sugar cane to paper, honey bottle to sugar, honeycomb to honey, cactus to green dye, magma block to magma cream, kelp to dried kelp
 
-- Grinding wheat into flour
-- Grinding bones into bone meal
-- Chopping logs into planks
-- Pressing various items into fluids
+### Farmer's Delight Compat (11 recipes)
+When Farmer's Delight is installed, the chopper gains meat-cutting recipes:
+- Beef, porkchop, chicken, cod, salmon, mutton (raw and cooked variants)
 
-These recipes exist as placeholder examples since this mod is primarily aimed at modpack makers. Additional recipes can be added via datapacks.
+## Automation
 
-## For Modpack Makers
+All Horse Powered machines support item automation via hoppers, pipes, and other modded item transport systems. Insert items into the input slot from the top or sides, and extract finished products from the bottom.
+
+## Mod Integrations
+
+- **JEI** — Recipe viewing support for all machine types
+- **Jade** — Block tooltips showing machine status, inventory, worker info, and progress
+- **GuideME** — In-game guidebook (when installed, not required)
+- **Farmer's Delight** — Conditional meat-cutting recipes for the chopper
+
+## Configuration
+
+The mod includes several configuration options:
+
+- Hunger exhaustion rates for manual machines
+- Whether axes take damage when using the chopping block
+- Points required for various machine operations
+- Press fluid tank capacity
+- Item rendering options
+
+---
+
+## For Modpack Makers & Datapack Authors
 
 ### Custom Recipes
 
-Horse Powered uses data-driven JSON recipes that can be added or modified via datapacks. Recipe types include:
+Horse Powered uses data-driven JSON recipes that can be added or modified via datapacks. All built-in recipes are data-generated and can be overridden.
 
-- `horsepowered:grinding` - Grindstone recipes
-- `horsepowered:chopping` - Chopping block recipes
-- `horsepowered:pressing` - Press recipes (supports item and fluid outputs)
+**Recipe types:**
+- `horsepowered:grinding` — Grindstone recipes (supports secondary output with chance)
+- `horsepowered:chopping` — Chopping recipes
+- `horsepowered:pressing` — Press recipes (supports item OR fluid output)
 
-Example grinding recipe (`data/yourpack/recipes/grinding/custom_recipe.json`):
+#### Grinding Recipe
 ```json
 {
   "type": "horsepowered:grinding",
-  "ingredient": { "item": "minecraft:wheat" },
-  "result": { "item": "yourmod:flour", "count": 1 },
+  "ingredient": {"item": "minecraft:bone"},
+  "result": {"id": "minecraft:bone_meal", "count": 3},
+  "secondary": {"id": "minecraft:bone_meal", "count": 1},
+  "secondaryChance": 25,
   "time": 12
+}
+```
+
+#### Chopping Recipe
+```json
+{
+  "type": "horsepowered:chopping",
+  "ingredient": {"tag": "minecraft:oak_logs"},
+  "result": {"id": "minecraft:oak_planks", "count": 4},
+  "time": 1
+}
+```
+
+#### Pressing Recipe (Item Output)
+```json
+{
+  "type": "horsepowered:pressing",
+  "ingredient": {"item": "minecraft:sugar_cane"},
+  "inputCount": 3,
+  "result": {"id": "minecraft:paper", "count": 3}
+}
+```
+
+#### Pressing Recipe (Fluid Output)
+```json
+{
+  "type": "horsepowered:pressing",
+  "ingredient": {"item": "minecraft:wheat_seeds"},
+  "inputCount": 12,
+  "fluidResult": {"id": "horsepowered:seed_oil", "amount": 250}
+}
+```
+
+### Conditional Recipes (Mod Compat)
+
+Use NeoForge conditions to add recipes that only load when a specific mod is present:
+```json
+{
+  "neoforge:conditions": [
+    {"type": "neoforge:mod_loaded", "modid": "farmersdelight"}
+  ],
+  "type": "horsepowered:chopping",
+  "ingredient": {"item": "minecraft:beef"},
+  "result": {"id": "farmersdelight:minced_beef", "count": 2},
+  "time": 1
 }
 ```
 
 ### Custom Worker Mobs
 
-By default, the following vanilla mobs can power horse-powered machines:
-- Horse
-- Donkey
-- Mule
-- Llama
-- Trader Llama
+By default, horses, donkeys, mules, llamas, and trader llamas can power machines. To add more, create an entity type tag at `data/horsepowered/tags/entity_types/valid_worker.json`:
 
-To add additional mobs as valid workers, create an entity type tag file at:
-`data/horsepowered/tags/entity_types/valid_worker.json`
-
-Example (adding modded horses):
 ```json
 {
   "replace": false,
@@ -94,35 +178,21 @@ Example (adding modded horses):
 }
 ```
 
-**Note:** Only PathfinderMob entities (entities with AI that can navigate) will work properly with the pathing system.
-
-## Mod Integrations
-
-- **JEI** - Recipe viewing support
-- **Jade** - Block information tooltips showing machine status, inventory, and worker info
-- **GuideME** - In-game documentation (when installed, not required)
-
-## Configuration
-
-The mod includes several configuration options:
-
-- Hunger exhaustion rates for manual machines
-- Whether axes take damage when using the chopping block
-- Points required for various machine operations
-- Item rendering options
+**Note:** Only `PathfinderMob` entities (mobs with navigation AI) work properly with the walking system.
 
 ## Requirements
 
 - Minecraft 1.21.1
 - NeoForge 21.1.0+
+- Java 21+
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+This project is licensed under the MIT License — see the [LICENSE.md](LICENSE.md) file for details.
 
 ## Credits
 
-- **Saereth** - Current development and 1.20.1 port
-- **GoryMoon** - Original [HorsePower](https://www.curseforge.com/minecraft/mc-mods/horse-power) mod concept and design
+- **Saereth** — Current development and port to modern NeoForge
+- **GoryMoon** — Original [HorsePower](https://www.curseforge.com/minecraft/mc-mods/horse-power) mod concept and design
 
-This mod is a spiritual successor and reimplementation of GoryMoon's original HorsePower mod, updated for modern Minecraft versions with new features and improvements. We thank GoryMoon for the original inspiration and concept that made this mod possible.
+This mod is a spiritual successor and reimplementation of GoryMoon's original HorsePower mod, updated for modern Minecraft with new features and improvements. We thank GoryMoon for the original inspiration that made this mod possible.

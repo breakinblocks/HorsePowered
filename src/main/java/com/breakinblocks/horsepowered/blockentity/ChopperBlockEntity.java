@@ -148,12 +148,18 @@ public class ChopperBlockEntity extends HPBlockEntityHorseBase {
         return 1;
     }
 
+    /**
+     * Returns the combined progress including the current windup sub-step.
+     * This gives Jade a smooth 0-100% bar even when recipe time=1.
+     */
     public int getCurrentChopTime() {
-        return currentItemChopTime;
+        int pointsPerCycle = HorsePowerConfig.pointsForWindup.get();
+        return currentItemChopTime * pointsPerCycle + currentWindup;
     }
 
     public int getTotalChopTime() {
-        return totalItemChopTime;
+        int pointsPerCycle = HorsePowerConfig.pointsForWindup.get();
+        return Math.max(1, totalItemChopTime) * pointsPerCycle;
     }
 
     public float getVisualWindup() {

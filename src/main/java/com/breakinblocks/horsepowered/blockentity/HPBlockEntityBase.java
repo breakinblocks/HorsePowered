@@ -26,6 +26,7 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
 
     protected NonNullList<ItemStack> itemStacks;
     protected Direction forward = Direction.NORTH;
+    protected ItemStack lastInputType = ItemStack.EMPTY;
 
     public HPBlockEntityBase(BlockEntityType<?> type, BlockPos pos, BlockState state, int inventorySize) {
         super(type, pos, state);
@@ -81,18 +82,19 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
 
     @Override
     public void setItem(int slot, ItemStack stack) {
-        ItemStack oldStack = getItem(slot);
         itemStacks.set(slot, stack);
 
         if (slot == 0 && stack.getCount() > getMaxStackSize(stack)) {
             stack.setCount(getMaxStackSize(stack));
         }
 
-        if (slot == 0) {
-            boolean isSameItem = !stack.isEmpty() && ItemStack.isSameItemSameComponents(stack, oldStack);
-            if (!isSameItem) {
+        if (slot == 0 && !stack.isEmpty()) {
+            boolean sameAsLast = !lastInputType.isEmpty()
+                    && ItemStack.isSameItemSameComponents(stack, lastInputType);
+            if (!sameAsLast) {
                 onInputChanged();
             }
+            lastInputType = stack.copyWithCount(1);
         }
 
         setChanged();
@@ -159,6 +161,12 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
             forward = Direction.byName(tag.getString("forward"));
             if (forward == null) forward = Direction.NORTH;
         }
+
+        if (tag.contains("lastInputType")) {
+            lastInputType = ItemStack.parseOptional(registries, tag.getCompound("lastInputType"));
+        } else {
+            lastInputType = ItemStack.EMPTY;
+        }
     }
 
     @Override
@@ -168,6 +176,10 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
 
         if (canBeRotated()) {
             tag.putString("forward", forward.getName());
+        }
+
+        if (!lastInputType.isEmpty()) {
+            tag.put("lastInputType", lastInputType.save(registries, new CompoundTag()));
         }
     }
 

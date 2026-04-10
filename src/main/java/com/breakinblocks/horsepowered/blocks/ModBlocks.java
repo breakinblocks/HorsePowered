@@ -2,14 +2,17 @@ package com.breakinblocks.horsepowered.blocks;
 
 import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.blockentity.*;
+import com.breakinblocks.horsepowered.fluids.ModFluids;
 import com.breakinblocks.horsepowered.items.ModItems;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -54,6 +57,18 @@ public class ModBlocks {
             () -> new BlockFiller(BlockBehaviour.Properties.of()
                     .mapColor(MapColor.WOOD)
                     .strength(5.0F)));
+
+    // Seed oil liquid block — highly flammable so fire chain-spreads through it
+    public static final DeferredBlock<LiquidBlock> SEED_OIL_BLOCK = BLOCKS.register("seed_oil",
+            () -> new FlammableLiquidBlock(ModFluids.SEED_OIL_SOURCE.get(), BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_YELLOW)
+                    .replaceable()
+                    .noCollission()
+                    .strength(100.0F)
+                    .pushReaction(PushReaction.DESTROY)
+                    .noLootTable()
+                    .liquid(),
+                    300, 300));
 
     // Block Entities
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<HandGrindstoneBlockEntity>> HAND_GRINDSTONE_BE =

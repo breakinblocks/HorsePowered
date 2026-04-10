@@ -14,10 +14,12 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
@@ -50,6 +52,9 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
 
         // Render working area highlight if active
         WorkingAreaRenderer.renderIfActive(blockEntity, poseStack, bufferSource);
+
+        // Render virtual worker entity
+        VirtualWorkerRenderer.renderWorker(blockEntity, partialTick, poseStack, bufferSource, packedLight);
 
         // Render lead to attached worker
         LeadRenderer.renderLead(blockEntity, partialTick, poseStack, bufferSource);
@@ -223,5 +228,12 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
     @Override
     public int getViewDistance() {
         return 64;
+    }
+
+    @Override
+    public AABB getRenderBoundingBox(PressBlockEntity blockEntity) {
+        BlockPos pos = blockEntity.getBlockPos();
+        return new AABB(pos.getX() - 3, pos.getY(), pos.getZ() - 3,
+                        pos.getX() + 4, pos.getY() + 4, pos.getZ() + 4);
     }
 }

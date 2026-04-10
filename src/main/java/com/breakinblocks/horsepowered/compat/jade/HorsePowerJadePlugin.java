@@ -40,8 +40,8 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
                     data.putInt(KEY_CURRENT, te.getCurrentMillTime());
                     data.putInt(KEY_TOTAL, te.getTotalMillTime());
                     data.putBoolean(KEY_HAS_WORKER, te.hasWorkerForDisplay());
-                    if (te.getWorker() != null) {
-                        data.putString(KEY_WORKER_NAME, te.getWorker().getDisplayName().getString());
+                    if (te.getWorkerDisplayName() != null) {
+                        data.putString(KEY_WORKER_NAME, te.getWorkerDisplayName());
                     }
                     data.putBoolean(KEY_IS_VALID, te.isValid());
                 }
@@ -60,8 +60,8 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
                     data.putInt(KEY_CURRENT, te.getCurrentChopTime());
                     data.putInt(KEY_TOTAL, te.getTotalChopTime());
                     data.putBoolean(KEY_HAS_WORKER, te.hasWorkerForDisplay());
-                    if (te.getWorker() != null) {
-                        data.putString(KEY_WORKER_NAME, te.getWorker().getDisplayName().getString());
+                    if (te.getWorkerDisplayName() != null) {
+                        data.putString(KEY_WORKER_NAME, te.getWorkerDisplayName());
                     }
                     data.putBoolean(KEY_IS_VALID, te.isValid());
                 }
@@ -80,8 +80,8 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
                     data.putInt(KEY_CURRENT, te.getCurrentPressStatus());
                     data.putInt(KEY_TOTAL, te.getTotalPressPoints());
                     data.putBoolean(KEY_HAS_WORKER, te.hasWorkerForDisplay());
-                    if (te.getWorker() != null) {
-                        data.putString(KEY_WORKER_NAME, te.getWorker().getDisplayName().getString());
+                    if (te.getWorkerDisplayName() != null) {
+                        data.putString(KEY_WORKER_NAME, te.getWorkerDisplayName());
                     }
                     data.putBoolean(KEY_IS_VALID, te.isValid());
                     FluidStack fluid = te.getTank().getFluid();
@@ -109,16 +109,16 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
                         data.putInt(KEY_CURRENT, te.getCurrentChopTime());
                         data.putInt(KEY_TOTAL, te.getTotalChopTime());
                         data.putBoolean(KEY_HAS_WORKER, te.hasWorkerForDisplay());
-                        if (te.getWorker() != null) {
-                            data.putString(KEY_WORKER_NAME, te.getWorker().getDisplayName().getString());
+                        if (te.getWorkerDisplayName() != null) {
+                            data.putString(KEY_WORKER_NAME, te.getWorkerDisplayName());
                         }
                         data.putBoolean(KEY_IS_VALID, te.isValid());
                     } else if (mainTe instanceof PressBlockEntity te) {
                         data.putInt(KEY_CURRENT, te.getCurrentPressStatus());
                         data.putInt(KEY_TOTAL, te.getTotalPressPoints());
                         data.putBoolean(KEY_HAS_WORKER, te.hasWorkerForDisplay());
-                        if (te.getWorker() != null) {
-                            data.putString(KEY_WORKER_NAME, te.getWorker().getDisplayName().getString());
+                        if (te.getWorkerDisplayName() != null) {
+                            data.putString(KEY_WORKER_NAME, te.getWorkerDisplayName());
                         }
                         data.putBoolean(KEY_IS_VALID, te.isValid());
                         FluidStack fluid = te.getTank().getFluid();
@@ -131,8 +131,8 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
                         data.putInt(KEY_CURRENT, te.getCurrentMillTime());
                         data.putInt(KEY_TOTAL, te.getTotalMillTime());
                         data.putBoolean(KEY_HAS_WORKER, te.hasWorkerForDisplay());
-                        if (te.getWorker() != null) {
-                            data.putString(KEY_WORKER_NAME, te.getWorker().getDisplayName().getString());
+                        if (te.getWorkerDisplayName() != null) {
+                            data.putString(KEY_WORKER_NAME, te.getWorkerDisplayName());
                         }
                         data.putBoolean(KEY_IS_VALID, te.isValid());
                     }

@@ -11,8 +11,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.AABB;
 import org.joml.Matrix4f;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Shared utility for rendering the working area highlight for horse-powered blocks.
@@ -56,6 +58,14 @@ public class WorkingAreaRenderer {
     }
 
     private static void renderFilledBoxes(List<Map.Entry<BlockPos, Boolean>> positions, BlockPos blockPos, PoseStack poseStack) {
+        // Build a set of all clear positions so we can skip internal faces
+        Set<BlockPos> clearPositions = new HashSet<>();
+        for (Map.Entry<BlockPos, Boolean> entry : positions) {
+            if (entry.getValue()) {
+                clearPositions.add(entry.getKey());
+            }
+        }
+
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.disableCull();
@@ -75,12 +85,17 @@ public class WorkingAreaRenderer {
             float y = pos.getY() - blockPos.getY();
             float z = pos.getZ() - blockPos.getZ();
 
-            int r = isClear ? 0 : 255;
-            int g = isClear ? 255 : 0;
-            int b = 0;
-            int a = 25; // Very transparent
-
-            renderFilledBox(buffer, matrix, x, y, z, x + 1, y + 1, z + 1, r, g, b, a);
+            if (isClear) {
+                // Only render faces on the outer boundary of the clear area
+                renderBoundaryFaces(buffer, matrix, pos, clearPositions, x, y, z,
+                        50, 200, 50, 25);
+            } else {
+                // Obstructed blocks render as individual highlighted boxes
+                renderFullBox(buffer, matrix,
+                        x + 0.02f, y + 0.02f, z + 0.02f,
+                        x + 0.98f, y + 0.98f, z + 0.98f,
+                        255, 40, 40, 50);
+            }
         }
 
         BufferUploader.drawWithShader(buffer.buildOrThrow());
@@ -90,64 +105,107 @@ public class WorkingAreaRenderer {
         RenderSystem.disableBlend();
     }
 
+    /**
+     * Renders only the faces of a block that are on the outer boundary of the clear area.
+     * A face is rendered only if the neighbor in that direction is NOT in the clear set.
+     */
+    private static void renderBoundaryFaces(BufferBuilder buffer, Matrix4f matrix,
+                                             BlockPos pos, Set<BlockPos> clearSet,
+                                             float x, float y, float z,
+                                             int r, int g, int b, int a) {
+        float x0 = x, y0 = y, z0 = z;
+        float x1 = x + 1, y1 = y + 1, z1 = z + 1;
+
+        if (!clearSet.contains(pos.below())) {
+            buffer.addVertex(matrix, x0, y0, z0).setColor(r, g, b, a);
+            buffer.addVertex(matrix, x1, y0, z0).setColor(r, g, b, a);
+            buffer.addVertex(matrix, x1, y0, z1).setColor(r, g, b, a);
+            buffer.addVertex(matrix, x0, y0, z1).setColor(r, g, b, a);
+        }
+        if (!clearSet.contains(pos.above())) {
+            buffer.addVertex(matrix, x0, y1, z1).setColor(r, g, b, a);
+            buffer.addVertex(matrix, x1, y1, z1).setColor(r, g, b, a);
+            buffer.addVertex(matrix, x1, y1, z0).setColor(r, g, b, a);
+            buffer.addVertex(matrix, x0, y1, z0).setColor(r, g, b, a);
+        }
+        if (!clearSet.contains(pos.north())) {
+            buffer.addVertex(matrix, x0, y0, z0).setColor(r, g, b, a);
+            buffer.addVertex(matrix, x0, y1, z0).setColor(r, g, b, a);
+            buffer.addVertex(matrix, x1, y1, z0).setColor(r, g, b, a);
+            buffer.addVertex(matrix, x1, y0, z0).setColor(r, g, b, a);
+        }
+        if (!clearSet.contains(pos.south())) {
+            buffer.addVertex(matrix, x1, y0, z1).setColor(r, g, b, a);
+            buffer.addVertex(matrix, x1, y1, z1).setColor(r, g, b, a);
+            buffer.addVertex(matrix, x0, y1, z1).setColor(r, g, b, a);
+            buffer.addVertex(matrix, x0, y0, z1).setColor(r, g, b, a);
+        }
+        if (!clearSet.contains(pos.west())) {
+            buffer.addVertex(matrix, x0, y0, z1).setColor(r, g, b, a);
+            buffer.addVertex(matrix, x0, y1, z1).setColor(r, g, b, a);
+            buffer.addVertex(matrix, x0, y1, z0).setColor(r, g, b, a);
+            buffer.addVertex(matrix, x0, y0, z0).setColor(r, g, b, a);
+        }
+        if (!clearSet.contains(pos.east())) {
+            buffer.addVertex(matrix, x1, y0, z0).setColor(r, g, b, a);
+            buffer.addVertex(matrix, x1, y1, z0).setColor(r, g, b, a);
+            buffer.addVertex(matrix, x1, y1, z1).setColor(r, g, b, a);
+            buffer.addVertex(matrix, x1, y0, z1).setColor(r, g, b, a);
+        }
+    }
+
+    private static void renderFullBox(BufferBuilder buffer, Matrix4f matrix,
+                                       float x0, float y0, float z0,
+                                       float x1, float y1, float z1,
+                                       int r, int g, int b, int a) {
+        // Bottom
+        buffer.addVertex(matrix, x0, y0, z0).setColor(r, g, b, a);
+        buffer.addVertex(matrix, x1, y0, z0).setColor(r, g, b, a);
+        buffer.addVertex(matrix, x1, y0, z1).setColor(r, g, b, a);
+        buffer.addVertex(matrix, x0, y0, z1).setColor(r, g, b, a);
+        // Top
+        buffer.addVertex(matrix, x0, y1, z1).setColor(r, g, b, a);
+        buffer.addVertex(matrix, x1, y1, z1).setColor(r, g, b, a);
+        buffer.addVertex(matrix, x1, y1, z0).setColor(r, g, b, a);
+        buffer.addVertex(matrix, x0, y1, z0).setColor(r, g, b, a);
+        // North
+        buffer.addVertex(matrix, x0, y0, z0).setColor(r, g, b, a);
+        buffer.addVertex(matrix, x0, y1, z0).setColor(r, g, b, a);
+        buffer.addVertex(matrix, x1, y1, z0).setColor(r, g, b, a);
+        buffer.addVertex(matrix, x1, y0, z0).setColor(r, g, b, a);
+        // South
+        buffer.addVertex(matrix, x1, y0, z1).setColor(r, g, b, a);
+        buffer.addVertex(matrix, x1, y1, z1).setColor(r, g, b, a);
+        buffer.addVertex(matrix, x0, y1, z1).setColor(r, g, b, a);
+        buffer.addVertex(matrix, x0, y0, z1).setColor(r, g, b, a);
+        // West
+        buffer.addVertex(matrix, x0, y0, z1).setColor(r, g, b, a);
+        buffer.addVertex(matrix, x0, y1, z1).setColor(r, g, b, a);
+        buffer.addVertex(matrix, x0, y1, z0).setColor(r, g, b, a);
+        buffer.addVertex(matrix, x0, y0, z0).setColor(r, g, b, a);
+        // East
+        buffer.addVertex(matrix, x1, y0, z0).setColor(r, g, b, a);
+        buffer.addVertex(matrix, x1, y1, z0).setColor(r, g, b, a);
+        buffer.addVertex(matrix, x1, y1, z1).setColor(r, g, b, a);
+        buffer.addVertex(matrix, x1, y0, z1).setColor(r, g, b, a);
+    }
+
     private static void renderWireframes(List<Map.Entry<BlockPos, Boolean>> positions, BlockPos blockPos,
                                           PoseStack poseStack, MultiBufferSource bufferSource) {
         VertexConsumer lineConsumer = bufferSource.getBuffer(RenderType.lines());
 
+        // Only wireframe blocked blocks so they stand out clearly
         for (Map.Entry<BlockPos, Boolean> entry : positions) {
-            BlockPos pos = entry.getKey();
-            boolean isClear = entry.getValue();
+            if (entry.getValue()) continue; // skip clear blocks
 
+            BlockPos pos = entry.getKey();
             double x = pos.getX() - blockPos.getX();
             double y = pos.getY() - blockPos.getY();
             double z = pos.getZ() - blockPos.getZ();
 
-            float r = isClear ? 0.0f : 1.0f;
-            float g = isClear ? 1.0f : 0.0f;
-
             AABB box = new AABB(x, y, z, x + 1, y + 1, z + 1);
-            LevelRenderer.renderLineBox(poseStack, lineConsumer, box, r, g, 0.0f, 1.0f);
+            LevelRenderer.renderLineBox(poseStack, lineConsumer, box, 1.0f, 0.0f, 0.0f, 1.0f);
         }
     }
 
-    private static void renderFilledBox(BufferBuilder buffer, Matrix4f matrix,
-                                         float x1, float y1, float z1,
-                                         float x2, float y2, float z2,
-                                         int r, int g, int b, int a) {
-        // Bottom face (y=y1)
-        buffer.addVertex(matrix, x1, y1, z1).setColor(r, g, b, a);
-        buffer.addVertex(matrix, x2, y1, z1).setColor(r, g, b, a);
-        buffer.addVertex(matrix, x2, y1, z2).setColor(r, g, b, a);
-        buffer.addVertex(matrix, x1, y1, z2).setColor(r, g, b, a);
-
-        // Top face (y=y2)
-        buffer.addVertex(matrix, x1, y2, z2).setColor(r, g, b, a);
-        buffer.addVertex(matrix, x2, y2, z2).setColor(r, g, b, a);
-        buffer.addVertex(matrix, x2, y2, z1).setColor(r, g, b, a);
-        buffer.addVertex(matrix, x1, y2, z1).setColor(r, g, b, a);
-
-        // North face (z=z1)
-        buffer.addVertex(matrix, x1, y1, z1).setColor(r, g, b, a);
-        buffer.addVertex(matrix, x1, y2, z1).setColor(r, g, b, a);
-        buffer.addVertex(matrix, x2, y2, z1).setColor(r, g, b, a);
-        buffer.addVertex(matrix, x2, y1, z1).setColor(r, g, b, a);
-
-        // South face (z=z2)
-        buffer.addVertex(matrix, x2, y1, z2).setColor(r, g, b, a);
-        buffer.addVertex(matrix, x2, y2, z2).setColor(r, g, b, a);
-        buffer.addVertex(matrix, x1, y2, z2).setColor(r, g, b, a);
-        buffer.addVertex(matrix, x1, y1, z2).setColor(r, g, b, a);
-
-        // West face (x=x1)
-        buffer.addVertex(matrix, x1, y1, z2).setColor(r, g, b, a);
-        buffer.addVertex(matrix, x1, y2, z2).setColor(r, g, b, a);
-        buffer.addVertex(matrix, x1, y2, z1).setColor(r, g, b, a);
-        buffer.addVertex(matrix, x1, y1, z1).setColor(r, g, b, a);
-
-        // East face (x=x2)
-        buffer.addVertex(matrix, x2, y1, z1).setColor(r, g, b, a);
-        buffer.addVertex(matrix, x2, y2, z1).setColor(r, g, b, a);
-        buffer.addVertex(matrix, x2, y2, z2).setColor(r, g, b, a);
-        buffer.addVertex(matrix, x2, y1, z2).setColor(r, g, b, a);
-    }
 }

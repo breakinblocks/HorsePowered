@@ -10,8 +10,10 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.AABB;
 
 public class GrindstoneBlockEntityRenderer implements BlockEntityRenderer<GrindstoneBlockEntity> {
 
@@ -29,6 +31,9 @@ public class GrindstoneBlockEntityRenderer implements BlockEntityRenderer<Grinds
 
         // Render working area highlight if active
         WorkingAreaRenderer.renderIfActive(blockEntity, poseStack, bufferSource);
+
+        // Render virtual worker entity
+        VirtualWorkerRenderer.renderWorker(blockEntity, partialTick, poseStack, bufferSource, packedLight);
 
         // Render lead to attached worker
         LeadRenderer.renderLead(blockEntity, partialTick, poseStack, bufferSource);
@@ -96,5 +101,12 @@ public class GrindstoneBlockEntityRenderer implements BlockEntityRenderer<Grinds
     @Override
     public int getViewDistance() {
         return 64; // Render from further away when highlighting
+    }
+
+    @Override
+    public AABB getRenderBoundingBox(GrindstoneBlockEntity blockEntity) {
+        BlockPos pos = blockEntity.getBlockPos();
+        return new AABB(pos.getX() - 3, pos.getY(), pos.getZ() - 3,
+                        pos.getX() + 4, pos.getY() + 4, pos.getZ() + 4);
     }
 }

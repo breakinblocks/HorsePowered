@@ -43,14 +43,6 @@ public class GrindstoneBlockEntity extends HPBlockEntityHorseBase {
     }
 
     @Override
-    public void setChanged() {
-        if (getItem(0).isEmpty()) {
-            currentItemMillTime = 0;
-        }
-        super.setChanged();
-    }
-
-    @Override
     public boolean targetReached() {
         currentItemMillTime++;
 

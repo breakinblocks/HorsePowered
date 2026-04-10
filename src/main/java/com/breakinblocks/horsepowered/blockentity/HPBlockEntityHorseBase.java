@@ -1,13 +1,16 @@
 package com.breakinblocks.horsepowered.blockentity;
 
-import com.breakinblocks.horsepowered.util.Utils;
 import com.google.common.collect.Lists;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Containers;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
-import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -16,39 +19,71 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
 
-    // 8-point square path around the block (symmetric)
-    // Values are multiplied by 2 in getPathPosition(), so 1.5 = 3 blocks from center
-    protected static final double[][] PATH = {
-            {-1.5, -1.5}, {0, -1.5}, {1.5, -1.5}, {1.5, 0},
-            {1.5, 1.5}, {0, 1.5}, {-1.5, 1.5}, {-1.5, 0}
-    };
+    private static final Logger LOGGER = LoggerFactory.getLogger(HPBlockEntityHorseBase.class);
 
-    protected AABB[] searchAreas = new AABB[8];
+    // Circular path around the block - 24 evenly spaced points at radius 1.5
+    // Values are multiplied by 2 in getPathPosition(), giving a 3-block radius circle
+    protected static final int PATH_POINTS = 24;
+    protected static final double CIRCLE_RADIUS = 1.5;
+    protected static final double[][] PATH;
+
+    static {
+        PATH = new double[PATH_POINTS][2];
+        for (int i = 0; i < PATH_POINTS; i++) {
+            double angle = 2.0 * Math.PI * i / PATH_POINTS;
+            PATH[i][0] = Math.sin(angle) * CIRCLE_RADIUS;
+            PATH[i][1] = -Math.cos(angle) * CIRCLE_RADIUS;
+        }
+    }
+
+    protected AABB[] searchAreas = new AABB[PATH_POINTS];
     protected List<BlockPos> searchPos = null;
     protected int origin = -1;
     protected int target = -1;
 
-    protected boolean hasWorker = false;
-    protected PathfinderMob worker;
-    protected CompoundTag nbtWorker;
+    // --- Virtual worker data (replaces live entity) ---
+    protected CompoundTag workerEntityData;
+    protected String workerEntityTypeId;
+    protected String workerDisplayName;
+    protected boolean hasVirtualWorker = false;
 
+    // --- Virtual position (computed each tick on both server and client) ---
+    protected double virtualX, virtualZ;
+    protected double prevVirtualX, prevVirtualZ;
+    protected float virtualYRot, prevVirtualYRot;
+    // Estimated entity height for leash attachment point calculation
+    protected float workerEntityHeight = 1.4f;
+
+    // --- Movement state ---
     protected boolean valid = false;
     protected int validationTimer = 0;
-    protected int locateHorseTimer = 0;
-    protected boolean running = true;
+    protected boolean running = false;
     protected boolean wasRunning = false;
+    protected int stopGraceTimer = 0;
+    protected static final int STOP_GRACE_TICKS = 40;
+
+    // Client-side: cached entity for rendering (not in the world)
+    private transient Entity cachedRenderEntity;
+    private transient String cachedRenderEntityType;
 
     // Client-side highlight rendering
     protected int highlightTimer = 0;
     public static final int HIGHLIGHT_DURATION = 100; // 5 seconds
+
+    // Movement speed (blocks per tick)
+    private static final double MOVEMENT_SPEED = 0.12;
+
+    // How quickly rotation catches up to movement direction (0-1, higher = snappier)
+    private static final float ROTATION_SMOOTHING = 0.25f;
 
     public HPBlockEntityHorseBase(BlockEntityType<?> type, BlockPos pos, BlockState state, int inventorySize) {
         super(type, pos, state, inventorySize);
@@ -94,19 +129,55 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
      */
     public abstract int getPositionOffset();
 
+    // --- Serialization ---
+
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
 
         target = tag.getInt("target");
         origin = tag.getInt("origin");
-        hasWorker = tag.getBoolean("hasWorker");
         valid = tag.getBoolean("valid");
+        running = tag.getBoolean("running");
 
-        // Always load the worker UUID if present - hasWorker flag may be stale
-        // but we can still try to find the worker by UUID
-        if (tag.contains("leash")) {
-            nbtWorker = tag.getCompound("leash");
+        boolean hadWorkerBefore = hasVirtualWorker;
+        hasVirtualWorker = tag.getBoolean("hasVirtualWorker");
+        if (hasVirtualWorker) {
+            if (tag.contains("workerEntityData")) {
+                workerEntityData = tag.getCompound("workerEntityData");
+            }
+            if (tag.contains("workerEntityTypeId")) {
+                workerEntityTypeId = tag.getString("workerEntityTypeId");
+            }
+            workerDisplayName = tag.contains("workerDisplayName") ? tag.getString("workerDisplayName") : "Worker";
+            workerEntityHeight = tag.contains("workerEntityHeight") ? tag.getFloat("workerEntityHeight") : 1.4f;
+
+            double loadedX = tag.contains("virtualX") ? tag.getDouble("virtualX") : worldPosition.getX() + 0.5;
+            double loadedZ = tag.contains("virtualZ") ? tag.getDouble("virtualZ") : worldPosition.getZ() + 0.5;
+            float loadedYRot = tag.contains("virtualYRot") ? tag.getFloat("virtualYRot") : 0f;
+
+            if (hadWorkerBefore && level != null && level.isClientSide) {
+                // Incremental client sync: update position but keep the client's
+                // smoothly-interpolated rotation to avoid single-tick mirror flips
+                virtualX = loadedX;
+                virtualZ = loadedZ;
+                prevVirtualX = loadedX;
+                prevVirtualZ = loadedZ;
+            } else {
+                virtualX = loadedX;
+                virtualZ = loadedZ;
+                virtualYRot = loadedYRot;
+                prevVirtualX = loadedX;
+                prevVirtualZ = loadedZ;
+                prevVirtualYRot = loadedYRot;
+            }
+
+            cachedRenderEntity = null;
+            cachedRenderEntityType = null;
+        } else {
+            workerEntityData = null;
+            workerEntityTypeId = null;
+            workerDisplayName = null;
         }
     }
 
@@ -116,157 +187,236 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
 
         tag.putInt("target", target);
         tag.putInt("origin", origin);
-        tag.putBoolean("hasWorker", hasWorker);
         tag.putBoolean("valid", valid);
+        tag.putBoolean("running", running);
 
-        // Update nbtWorker from current worker if available
-        if (worker != null) {
-            if (nbtWorker == null) {
-                CompoundTag workerTag = new CompoundTag();
-                workerTag.putUUID("UUID", worker.getUUID());
-                nbtWorker = workerTag;
+        tag.putBoolean("hasVirtualWorker", hasVirtualWorker);
+        if (hasVirtualWorker) {
+            if (workerEntityData != null) {
+                tag.put("workerEntityData", workerEntityData);
             }
-        }
-        // Always save the leash tag if we have worker data (preserves UUID across reloads
-        // even when the worker entity reference hasn't been restored yet)
-        if (nbtWorker != null) {
-            tag.put("leash", nbtWorker);
+            if (workerEntityTypeId != null) {
+                tag.putString("workerEntityTypeId", workerEntityTypeId);
+            }
+            if (workerDisplayName != null) {
+                tag.putString("workerDisplayName", workerDisplayName);
+            }
+            tag.putFloat("workerEntityHeight", workerEntityHeight);
+
+            tag.putDouble("virtualX", virtualX);
+            tag.putDouble("virtualZ", virtualZ);
+            tag.putFloat("virtualYRot", virtualYRot);
         }
     }
 
-    /**
-     * Attempts to find the worker entity by UUID
-     */
-    private boolean findWorker() {
-        if (nbtWorker == null || level == null) return false;
-
-        UUID uuid = nbtWorker.getUUID("UUID");
-        int x = worldPosition.getX();
-        int y = worldPosition.getY();
-        int z = worldPosition.getZ();
-
-        AABB searchArea = new AABB(x - 7.0D, y - 7.0D, z - 7.0D, x + 7.0D, y + 7.0D, z + 7.0D);
-
-        // Search all PathfinderMobs by UUID (ignoring tag for reconnection)
-        List<PathfinderMob> allCreatures = level.getEntitiesOfClass(PathfinderMob.class, searchArea);
-
-        for (PathfinderMob creature : allCreatures) {
-            if (creature.getUUID().equals(uuid)) {
-                // Found the worker by UUID - reconnect even if tag check fails
-                // (the tag might not be loaded yet, or modpack removed the entity from tag)
-                setWorker(creature);
-                creature.setPersistenceRequired();
-                return true;
-            }
-        }
-
-        return false;
-    }
+    // --- Worker management ---
 
     /**
-     * Sets a new worker entity to power this block
+     * Sets a new worker entity to power this block.
+     * Serializes the entity data and removes it from the world.
      */
     public void setWorker(PathfinderMob newWorker) {
-        hasWorker = true;
-        worker = newWorker;
-        // Path positions can be up to ~4.24 blocks from center (corners at -3,-3)
-        // Use radius of 5 to allow navigation to all path points
-        worker.restrictTo(worldPosition, 5);
-        // Prevent the worker from despawning naturally while attached
-        // Note: PathfinderMob extends Mob, so we can call this directly
-        worker.setPersistenceRequired();
-        target = getClosestTarget();
+        if (level == null) return;
 
-        if (worker != null) {
-            CompoundTag workerTag = new CompoundTag();
-            workerTag.putUUID("UUID", worker.getUUID());
-            nbtWorker = workerTag;
-        }
+        // Serialize entity data (1.21.1 CompoundTag API)
+        CompoundTag data = new CompoundTag();
+        newWorker.saveAsPassenger(data);
+        workerEntityData = data;
+        workerEntityTypeId = BuiltInRegistries.ENTITY_TYPE.getKey(newWorker.getType()).toString();
+        workerEntityHeight = newWorker.getBbHeight();
+        hasVirtualWorker = true;
+
+        String name = newWorker.getDisplayName().getString();
+        workerDisplayName = (name != null && !name.isEmpty()) ? name :
+                BuiltInRegistries.ENTITY_TYPE.getKey(newWorker.getType()).getPath();
+
+        virtualX = newWorker.getX();
+        virtualZ = newWorker.getZ();
+        prevVirtualX = virtualX;
+        prevVirtualZ = virtualZ;
+        virtualYRot = newWorker.getYRot();
+        prevVirtualYRot = virtualYRot;
+
+        target = getClosestTarget();
+        running = false;
+        wasRunning = false;
+
+        newWorker.discard();
+
+        LOGGER.info("[HorsePowered] setWorker at {}: Stored {} ({})", worldPosition, workerDisplayName, workerEntityTypeId);
         setChanged();
     }
 
     /**
-     * Releases the worker back to a player with a lead
+     * Releases the worker back to a player with a lead.
      */
     public void setWorkerToPlayer(Player player) {
-        if (hasWorker() && worker.canBeLeashed()) {
-            hasWorker = false;
-            worker.clearRestriction();
-            worker.setLeashedTo(player, true);
-            worker = null;
-            nbtWorker = null;
-            setChanged();
+        if (!hasVirtualWorker || level == null || level.isClientSide) return;
+
+        PathfinderMob mob = recreateEntity();
+        if (mob != null) {
+            mob.setPos(virtualX, worldPosition.getY() + getPositionOffset(), virtualZ);
+            level.addFreshEntity(mob);
+            mob.setLeashedTo(player, true);
+            LOGGER.info("[HorsePowered] setWorkerToPlayer at {}: Released {} to player", worldPosition, workerDisplayName);
+        }
+
+        clearVirtualWorker();
+        setChanged();
+    }
+
+    /**
+     * Spawns the stored entity back into the world (e.g., when block is broken).
+     */
+    public void spawnStoredEntity() {
+        if (!hasVirtualWorker || level == null || level.isClientSide) return;
+
+        PathfinderMob mob = recreateEntity();
+        if (mob != null) {
+            mob.setPos(virtualX, worldPosition.getY() + getPositionOffset(), virtualZ);
+            level.addFreshEntity(mob);
+            LOGGER.info("[HorsePowered] spawnStoredEntity at {}: Spawned {} back into world", worldPosition, workerDisplayName);
+        }
+
+        clearVirtualWorker();
+    }
+
+    /**
+     * Recreates a PathfinderMob entity from the stored data.
+     * Returns null if the entity type is invalid or creation fails.
+     */
+    private PathfinderMob recreateEntity() {
+        if (workerEntityData == null || workerEntityTypeId == null || level == null) return null;
+
+        try {
+            // In 1.21.1, EntityType.create(CompoundTag, Level) is the preferred way
+            // as it reads the entity ID from the tag and handles full NBT load.
+            CompoundTag fullTag = workerEntityData.copy();
+            fullTag.putString("id", workerEntityTypeId);
+            return EntityType.create(fullTag, level)
+                    .filter(e -> e instanceof PathfinderMob)
+                    .map(e -> (PathfinderMob) e)
+                    .orElse(null);
+        } catch (Exception e) {
+            LOGGER.error("[HorsePowered] recreateEntity: Failed to recreate entity of type {}", workerEntityTypeId, e);
+        }
+        return null;
+    }
+
+    /**
+     * Clears all virtual worker data.
+     */
+    private void clearVirtualWorker() {
+        workerEntityData = null;
+        workerEntityTypeId = null;
+        workerDisplayName = null;
+        hasVirtualWorker = false;
+        target = -1;
+        origin = -1;
+        running = false;
+        cachedRenderEntity = null;
+        cachedRenderEntityType = null;
+    }
+
+    /**
+     * Handles block removal: spawn the stored worker back into the world
+     * and drop a lead item. Called from the block's onRemove method.
+     */
+    public void onBlockRemoved() {
+        if (hasVirtualWorker && level != null && !level.isClientSide) {
+            spawnStoredEntity();
+            Containers.dropItemStack(level, worldPosition.getX(), worldPosition.getY() + 1, worldPosition.getZ(), new ItemStack(Items.LEAD));
         }
     }
 
     /**
-     * Checks if the worker is still valid and working.
-     * This method has side effects on the server (drops lead if worker lost).
-     * For display purposes only, use hasWorkerForDisplay() instead.
+     * Checks if a virtual worker is attached.
      */
     public boolean hasWorker() {
-        if (worker != null && worker.isAlive() && !worker.isLeashed() && worker.distanceToSqr(Vec3.atCenterOf(worldPosition)) < 45) {
-            return true;
-        } else {
-            if (worker != null) {
-                // Only drop lead on server side
-                if (level != null && !level.isClientSide) {
-                    Containers.dropItemStack(level, worldPosition.getX(), worldPosition.getY() + 1, worldPosition.getZ(), new ItemStack(Items.LEAD));
-                }
-                worker = null;
-                nbtWorker = null;
-            }
-            hasWorker = false;
-            return false;
-        }
+        return hasVirtualWorker;
     }
 
     /**
-     * Returns whether a worker is attached, without any side effects.
-     * Use this for display purposes (Jade, rendering, etc.)
+     * Returns whether a worker is attached, for display purposes.
      */
     public boolean hasWorkerForDisplay() {
-        // If we have an active worker reference that's valid, return true
-        if (worker != null && worker.isAlive() && !worker.isLeashed()) {
-            return true;
-        }
-        // Otherwise, return the stored flag (may be true if we haven't found the entity yet)
-        return hasWorker || nbtWorker != null;
+        return hasVirtualWorker;
     }
 
-    public PathfinderMob getWorker() {
-        return worker;
+    /**
+     * Gets the stored worker's display name (for Jade tooltips, etc.)
+     */
+    public String getWorkerDisplayName() {
+        return workerDisplayName;
     }
 
     public boolean isValid() {
         return valid;
     }
 
+    // --- Virtual position accessors (for renderer) ---
+
+    public double getVirtualX() { return virtualX; }
+    public double getVirtualZ() { return virtualZ; }
+    public float getVirtualYRot() { return virtualYRot; }
+    public double getPrevVirtualX() { return prevVirtualX; }
+    public double getPrevVirtualZ() { return prevVirtualZ; }
+    public float getPrevVirtualYRot() { return prevVirtualYRot; }
+    public double getVirtualY() { return worldPosition.getY() + getPositionOffset(); }
+    public float getWorkerEntityHeight() { return workerEntityHeight; }
+    public String getWorkerEntityTypeId() { return workerEntityTypeId; }
+    public CompoundTag getWorkerEntityData() { return workerEntityData; }
+
     /**
-     * Starts showing the working area highlight
+     * Gets or creates a cached entity for client-side rendering.
+     * The entity is NOT in the world - it exists only as a render reference.
      */
+    public Entity getCachedRenderEntity() {
+        if (level == null || !level.isClientSide || !hasVirtualWorker) return null;
+
+        if (cachedRenderEntity == null || !workerEntityTypeId.equals(cachedRenderEntityType)) {
+            cachedRenderEntity = null;
+            cachedRenderEntityType = null;
+
+            if (workerEntityTypeId == null || workerEntityData == null) return null;
+
+            try {
+                CompoundTag fullTag = workerEntityData.copy();
+                fullTag.putString("id", workerEntityTypeId);
+                Entity entity = EntityType.create(fullTag, level).orElse(null);
+                if (entity != null) {
+                    entity.setNoGravity(true);
+                    entity.setSilent(true);
+                    if (entity instanceof PathfinderMob mob) {
+                        mob.setNoAi(true);
+                    }
+                    cachedRenderEntity = entity;
+                    cachedRenderEntityType = workerEntityTypeId;
+                }
+            } catch (Exception e) {
+                LOGGER.warn("[HorsePowered] Failed to create cached render entity: {}", workerEntityTypeId, e);
+            }
+        }
+
+        return cachedRenderEntity;
+    }
+
+    // --- Highlight rendering ---
+
     public void showWorkingAreaHighlight() {
         highlightTimer = HIGHLIGHT_DURATION;
     }
 
-    /**
-     * Checks if the working area highlight should be rendered
-     */
     public boolean shouldShowHighlight() {
         return highlightTimer > 0;
     }
 
-    /**
-     * Gets the list of positions that need to be clear for the working area.
-     * Returns a list of pairs: BlockPos and boolean (true = clear, false = obstructed)
-     */
     public List<Map.Entry<BlockPos, Boolean>> getWorkingAreaPositions() {
         List<Map.Entry<BlockPos, Boolean>> positions = new ArrayList<>();
         if (level == null) return positions;
 
-        // Build positions if not already cached
         if (searchPos == null) {
-            validateArea(); // This builds searchPos
+            validateArea();
         }
 
         if (searchPos != null) {
@@ -279,97 +429,79 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
         return positions;
     }
 
-    /**
-     * Gets the world position for a path index.
-     * Path is centered on the block's center (not corner).
-     */
+    // --- Path / position logic ---
+
     private Vec3 getPathPosition(int i) {
-        // Add 0.5 to center on the block (block positions are at corners)
         double x = worldPosition.getX() + 0.5 + PATH[i][0] * 2;
         double y = worldPosition.getY() + getPositionOffset();
         double z = worldPosition.getZ() + 0.5 + PATH[i][1] * 2;
         return new Vec3(x, y, z);
     }
 
-    /**
-     * Finds the closest path point to the current worker position
-     */
     protected int getClosestTarget() {
-        if (hasWorker()) {
-            double dist = Double.MAX_VALUE;
-            int closest = 0;
+        if (!hasVirtualWorker) return 0;
 
-            for (int i = 0; i < PATH.length; i++) {
-                Vec3 pos = getPathPosition(i);
-                double tmp = worker.distanceToSqr(pos.x, pos.y, pos.z);
-                if (tmp < dist) {
-                    dist = tmp;
-                    closest = i;
-                }
+        double dist = Double.MAX_VALUE;
+        int closest = 0;
+
+        for (int i = 0; i < PATH.length; i++) {
+            Vec3 pos = getPathPosition(i);
+            double dx = virtualX - pos.x;
+            double dz = virtualZ - pos.z;
+            double tmp = dx * dx + dz * dz;
+            if (tmp < dist) {
+                dist = tmp;
+                closest = i;
             }
-
-            return closest;
         }
-        return 0;
+
+        return closest;
     }
 
-    /**
-     * Server tick logic for horse-powered operation
-     */
+    // --- Tick logic ---
+
     public static <T extends HPBlockEntityHorseBase> void serverTick(Level level, BlockPos pos, BlockState state, T blockEntity) {
         blockEntity.tickServer();
     }
 
-    /**
-     * Client tick logic (for animations)
-     */
     public static <T extends HPBlockEntityHorseBase> void clientTick(Level level, BlockPos pos, BlockState state, T blockEntity) {
         blockEntity.tickClient();
     }
 
     protected void tickClient() {
-        // Tick down highlight timer
         if (highlightTimer > 0) {
             highlightTimer--;
         }
 
-        // Try to find worker entity on client for rendering
-        if (worker == null && nbtWorker != null && level != null) {
-            findWorkerClient();
+        if (hasVirtualWorker) {
+            if (running && valid) {
+                moveVirtualPosition();
+            }
+            updateCachedRenderEntity();
         }
     }
 
-    /**
-     * Client-side worker finding for rendering purposes.
-     * This doesn't set up navigation or persistence, just finds the entity reference.
-     */
-    private void findWorkerClient() {
-        if (nbtWorker == null || level == null || !nbtWorker.contains("UUID")) return;
+    private void updateCachedRenderEntity() {
+        Entity entity = getCachedRenderEntity();
+        if (entity == null) return;
 
-        UUID uuid = nbtWorker.getUUID("UUID");
-        int x = worldPosition.getX();
-        int y = worldPosition.getY();
-        int z = worldPosition.getZ();
+        entity.tickCount++;
 
-        AABB searchArea = new AABB(x - 10.0D, y - 10.0D, z - 10.0D, x + 10.0D, y + 10.0D, z + 10.0D);
-        List<PathfinderMob> creatures = level.getEntitiesOfClass(PathfinderMob.class, searchArea);
-
-        for (PathfinderMob creature : creatures) {
-            if (creature.getUUID().equals(uuid)) {
-                worker = creature;
-                return;
+        if (entity instanceof LivingEntity living) {
+            if (running && valid) {
+                living.walkAnimation.update(0.6f, 0.4f);
+            } else {
+                living.walkAnimation.update(0.0f, 1.0f);
             }
         }
     }
 
     protected void tickServer() {
-        // Validation timer
         validationTimer--;
         if (validationTimer <= 0) {
             boolean wasValid = valid;
             valid = validateArea();
             validationTimer = valid ? 220 : 60;
-            // Sync to client when valid state changes (for Jade tooltip)
             if (wasValid != valid) {
                 setChanged();
             }
@@ -377,96 +509,97 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
 
         boolean flag = false;
 
-        // Try to find worker if we had one but lost reference
-        boolean hasWorkerNow = hasWorker();
-        if (!hasWorkerNow) {
-            locateHorseTimer--;
-        }
-        if (!hasWorkerNow && nbtWorker != null && locateHorseTimer <= 0) {
-            flag = findWorker();
-        }
-        if (locateHorseTimer <= 0) {
-            locateHorseTimer = 120;
-        }
-
-        if (valid) {
-            // Check if we should be running
-            if (!running && canWork()) {
+        if (valid && hasVirtualWorker) {
+            if (canWork()) {
                 running = true;
-            } else if (running && !canWork()) {
+                stopGraceTimer = STOP_GRACE_TICKS;
+            } else if (running && stopGraceTimer > 0) {
+                stopGraceTimer--;
+            } else {
                 running = false;
             }
 
             if (running != wasRunning) {
-                target = getClosestTarget();
+                if (!wasRunning) {
+                    target = getClosestTarget();
+                }
                 wasRunning = running;
+                setChanged();
             }
 
-            if (hasWorker()) {
-                if (running) {
-                    Vec3 pathPos = getPathPosition(target);
-                    double x = pathPos.x;
-                    double y = worker.getY(); // Use worker's Y for collision detection
-                    double z = pathPos.z;
-
-                    // Create/update search area for current target using worker's Y level
-                    // We recreate it each time since the worker Y might vary slightly
-                    searchAreas[target] = new AABB(x - 0.5D, y - 0.5D, z - 0.5D, x + 0.5D, y + 1.5D, z + 0.5D);
-
-                    // Check if worker reached the target
-                    if (worker.getBoundingBox().intersects(searchAreas[target])) {
-                        int next = target + 1;
-                        int previous = target - 1;
-                        if (next >= PATH.length) next = 0;
-                        if (previous < 0) previous = PATH.length - 1;
-
-                        // Process if we moved to a new position
-                        if (origin != target && target != previous) {
-                            origin = target;
-                            flag = targetReached();
-                        }
-                        target = next;
-                    }
-
-                    // Stop horse from eating
-                    if (worker instanceof AbstractHorse horse && horse.isEating()) {
-                        horse.setEating(false);
-                    }
-
-                    // Navigate to target - use direct position control for all workers
-                    // Navigation systems are unreliable, especially for tamed horses
-                    if (target != -1) {
-                        pathPos = getPathPosition(target);
-
-                        // Calculate direction to target
-                        double dx = pathPos.x - worker.getX();
-                        double dz = pathPos.z - worker.getZ();
-                        double dist = Math.sqrt(dx * dx + dz * dz);
-
-                        if (dist > 0.5) { // Only move if not already at target
-                            // Normalize and calculate step toward target
-                            double speed = 0.12; // Movement per tick (about 2.4 blocks/sec)
-                            double stepX = (dx / dist) * speed;
-                            double stepZ = (dz / dist) * speed;
-
-                            // Directly move the entity position (bypasses all AI)
-                            double newX = worker.getX() + stepX;
-                            double newZ = worker.getZ() + stepZ;
-                            worker.setPos(newX, worker.getY(), newZ);
-
-                            // Make the worker look in the direction of movement
-                            float targetYaw = (float) (Math.atan2(-dx, dz) * (180.0 / Math.PI));
-                            worker.setYRot(targetYaw);
-                            worker.yBodyRot = targetYaw;
-                            worker.yHeadRot = targetYaw;
-                        }
-                    }
-                }
+            if (running) {
+                flag = moveVirtualPositionServer();
             }
         }
 
         if (flag) {
             setChanged();
+        }
+    }
+
+    private boolean moveVirtualPositionServer() {
+        if (target < 0 || target >= PATH.length) {
+            target = 0;
+        }
+
+        boolean flag = false;
+
+        Vec3 pathPos = getPathPosition(target);
+        double y = worldPosition.getY() + getPositionOffset();
+
+        searchAreas[target] = new AABB(
+                pathPos.x - 0.5, y - 0.5, pathPos.z - 0.5,
+                pathPos.x + 0.5, y + 1.5, pathPos.z + 0.5);
+
+        double dx = virtualX - pathPos.x;
+        double dz = virtualZ - pathPos.z;
+        double distSq = dx * dx + dz * dz;
+
+        if (distSq < 0.16) {
+            int next = target + 1;
+            int previous = target - 1;
+            if (next >= PATH.length) next = 0;
+            if (previous < 0) previous = PATH.length - 1;
+
+            if (origin != target && target != previous) {
+                origin = target;
+                if (canWork()) {
+                    flag = targetReached();
+                }
+            }
+            target = next;
+        }
+
+        moveVirtualPosition();
+
+        return flag;
+    }
+
+    private void moveVirtualPosition() {
+        if (target < 0 || target >= PATH.length) return;
+
+        prevVirtualX = virtualX;
+        prevVirtualZ = virtualZ;
+        prevVirtualYRot = virtualYRot;
+
+        Vec3 pathPos = getPathPosition(target);
+
+        double dx = pathPos.x - virtualX;
+        double dz = pathPos.z - virtualZ;
+        double dist = Math.sqrt(dx * dx + dz * dz);
+
+        if (dist > 0.1) {
+            double stepX = (dx / dist) * MOVEMENT_SPEED;
+            double stepZ = (dz / dist) * MOVEMENT_SPEED;
+
+            virtualX += stepX;
+            virtualZ += stepZ;
+
+            float targetYRot = (float) (Math.atan2(-dx, dz) * (180.0 / Math.PI));
+            float diff = targetYRot - virtualYRot;
+            while (diff < -180) diff += 360;
+            while (diff > 180) diff -= 360;
+            virtualYRot += diff * ROTATION_SMOOTHING;
         }
     }
 }
