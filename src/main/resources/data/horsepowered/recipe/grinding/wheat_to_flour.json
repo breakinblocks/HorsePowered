@@ -1,9 +1,0 @@
-{
-  "type": "horsepowered:grinding",
-  "ingredient": "minecraft:wheat",
-  "result": {
-    "id": "horsepowered:flour",
-    "count": 1
-  },
-  "time": 12
-}

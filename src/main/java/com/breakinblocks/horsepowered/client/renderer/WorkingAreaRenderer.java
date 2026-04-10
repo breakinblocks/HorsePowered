@@ -6,36 +6,36 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
- * Shared utility for rendering the working area highlight for horse-powered blocks.
- * Displays green boxes for clear areas and red boxes for obstructed areas.
+ * Renders the working area highlight for horse-powered blocks as a single
+ * combined outline rather than individual block boxes.
+ * Only outer boundary faces are drawn, so the area reads as one cohesive shape.
  */
 public class WorkingAreaRenderer {
 
-    // Colors for clear (green) and obstructed (red) areas - with transparency
-    private static final int CLEAR_R = 0, CLEAR_G = 255, CLEAR_B = 0, CLEAR_A = 80;
-    private static final int BLOCKED_R = 255, BLOCKED_G = 0, BLOCKED_B = 0, BLOCKED_A = 80;
+    // Low-opacity green for clear area, brighter red for obstructed blocks
+    private static final int CLEAR_R = 50, CLEAR_G = 200, CLEAR_B = 50, CLEAR_A = 25;
+    private static final int BLOCKED_R = 255, BLOCKED_G = 40, BLOCKED_B = 40, BLOCKED_A = 50;
 
-    /**
-     * Renders the working area highlight using pre-extracted render state data.
-     * This version is compatible with the 1.21.9+ render state extraction pattern.
-     *
-     * @param showHighlight Whether to show the highlight (from render state)
-     * @param positions The working area positions with clear/blocked status
-     * @param blockPos The block position (for calculating offsets)
-     * @param poseStack The pose stack (already translated to block position)
-     * @param collector The node collector for submitting geometry
-     */
     public static void render(boolean showHighlight, List<Map.Entry<BlockPos, Boolean>> positions,
                               BlockPos blockPos, PoseStack poseStack, SubmitNodeCollector collector) {
         if (!showHighlight || positions == null || positions.isEmpty()) {
             return;
         }
 
-        // Submit custom geometry for all highlight boxes
+        // Build a set of all clear positions for neighbor lookup
+        Set<BlockPos> clearPositions = new HashSet<>();
+        for (Map.Entry<BlockPos, Boolean> entry : positions) {
+            if (entry.getValue()) {
+                clearPositions.add(entry.getKey());
+            }
+        }
+
         collector.submitCustomGeometry(
                 poseStack,
                 RenderTypes.debugQuads(),
@@ -44,65 +44,93 @@ public class WorkingAreaRenderer {
                         BlockPos pos = entry.getKey();
                         boolean isClear = entry.getValue();
 
-                        // Calculate offset from block entity position
                         float x = pos.getX() - blockPos.getX();
                         float y = pos.getY() - blockPos.getY();
                         float z = pos.getZ() - blockPos.getZ();
 
-                        // Render a slightly smaller box (0.02 inset) to avoid z-fighting
-                        renderBox(consumer, pose, x + 0.02f, y + 0.02f, z + 0.02f,
-                                x + 0.98f, y + 0.98f, z + 0.98f, isClear);
+                        if (isClear) {
+                            // Only render faces on the boundary of the clear area
+                            renderBoundaryFaces(consumer, pose, pos, clearPositions,
+                                    x, y, z, CLEAR_R, CLEAR_G, CLEAR_B, CLEAR_A);
+                        } else {
+                            // Blocked blocks render as individual highlighted boxes
+                            renderFullBox(consumer, pose,
+                                    x + 0.02f, y + 0.02f, z + 0.02f,
+                                    x + 0.98f, y + 0.98f, z + 0.98f,
+                                    BLOCKED_R, BLOCKED_G, BLOCKED_B, BLOCKED_A);
+                        }
                     }
                 }
         );
     }
 
     /**
-     * Renders a colored box using quads.
+     * Renders only the faces of a block that are on the outer boundary of the clear area.
+     * A face is rendered only if the neighbor in that direction is NOT in the clear set.
      */
-    private static void renderBox(VertexConsumer buffer, PoseStack.Pose pose,
-                                   float minX, float minY, float minZ,
-                                   float maxX, float maxY, float maxZ,
-                                   boolean isClear) {
-        int r = isClear ? CLEAR_R : BLOCKED_R;
-        int g = isClear ? CLEAR_G : BLOCKED_G;
-        int b = isClear ? CLEAR_B : BLOCKED_B;
-        int a = isClear ? CLEAR_A : BLOCKED_A;
+    private static void renderBoundaryFaces(VertexConsumer buffer, PoseStack.Pose pose,
+                                             BlockPos pos, Set<BlockPos> clearSet,
+                                             float x, float y, float z,
+                                             int r, int g, int b, int a) {
+        float x0 = x, y0 = y, z0 = z;
+        float x1 = x + 1, y1 = y + 1, z1 = z + 1;
 
-        // Bottom face (y = minY)
-        buffer.addVertex(pose, minX, minY, minZ).setColor(r, g, b, a);
-        buffer.addVertex(pose, maxX, minY, minZ).setColor(r, g, b, a);
-        buffer.addVertex(pose, maxX, minY, maxZ).setColor(r, g, b, a);
-        buffer.addVertex(pose, minX, minY, maxZ).setColor(r, g, b, a);
+        // Bottom face — only if block below is not in the clear area
+        if (!clearSet.contains(pos.below())) {
+            quad(buffer, pose, x0,y0,z0, x1,y0,z0, x1,y0,z1, x0,y0,z1, r,g,b,a);
+        }
+        // Top face
+        if (!clearSet.contains(pos.above())) {
+            quad(buffer, pose, x0,y1,z1, x1,y1,z1, x1,y1,z0, x0,y1,z0, r,g,b,a);
+        }
+        // North face (z-)
+        if (!clearSet.contains(pos.north())) {
+            quad(buffer, pose, x0,y0,z0, x0,y1,z0, x1,y1,z0, x1,y0,z0, r,g,b,a);
+        }
+        // South face (z+)
+        if (!clearSet.contains(pos.south())) {
+            quad(buffer, pose, x1,y0,z1, x1,y1,z1, x0,y1,z1, x0,y0,z1, r,g,b,a);
+        }
+        // West face (x-)
+        if (!clearSet.contains(pos.west())) {
+            quad(buffer, pose, x0,y0,z1, x0,y1,z1, x0,y1,z0, x0,y0,z0, r,g,b,a);
+        }
+        // East face (x+)
+        if (!clearSet.contains(pos.east())) {
+            quad(buffer, pose, x1,y0,z0, x1,y1,z0, x1,y1,z1, x1,y0,z1, r,g,b,a);
+        }
+    }
 
-        // Top face (y = maxY)
-        buffer.addVertex(pose, minX, maxY, maxZ).setColor(r, g, b, a);
-        buffer.addVertex(pose, maxX, maxY, maxZ).setColor(r, g, b, a);
-        buffer.addVertex(pose, maxX, maxY, minZ).setColor(r, g, b, a);
-        buffer.addVertex(pose, minX, maxY, minZ).setColor(r, g, b, a);
+    private static void quad(VertexConsumer buffer, PoseStack.Pose pose,
+                              float x0, float y0, float z0,
+                              float x1, float y1, float z1,
+                              float x2, float y2, float z2,
+                              float x3, float y3, float z3,
+                              int r, int g, int b, int a) {
+        buffer.addVertex(pose, x0, y0, z0).setColor(r, g, b, a);
+        buffer.addVertex(pose, x1, y1, z1).setColor(r, g, b, a);
+        buffer.addVertex(pose, x2, y2, z2).setColor(r, g, b, a);
+        buffer.addVertex(pose, x3, y3, z3).setColor(r, g, b, a);
+    }
 
-        // North face (z = minZ)
-        buffer.addVertex(pose, minX, minY, minZ).setColor(r, g, b, a);
-        buffer.addVertex(pose, minX, maxY, minZ).setColor(r, g, b, a);
-        buffer.addVertex(pose, maxX, maxY, minZ).setColor(r, g, b, a);
-        buffer.addVertex(pose, maxX, minY, minZ).setColor(r, g, b, a);
-
-        // South face (z = maxZ)
-        buffer.addVertex(pose, maxX, minY, maxZ).setColor(r, g, b, a);
-        buffer.addVertex(pose, maxX, maxY, maxZ).setColor(r, g, b, a);
-        buffer.addVertex(pose, minX, maxY, maxZ).setColor(r, g, b, a);
-        buffer.addVertex(pose, minX, minY, maxZ).setColor(r, g, b, a);
-
-        // West face (x = minX)
-        buffer.addVertex(pose, minX, minY, maxZ).setColor(r, g, b, a);
-        buffer.addVertex(pose, minX, maxY, maxZ).setColor(r, g, b, a);
-        buffer.addVertex(pose, minX, maxY, minZ).setColor(r, g, b, a);
-        buffer.addVertex(pose, minX, minY, minZ).setColor(r, g, b, a);
-
-        // East face (x = maxX)
-        buffer.addVertex(pose, maxX, minY, minZ).setColor(r, g, b, a);
-        buffer.addVertex(pose, maxX, maxY, minZ).setColor(r, g, b, a);
-        buffer.addVertex(pose, maxX, maxY, maxZ).setColor(r, g, b, a);
-        buffer.addVertex(pose, maxX, minY, maxZ).setColor(r, g, b, a);
+    /**
+     * Renders a full box with all 6 faces (for obstructed blocks).
+     */
+    private static void renderFullBox(VertexConsumer buffer, PoseStack.Pose pose,
+                                       float x0, float y0, float z0,
+                                       float x1, float y1, float z1,
+                                       int r, int g, int b, int a) {
+        // Bottom
+        quad(buffer, pose, x0,y0,z0, x1,y0,z0, x1,y0,z1, x0,y0,z1, r,g,b,a);
+        // Top
+        quad(buffer, pose, x0,y1,z1, x1,y1,z1, x1,y1,z0, x0,y1,z0, r,g,b,a);
+        // North
+        quad(buffer, pose, x0,y0,z0, x0,y1,z0, x1,y1,z0, x1,y0,z0, r,g,b,a);
+        // South
+        quad(buffer, pose, x1,y0,z1, x1,y1,z1, x0,y1,z1, x0,y0,z1, r,g,b,a);
+        // West
+        quad(buffer, pose, x0,y0,z1, x0,y1,z1, x0,y1,z0, x0,y0,z0, r,g,b,a);
+        // East
+        quad(buffer, pose, x1,y0,z0, x1,y1,z0, x1,y1,z1, x1,y0,z1, r,g,b,a);
     }
 }

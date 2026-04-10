@@ -113,7 +113,7 @@ public class BlockFiller extends Block implements EntityBlock {
     }
 
     @Override
-    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData) {
+    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData, net.minecraft.world.entity.player.Player player) {
         BlockPos filledPos = pos.relative(state.getValue(FACING));
         BlockState filledState = level.getBlockState(filledPos);
         if (filledState.getBlock() instanceof BlockHPBase) {

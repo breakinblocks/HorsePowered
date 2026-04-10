@@ -1,9 +1,0 @@
-{
-  "type": "horsepowered:chopping",
-  "ingredient": "#minecraft:birch_logs",
-  "result": {
-    "id": "minecraft:birch_planks",
-    "count": 4
-  },
-  "time": 1
-}

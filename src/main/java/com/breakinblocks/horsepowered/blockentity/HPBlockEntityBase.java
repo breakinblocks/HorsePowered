@@ -1,5 +1,7 @@
 package com.breakinblocks.horsepowered.blockentity;
 
+import com.breakinblocks.horsepowered.recipes.HPRecipeInput;
+import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -8,19 +10,30 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 
+import org.slf4j.Logger;
+
+import java.util.Optional;
+
 public abstract class HPBlockEntityBase extends BlockEntity implements Container, WorldlyContainer {
+
+    private static final Logger LOGGER = LogUtils.getLogger();
 
     private static final int[] SLOTS_DOWN_DUAL = {1, 2};
     private static final int[] SLOTS_DOWN_SINGLE = {1};
@@ -279,9 +292,28 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
      */
     protected void processSecondary(ItemStack secondary, int chance) {
         if (!secondary.isEmpty() && level != null) {
-            if (chance >= 100 || level.random.nextInt(100) < chance) {
+            if (chance >= 100 || level.getRandom().nextInt(100) < chance) {
                 mergeOutput(2, secondary);
             }
+        }
+    }
+
+    /**
+     * Looks up a recipe of the given type for the specified input item.
+     * Centralizes the common recipe lookup pattern used across all block entities.
+     */
+    protected <T extends Recipe<HPRecipeInput>> Optional<RecipeHolder<T>> findRecipe(RecipeType<T> type, ItemStack input) {
+        if (!(level instanceof ServerLevel serverLevel)) return Optional.empty();
+        try {
+            Optional<RecipeHolder<T>> result = ((RecipeManager) serverLevel.recipeAccess())
+                    .getRecipeFor(type, new HPRecipeInput(input), serverLevel);
+            if (result.isEmpty()) {
+                LOGGER.debug("[HorsePowered] No recipe found for type {} with input {}", type, input);
+            }
+            return result;
+        } catch (Exception e) {
+            LOGGER.error("[HorsePowered] Recipe lookup failed for type {} with input {}", type, input, e);
+            return Optional.empty();
         }
     }
 

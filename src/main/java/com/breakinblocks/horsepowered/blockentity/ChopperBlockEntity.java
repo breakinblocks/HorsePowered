@@ -2,16 +2,13 @@ package com.breakinblocks.horsepowered.blockentity;
 
 import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import com.breakinblocks.horsepowered.recipes.ChoppingRecipe;
-import com.breakinblocks.horsepowered.recipes.HPRecipeInput;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Optional;
 
@@ -63,12 +60,10 @@ public class ChopperBlockEntity extends HPBlockEntityHorseBase {
             if (!ItemStack.isSameItemSameComponents(inputSlot, stack)) return false;
             if (inputSlot.getCount() >= getInventoryStackLimit()) return false;
         }
-        if (!(level instanceof ServerLevel serverLevel)) return false;
-
-        HPRecipeInput recipeInput = new HPRecipeInput(stack);
-        return ((RecipeManager) serverLevel.recipeAccess())
-                .getRecipeFor(HPRecipes.CHOPPING_TYPE.get(), recipeInput, serverLevel)
-                .isPresent();
+        // Recipe lookup is server-only; on the client, allow insertion so the
+        // interaction isn't blocked (server will do the authoritative check)
+        if (level != null && level.isClientSide()) return true;
+        return findRecipe(HPRecipes.CHOPPING_TYPE.get(), stack).isPresent();
     }
 
     @Override
@@ -127,7 +122,7 @@ public class ChopperBlockEntity extends HPBlockEntityHorseBase {
 
     @Override
     public ItemStack getRecipeOutput() {
-        return getRecipe().map(r -> r.value().getResult().copy()).orElse(ItemStack.EMPTY);
+        return getRecipe().map(r -> r.value().createResult()).orElse(ItemStack.EMPTY);
     }
 
     @Override
@@ -136,10 +131,7 @@ public class ChopperBlockEntity extends HPBlockEntityHorseBase {
     }
 
     public Optional<RecipeHolder<ChoppingRecipe>> getRecipe() {
-        if (!(level instanceof ServerLevel serverLevel)) return Optional.empty();
-        HPRecipeInput recipeInput = new HPRecipeInput(getItem(0));
-        return ((RecipeManager) serverLevel.recipeAccess())
-                .getRecipeFor(HPRecipes.CHOPPING_TYPE.get(), recipeInput, serverLevel);
+        return findRecipe(HPRecipes.CHOPPING_TYPE.get(), getItem(0));
     }
 
     @Override

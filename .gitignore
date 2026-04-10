@@ -58,6 +58,12 @@ replay_pid*
 *~
 local.properties
 
+# Markdown files — only README.md, LICENSE.md, and metadata/changelogs/ are tracked
+*.md
+!README.md
+!LICENSE.md
+!metadata/changelogs/**/*.md
+
 gradle/wrapper/
 
 *.bat

@@ -28,20 +28,20 @@ side = "BOTH"
 [[dependencies.${mod_id}]]
 modId = "jei"
 type = "optional"
-versionRange = "[19,)"
+versionRange = "[28,)"
 ordering = "AFTER"
 side = "CLIENT"
 
 [[dependencies.${mod_id}]]
 modId = "jade"
 type = "optional"
-versionRange = "[15,)"
+versionRange = "[26,)"
 ordering = "AFTER"
 side = "CLIENT"
 
 [[dependencies.${mod_id}]]
 modId = "guideme"
 type = "optional"
-versionRange = "[21.11,)"
+versionRange = "[26,)"
 ordering = "AFTER"
 side = "CLIENT"

@@ -3,7 +3,7 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.moddev' version '2.0.131'
+    id 'net.neoforged.moddev' version '2.0.141'
 }
 
 version = "${minecraft_version}-${mod_version}"
@@ -13,15 +13,12 @@ base {
     archivesName = mod_id
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 
 neoForge {
     version = neoforge_version
 
-    parchment {
-        mappingsVersion = "2025.07.18"
-        minecraftVersion = "1.21.8"
-    }
+    // Parchment mappings removed - MC 26.1+ is no longer obfuscated
 
     runs {
         client {
@@ -35,8 +32,13 @@ neoForge {
             systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
         }
 
-        data {
+        serverData {
             serverData()
+            programArguments.addAll '--mod', mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+        }
+
+        clientData {
+            clientData()
             programArguments.addAll '--mod', mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
         }
     }
@@ -86,8 +88,7 @@ dependencies {
     runtimeOnly "maven.modrinth:jade:${jade_version}+neoforge"
 
     // GuideME - guidebook framework
-    compileOnly "org.appliedenergistics:guideme:${guideme_version}:api"
-    runtimeOnly "org.appliedenergistics:guideme:${guideme_version}"
+    implementation "curse.maven:guideme-1173950:7885779"
 }
 
 tasks.named('processResources', ProcessResources).configure {

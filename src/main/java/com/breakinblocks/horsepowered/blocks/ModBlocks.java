@@ -1,9 +1,11 @@
 package com.breakinblocks.horsepowered.blocks;
 
 import com.breakinblocks.horsepowered.HorsePowerMod;
+import com.breakinblocks.horsepowered.fluids.ModFluids;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 import net.neoforged.neoforge.registries.DeferredBlock;
@@ -46,6 +48,19 @@ public class ModBlocks {
                     .setId(ResourceKey.create(Registries.BLOCK, registryName))
                     .mapColor(MapColor.WOOD)
                     .strength(5.0F)));
+
+    // Fluid blocks — seed oil is flammable: high flammability (300) + instant spread (300)
+    public static final DeferredBlock<LiquidBlock> SEED_OIL_BLOCK = BLOCKS.register("seed_oil",
+            registryName -> new FlammableLiquidBlock(ModFluids.SEED_OIL_SOURCE.get(), BlockBehaviour.Properties.of()
+                    .setId(ResourceKey.create(Registries.BLOCK, registryName))
+                    .mapColor(MapColor.COLOR_YELLOW)
+                    .replaceable()
+                    .noCollision()
+                    .strength(100.0F)
+                    .pushReaction(net.minecraft.world.level.material.PushReaction.DESTROY)
+                    .noLootTable()
+                    .liquid(),
+                    300, 300));
 
     public static final DeferredBlock<Block> FILLER = BLOCKS.register("filler",
             registryName -> new BlockFiller(BlockBehaviour.Properties.of()

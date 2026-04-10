@@ -4,6 +4,7 @@ import com.breakinblocks.horsepowered.blockentity.ModBlockEntities;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import com.breakinblocks.horsepowered.items.ModItems;
+import com.breakinblocks.horsepowered.fluids.ModFluids;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
 import com.mojang.logging.LogUtils;
 import net.minecraft.network.chat.Component;
@@ -17,9 +18,13 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.ModList;
+import com.breakinblocks.horsepowered.blockentity.HPBlockEntityBase;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.transfer.item.WorldlyContainerWrapper;
 import org.slf4j.Logger;
 
 @Mod(HorsePowerMod.MOD_ID)
@@ -43,6 +48,7 @@ public class HorsePowerMod {
                         // Items
                         output.accept(ModItems.FLOUR.get());
                         output.accept(ModItems.DOUGH.get());
+                        output.accept(ModItems.SEED_OIL_BUCKET.get());
                         // Blocks
                         output.accept(ModBlocks.HAND_GRINDSTONE.get());
                         output.accept(ModBlocks.GRINDSTONE.get());
@@ -62,6 +68,8 @@ public class HorsePowerMod {
         ModBlocks.BLOCKS.register(modEventBus);
         ModItems.ITEMS.register(modEventBus);
         ModBlockEntities.BLOCK_ENTITIES.register(modEventBus);
+        ModFluids.FLUID_TYPES.register(modEventBus);
+        ModFluids.FLUIDS.register(modEventBus);
         HPRecipes.RECIPE_TYPES.register(modEventBus);
         HPRecipes.RECIPE_SERIALIZERS.register(modEventBus);
         HPRecipes.RECIPE_BOOK_CATEGORIES.register(modEventBus);
@@ -74,8 +82,9 @@ public class HorsePowerMod {
         // Register common setup listener
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::buildCreativeContents);
+        modEventBus.addListener(HorsePowerMod::registerCapabilities);
 
-        // Client-only setup - registration is handled by @EventBusSubscriber in HorsePowerClient
+        // Client-only setup
         if (dist.isClient()) {
             registerClientExtensions(container);
         }
@@ -83,6 +92,64 @@ public class HorsePowerMod {
 
     private void commonSetup(final FMLCommonSetupEvent event) {
         LOGGER.info("Horse Powered common setup");
+        event.enqueueWork(() -> {
+            var lavaType = net.neoforged.neoforge.common.NeoForgeMod.LAVA_TYPE.value();
+            var oilType = ModFluids.SEED_OIL_TYPE.get();
+            var fire = net.minecraft.world.level.block.Blocks.FIRE.defaultBlockState();
+            var air = net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
+
+            // Seed oil + adjacent lava → seed oil becomes fire (or air if fire can't survive)
+            net.neoforged.neoforge.fluids.FluidInteractionRegistry.addInteraction(oilType,
+                    new net.neoforged.neoforge.fluids.FluidInteractionRegistry.InteractionInformation(
+                            lavaType,
+                            fluidState -> fire));
+
+            // Seed oil + adjacent fire block → seed oil becomes fire
+            net.neoforged.neoforge.fluids.FluidInteractionRegistry.addInteraction(oilType,
+                    new net.neoforged.neoforge.fluids.FluidInteractionRegistry.InteractionInformation(
+                            (level, currentPos, relativePos, currentState) ->
+                                    level.getBlockState(relativePos).is(net.minecraft.world.level.block.Blocks.FIRE),
+                            fluidState -> fire));
+
+            // Lava + adjacent seed oil → lava becomes fire
+            // This handles the case where lava flows INTO oil
+            net.neoforged.neoforge.fluids.FluidInteractionRegistry.addInteraction(lavaType,
+                    new net.neoforged.neoforge.fluids.FluidInteractionRegistry.InteractionInformation(
+                            oilType,
+                            fluidState -> fire));
+
+            LOGGER.info("Registered seed oil fluid interactions");
+        });
+    }
+
+    private static void registerCapabilities(RegisterCapabilitiesEvent event) {
+        // Register item handler capabilities for all block entities that implement WorldlyContainer.
+        // This allows hoppers and other automation to interact with HP blocks.
+        event.registerBlockEntity(Capabilities.Item.BLOCK,
+                ModBlockEntities.CHOPPER.get(),
+                (be, side) -> new WorldlyContainerWrapper(be, side));
+        event.registerBlockEntity(Capabilities.Item.BLOCK,
+                ModBlockEntities.GRINDSTONE.get(),
+                (be, side) -> new WorldlyContainerWrapper(be, side));
+        event.registerBlockEntity(Capabilities.Item.BLOCK,
+                ModBlockEntities.PRESS.get(),
+                (be, side) -> new WorldlyContainerWrapper(be, side));
+        event.registerBlockEntity(Capabilities.Item.BLOCK,
+                ModBlockEntities.HAND_GRINDSTONE.get(),
+                (be, side) -> new WorldlyContainerWrapper(be, side));
+        event.registerBlockEntity(Capabilities.Item.BLOCK,
+                ModBlockEntities.CHOPPING_BLOCK.get(),
+                (be, side) -> new WorldlyContainerWrapper(be, side));
+        // Filler delegates to its main block - look up the main block's capability directly
+        event.registerBlockEntity(Capabilities.Item.BLOCK,
+                ModBlockEntities.FILLER.get(),
+                (be, side) -> {
+                    HPBlockEntityBase mainBe = be.getFilledTileEntity();
+                    if (mainBe != null) {
+                        return new WorldlyContainerWrapper(mainBe, side);
+                    }
+                    return null;
+                });
     }
 
     private void buildCreativeContents(final BuildCreativeModeTabContentsEvent event) {

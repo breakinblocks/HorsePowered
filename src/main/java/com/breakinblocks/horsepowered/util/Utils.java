@@ -1,6 +1,7 @@
 package com.breakinblocks.horsepowered.util;
 
 import com.breakinblocks.horsepowered.HorsePowerMod;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
@@ -27,7 +28,8 @@ public class Utils {
      * Checks if an entity is a valid worker for horse-powered blocks
      */
     public static boolean isValidWorker(Entity entity) {
-        return entity instanceof PathfinderMob && entity.getType().is(VALID_WORKER_TAG);
+        return entity instanceof PathfinderMob
+                && BuiltInRegistries.ENTITY_TYPE.wrapAsHolder(entity.getType()).is(VALID_WORKER_TAG);
     }
 
     /**

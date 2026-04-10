@@ -3,7 +3,11 @@
 
   "item.horsepowered.flour": "Flour",
   "item.horsepowered.dough": "Dough",
+  "item.horsepowered.seed_oil_bucket": "Seed Oil Bucket",
   "item.horsepowered.guide": "Horse Powered Guide",
+
+  "fluid_type.horsepowered.seed_oil": "Seed Oil",
+  "block.horsepowered.seed_oil": "Seed Oil",
 
   "block.horsepowered.hand_grindstone": "Hand Grindstone",
   "block.horsepowered.grindstone": "Horse Grindstone",

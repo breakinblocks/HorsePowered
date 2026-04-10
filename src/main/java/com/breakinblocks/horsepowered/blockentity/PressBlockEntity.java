@@ -1,7 +1,6 @@
 package com.breakinblocks.horsepowered.blockentity;
 
 import com.breakinblocks.horsepowered.config.HorsePowerConfig;
-import com.breakinblocks.horsepowered.recipes.HPRecipeInput;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
 import com.breakinblocks.horsepowered.recipes.PressRecipe;
 import net.minecraft.core.BlockPos;
@@ -11,9 +10,9 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
@@ -94,7 +93,7 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
 
     @Override
     public ItemStack getRecipeOutput() {
-        return getRecipe().map(r -> r.value().getResult().copy()).orElse(ItemStack.EMPTY);
+        return getRecipe().map(r -> r.value().createResult()).orElse(ItemStack.EMPTY);
     }
 
     @Override
@@ -103,10 +102,7 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
     }
 
     public Optional<RecipeHolder<PressRecipe>> getRecipe() {
-        if (!(level instanceof ServerLevel serverLevel)) return Optional.empty();
-        HPRecipeInput recipeInput = new HPRecipeInput(getItem(0));
-        return ((RecipeManager) serverLevel.recipeAccess())
-                .getRecipeFor(HPRecipes.PRESSING_TYPE.get(), recipeInput, serverLevel);
+        return findRecipe(HPRecipes.PRESSING_TYPE.get(), getItem(0));
     }
 
     @Override
@@ -125,7 +121,7 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
             if (recipe.hasFluidOutput()) {
                 tank.fill(fluidResult.copy(), IFluidHandler.FluidAction.EXECUTE);
             } else {
-                mergeOutput(1, recipe.getResult());
+                mergeOutput(1, recipe.createResult());
             }
 
             getItem(0).shrink(recipe.getInputCount());
@@ -148,7 +144,7 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
         if (recipeOpt.isEmpty()) return false;
 
         PressRecipe recipe = recipeOpt.get().value();
-        ItemStack result = recipe.getResult();
+        ItemStack result = recipe.createResult();
         FluidStack fluidOutput = recipe.getFluidResult();
 
         if (getItem(0).getCount() < recipe.getInputCount()) {
@@ -174,13 +170,9 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
 
     @Override
     public int getInventoryStackLimit(ItemStack stack) {
-        if (!(level instanceof ServerLevel serverLevel)) return getInventoryStackLimit();
-
-        HPRecipeInput recipeInput = new HPRecipeInput(stack);
-        Optional<RecipeHolder<PressRecipe>> recipeOpt = ((RecipeManager) serverLevel.recipeAccess())
-                .getRecipeFor(HPRecipes.PRESSING_TYPE.get(), recipeInput, serverLevel);
-
-        return recipeOpt.map(r -> r.value().getInputCount()).orElse(getInventoryStackLimit());
+        return this.<PressRecipe>findRecipe(HPRecipes.PRESSING_TYPE.get(), stack)
+                .map(r -> r.value().getInputCount())
+                .orElse(getInventoryStackLimit());
     }
 
     @Override
@@ -198,7 +190,9 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
         if (index != 0) return false;
         // Only reject if pressing is in progress (don't reject just because output has items)
         if (currentPressStatus != 0) return false;
-        if (!(level instanceof ServerLevel serverLevel)) return false;
+        // Recipe lookup is server-only; on the client, allow insertion so the
+        // interaction isn't blocked (server will do the authoritative check)
+        if (!(level instanceof ServerLevel serverLevel)) return level != null && level.isClientSide();
 
         // Check if ANY press recipe accepts this item type (ignore count requirement)
         // This allows hoppers to insert items one at a time

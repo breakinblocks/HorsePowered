@@ -44,15 +44,15 @@ public class HPRecipes {
                 }
             });
 
-    // Recipe Serializers
+    // Recipe Serializers - RecipeSerializer is now a record of MapCodec + StreamCodec in 26.1
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<GrindstoneRecipe>> GRINDING_SERIALIZER =
-            RECIPE_SERIALIZERS.register("grinding", GrindstoneRecipe.Serializer::new);
+            RECIPE_SERIALIZERS.register("grinding", () -> new RecipeSerializer<>(GrindstoneRecipe.CODEC, GrindstoneRecipe.STREAM_CODEC));
 
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<ChoppingRecipe>> CHOPPING_SERIALIZER =
-            RECIPE_SERIALIZERS.register("chopping", ChoppingRecipe.Serializer::new);
+            RECIPE_SERIALIZERS.register("chopping", () -> new RecipeSerializer<>(ChoppingRecipe.CODEC, ChoppingRecipe.STREAM_CODEC));
 
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<PressRecipe>> PRESSING_SERIALIZER =
-            RECIPE_SERIALIZERS.register("pressing", PressRecipe.Serializer::new);
+            RECIPE_SERIALIZERS.register("pressing", () -> new RecipeSerializer<>(PressRecipe.CODEC, PressRecipe.STREAM_CODEC));
 
     // Recipe Book Categories
     public static final DeferredHolder<RecipeBookCategory, RecipeBookCategory> GRINDING_CATEGORY =

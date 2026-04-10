@@ -4,7 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.fluids.FluidStack;
 
 /**
@@ -41,9 +40,9 @@ public class FluidRenderer {
         float fillRatio = (float) fluidStack.getAmount() / tankCapacity;
         fillRatio = Math.max(0.01f, Math.min(1.0f, fillRatio)); // Clamp between 0.01 and 1.0
 
-        // Get fluid color
-        IClientFluidTypeExtensions fluidExtensions = IClientFluidTypeExtensions.of(fluidStack.getFluid());
-        int color = fluidExtensions.getTintColor(fluidStack);
+        // Get fluid color - use default opaque white since getTintColor was removed in 26.1
+        // The fluid texture itself provides the visual color
+        int color = 0xFFFFFFFF;
 
         int r = (color >> 16) & 0xFF;
         int g = (color >> 8) & 0xFF;

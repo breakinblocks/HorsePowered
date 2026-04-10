@@ -1,0 +1,7 @@
+{
+  "neoforge:conditions": [{"type": "neoforge:mod_loaded", "modid": "farmersdelight"}],
+  "type": "horsepowered:chopping",
+  "ingredient": "minecraft:salmon",
+  "result": {"id": "farmersdelight:salmon_slice", "count": 2},
+  "time": 1
+}

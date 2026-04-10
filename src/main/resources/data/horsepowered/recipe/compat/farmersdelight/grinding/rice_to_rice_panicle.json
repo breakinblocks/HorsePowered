@@ -1,0 +1,9 @@
+{
+  "neoforge:conditions": [{"type": "neoforge:mod_loaded", "modid": "farmersdelight"}],
+  "type": "horsepowered:grinding",
+  "ingredient": "farmersdelight:rice_panicle",
+  "result": {"id": "farmersdelight:rice", "count": 1},
+  "secondary": {"id": "farmersdelight:straw", "count": 1},
+  "secondaryChance": 50,
+  "time": 8
+}
