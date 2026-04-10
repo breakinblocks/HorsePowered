@@ -140,7 +140,9 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 // Mod publishing to CurseForge, Modrinth, and GitHub
+// Pass -PdryRun=true to test publishing without actually uploading
 publishMods {
+    dryRun = project.hasProperty("dryRun") && project.property("dryRun") == "true"
     file = jar.archiveFile
     def changelogFile = file("metadata/changelogs/${mod_version}.md")
     changelog = changelogFile.exists() ? changelogFile.text : "Release ${version}"
