@@ -2,6 +2,7 @@ package com.breakinblocks.horsepowered.compat.jei;
 
 import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
+import com.breakinblocks.horsepowered.events.HPDatapackSync;
 import com.breakinblocks.horsepowered.recipes.ChoppingRecipe;
 import com.breakinblocks.horsepowered.recipes.GrindstoneRecipe;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
@@ -16,8 +17,7 @@ import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.item.crafting.RecipeManager;
-import net.neoforged.neoforge.server.ServerLifecycleHooks;
+import net.minecraft.world.item.crafting.RecipeMap;
 
 import java.util.List;
 
@@ -55,38 +55,24 @@ public class HorsePowerPlugin implements IModPlugin {
         );
     }
 
+    // Recipes are captured from the server's sync into HPDatapackSync#clientRecipes
+    // (we opt in via OnDatapackSyncEvent#sendRecipes on the server side).
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
-        // Since 1.21.2, recipes are server-side only - use ServerLifecycleHooks to get RecipeManager
-        var server = ServerLifecycleHooks.getCurrentServer();
-        if (server == null) {
-            // In dedicated server multiplayer without integrated server, JEI handles syncing
-            return;
-        }
-        RecipeManager recipeManager = server.getRecipeManager();
+        RecipeMap recipeMap = HPDatapackSync.getClientRecipes();
+        if (recipeMap == null) return;
 
-        // Grinding recipes - unwrap from RecipeHolder
-        List<GrindstoneRecipe> grindingRecipes = recipeManager.recipeMap().byType(HPRecipes.GRINDING_TYPE.get())
-                .stream()
-                .map(RecipeHolder::value)
-                .toList();
+        List<GrindstoneRecipe> grindingRecipes = recipeMap.byType(HPRecipes.GRINDING_TYPE.get())
+                .stream().map(RecipeHolder::value).toList();
         registration.addRecipes(GRINDING_TYPE, grindingRecipes);
 
-        // Chopping recipes - unwrap from RecipeHolder
-        List<ChoppingRecipe> choppingRecipes = recipeManager.recipeMap().byType(HPRecipes.CHOPPING_TYPE.get())
-                .stream()
-                .map(RecipeHolder::value)
-                .toList();
+        List<ChoppingRecipe> choppingRecipes = recipeMap.byType(HPRecipes.CHOPPING_TYPE.get())
+                .stream().map(RecipeHolder::value).toList();
         registration.addRecipes(CHOPPING_TYPE, choppingRecipes);
-
-        // Manual chopping uses the same recipes
         registration.addRecipes(MANUAL_CHOPPING_TYPE, choppingRecipes);
 
-        // Pressing recipes - unwrap from RecipeHolder
-        List<PressRecipe> pressingRecipes = recipeManager.recipeMap().byType(HPRecipes.PRESSING_TYPE.get())
-                .stream()
-                .map(RecipeHolder::value)
-                .toList();
+        List<PressRecipe> pressingRecipes = recipeMap.byType(HPRecipes.PRESSING_TYPE.get())
+                .stream().map(RecipeHolder::value).toList();
         registration.addRecipes(PRESSING_TYPE, pressingRecipes);
     }
 
