@@ -136,10 +136,8 @@ tasks.withType(JavaCompile).configureEach {
     options.compilerArgs << '-Xlint:deprecation'
 }
 
-// Mod publishing to CurseForge, Modrinth, and GitHub
-// Pass -PdryRun=true to test publishing without actually uploading
+// Mod publishing to CurseForge and Modrinth (GitHub releases handled by CI)
 publishMods {
-    dryRun = project.hasProperty("dryRun") && project.property("dryRun") == "true"
     file = jar.archiveFile
     def changelogFile = file("metadata/changelogs/${mod_version}.md")
     changelog = changelogFile.exists() ? changelogFile.text : "Release ${version}"
@@ -160,41 +158,12 @@ publishMods {
         minecraftVersions.add(minecraft_version)
         optional("jei", "jade", "guideme")
     }
-
-    def githubToken = providers.environmentVariable("GITHUB_TOKEN")
-    if (githubToken.isPresent()) {
-        github {
-            repository = "breakinblocks/HorsePowered"
-            accessToken = githubToken
-            commitish = "main"
-        }
-    }
 }
 
-// Include Maven publish when running publishMods.
-// Failures (e.g. HTTP 409 if the version already exists on the Maven repo) are logged
-// but do not fail the overall publishMods invocation, so CurseForge/Modrinth/GitHub
-// publishing can still continue.
+// Include Maven publish when running publishMods
 tasks.named('publishMods') {
     def mavenUser = providers.environmentVariable("MAVEN_USER")
     if (mavenUser.isPresent()) {
         dependsOn 'publishMavenJavaPublicationToBreakInBlocksRepository'
-    }
-}
-
-afterEvaluate {
-    def mavenTask = tasks.findByName('publishMavenJavaPublicationToBreakInBlocksRepository')
-    if (mavenTask != null) {
-        def originalActions = new ArrayList<>(mavenTask.actions)
-        mavenTask.actions.clear()
-        mavenTask.doLast('Tolerant Maven publish') {
-            originalActions.each { action ->
-                try {
-                    action.execute(mavenTask)
-                } catch (Exception e) {
-                    logger.warn("Maven publish failed (continuing anyway): ${e.message}")
-                }
-            }
-        }
     }
 }

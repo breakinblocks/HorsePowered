@@ -27,7 +27,13 @@ jobs:
       - name: Build
         run: chmod +x gradlew && ./gradlew clean build
 
+      - name: Resolve version
+        id: version
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
       - name: Create GitHub Release
-        run: ./gradlew publishMods
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/libs/horsepowered-*.jar
+          body_path: metadata/changelogs/${{ steps.version.outputs.version }}.md
+          fail_on_unmatched_files: true
