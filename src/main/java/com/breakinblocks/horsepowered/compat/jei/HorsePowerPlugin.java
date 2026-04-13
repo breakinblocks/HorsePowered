@@ -21,8 +21,6 @@ import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import java.util.List;
 
-// TODO: Update to non-deprecated JEI API when available
-@SuppressWarnings("removal")
 @JeiPlugin
 public class HorsePowerPlugin implements IModPlugin {
 

@@ -13,8 +13,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 
-// TODO: Update to non-deprecated JEI API when available
-@SuppressWarnings("removal")
 public class HorsePowerGrindingCategory extends BaseHPCategory<GrindstoneRecipe> {
 
     private static final int WIDTH = 100;

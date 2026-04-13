@@ -44,14 +44,9 @@ public class GrindstoneBlockEntityRenderer implements BlockEntityRenderer<Grinds
     public void submit(GrindstoneRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
         HorseBlockRenderState.submitWorkerAndArea(state, poseStack, collector, camera);
 
-        // Render input item on top of the grinder
         RenderUtils.renderFlatItem(state.inputItem, poseStack, collector, state.lightCoords, 0.5D, 0.55D, 0.5D, 0.4F);
-
-        // Render output item in front of grindstone
-        RenderUtils.renderFlatItem(state.outputItem, poseStack, collector, state.lightCoords, 0.5D, 0.2D, -0.1D, 0.3F);
-
-        // Render secondary output behind grindstone
-        RenderUtils.renderFlatItem(state.secondaryItem, poseStack, collector, state.lightCoords, 0.5D, 0.2D, 1.1D, 0.3F);
+        RenderUtils.renderFlatItem(state.outputItem, poseStack, collector, state.lightCoords, 0.5D, 0.2D, 0.18D, 0.3F);
+        RenderUtils.renderFlatItem(state.secondaryItem, poseStack, collector, state.lightCoords, 0.5D, 0.2D, 0.82D, 0.3F);
     }
 
     @Override

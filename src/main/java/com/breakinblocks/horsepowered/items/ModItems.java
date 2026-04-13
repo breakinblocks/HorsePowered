@@ -16,7 +16,6 @@ public class ModItems {
 
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(HorsePowerMod.MOD_ID);
 
-    // Regular items - In NeoForge 21.11+, you must use .setId() on Item.Properties
     public static final DeferredItem<Item> FLOUR = ITEMS.register("flour",
             registryName -> new Item(new Item.Properties()
                     .setId(ResourceKey.create(Registries.ITEM, registryName))));
@@ -25,14 +24,17 @@ public class ModItems {
             registryName -> new Item(new Item.Properties()
                     .setId(ResourceKey.create(Registries.ITEM, registryName))));
 
-    // Fluid buckets
     public static final DeferredItem<BucketItem> SEED_OIL_BUCKET = ITEMS.register("seed_oil_bucket",
             registryName -> new BucketItem(ModFluids.SEED_OIL_SOURCE.get(), new Item.Properties()
                     .setId(ResourceKey.create(Registries.ITEM, registryName))
                     .craftRemainder(Items.BUCKET)
                     .stacksTo(1)));
 
-    // Block items - register with lazy block lookup
+    public static final DeferredItem<WorkSaddleItem> WORK_SADDLE = ITEMS.register("work_saddle",
+            registryName -> new WorkSaddleItem(new Item.Properties()
+                    .setId(ResourceKey.create(Registries.ITEM, registryName))
+                    .stacksTo(1)));
+
     public static final DeferredItem<BlockItem> HAND_GRINDSTONE_ITEM = ITEMS.register("hand_grindstone",
             registryName -> new BlockItem(ModBlocks.HAND_GRINDSTONE.get(), new Item.Properties()
                     .setId(ResourceKey.create(Registries.ITEM, registryName))

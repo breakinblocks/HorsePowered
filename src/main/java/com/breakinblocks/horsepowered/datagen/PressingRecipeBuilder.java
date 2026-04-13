@@ -11,6 +11,8 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.material.Fluid;
+import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
+import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Optional;
@@ -18,6 +20,7 @@ import java.util.Optional;
 public class PressingRecipeBuilder {
     private final Ingredient ingredient;
     private int inputCount = 1;
+    private @Nullable SizedFluidIngredient fluidInput;
     private @Nullable ItemStackTemplate result;
     private PressRecipe.@Nullable FluidRef fluidRef;
 
@@ -39,6 +42,16 @@ public class PressingRecipeBuilder {
         return this;
     }
 
+    public PressingRecipeBuilder fluidInput(SizedFluidIngredient input) {
+        this.fluidInput = input;
+        return this;
+    }
+
+    public PressingRecipeBuilder fluidInput(Fluid fluid, int amount) {
+        this.fluidInput = new SizedFluidIngredient(FluidIngredient.of(fluid), amount);
+        return this;
+    }
+
     public PressingRecipeBuilder fluidResult(Fluid fluid, int amount) {
         this.fluidRef = new PressRecipe.FluidRef(
                 net.minecraft.core.registries.BuiltInRegistries.FLUID.getKey(fluid), amount);
@@ -54,6 +67,7 @@ public class PressingRecipeBuilder {
         ResourceKey<Recipe<?>> key = ResourceKey.create(Registries.RECIPE,
                 HorsePowerMod.id("pressing/" + name));
         output.accept(key, new PressRecipe(ingredient, inputCount,
+                Optional.ofNullable(fluidInput),
                 Optional.ofNullable(result), Optional.ofNullable(fluidRef)), null);
     }
 }

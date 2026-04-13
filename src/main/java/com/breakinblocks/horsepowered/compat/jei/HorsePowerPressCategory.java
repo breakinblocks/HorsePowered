@@ -14,8 +14,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.Holder;
 import net.minecraft.world.item.ItemStack;
 
-// TODO: Update to non-deprecated JEI API when available
-@SuppressWarnings({"removal", "deprecation"})
+@SuppressWarnings("deprecation")
 public class HorsePowerPressCategory extends BaseHPCategory<PressRecipe> {
 
     private static final int WIDTH = 82;
@@ -53,6 +52,13 @@ public class HorsePowerPressCategory extends BaseHPCategory<PressRecipe> {
                         .toList())
                 .setBackground(slot, -1, -1);
 
+        recipe.getFluidInput().ifPresent(fluidIn ->
+                builder.addSlot(RecipeIngredientRole.INPUT, 1, 22)
+                        .setFluidRenderer(fluidIn.amount(), false, 16, 16)
+                        .addIngredients(NeoForgeTypes.FLUID_STACK, fluidIn.ingredient().fluids().stream()
+                                .map(h -> new net.neoforged.neoforge.fluids.FluidStack(h.value(), fluidIn.amount()))
+                                .toList()));
+
         if (recipe.hasFluidOutput()) {
             builder.addSlot(RecipeIngredientRole.OUTPUT, 61, 1)
                     .setFluidRenderer(recipe.getFluidResult().getAmount(), false, 16, 32)
@@ -70,8 +76,15 @@ public class HorsePowerPressCategory extends BaseHPCategory<PressRecipe> {
 
         if (recipe.getInputCount() > 1) {
             String countText = "x" + recipe.getInputCount();
-            guiGraphics.text(Minecraft.getInstance().font, countText, 1, 24, 0x808080, false);
+            int countX = recipe.hasFluidInput() ? 22 : 1;
+            int countY = recipe.hasFluidInput() ? 24 : 24;
+            guiGraphics.text(Minecraft.getInstance().font, countText, countX, countY, 0x808080, false);
         }
+
+        recipe.getFluidInput().ifPresent(fluidIn -> {
+            String text = fluidIn.amount() + " mB";
+            guiGraphics.text(Minecraft.getInstance().font, text, 22, 30, 0x808080, false);
+        });
 
         if (recipe.hasFluidOutput()) {
             String fluidText = recipe.getFluidResult().getAmount() + " mB";

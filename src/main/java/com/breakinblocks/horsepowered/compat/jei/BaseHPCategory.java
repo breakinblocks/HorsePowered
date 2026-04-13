@@ -13,8 +13,6 @@ import net.minecraft.world.level.ItemLike;
  * Base class for all HorsePowered JEI recipe categories, providing shared constructor
  * boilerplate and common getter implementations.
  */
-// TODO: Update to non-deprecated JEI API when available
-@SuppressWarnings("removal")
 public abstract class BaseHPCategory<T> implements IRecipeCategory<T> {
 
     protected final IDrawable icon;

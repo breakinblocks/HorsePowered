@@ -49,6 +49,7 @@ public class HorsePowerMod {
                         output.accept(ModItems.FLOUR.get());
                         output.accept(ModItems.DOUGH.get());
                         output.accept(ModItems.SEED_OIL_BUCKET.get());
+                        output.accept(ModItems.WORK_SADDLE.get());
                         // Blocks
                         output.accept(ModBlocks.HAND_GRINDSTONE.get());
                         output.accept(ModBlocks.GRINDSTONE.get());
@@ -64,7 +65,8 @@ public class HorsePowerMod {
     }
 
     public HorsePowerMod(IEventBus modEventBus, ModContainer container, Dist dist) {
-        // Register blocks first, then items (block items depend on blocks), then block entities
+        net.neoforged.neoforge.common.NeoForgeMod.enableMilkFluid();
+
         ModBlocks.BLOCKS.register(modEventBus);
         ModItems.ITEMS.register(modEventBus);
         ModBlockEntities.BLOCK_ENTITIES.register(modEventBus);
@@ -75,16 +77,13 @@ public class HorsePowerMod {
         HPRecipes.RECIPE_BOOK_CATEGORIES.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);
 
-        // Register configs
         container.registerConfig(ModConfig.Type.COMMON, HorsePowerConfig.COMMON_SPEC);
         container.registerConfig(ModConfig.Type.CLIENT, HorsePowerConfig.CLIENT_SPEC);
 
-        // Register common setup listener
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::buildCreativeContents);
         modEventBus.addListener(HorsePowerMod::registerCapabilities);
 
-        // Client-only setup
         if (dist.isClient()) {
             registerClientExtensions(container);
         }

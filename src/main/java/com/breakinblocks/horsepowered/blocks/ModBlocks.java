@@ -15,8 +15,6 @@ public class ModBlocks {
 
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(HorsePowerMod.MOD_ID);
 
-    // Blocks - block items are registered in ModItems
-    // In NeoForge 21.11+, you must use .setId() on BlockBehaviour.Properties
     public static final DeferredBlock<Block> HAND_GRINDSTONE = BLOCKS.register("hand_grindstone",
             registryName -> new BlockHandGrindstone(BlockBehaviour.Properties.of()
                     .setId(ResourceKey.create(Registries.BLOCK, registryName))

@@ -19,8 +19,6 @@ import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 
 import java.util.Optional;
 
-// TODO: Migrate to ResourceHandler<FluidResource> when FluidTank is removed in NeoForge 21.10+
-@SuppressWarnings("removal")
 public class PressBlockEntity extends HPBlockEntityHorseBase {
 
     private final FluidTank tank;
@@ -40,7 +38,6 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
         output.putInt("currentPressStatus", currentPressStatus);
-        // Save fluid as CompoundTag using codec
         if (!tank.isEmpty()) {
             FluidStack.CODEC.encodeStart(NbtOps.INSTANCE, tank.getFluid())
                     .resultOrPartial(e -> {})
@@ -55,12 +52,14 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
-        // Load fluid from CompoundTag using codec
-        input.read("fluid", CompoundTag.CODEC).ifPresent(tag -> {
-            FluidStack.CODEC.parse(NbtOps.INSTANCE, tag)
-                    .resultOrPartial(e -> {})
-                    .ifPresent(fluidStack -> tank.setFluid(fluidStack));
-        });
+        // saveAdditional only writes "fluid" when the tank is non-empty, so a missing
+        // key means "tank is empty" — explicitly clear it here or stale milk lingers
+        // on the client after a recipe drains the tank.
+        input.read("fluid", CompoundTag.CODEC).ifPresentOrElse(
+                tag -> FluidStack.CODEC.parse(NbtOps.INSTANCE, tag)
+                        .resultOrPartial(e -> {})
+                        .ifPresent(tank::setFluid),
+                () -> tank.setFluid(FluidStack.EMPTY));
 
         if (!getItem(0).isEmpty()) {
             currentPressStatus = input.getIntOr("currentPressStatus", 0);
@@ -116,12 +115,17 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
             if (recipeOpt.isEmpty()) return;
 
             PressRecipe recipe = recipeOpt.get().value();
-            FluidStack fluidResult = recipe.getFluidResult();
+
+            recipe.getFluidInput().ifPresent(fluidIn ->
+                    tank.drain(fluidIn.amount(), IFluidHandler.FluidAction.EXECUTE));
 
             if (recipe.hasFluidOutput()) {
-                tank.fill(fluidResult.copy(), IFluidHandler.FluidAction.EXECUTE);
-            } else {
-                mergeOutput(1, recipe.createResult());
+                tank.fill(recipe.getFluidResult().copy(), IFluidHandler.FluidAction.EXECUTE);
+            }
+
+            ItemStack itemResult = recipe.createResult();
+            if (!itemResult.isEmpty()) {
+                mergeOutput(1, itemResult);
             }
 
             getItem(0).shrink(recipe.getInputCount());
@@ -145,7 +149,6 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
 
         PressRecipe recipe = recipeOpt.get().value();
         ItemStack result = recipe.createResult();
-        FluidStack fluidOutput = recipe.getFluidResult();
 
         if (getItem(0).getCount() < recipe.getInputCount()) {
             return false;
@@ -155,17 +158,34 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
             return false;
         }
 
-        ItemStack output = getItem(1);
-        if (recipe.hasFluidOutput()) {
-            // For fluid output, output slot must be empty and tank must have room
-            return output.isEmpty() &&
-                    (tank.getFluidAmount() == 0 || tank.fill(fluidOutput.copy(), IFluidHandler.FluidAction.SIMULATE) >= fluidOutput.getAmount());
-        } else {
-            // For item output, tank must be empty and output slot must have room
-            return tank.getFluidAmount() == 0 &&
-                    (output.isEmpty() || (ItemStack.isSameItemSameComponents(output, result) &&
-                            output.getCount() + result.getCount() <= output.getMaxStackSize()));
+        if (recipe.hasFluidInput() && !recipe.getFluidInput().get().test(tank.getFluid())) {
+            return false;
         }
+
+        ItemStack output = getItem(1);
+        if (!result.isEmpty()) {
+            if (!output.isEmpty()) {
+                if (!ItemStack.isSameItemSameComponents(output, result)) return false;
+                if (output.getCount() + result.getCount() > output.getMaxStackSize()) return false;
+            }
+        }
+
+        if (recipe.hasFluidOutput()) {
+            FluidStack fluidOutput = recipe.getFluidResult();
+            int drained = recipe.hasFluidInput() ? recipe.getFluidInput().get().amount() : 0;
+            int simulatedAfterDrain = tank.getFluidAmount() - drained;
+            // After drain the slot may be empty (any fluid) or already hold the output fluid.
+            if (simulatedAfterDrain > 0 && !FluidStack.isSameFluidSameComponents(tank.getFluid(), fluidOutput)) {
+                return false;
+            }
+            int capacityFree = tank.getCapacity() - simulatedAfterDrain;
+            if (capacityFree < fluidOutput.getAmount()) return false;
+        } else if (!recipe.hasFluidInput()) {
+            // Pure item-output recipes still require an empty tank so leftover fluid can't strand the press.
+            if (tank.getFluidAmount() != 0) return false;
+        }
+
+        return true;
     }
 
     @Override

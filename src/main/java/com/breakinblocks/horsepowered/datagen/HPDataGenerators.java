@@ -5,10 +5,6 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 
-/**
- * Data generators for Horse Powered.
- * In 26.1, data generation is split into client and server events.
- */
 @EventBusSubscriber(modid = HorsePowerMod.MOD_ID)
 public class HPDataGenerators {
 

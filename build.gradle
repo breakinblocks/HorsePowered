@@ -19,8 +19,6 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 neoForge {
     version = neoforge_version
 
-    // Parchment mappings removed - MC 26.1+ is no longer obfuscated
-
     runs {
         client {
             client()
@@ -88,8 +86,7 @@ dependencies {
     compileOnly "maven.modrinth:jade:${jade_version}+neoforge"
     runtimeOnly "maven.modrinth:jade:${jade_version}+neoforge"
 
-    // GuideME - guidebook framework
-    implementation "curse.maven:guideme-1173950:7885779"
+    compileOnly "curse.maven:guideme-1173950:7885779"
 }
 
 tasks.named('processResources', ProcessResources).configure {

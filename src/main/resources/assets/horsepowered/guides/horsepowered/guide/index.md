@@ -29,6 +29,9 @@ Start by crafting a [Hand Grindstone](hand_grindstone.md) for manual grinding, o
 - [Horse Chopper](horse_chopper.md) - Automated chopping powered by a horse
 - [Horse Press](horse_press.md) - Press items into fluids or other products
 
+### Tools
+- [Work Saddle](work_saddle.md) - Capture and transport workers across long distances
+
 ## Tips
 
 - Horses and other creatures can be attached to horse-powered blocks by leading them with a lead and right-clicking the block

@@ -1,0 +1,27 @@
+{
+  "model": {
+    "type": "minecraft:condition",
+    "property": "minecraft:has_component",
+    "component": "minecraft:entity_data",
+    "on_false": {
+      "type": "minecraft:model",
+      "model": "horsepowered:item/work_saddle"
+    },
+    "on_true": {
+      "type": "minecraft:composite",
+      "models": [
+        {
+          "type": "minecraft:model",
+          "model": "horsepowered:item/work_saddle"
+        },
+        {
+          "type": "minecraft:special",
+          "base": "horsepowered:item/work_saddle",
+          "model": {
+            "type": "horsepowered:work_saddle_entity"
+          }
+        }
+      ]
+    }
+  }
+}

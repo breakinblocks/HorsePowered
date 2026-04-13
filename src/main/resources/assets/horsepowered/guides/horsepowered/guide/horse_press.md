@@ -30,31 +30,36 @@ The Horse Press is a horse-powered machine that can press items to extract fluid
 ## Usage
 
 1. Right-click with items to insert them into the press
-2. The attached creature will press items automatically
-3. Fluids are stored internally or output to adjacent tanks
+2. Right-click with a bucket of fluid to fill the internal tank, or with an empty bucket to drain it
+3. The attached creature will press items automatically
 4. Right-click to extract any solid outputs
 
 ## Recipe
 
 <RecipeFor id="horsepowered:press" />
 
-## Fluid Output
+## Fluid Tank
 
-The Horse Press can produce fluids from certain recipes:
-- Fluids are stored in an internal tank
-- Connect a fluid pipe or tank to extract fluids
-- Place a bucket and right-click to manually extract fluids
+The Horse Press has an internal fluid tank used for both producing and consuming fluids:
+
+- **Producing fluids** — recipes like seed pressing fill the tank with the result
+- **Consuming fluids** — recipes can also require a fluid input that is drained from the tank as part of the press cycle
+- Right-click with a filled bucket to fill the tank, or with an empty bucket to drain it
+- Connect a fluid pipe or tank for automated fluid transfer
 
 ## Notes
 
 - The press is two blocks tall
 - Some recipes require multiple input items
+- Some recipes require a specific fluid in the tank in addition to the item input
 - The creature requires a clear path around the press
 - Right-click with an empty hand to release the attached creature
 
 ## Example Recipes
 
 Common pressing operations:
-- Seeds to Seed Oil (requires mod support)
-- Leaves to Water
-- Various fruits to juice (with mod support)
+- Seeds to Seed Oil — fills the tank
+- Bone Meal + 1000 mB Milk to Slime Ball — consumes fluid from the tank, produces an item
+- Sugar Cane to Paper, Honey Bottle to Sugar
+- Ice / Snow to Water — fills the tank with water
+- Flowers to Dye

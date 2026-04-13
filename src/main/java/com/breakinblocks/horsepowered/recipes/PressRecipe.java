@@ -17,15 +17,13 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 
 import java.util.Optional;
 
 public class PressRecipe extends BaseHPRecipe {
 
-    /**
-     * Deferred fluid reference that avoids creating a FluidStack during recipe loading
-     * (when fluid components aren't bound yet). The FluidStack is created lazily at runtime.
-     */
+    // FluidRef defers FluidStack construction until item components are bound at runtime.
     public record FluidRef(Identifier fluidId, int amount) {
         public static final Codec<FluidRef> CODEC = RecordCodecBuilder.create(instance ->
                 instance.group(
@@ -40,7 +38,6 @@ public class PressRecipe extends BaseHPRecipe {
                 FluidRef::new
         );
 
-        /** Creates a FluidStack at runtime when fluid components are bound. */
         public FluidStack create() {
             return new FluidStack(BuiltInRegistries.FLUID.getValue(fluidId), amount);
         }
@@ -51,12 +48,15 @@ public class PressRecipe extends BaseHPRecipe {
     }
 
     private final int inputCount;
+    private final Optional<SizedFluidIngredient> fluidInput;
     private final Optional<FluidRef> fluidRef;
 
     public PressRecipe(Ingredient ingredient, int inputCount,
+                       Optional<SizedFluidIngredient> fluidInput,
                        Optional<ItemStackTemplate> result, Optional<FluidRef> fluidRef) {
         super(ingredient, result.orElse(null));
         this.inputCount = inputCount;
+        this.fluidInput = fluidInput;
         this.fluidRef = fluidRef;
     }
 
@@ -85,7 +85,6 @@ public class PressRecipe extends BaseHPRecipe {
         return inputCount;
     }
 
-    /** Creates a FluidStack at runtime. Returns empty if no fluid output. */
     public FluidStack getFluidResult() {
         return fluidRef.map(FluidRef::create).orElse(FluidStack.EMPTY);
     }
@@ -94,11 +93,19 @@ public class PressRecipe extends BaseHPRecipe {
         return fluidRef.isPresent();
     }
 
-    // Codecs - use ItemStackTemplate.CODEC and deferred FluidRef to avoid bound-component issues
+    public Optional<SizedFluidIngredient> getFluidInput() {
+        return fluidInput;
+    }
+
+    public boolean hasFluidInput() {
+        return fluidInput.isPresent();
+    }
+
     public static final MapCodec<PressRecipe> CODEC = RecordCodecBuilder.mapCodec(instance ->
             instance.group(
                     Ingredient.CODEC.fieldOf("ingredient").forGetter(PressRecipe::getIngredient),
                     Codec.INT.optionalFieldOf("inputCount", 1).forGetter(PressRecipe::getInputCount),
+                    SizedFluidIngredient.CODEC.optionalFieldOf("fluidInput").forGetter(PressRecipe::getFluidInput),
                     ItemStackTemplate.CODEC.optionalFieldOf("result").forGetter(r -> Optional.ofNullable(r.getResult())),
                     FluidRef.CODEC.optionalFieldOf("fluidResult").forGetter(r -> r.fluidRef)
             ).apply(instance, PressRecipe::new)
@@ -107,6 +114,7 @@ public class PressRecipe extends BaseHPRecipe {
     public static final StreamCodec<RegistryFriendlyByteBuf, PressRecipe> STREAM_CODEC = StreamCodec.composite(
             Ingredient.CONTENTS_STREAM_CODEC, PressRecipe::getIngredient,
             ByteBufCodecs.VAR_INT, PressRecipe::getInputCount,
+            ByteBufCodecs.optional(SizedFluidIngredient.STREAM_CODEC), PressRecipe::getFluidInput,
             ByteBufCodecs.optional(ItemStackTemplate.STREAM_CODEC), r -> Optional.ofNullable(r.getResult()),
             ByteBufCodecs.optional(FluidRef.STREAM_CODEC), r -> r.fluidRef,
             PressRecipe::new

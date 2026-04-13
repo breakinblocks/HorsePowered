@@ -18,8 +18,7 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 
-// TODO: Update to non-deprecated JEI/Minecraft API when available
-@SuppressWarnings({"removal", "deprecation"})
+@SuppressWarnings("deprecation")
 public class HorsePowerManualChoppingCategory extends BaseHPCategory<ChoppingRecipe> {
 
     private static final int WIDTH = 100;

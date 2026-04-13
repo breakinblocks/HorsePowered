@@ -21,7 +21,11 @@ A Minecraft NeoForge mod that adds horse-powered machinery for grinding, choppin
 
 - **Horse Grindstone** — An automated grindstone powered by a horse walking in circles. Continuously grinds items without manual intervention.
 - **Horse Chopper** — An automated chopping machine. Attach a horse to chop logs into planks automatically.
-- **Horse Press** — Press items to extract fluids or produce other outputs. Squeeze flowers for dye, press seeds for oil, and more.
+- **Horse Press** — Press items to extract fluids or produce other outputs. Recipes can also consume fluids from the press's internal tank to make new items. Right-click with a bucket to fill or drain the tank.
+
+### Tools
+
+- **Work Saddle** — Right-click any creature in the `horsepowered:valid_worker` tag (tamed or untamed) to capture it onto the saddle, then right-click a block to release it. Lets you transport workers across long distances without leashing them home.
 
 ### Seed Oil
 
@@ -153,9 +157,22 @@ Horse Powered uses data-driven JSON recipes that can be added or modified via da
   "fluidResult": { "id": "horsepowered:seed_oil", "amount": 250 }
 }
 ```
+
+#### Pressing Recipe (Fluid Input + Item Output)
+```json
+{
+  "type": "horsepowered:pressing",
+  "ingredient": "minecraft:bone_meal",
+  "inputCount": 1,
+  "fluidInput": { "ingredient": "minecraft:milk", "amount": 1000 },
+  "result": { "id": "minecraft:slime_ball" }
+}
+```
 - `inputCount` — Number of items consumed per press (default: 1)
+- `fluidInput` — Optional `SizedFluidIngredient` drained from the tank each press
 - `result` — Item output (omit for fluid-only)
 - `fluidResult` — Fluid output with `id` and `amount` in mB (omit for item-only)
+- A recipe can combine `fluidInput` with either `result`, `fluidResult`, or both
 
 ### Conditional Recipes (Mod Compat)
 
@@ -190,8 +207,8 @@ By default, horses, donkeys, mules, llamas, and trader llamas can power machines
 
 ## Requirements
 
-- Minecraft 26.1.1
-- NeoForge 26.1.1+
+- Minecraft 26.1.2
+- NeoForge 26.1.2+
 - Java 25+
 
 ## License

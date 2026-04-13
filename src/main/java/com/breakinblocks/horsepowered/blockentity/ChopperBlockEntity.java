@@ -79,7 +79,6 @@ public class ChopperBlockEntity extends HPBlockEntityHorseBase {
     }
 
     private void updateVisualWindup() {
-        // Update visual windup based on current progress
         float windup = HorsePowerConfig.pointsForWindup.get() > 0 ? HorsePowerConfig.pointsForWindup.get() : 1;
         visualWindup = -0.74F + (0.74F * (((float) currentWindup) / (windup - 1)));
     }

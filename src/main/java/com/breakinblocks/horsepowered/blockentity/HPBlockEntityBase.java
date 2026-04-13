@@ -158,7 +158,6 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
         return index > 0; // Only output slots
     }
 
-    // NBT serialization
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
@@ -183,7 +182,6 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
         }
     }
 
-    // Sync to client
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         return this.saveWithoutMetadata(registries);
@@ -203,7 +201,6 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
         }
     }
 
-    // Recipe and work logic
     public boolean canWork() {
         if (getItem(0).isEmpty()) {
             return false;
@@ -221,7 +218,6 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
             return false;
         }
 
-        // Check if output slot can accept result
         ItemStack currentOutput = getItem(1);
         if (!currentOutput.isEmpty()) {
             if (!canCombine(currentOutput, output)) {
@@ -232,7 +228,6 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
             }
         }
 
-        // Check if secondary slot can accept result
         if (!secondary.isEmpty()) {
             ItemStack currentSecondary = getItem(2);
             if (!currentSecondary.isEmpty()) {
@@ -283,7 +278,11 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
         if (current.isEmpty()) {
             setItem(slot, result.copy());
         } else if (ItemStack.isSameItemSameComponents(current, result)) {
+            // grow() mutates the stack in place — setItem isn't called so we have to
+            // setChanged ourselves or the new count never syncs to the client and
+            // tools like Jade see the stale pre-merge count.
             current.grow(result.getCount());
+            setChanged();
         }
     }
 

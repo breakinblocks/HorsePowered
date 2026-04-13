@@ -5,6 +5,9 @@
   "item.horsepowered.dough": "Dough",
   "item.horsepowered.seed_oil_bucket": "Seed Oil Bucket",
   "item.horsepowered.guide": "Horse Powered Guide",
+  "item.horsepowered.work_saddle": "Work Saddle",
+  "item.horsepowered.work_saddle.contains": "Carrying: %s",
+  "item.horsepowered.work_saddle.duplicate": "That worker is already in the world",
 
   "fluid_type.horsepowered.seed_oil": "Seed Oil",
   "block.horsepowered.seed_oil": "Seed Oil",

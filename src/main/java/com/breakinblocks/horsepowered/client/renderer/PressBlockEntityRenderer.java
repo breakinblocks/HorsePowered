@@ -54,11 +54,8 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
         // Render plunger
         PlungerRenderer.renderPlunger(poseStack, collector, state.visualProgress, state.lightCoords);
 
-        // Render input item inside the press basin
-        RenderUtils.renderFlatItem(state.inputItem, poseStack, collector, state.lightCoords, 0.5D, 0.15D, 0.5D, 0.5F);
-
-        // Render output item beside the press
-        RenderUtils.renderFlatItem(state.outputItem, poseStack, collector, state.lightCoords, 0.5D, 0.2D, 1.1D, 0.3F);
+        RenderUtils.renderFlatItem(state.inputItem, poseStack, collector, state.lightCoords, 0.35D, 0.15D, 0.5D, 0.5F);
+        RenderUtils.renderFlatItem(state.outputItem, poseStack, collector, state.lightCoords, 0.7D, 0.15D, 0.5D, 0.3F);
 
         // Render fluid in tank
         if (!state.fluidStack.isEmpty()) {
