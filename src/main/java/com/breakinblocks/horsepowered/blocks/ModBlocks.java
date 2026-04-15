@@ -29,6 +29,13 @@ public class ModBlocks {
                     .strength(3.5F)
                     .requiresCorrectToolForDrops()));
 
+    public static final DeferredBlock<Block> GENERATOR = BLOCKS.register("generator",
+            registryName -> new BlockGenerator(BlockBehaviour.Properties.of()
+                    .setId(ResourceKey.create(Registries.BLOCK, registryName))
+                    .mapColor(MapColor.DEEPSLATE)
+                    .strength(4.0F)
+                    .requiresCorrectToolForDrops()));
+
     public static final DeferredBlock<Block> CHOPPING_BLOCK = BLOCKS.register("chopping_block",
             registryName -> new BlockChoppingBlock(BlockBehaviour.Properties.of()
                     .setId(ResourceKey.create(Registries.BLOCK, registryName))

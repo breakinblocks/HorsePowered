@@ -37,6 +37,9 @@ public class ModBlockEntities {
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<FillerBlockEntity>> FILLER =
             registerBlockEntity("filler", FillerBlockEntity::new, () -> ModBlocks.FILLER.get());
 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<GeneratorBlockEntity>> GENERATOR =
+            registerBlockEntity("generator", GeneratorBlockEntity::new, () -> ModBlocks.GENERATOR.get());
+
     /**
      * Helper method to register a block entity type with a single valid block.
      * The block supplier is evaluated lazily during registration, after blocks are registered.

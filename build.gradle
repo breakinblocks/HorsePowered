@@ -81,6 +81,7 @@ dependencies {
     compileOnly "maven.modrinth:jade:${jade_version}+neoforge"
     runtimeOnly "maven.modrinth:jade:${jade_version}+neoforge"
 
+    // compileOnly: this GuideME build pins minecraft 26.1.1, so keep it off the runtime classpath
     compileOnly "curse.maven:guideme-1173950:7885779"
 }
 

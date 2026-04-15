@@ -56,6 +56,7 @@ public class HorsePowerMod {
                         output.accept(ModBlocks.CHOPPING_BLOCK.get());
                         output.accept(ModBlocks.CHOPPER.get());
                         output.accept(ModBlocks.PRESS.get());
+                        output.accept(ModBlocks.GENERATOR.get());
                     })
                     .build()
     );
@@ -139,6 +140,9 @@ public class HorsePowerMod {
         event.registerBlockEntity(Capabilities.Item.BLOCK,
                 ModBlockEntities.CHOPPING_BLOCK.get(),
                 (be, side) -> new WorldlyContainerWrapper(be, side));
+        event.registerBlockEntity(Capabilities.Energy.BLOCK,
+                ModBlockEntities.GENERATOR.get(),
+                (be, side) -> be.getEnergyHandler());
         // Filler delegates to its main block - look up the main block's capability directly
         event.registerBlockEntity(Capabilities.Item.BLOCK,
                 ModBlockEntities.FILLER.get(),

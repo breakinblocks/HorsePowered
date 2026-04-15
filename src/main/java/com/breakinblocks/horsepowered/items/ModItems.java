@@ -55,4 +55,8 @@ public class ModItems {
             registryName -> new BlockItem(ModBlocks.PRESS.get(), new Item.Properties()
                     .setId(ResourceKey.create(Registries.ITEM, registryName))
                     .useBlockDescriptionPrefix()));
+    public static final DeferredItem<BlockItem> GENERATOR_ITEM = ITEMS.register("generator",
+            registryName -> new BlockItem(ModBlocks.GENERATOR.get(), new Item.Properties()
+                    .setId(ResourceKey.create(Registries.ITEM, registryName))
+                    .useBlockDescriptionPrefix()));
 }

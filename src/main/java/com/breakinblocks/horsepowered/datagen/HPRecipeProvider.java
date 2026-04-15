@@ -100,6 +100,17 @@ public class HPRecipeProvider extends RecipeProvider.Runner {
                     .unlockedBy("has_piston", has(Items.PISTON))
                     .save(this.output, recipeKey("crafting/press"));
 
+            ShapedRecipeBuilder.shaped(this.registries.lookupOrThrow(Registries.ITEM), RecipeCategory.REDSTONE, ModBlocks.GENERATOR.get())
+                    .pattern("SRS")
+                    .pattern("DGD")
+                    .pattern("DDD")
+                    .define('S', Items.POLISHED_DEEPSLATE_SLAB)
+                    .define('R', Items.LIGHTNING_ROD)
+                    .define('D', Items.POLISHED_DEEPSLATE)
+                    .define('G', ModBlocks.GRINDSTONE.get())
+                    .unlockedBy("has_grindstone", has(ModBlocks.GRINDSTONE.get()))
+                    .save(this.output, recipeKey("crafting/generator"));
+
             ShapelessRecipeBuilder.shapeless(this.registries.lookupOrThrow(Registries.ITEM), RecipeCategory.FOOD, ModItems.DOUGH.get())
                     .requires(ModItems.FLOUR.get())
                     .requires(Items.WATER_BUCKET)

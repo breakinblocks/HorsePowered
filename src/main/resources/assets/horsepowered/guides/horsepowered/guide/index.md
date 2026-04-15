@@ -28,6 +28,7 @@ Start by crafting a [Hand Grindstone](hand_grindstone.md) for manual grinding, o
 - [Horse Grindstone](horse_grindstone.md) - Automated grinding powered by a horse
 - [Horse Chopper](horse_chopper.md) - Automated chopping powered by a horse
 - [Horse Press](horse_press.md) - Press items into fluids or other products
+- [Horse Powered Generator](horse_generator.md) - Convert horsepower into Forge Energy
 
 ### Tools
 - [Work Saddle](work_saddle.md) - Capture and transport workers across long distances
