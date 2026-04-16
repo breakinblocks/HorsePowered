@@ -134,8 +134,6 @@ tasks.withType(JavaCompile).configureEach {
     options.compilerArgs << '-Xlint:deprecation'
 }
 
-// Mod publishing to CurseForge, Modrinth, and GitHub
-// Pass -PdryRun=true to test publishing without actually uploading
 publishMods {
     dryRun = project.hasProperty("dryRun") && project.property("dryRun") == "true"
     file = jar.archiveFile
@@ -158,19 +156,8 @@ publishMods {
         minecraftVersions.add(minecraft_version)
         optional("jei", "jade", "guideme")
     }
-
-    def githubToken = providers.environmentVariable("GITHUB_TOKEN")
-    if (githubToken.isPresent()) {
-        github {
-            repository = "breakinblocks/HorsePowered"
-            accessToken = githubToken
-            commitish = "main"
-        }
-    }
 }
 
-// Include Maven publish when running publishMods.
-// Failures (e.g. HTTP 409 if the version already exists) are logged but non-fatal.
 tasks.named('publishMods') {
     def mavenUser = providers.environmentVariable("MAVEN_USER")
     if (mavenUser.isPresent()) {
