@@ -3,9 +3,10 @@ plugins {
     id 'idea'
     id 'maven-publish'
     id 'net.minecraftforge.gradle' version '6.0.+'
+    id 'me.modmuss50.mod-publish-plugin' version '1.1.0'
 }
 
-version = mod_version
+version = "${minecraft_version}-${mod_version}"
 group = mod_group_id
 
 base {
@@ -133,11 +134,61 @@ publishing {
     }
     repositories {
         maven {
-            url "file://${project.projectDir}/mcmodsrepo"
+            name = "BreakInBlocks"
+            url = version.toString().endsWith("-SNAPSHOT") ?
+                "https://maven.breakinblocks.com/snapshots" :
+                "https://maven.breakinblocks.com/releases"
+            credentials {
+                username = System.getenv("MAVEN_USER") ?: ""
+                password = System.getenv("MAVEN_TOKEN") ?: ""
+            }
         }
     }
 }
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+}
+
+// Mod publishing to CurseForge, Modrinth, and GitHub.
+// Pass -PdryRun=true to test publishing without actually uploading.
+publishMods {
+    dryRun = project.hasProperty("dryRun") && project.property("dryRun") == "true"
+    file = jar.archiveFile
+    def changelogFile = file("metadata/changelogs/${mod_version}.md")
+    changelog = changelogFile.exists() ? changelogFile.text : "Release ${version}"
+    type = STABLE
+    modLoaders.add("forge")
+
+    curseforge {
+        projectId = "1408330"
+        projectSlug = "horsepowered"
+        accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
+        minecraftVersions.add(minecraft_version)
+        optional("jei", "jade", "guideme")
+    }
+
+    modrinth {
+        projectId = "cZml36tg"
+        accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+        minecraftVersions.add(minecraft_version)
+        optional("jei", "jade", "guideme")
+    }
+
+    def githubToken = providers.environmentVariable("GITHUB_TOKEN")
+    if (githubToken.isPresent()) {
+        github {
+            repository = "breakinblocks/HorsePowered"
+            accessToken = githubToken
+            commitish = "main"
+        }
+    }
+}
+
+// Include Maven publish when running publishMods.
+tasks.named('publishMods') {
+    def mavenUser = providers.environmentVariable("MAVEN_USER")
+    if (mavenUser.isPresent()) {
+        dependsOn 'publishMavenJavaPublicationToBreakInBlocksRepository'
+    }
 }

@@ -35,13 +35,20 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
     public void render(ChopperBlockEntity blockEntity, float partialTick, PoseStack poseStack,
                        MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
 
+        BlockState state = blockEntity.getBlockState();
+        // Skip the last-frame render when the BE is being destroyed — the state
+        // can already be AIR (no FACING property), which would throw and leave a
+        // missing-texture particle burst.
+        if (blockEntity.isRemoved() || !state.hasProperty(BlockChopper.FACING)) {
+            return;
+        }
+
         // Render working area highlight if active
         WorkingAreaRenderer.renderIfActive(blockEntity, poseStack, bufferSource);
 
         // Render lead to attached worker
         LeadRenderer.renderLead(blockEntity, partialTick, poseStack, bufferSource);
 
-        BlockState state = blockEntity.getBlockState();
         Direction facing = state.getValue(BlockChopper.FACING);
         float rotation = getRotation(facing);
 
