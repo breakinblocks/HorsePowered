@@ -22,7 +22,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 import org.joml.Matrix4f;
 
 public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockEntity> {
@@ -64,7 +63,6 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
 
         ItemStack input = blockEntity.getItem(0);
         ItemStack output = blockEntity.getItem(1);
-        FluidTank tank = blockEntity.getTank();
 
         // Render input items in the press basin
         if (!input.isEmpty()) {
@@ -98,15 +96,20 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
             }
         }
 
-        // Render fluid in tank
-        if (!tank.isEmpty()) {
-            renderFluid(poseStack, bufferSource, packedLight, tank);
+        // Render input fluid in the left half, output fluid in the right half.
+        FluidStack inputFluid = blockEntity.getInputTank().getFluid();
+        if (!inputFluid.isEmpty()) {
+            renderFluidHalf(poseStack, bufferSource, packedLight, inputFluid, blockEntity.getInputTank().getCapacity(), true);
+        }
+        FluidStack outputFluid = blockEntity.getOutputTank().getFluid();
+        if (!outputFluid.isEmpty()) {
+            renderFluidHalf(poseStack, bufferSource, packedLight, outputFluid, blockEntity.getOutputTank().getCapacity(), false);
         }
     }
 
-    private void renderFluid(PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, FluidTank tank) {
-        FluidStack fluidStack = tank.getFluid();
-        if (fluidStack.isEmpty()) return;
+    private void renderFluidHalf(PoseStack poseStack, MultiBufferSource bufferSource, int packedLight,
+                                 FluidStack fluidStack, int capacity, boolean leftHalf) {
+        if (fluidStack.isEmpty() || capacity <= 0) return;
 
         IClientFluidTypeExtensions fluidTypeExtensions = IClientFluidTypeExtensions.of(fluidStack.getFluid());
         ResourceLocation stillTexture = fluidTypeExtensions.getStillTexture(fluidStack);
@@ -115,11 +118,13 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
         TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(stillTexture);
         int color = fluidTypeExtensions.getTintColor(fluidStack);
 
-        float fillPercentage = (float) tank.getFluidAmount() / tank.getCapacity();
+        float fillPercentage = (float) fluidStack.getAmount() / capacity;
         float fluidHeight = 0.1F + (fillPercentage * 0.6F);
 
         poseStack.pushPose();
-        poseStack.translate(0.125, 0.1, 0.125);
+        // Translate to tank origin (0.125, 0.1, 0.125), then offset to the correct half on X.
+        float xOffset = leftHalf ? 0f : 0.375f;
+        poseStack.translate(0.125 + xOffset, 0.1, 0.125);
 
         VertexConsumer builder = bufferSource.getBuffer(RenderType.translucent());
         Matrix4f matrix = poseStack.last().pose();
@@ -130,7 +135,8 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
         float a = ((color >> 24) & 0xFF) / 255.0F;
         if (a == 0) a = 1.0F;
 
-        float width = 0.75F;
+        float width = 0.375F; // Half of the original 0.75F tank width
+        float depth = 0.75F;
         float u1 = sprite.getU0();
         float u2 = sprite.getU1();
         float v1 = sprite.getV0();
@@ -138,8 +144,8 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
 
         // Top face
         builder.addVertex(matrix, 0, fluidHeight, 0).setColor(r, g, b, a).setUv(u1, v1).setLight(packedLight).setNormal(0, 1, 0);
-        builder.addVertex(matrix, 0, fluidHeight, width).setColor(r, g, b, a).setUv(u1, v2).setLight(packedLight).setNormal(0, 1, 0);
-        builder.addVertex(matrix, width, fluidHeight, width).setColor(r, g, b, a).setUv(u2, v2).setLight(packedLight).setNormal(0, 1, 0);
+        builder.addVertex(matrix, 0, fluidHeight, depth).setColor(r, g, b, a).setUv(u1, v2).setLight(packedLight).setNormal(0, 1, 0);
+        builder.addVertex(matrix, width, fluidHeight, depth).setColor(r, g, b, a).setUv(u2, v2).setLight(packedLight).setNormal(0, 1, 0);
         builder.addVertex(matrix, width, fluidHeight, 0).setColor(r, g, b, a).setUv(u2, v1).setLight(packedLight).setNormal(0, 1, 0);
 
         poseStack.popPose();

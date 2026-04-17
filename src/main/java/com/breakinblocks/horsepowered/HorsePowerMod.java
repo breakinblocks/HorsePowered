@@ -17,6 +17,8 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -72,6 +74,7 @@ public class HorsePowerMod {
         // Register common setup listener
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::buildCreativeContents);
+        modEventBus.addListener(HorsePowerMod::registerCapabilities);
 
         // Client-only setup - registration is handled by @EventBusSubscriber in HorsePowerClient
         if (dist.isClient()) {
@@ -109,6 +112,27 @@ public class HorsePowerMod {
 
     private void buildCreativeContents(final BuildCreativeModeTabContentsEvent event) {
         // Items are added via the creative tab builder
+    }
+
+    private static void registerCapabilities(RegisterCapabilitiesEvent event) {
+        // Press exposes a directional fluid handler: insertions go to the input tank,
+        // extractions drain the output tank. Prevents pipes from contaminating input
+        // with arbitrary fluids or stealing reagents mid-process.
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK,
+                ModBlocks.PRESS_BE.get(),
+                (be, side) -> be.getFluidHandler());
+
+        // Filler blocks delegate to the press when they sit above one — pipes can connect
+        // to either half of the multi-block.
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK,
+                ModBlocks.FILLER_BE.get(),
+                (be, side) -> {
+                    var mainBe = be.getFilledTileEntity();
+                    if (mainBe instanceof com.breakinblocks.horsepowered.blockentity.PressBlockEntity press) {
+                        return press.getFluidHandler();
+                    }
+                    return null;
+                });
     }
 
     /**

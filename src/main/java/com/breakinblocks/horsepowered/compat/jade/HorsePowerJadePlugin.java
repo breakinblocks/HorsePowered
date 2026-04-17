@@ -29,6 +29,12 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
     private static final String KEY_FLUID_NAME = "hp_fluid_name";
     private static final String KEY_FLUID_AMOUNT = "hp_fluid_amount";
     private static final String KEY_FLUID_CAPACITY = "hp_fluid_capacity";
+    private static final String KEY_INPUT_FLUID_NAME = "hp_input_fluid_name";
+    private static final String KEY_INPUT_FLUID_AMOUNT = "hp_input_fluid_amount";
+    private static final String KEY_INPUT_FLUID_CAPACITY = "hp_input_fluid_capacity";
+    private static final String KEY_OUTPUT_FLUID_NAME = "hp_output_fluid_name";
+    private static final String KEY_OUTPUT_FLUID_AMOUNT = "hp_output_fluid_amount";
+    private static final String KEY_OUTPUT_FLUID_CAPACITY = "hp_output_fluid_capacity";
 
     @Override
     public void register(IWailaCommonRegistration registration) {
@@ -84,12 +90,7 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
                         data.putString(KEY_WORKER_NAME, te.getWorkerDisplayName());
                     }
                     data.putBoolean(KEY_IS_VALID, te.isValid());
-                    FluidStack fluid = te.getTank().getFluid();
-                    if (!fluid.isEmpty()) {
-                        data.putString(KEY_FLUID_NAME, fluid.getHoverName().getString());
-                        data.putInt(KEY_FLUID_AMOUNT, fluid.getAmount());
-                        data.putInt(KEY_FLUID_CAPACITY, te.getTank().getCapacity());
-                    }
+                    appendPressTankData(data, te);
                 }
             }
 
@@ -121,12 +122,7 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
                             data.putString(KEY_WORKER_NAME, te.getWorkerDisplayName());
                         }
                         data.putBoolean(KEY_IS_VALID, te.isValid());
-                        FluidStack fluid = te.getTank().getFluid();
-                        if (!fluid.isEmpty()) {
-                            data.putString(KEY_FLUID_NAME, fluid.getHoverName().getString());
-                            data.putInt(KEY_FLUID_AMOUNT, fluid.getAmount());
-                            data.putInt(KEY_FLUID_CAPACITY, te.getTank().getCapacity());
-                        }
+                        appendPressTankData(data, te);
                     } else if (mainTe instanceof GrindstoneBlockEntity te) {
                         data.putInt(KEY_CURRENT, te.getCurrentMillTime());
                         data.putInt(KEY_TOTAL, te.getTotalMillTime());
@@ -201,12 +197,7 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
 
                     // Use server data for fluid info
                     CompoundTag data = accessor.getServerData();
-                    if (data.contains(KEY_FLUID_NAME)) {
-                        tooltip.add(Component.translatable("jade." + HorsePowerMod.MOD_ID + ".fluid",
-                                data.getString(KEY_FLUID_NAME),
-                                data.getInt(KEY_FLUID_AMOUNT),
-                                data.getInt(KEY_FLUID_CAPACITY)));
-                    }
+                    appendFluidInfoFromData(tooltip, data);
 
                     appendProgressFromData(tooltip, data);
                     appendWorkerInfoFromData(tooltip, data);
@@ -239,12 +230,7 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
 
                     // Use server data for progress
                     CompoundTag data = accessor.getServerData();
-                    if (data.contains(KEY_FLUID_NAME)) {
-                        tooltip.add(Component.translatable("jade." + HorsePowerMod.MOD_ID + ".fluid",
-                                data.getString(KEY_FLUID_NAME),
-                                data.getInt(KEY_FLUID_AMOUNT),
-                                data.getInt(KEY_FLUID_CAPACITY)));
-                    }
+                    appendFluidInfoFromData(tooltip, data);
                     appendProgressFromData(tooltip, data);
                     appendWorkerInfoFromData(tooltip, data);
                 }
@@ -296,6 +282,43 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
         if (!stack.isEmpty()) {
             tooltip.add(Component.translatable("jade." + HorsePowerMod.MOD_ID + "." + type,
                     stack.getHoverName(), stack.getCount()));
+        }
+    }
+
+    private static void appendFluidInfoFromData(ITooltip tooltip, CompoundTag data) {
+        if (data.contains(KEY_INPUT_FLUID_NAME)) {
+            tooltip.add(Component.translatable("jade." + HorsePowerMod.MOD_ID + ".fluid_input",
+                    data.getString(KEY_INPUT_FLUID_NAME),
+                    data.getInt(KEY_INPUT_FLUID_AMOUNT),
+                    data.getInt(KEY_INPUT_FLUID_CAPACITY)));
+        }
+        if (data.contains(KEY_OUTPUT_FLUID_NAME)) {
+            tooltip.add(Component.translatable("jade." + HorsePowerMod.MOD_ID + ".fluid_output",
+                    data.getString(KEY_OUTPUT_FLUID_NAME),
+                    data.getInt(KEY_OUTPUT_FLUID_AMOUNT),
+                    data.getInt(KEY_OUTPUT_FLUID_CAPACITY)));
+        }
+        // Legacy single-tank key — kept for save-format compatibility during migration.
+        if (data.contains(KEY_FLUID_NAME)) {
+            tooltip.add(Component.translatable("jade." + HorsePowerMod.MOD_ID + ".fluid",
+                    data.getString(KEY_FLUID_NAME),
+                    data.getInt(KEY_FLUID_AMOUNT),
+                    data.getInt(KEY_FLUID_CAPACITY)));
+        }
+    }
+
+    private static void appendPressTankData(CompoundTag data, PressBlockEntity te) {
+        FluidStack inputFluid = te.getInputTank().getFluid();
+        if (!inputFluid.isEmpty()) {
+            data.putString(KEY_INPUT_FLUID_NAME, inputFluid.getHoverName().getString());
+            data.putInt(KEY_INPUT_FLUID_AMOUNT, inputFluid.getAmount());
+            data.putInt(KEY_INPUT_FLUID_CAPACITY, te.getInputTank().getCapacity());
+        }
+        FluidStack outputFluid = te.getOutputTank().getFluid();
+        if (!outputFluid.isEmpty()) {
+            data.putString(KEY_OUTPUT_FLUID_NAME, outputFluid.getHoverName().getString());
+            data.putInt(KEY_OUTPUT_FLUID_AMOUNT, outputFluid.getAmount());
+            data.putInt(KEY_OUTPUT_FLUID_CAPACITY, te.getOutputTank().getCapacity());
         }
     }
 
