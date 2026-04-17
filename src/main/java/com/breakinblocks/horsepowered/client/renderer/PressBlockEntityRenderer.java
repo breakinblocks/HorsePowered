@@ -38,9 +38,10 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
         // Extract plunger animation progress
         state.visualProgress = blockEntity.getVisualProgress();
 
-        // Extract fluid state
-        state.fluidStack = blockEntity.getTank().getFluid().copy();
-        state.tankCapacity = blockEntity.getTank().getCapacity();
+        // Extract fluid state for both tanks
+        state.inputFluid = blockEntity.getInputFluid();
+        state.outputFluid = blockEntity.getOutputFluid();
+        state.tankCapacity = blockEntity.getTankCapacity();
 
         // Extract item states for rendering
         RenderUtils.extractItemState(state.inputItem, blockEntity.getItem(0), blockEntity.getLevel());
@@ -54,13 +55,12 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
         // Render plunger
         PlungerRenderer.renderPlunger(poseStack, collector, state.visualProgress, state.lightCoords);
 
-        RenderUtils.renderFlatItem(state.inputItem, poseStack, collector, state.lightCoords, 0.35D, 0.15D, 0.5D, 0.5F);
-        RenderUtils.renderFlatItem(state.outputItem, poseStack, collector, state.lightCoords, 0.7D, 0.15D, 0.5D, 0.3F);
+        RenderUtils.renderFlatItem(state.inputItem, poseStack, collector, state.lightCoords, 0.35D, 0.95D, 0.5D, 0.5F);
+        RenderUtils.renderFlatItem(state.outputItem, poseStack, collector, state.lightCoords, 0.7D, 0.95D, 0.5D, 0.3F);
 
-        // Render fluid in tank
-        if (!state.fluidStack.isEmpty()) {
-            FluidRenderer.renderFluid(poseStack, collector, state.fluidStack, state.tankCapacity, state.lightCoords);
-        }
+        // Render input fluid in the left half of the tank, output fluid in the right half.
+        FluidRenderer.renderFluidHalf(poseStack, collector, state.inputFluid, state.tankCapacity, state.lightCoords, true);
+        FluidRenderer.renderFluidHalf(poseStack, collector, state.outputFluid, state.tankCapacity, state.lightCoords, false);
     }
 
     @Override
@@ -77,7 +77,8 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
 
     public static class PressRenderState extends HorseBlockRenderState {
         public float visualProgress;
-        public FluidStack fluidStack = FluidStack.EMPTY;
+        public FluidStack inputFluid = FluidStack.EMPTY;
+        public FluidStack outputFluid = FluidStack.EMPTY;
         public int tankCapacity;
         public final ItemStackRenderState inputItem = new ItemStackRenderState();
         public final ItemStackRenderState outputItem = new ItemStackRenderState();

@@ -32,6 +32,15 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
     public void extractRenderState(ChopperBlockEntity blockEntity, ChopperRenderState state, float partialTick,
                                    Vec3 cameraPos, @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
         BlockEntityRenderState.extractBase(blockEntity, state, crumblingOverlay);
+        // Skip the remaining state extraction when the BE is being destroyed — otherwise
+        // item-model/texture lookups in the final frame can produce a purple/black flash.
+        state.skipSubmit = blockEntity.isRemoved();
+        if (state.skipSubmit) {
+            state.inputItem.clear();
+            state.outputItem.clear();
+            state.hasWorker = false;
+            return;
+        }
         HorseBlockRenderState.extractWorkerState(blockEntity, state, partialTick);
 
         // Extract blade animation value
@@ -44,6 +53,8 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
 
     @Override
     public void submit(ChopperRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
+        if (state.skipSubmit) return;
+
         HorseBlockRenderState.submitWorkerAndArea(state, poseStack, collector, camera);
 
         // Render chopping blade
@@ -69,6 +80,7 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
     }
 
     public static class ChopperRenderState extends HorseBlockRenderState {
+        public boolean skipSubmit;
         public float visualWindup;
         public final ItemStackRenderState inputItem = new ItemStackRenderState();
         public final ItemStackRenderState outputItem = new ItemStackRenderState();

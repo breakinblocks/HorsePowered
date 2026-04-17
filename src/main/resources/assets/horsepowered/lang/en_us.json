@@ -38,6 +38,8 @@
   "jade.horsepowered.output": "Output: %s x%s",
   "jade.horsepowered.secondary": "Secondary: %s x%s",
   "jade.horsepowered.fluid": "Fluid: %s %s/%s mB",
+  "jade.horsepowered.fluid_input": "Input Fluid: %s %s/%s mB",
+  "jade.horsepowered.fluid_output": "Output Fluid: %s %s/%s mB",
   "jade.horsepowered.progress": "Progress: %s%%",
   "jade.horsepowered.worker": "Worker: %s",
   "jade.horsepowered.worker_attached": "Worker attached (loading...)",

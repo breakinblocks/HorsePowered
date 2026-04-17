@@ -18,7 +18,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.fluids.FluidUtil;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.transfer.fluid.FluidUtil;
 import org.jetbrains.annotations.Nullable;
 
 public class BlockPress extends BlockHPBase {
@@ -41,11 +43,11 @@ public class BlockPress extends BlockHPBase {
     @Override
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if (level.getBlockEntity(pos) instanceof PressBlockEntity press
-                && FluidUtil.getFluidHandler(stack).isPresent()) {
+                && ItemAccess.forPlayerInteraction(player, hand).getCapability(Capabilities.Fluid.ITEM) != null) {
             if (level.isClientSide()) {
                 return InteractionResult.SUCCESS;
             }
-            if (FluidUtil.interactWithFluidHandler(player, hand, press.getTank())) {
+            if (FluidUtil.interactWithFluidHandler(player, hand, pos, press.getFluidHandler())) {
                 press.setChanged();
                 return InteractionResult.SUCCESS;
             }

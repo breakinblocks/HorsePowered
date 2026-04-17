@@ -24,16 +24,30 @@ public class FluidRenderer {
     private static final float INSET = 0.001f;
 
     /**
-     * Renders fluid in the press tank.
-     *
-     * @param poseStack The pose stack (already translated to block position)
-     * @param collector The node collector for submitting geometry
-     * @param fluidStack The fluid to render
-     * @param tankCapacity The tank's maximum capacity
-     * @param packedLight The packed light level
+     * Renders fluid in the full press tank (legacy single-tank layout).
      */
     public static void renderFluid(PoseStack poseStack, SubmitNodeCollector collector,
                                     FluidStack fluidStack, int tankCapacity, int packedLight) {
+        renderFluidBand(poseStack, collector, fluidStack, tankCapacity, packedLight,
+                TANK_MIN_X + INSET, TANK_MAX_X - INSET);
+    }
+
+    /**
+     * Renders fluid in either the left or right half of the press tank. Used for the
+     * split input/output tank layout — input on the left, output on the right.
+     */
+    public static void renderFluidHalf(PoseStack poseStack, SubmitNodeCollector collector,
+                                        FluidStack fluidStack, int tankCapacity, int packedLight,
+                                        boolean leftHalf) {
+        float mid = (TANK_MIN_X + TANK_MAX_X) / 2f;
+        float minX = leftHalf ? TANK_MIN_X + INSET : mid + INSET;
+        float maxX = leftHalf ? mid - INSET : TANK_MAX_X - INSET;
+        renderFluidBand(poseStack, collector, fluidStack, tankCapacity, packedLight, minX, maxX);
+    }
+
+    private static void renderFluidBand(PoseStack poseStack, SubmitNodeCollector collector,
+                                         FluidStack fluidStack, int tankCapacity, int packedLight,
+                                         float minX, float maxX) {
         if (fluidStack.isEmpty() || tankCapacity <= 0) return;
 
         // Calculate fill level
@@ -54,8 +68,6 @@ public class FluidRenderer {
         float fluidMinY = TANK_MIN_Y + INSET;
         float fluidMaxY = TANK_MIN_Y + (TANK_MAX_Y - TANK_MIN_Y) * fillRatio;
 
-        float minX = TANK_MIN_X + INSET;
-        float maxX = TANK_MAX_X - INSET;
         float minZ = TANK_MIN_Z + INSET;
         float maxZ = TANK_MAX_Z - INSET;
 

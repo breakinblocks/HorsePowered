@@ -5,6 +5,8 @@ import com.breakinblocks.horsepowered.blockentity.ModBlockEntities;
 import com.breakinblocks.horsepowered.client.renderer.ChopperBlockEntityRenderer;
 import com.breakinblocks.horsepowered.client.renderer.GeneratorBlockEntityRenderer;
 import com.breakinblocks.horsepowered.client.renderer.GrindstoneBlockEntityRenderer;
+import com.breakinblocks.horsepowered.client.renderer.HandGrindstoneBlockEntityRenderer;
+import com.breakinblocks.horsepowered.client.renderer.ManualChopperBlockEntityRenderer;
 import com.breakinblocks.horsepowered.client.renderer.PressBlockEntityRenderer;
 import com.breakinblocks.horsepowered.client.renderer.WorkSaddleSpecialRenderer;
 import com.breakinblocks.horsepowered.fluids.ModFluids;
@@ -23,7 +25,9 @@ public class HorsePowerClient {
 
     @SubscribeEvent
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
+        event.registerBlockEntityRenderer(ModBlockEntities.HAND_GRINDSTONE.get(), HandGrindstoneBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.GRINDSTONE.get(), GrindstoneBlockEntityRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.CHOPPING_BLOCK.get(), ManualChopperBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.CHOPPER.get(), ChopperBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.PRESS.get(), PressBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.GENERATOR.get(), GeneratorBlockEntityRenderer::new);

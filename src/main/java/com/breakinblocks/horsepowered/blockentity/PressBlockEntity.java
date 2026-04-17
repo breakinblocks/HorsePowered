@@ -4,8 +4,6 @@ import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
 import com.breakinblocks.horsepowered.recipes.PressRecipe;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -14,58 +12,70 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.fluid.FluidStacksResourceHandler;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 
 import java.util.Optional;
 
 public class PressBlockEntity extends HPBlockEntityHorseBase {
 
-    private final FluidTank tank;
+    private static final String TANKS_KEY = "tanks";
+
+    private final PressTanks tanks;
+    private final DualTankFluidHandler fluidHandler;
     private int currentPressStatus;
 
     public PressBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.PRESS.get(), pos, state, 2);
-        this.tank = new FluidTank(HorsePowerConfig.pressFluidTankSize.get()) {
-            @Override
-            protected void onContentsChanged() {
-                setChanged();
-            }
-        };
+        this.tanks = new PressTanks(HorsePowerConfig.pressFluidTankSize.get());
+        this.fluidHandler = new DualTankFluidHandler(tanks);
     }
 
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
         output.putInt("currentPressStatus", currentPressStatus);
-        if (!tank.isEmpty()) {
-            FluidStack.CODEC.encodeStart(NbtOps.INSTANCE, tank.getFluid())
-                    .resultOrPartial(e -> {})
-                    .ifPresent(tag -> {
-                        if (tag instanceof CompoundTag compoundTag) {
-                            output.store("fluid", CompoundTag.CODEC, compoundTag);
-                        }
-                    });
-        }
+        tanks.serialize(output.child(TANKS_KEY));
     }
 
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
-        // saveAdditional only writes "fluid" when the tank is non-empty, so a missing
-        // key means "tank is empty" — explicitly clear it here or stale milk lingers
-        // on the client after a recipe drains the tank.
-        input.read("fluid", CompoundTag.CODEC).ifPresentOrElse(
-                tag -> FluidStack.CODEC.parse(NbtOps.INSTANCE, tag)
-                        .resultOrPartial(e -> {})
-                        .ifPresent(tank::setFluid),
-                () -> tank.setFluid(FluidStack.EMPTY));
+        input.child(TANKS_KEY).ifPresent(tanks::deserialize);
+
+        // Legacy migration: pre-split saves used a single "fluid" key. Drop it into the
+        // output tank if the fluid matches any recipe result (likely mid-extraction),
+        // otherwise treat it as pending input.
+        if (tanks.getResource(0).isEmpty() && tanks.getResource(1).isEmpty()) {
+            input.read("fluid", FluidStack.CODEC).ifPresent(legacy -> {
+                if (legacy.isEmpty()) return;
+                int targetIndex = matchesAnyRecipeOutput(legacy)
+                        ? DualTankFluidHandler.OUTPUT_INDEX
+                        : DualTankFluidHandler.INPUT_INDEX;
+                try (Transaction tx = Transaction.openRoot()) {
+                    tanks.insert(targetIndex, FluidResource.of(legacy), legacy.getAmount(), tx);
+                    tx.commit();
+                }
+            });
+        }
 
         if (!getItem(0).isEmpty()) {
             currentPressStatus = input.getIntOr("currentPressStatus", 0);
         } else {
             currentPressStatus = 0;
         }
+    }
+
+    private boolean matchesAnyRecipeOutput(FluidStack fluid) {
+        if (level == null || fluid.isEmpty()) return false;
+        return ((RecipeManager) level.recipeAccess())
+                .recipeMap().byType(HPRecipes.PRESSING_TYPE.get())
+                .stream()
+                .anyMatch(r -> {
+                    PressRecipe rec = r.value();
+                    return rec.hasFluidOutput() && FluidStack.isSameFluidSameComponents(rec.getFluidResult(), fluid);
+                });
     }
 
     @Override
@@ -116,11 +126,21 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
 
             PressRecipe recipe = recipeOpt.get().value();
 
-            recipe.getFluidInput().ifPresent(fluidIn ->
-                    tank.drain(fluidIn.amount(), IFluidHandler.FluidAction.EXECUTE));
+            try (Transaction tx = Transaction.openRoot()) {
+                recipe.getFluidInput().ifPresent(fluidIn -> {
+                    FluidStack inputFluid = getInputFluid();
+                    if (!inputFluid.isEmpty()) {
+                        tanks.extract(DualTankFluidHandler.INPUT_INDEX,
+                                FluidResource.of(inputFluid), fluidIn.amount(), tx);
+                    }
+                });
 
-            if (recipe.hasFluidOutput()) {
-                tank.fill(recipe.getFluidResult().copy(), IFluidHandler.FluidAction.EXECUTE);
+                if (recipe.hasFluidOutput()) {
+                    FluidStack result = recipe.getFluidResult();
+                    tanks.insert(DualTankFluidHandler.OUTPUT_INDEX,
+                            FluidResource.of(result), result.getAmount(), tx);
+                }
+                tx.commit();
             }
 
             ItemStack itemResult = recipe.createResult();
@@ -158,7 +178,8 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
             return false;
         }
 
-        if (recipe.hasFluidInput() && !recipe.getFluidInput().get().test(tank.getFluid())) {
+        FluidStack inputFluid = getInputFluid();
+        if (recipe.hasFluidInput() && !recipe.getFluidInput().get().test(inputFluid)) {
             return false;
         }
 
@@ -172,17 +193,13 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
 
         if (recipe.hasFluidOutput()) {
             FluidStack fluidOutput = recipe.getFluidResult();
-            int drained = recipe.hasFluidInput() ? recipe.getFluidInput().get().amount() : 0;
-            int simulatedAfterDrain = tank.getFluidAmount() - drained;
-            // After drain the slot may be empty (any fluid) or already hold the output fluid.
-            if (simulatedAfterDrain > 0 && !FluidStack.isSameFluidSameComponents(tank.getFluid(), fluidOutput)) {
+            FluidStack currentOutput = getOutputFluid();
+            // Output tank must be empty or already hold the same fluid, with room for the recipe result.
+            if (!currentOutput.isEmpty() && !FluidStack.isSameFluidSameComponents(currentOutput, fluidOutput)) {
                 return false;
             }
-            int capacityFree = tank.getCapacity() - simulatedAfterDrain;
+            int capacityFree = getTankCapacity() - currentOutput.getAmount();
             if (capacityFree < fluidOutput.getAmount()) return false;
-        } else if (!recipe.hasFluidInput()) {
-            // Pure item-output recipes still require an empty tank so leftover fluid can't strand the press.
-            if (tank.getFluidAmount() != 0) return false;
         }
 
         return true;
@@ -208,22 +225,31 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
     @Override
     public boolean isItemValidForSlot(int index, ItemStack stack) {
         if (index != 0) return false;
-        // Only reject if pressing is in progress (don't reject just because output has items)
         if (currentPressStatus != 0) return false;
-        // Recipe lookup is server-only; on the client, allow insertion so the
-        // interaction isn't blocked (server will do the authoritative check)
         if (!(level instanceof ServerLevel serverLevel)) return level != null && level.isClientSide();
 
-        // Check if ANY press recipe accepts this item type (ignore count requirement)
-        // This allows hoppers to insert items one at a time
         return ((RecipeManager) serverLevel.recipeAccess())
                 .recipeMap().byType(HPRecipes.PRESSING_TYPE.get())
                 .stream()
                 .anyMatch(recipe -> recipe.value().getIngredient().test(stack));
     }
 
-    public FluidTank getTank() {
-        return tank;
+    public FluidStack getInputFluid() {
+        return tanks.getResource(DualTankFluidHandler.INPUT_INDEX)
+                .toStack(tanks.getAmountAsInt(DualTankFluidHandler.INPUT_INDEX));
+    }
+
+    public FluidStack getOutputFluid() {
+        return tanks.getResource(DualTankFluidHandler.OUTPUT_INDEX)
+                .toStack(tanks.getAmountAsInt(DualTankFluidHandler.OUTPUT_INDEX));
+    }
+
+    public int getTankCapacity() {
+        return tanks.getCapacityAsInt(DualTankFluidHandler.INPUT_INDEX, FluidResource.EMPTY);
+    }
+
+    public DualTankFluidHandler getFluidHandler() {
+        return fluidHandler;
     }
 
     public int getCurrentPressStatus() {
@@ -248,5 +274,16 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
     @Override
     public int getOutputSlot() {
         return 1;
+    }
+
+    private class PressTanks extends FluidStacksResourceHandler {
+        PressTanks(int capacity) {
+            super(2, capacity);
+        }
+
+        @Override
+        protected void onContentsChanged(int index, FluidStack previousContents) {
+            setChanged();
+        }
     }
 }

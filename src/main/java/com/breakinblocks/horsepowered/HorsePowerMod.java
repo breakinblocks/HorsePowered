@@ -143,6 +143,14 @@ public class HorsePowerMod {
         event.registerBlockEntity(Capabilities.Energy.BLOCK,
                 ModBlockEntities.GENERATOR.get(),
                 (be, side) -> be.getEnergyHandler());
+
+        // Press exposes a directional fluid handler: insertions go to the input tank,
+        // extractions drain the output tank. Prevents pipes from contaminating input
+        // with arbitrary fluids or stealing reagents mid-process.
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK,
+                ModBlockEntities.PRESS.get(),
+                (be, side) -> be.getFluidHandler());
+
         // Filler delegates to its main block - look up the main block's capability directly
         event.registerBlockEntity(Capabilities.Item.BLOCK,
                 ModBlockEntities.FILLER.get(),
@@ -150,6 +158,15 @@ public class HorsePowerMod {
                     HPBlockEntityBase mainBe = be.getFilledTileEntity();
                     if (mainBe != null) {
                         return new WorldlyContainerWrapper(mainBe, side);
+                    }
+                    return null;
+                });
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK,
+                ModBlockEntities.FILLER.get(),
+                (be, side) -> {
+                    HPBlockEntityBase mainBe = be.getFilledTileEntity();
+                    if (mainBe instanceof com.breakinblocks.horsepowered.blockentity.PressBlockEntity press) {
+                        return press.getFluidHandler();
                     }
                     return null;
                 });
