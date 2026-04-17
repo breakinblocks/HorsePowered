@@ -64,7 +64,8 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
                 if (accessor.getBlockEntity() instanceof PressBlockEntity te) {
                     appendItemInfo(tooltip, te.getItem(0), "input");
                     appendItemInfo(tooltip, te.getItem(1), "output");
-                    appendFluidInfo(tooltip, te.getTank().getFluid(), te.getTank().getCapacity());
+                    appendFluidInfo(tooltip, te.getInputTank().getFluid(), te.getInputTank().getCapacity(), "fluid_input");
+                    appendFluidInfo(tooltip, te.getOutputTank().getFluid(), te.getOutputTank().getCapacity(), "fluid_output");
                     appendWorkerInfo(tooltip, te);
                 }
             }
@@ -118,9 +119,9 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
         }
     }
 
-    private static void appendFluidInfo(ITooltip tooltip, FluidStack fluid, int capacity) {
+    private static void appendFluidInfo(ITooltip tooltip, FluidStack fluid, int capacity, String key) {
         if (!fluid.isEmpty()) {
-            tooltip.add(Component.translatable("jade." + Reference.MODID + ".fluid",
+            tooltip.add(Component.translatable("jade." + Reference.MODID + "." + key,
                     fluid.getDisplayName(), fluid.getAmount(), capacity));
         }
     }

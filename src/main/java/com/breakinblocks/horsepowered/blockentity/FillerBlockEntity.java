@@ -6,10 +6,16 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.common.util.LazyOptional;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Tile entity for filler blocks that delegates to the main block below
+ * Tile entity for filler blocks that delegates to the main block below.
+ * For the press, delegates the fluid capability so pipes can connect to either
+ * half of the multi-block.
  */
 public class FillerBlockEntity extends BlockEntity {
 
@@ -49,5 +55,15 @@ public class FillerBlockEntity extends BlockEntity {
             te.setChanged();
         }
         super.setChanged();
+    }
+
+    @Override
+    public <T> @NotNull LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
+        if (cap == ForgeCapabilities.FLUID_HANDLER) {
+            if (getFilledTileEntity() instanceof PressBlockEntity press) {
+                return press.getCapability(cap, side);
+            }
+        }
+        return super.getCapability(cap, side);
     }
 }

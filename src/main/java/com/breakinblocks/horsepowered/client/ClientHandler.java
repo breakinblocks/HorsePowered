@@ -3,6 +3,8 @@ package com.breakinblocks.horsepowered.client;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.client.renderer.ChopperBlockEntityRenderer;
 import com.breakinblocks.horsepowered.client.renderer.GrindstoneBlockEntityRenderer;
+import com.breakinblocks.horsepowered.client.renderer.HandGrindstoneBlockEntityRenderer;
+import com.breakinblocks.horsepowered.client.renderer.ManualChopperBlockEntityRenderer;
 import com.breakinblocks.horsepowered.client.renderer.PressBlockEntityRenderer;
 import com.breakinblocks.horsepowered.lib.Reference;
 import net.minecraftforge.api.distmarker.Dist;
@@ -15,7 +17,9 @@ public class ClientHandler {
 
     @SubscribeEvent
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
+        event.registerBlockEntityRenderer(ModBlocks.HAND_GRINDSTONE_BE.get(), HandGrindstoneBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(ModBlocks.GRINDSTONE_BE.get(), GrindstoneBlockEntityRenderer::new);
+        event.registerBlockEntityRenderer(ModBlocks.CHOPPING_BLOCK_BE.get(), ManualChopperBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(ModBlocks.CHOPPER_BE.get(), ChopperBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(ModBlocks.PRESS_BE.get(), PressBlockEntityRenderer::new);
     }
