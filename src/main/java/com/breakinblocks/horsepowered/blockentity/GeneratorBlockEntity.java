@@ -2,12 +2,15 @@ package com.breakinblocks.horsepowered.blockentity;
 
 import com.breakinblocks.horsepowered.blocks.BlockGenerator;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import net.neoforged.neoforge.transfer.energy.SimpleEnergyHandler;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 
 public class GeneratorBlockEntity extends HPBlockEntityHorseBase {
 
@@ -37,9 +40,35 @@ public class GeneratorBlockEntity extends HPBlockEntityHorseBase {
             }
         }
 
+        if (level != null && !level.isClientSide() && energy.getAmountAsInt() > 0) {
+            pushEnergyToNeighbors();
+        }
+
         BlockState state = getBlockState();
         if (state.hasProperty(BlockGenerator.POWERED) && state.getValue(BlockGenerator.POWERED) != working) {
             level.setBlock(worldPosition, state.setValue(BlockGenerator.POWERED, working), 3);
+        }
+    }
+
+    private void pushEnergyToNeighbors() {
+        for (Direction dir : Direction.values()) {
+            int stored = energy.getAmountAsInt();
+            if (stored <= 0) return;
+
+            EnergyHandler neighbor = level.getCapability(
+                    Capabilities.Energy.BLOCK,
+                    worldPosition.relative(dir),
+                    dir.getOpposite());
+            if (neighbor == null) continue;
+
+            try (Transaction tx = Transaction.openRoot()) {
+                int inserted = neighbor.insert(stored, tx);
+                if (inserted <= 0) continue;
+                int extracted = energy.extract(inserted, tx);
+                if (extracted == inserted) {
+                    tx.commit();
+                }
+            }
         }
     }
 
@@ -87,14 +116,23 @@ public class GeneratorBlockEntity extends HPBlockEntityHorseBase {
         return -1;
     }
 
-    private static final class GeneratorEnergy extends SimpleEnergyHandler {
+    private final class GeneratorEnergy extends SimpleEnergyHandler {
         GeneratorEnergy() {
-            super(MAX_ENERGY, 0, FE_PER_TICK);
+            super(MAX_ENERGY, 0, MAX_ENERGY);
         }
 
         void generate(int amount) {
             if (amount <= 0) return;
+            int previous = this.energy;
             this.energy = Math.min(this.capacity, this.energy + amount);
+            if (this.energy != previous) {
+                setChanged();
+            }
+        }
+
+        @Override
+        protected void onEnergyChanged(int previousAmount) {
+            setChanged();
         }
     }
 }

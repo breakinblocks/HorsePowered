@@ -1,6 +1,7 @@
 package com.breakinblocks.horsepowered.blockentity;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
@@ -15,6 +16,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.LeverBlock;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.TagValueInput;
@@ -52,6 +54,7 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
 
     protected AABB[] searchAreas = new AABB[PATH_POINTS];
     protected List<BlockPos> searchPos = null;
+    protected List<BlockPos> floorPos = null;
     protected int origin = -1;
     protected int target = -1;
 
@@ -91,15 +94,12 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
         super.preRemoveSideEffects(pos, state);
     }
 
-    /**
-     * Validates that the area around the block is clear for the horse to walk.
-     * Default implementation checks a 7x7 area (excluding center 3x3) at Y=0 and Y=1.
-     */
     public boolean validateArea() {
         if (level == null) return false;
 
         if (searchPos == null) {
             searchPos = Lists.newArrayList();
+            floorPos = Lists.newArrayList();
 
             for (int x = -3; x <= 3; x++) {
                 for (int z = -3; z <= 3; z++) {
@@ -108,13 +108,21 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
                     }
                     searchPos.add(worldPosition.offset(x, 0, z));
                     searchPos.add(worldPosition.offset(x, 1, z));
+                    floorPos.add(worldPosition.offset(x, -1, z));
                 }
             }
         }
 
         for (BlockPos pos : searchPos) {
             BlockState state = level.getBlockState(pos);
+            if (state.getBlock() instanceof LeverBlock) continue;
             if (!state.canBeReplaced()) {
+                return false;
+            }
+        }
+        for (BlockPos pos : floorPos) {
+            BlockState state = level.getBlockState(pos);
+            if (!state.isFaceSturdy(level, pos, Direction.UP)) {
                 return false;
             }
         }
@@ -381,8 +389,16 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
         if (searchPos != null) {
             for (BlockPos pos : searchPos) {
                 BlockState state = level.getBlockState(pos);
-                boolean isClear = state.canBeReplaced();
+                boolean isClear = state.canBeReplaced() || state.getBlock() instanceof LeverBlock;
                 positions.add(Map.entry(pos, isClear));
+            }
+        }
+        if (floorPos != null) {
+            for (BlockPos pos : floorPos) {
+                BlockState state = level.getBlockState(pos);
+                if (!state.isFaceSturdy(level, pos, Direction.UP)) {
+                    positions.add(Map.entry(pos, false));
+                }
             }
         }
         return positions;
