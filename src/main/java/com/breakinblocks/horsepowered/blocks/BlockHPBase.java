@@ -11,7 +11,6 @@ import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.LeadItem;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -112,11 +111,7 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
         // Handle attaching a leashed creature
         if (horseTE != null && ((stack.getItem() instanceof LeadItem && creature != null) || creature != null)) {
             if (!horseTE.hasWorker()) {
-                // Detach leash but don't drop it - give the lead back to the player
                 creature.dropLeash(true, false);
-                if (!level.isClientSide) {
-                    ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(Items.LEAD));
-                }
                 horseTE.setWorker(creature);
                 onWorkerAttached(player, creature);
                 return ItemInteractionResult.sidedSuccess(level.isClientSide);
