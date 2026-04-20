@@ -64,8 +64,5 @@ local.properties
 !LICENSE.md
 !metadata/changelogs/**/*.md
 
-gradle/wrapper/
-
 *.bat
-
-gradlew
+!gradlew.bat
