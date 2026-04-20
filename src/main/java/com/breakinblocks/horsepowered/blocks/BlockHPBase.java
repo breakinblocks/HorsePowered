@@ -99,9 +99,7 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
         // Handle attaching a leashed creature (server-side only to prevent sync issues)
         if (horseTE != null && creature != null && !level.isClientSide()) {
             if (!horseTE.hasWorker()) {
-                // Use dropLeash() to properly clear leash data AND broadcast to clients
-                // This also drops the lead as an item entity, so no need to give it back manually
-                creature.dropLeash();
+                creature.removeLeash();
                 horseTE.setWorker(creature);
                 onWorkerAttached(player, creature);
                 return InteractionResult.SUCCESS;
