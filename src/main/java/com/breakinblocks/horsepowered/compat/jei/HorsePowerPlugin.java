@@ -10,7 +10,7 @@ import com.breakinblocks.horsepowered.recipes.PressRecipe;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.helpers.IGuiHelper;
-import mezz.jei.api.recipe.RecipeType;
+import mezz.jei.api.recipe.types.IRecipeType;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
@@ -26,17 +26,17 @@ public class HorsePowerPlugin implements IModPlugin {
 
     public static final Identifier UID = Identifier.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "jei_plugin");
 
-    public static final RecipeType<GrindstoneRecipe> GRINDING_TYPE =
-            RecipeType.create(HorsePowerMod.MOD_ID, "grinding", GrindstoneRecipe.class);
+    public static final IRecipeType<GrindstoneRecipe> GRINDING_TYPE =
+            IRecipeType.create(HorsePowerMod.MOD_ID, "grinding", GrindstoneRecipe.class);
 
-    public static final RecipeType<ChoppingRecipe> CHOPPING_TYPE =
-            RecipeType.create(HorsePowerMod.MOD_ID, "chopping", ChoppingRecipe.class);
+    public static final IRecipeType<ChoppingRecipe> CHOPPING_TYPE =
+            IRecipeType.create(HorsePowerMod.MOD_ID, "chopping", ChoppingRecipe.class);
 
-    public static final RecipeType<ChoppingRecipe> MANUAL_CHOPPING_TYPE =
-            RecipeType.create(HorsePowerMod.MOD_ID, "manual_chopping", ChoppingRecipe.class);
+    public static final IRecipeType<ChoppingRecipe> MANUAL_CHOPPING_TYPE =
+            IRecipeType.create(HorsePowerMod.MOD_ID, "manual_chopping", ChoppingRecipe.class);
 
-    public static final RecipeType<PressRecipe> PRESSING_TYPE =
-            RecipeType.create(HorsePowerMod.MOD_ID, "pressing", PressRecipe.class);
+    public static final IRecipeType<PressRecipe> PRESSING_TYPE =
+            IRecipeType.create(HorsePowerMod.MOD_ID, "pressing", PressRecipe.class);
 
     @Override
     public Identifier getPluginUid() {
@@ -79,14 +79,15 @@ public class HorsePowerPlugin implements IModPlugin {
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
         // Grinding catalysts
-        registration.addRecipeCatalyst(new ItemStack(ModBlocks.HAND_GRINDSTONE.get()), GRINDING_TYPE);
-        registration.addRecipeCatalyst(new ItemStack(ModBlocks.GRINDSTONE.get()), GRINDING_TYPE);
+        registration.addCraftingStation(GRINDING_TYPE,
+                new ItemStack(ModBlocks.HAND_GRINDSTONE.get()),
+                new ItemStack(ModBlocks.GRINDSTONE.get()));
 
         // Chopping catalysts - manual chopping block shows axe, horse chopper doesn't
-        registration.addRecipeCatalyst(new ItemStack(ModBlocks.CHOPPING_BLOCK.get()), MANUAL_CHOPPING_TYPE);
-        registration.addRecipeCatalyst(new ItemStack(ModBlocks.CHOPPER.get()), CHOPPING_TYPE);
+        registration.addCraftingStation(MANUAL_CHOPPING_TYPE, new ItemStack(ModBlocks.CHOPPING_BLOCK.get()));
+        registration.addCraftingStation(CHOPPING_TYPE, new ItemStack(ModBlocks.CHOPPER.get()));
 
         // Pressing catalysts
-        registration.addRecipeCatalyst(new ItemStack(ModBlocks.PRESS.get()), PRESSING_TYPE);
+        registration.addCraftingStation(PRESSING_TYPE, new ItemStack(ModBlocks.PRESS.get()));
     }
 }

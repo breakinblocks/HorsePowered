@@ -8,13 +8,12 @@ import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.neoforge.NeoForgeTypes;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import mezz.jei.api.recipe.RecipeType;
+import mezz.jei.api.recipe.types.IRecipeType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.Holder;
 import net.minecraft.world.item.ItemStack;
 
-@SuppressWarnings("deprecation")
 public class HorsePowerPressCategory extends BaseHPCategory<PressRecipe> {
 
     private static final int WIDTH = 82;
@@ -25,7 +24,7 @@ public class HorsePowerPressCategory extends BaseHPCategory<PressRecipe> {
     }
 
     @Override
-    public RecipeType<PressRecipe> getRecipeType() {
+    public IRecipeType<PressRecipe> getRecipeType() {
         return HorsePowerPlugin.PRESSING_TYPE;
     }
 
@@ -42,7 +41,7 @@ public class HorsePowerPressCategory extends BaseHPCategory<PressRecipe> {
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, PressRecipe recipe, IFocusGroup focuses) {
         builder.addSlot(RecipeIngredientRole.INPUT, 1, 1)
-                .addItemStacks(recipe.getIngredient().items()
+                .addItemStacks(recipe.getIngredient().getValues().stream()
                         .map(Holder::value)
                         .map(item -> {
                             ItemStack stack = new ItemStack(item);
@@ -62,10 +61,10 @@ public class HorsePowerPressCategory extends BaseHPCategory<PressRecipe> {
         if (recipe.hasFluidOutput()) {
             builder.addSlot(RecipeIngredientRole.OUTPUT, 61, 1)
                     .setFluidRenderer(recipe.getFluidResult().getAmount(), false, 16, 32)
-                    .addIngredient(NeoForgeTypes.FLUID_STACK, recipe.getFluidResult());
+                    .add(NeoForgeTypes.FLUID_STACK, recipe.getFluidResult());
         } else {
             builder.addSlot(RecipeIngredientRole.OUTPUT, 61, 1)
-                    .addItemStack(recipe.createResult())
+                    .add(recipe.createResult())
                     .setBackground(slot, -1, -1);
         }
     }

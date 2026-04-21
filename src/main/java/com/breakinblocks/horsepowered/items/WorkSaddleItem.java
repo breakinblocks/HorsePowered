@@ -4,6 +4,7 @@ import com.breakinblocks.horsepowered.HorsePowerMod;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
@@ -43,7 +44,7 @@ public class WorkSaddleItem extends Item {
         if (stack.has(DataComponents.ENTITY_DATA)) {
             return InteractionResult.PASS;
         }
-        if (!target.getType().builtInRegistryHolder().is(VALID_WORKER)) {
+        if (!BuiltInRegistries.ENTITY_TYPE.wrapAsHolder(target.getType()).is(VALID_WORKER)) {
             return InteractionResult.PASS;
         }
         if (level.isClientSide()) {
@@ -143,6 +144,7 @@ public class WorkSaddleItem extends Item {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, Consumer<Component> consumer, TooltipFlag flag) {
         super.appendHoverText(stack, context, display, consumer, flag);
         TypedEntityData<EntityType<?>> data = stack.get(DataComponents.ENTITY_DATA);

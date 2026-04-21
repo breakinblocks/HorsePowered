@@ -8,7 +8,7 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import mezz.jei.api.recipe.RecipeType;
+import mezz.jei.api.recipe.types.IRecipeType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
@@ -23,7 +23,7 @@ public class HorsePowerGrindingCategory extends BaseHPCategory<GrindstoneRecipe>
     }
 
     @Override
-    public RecipeType<GrindstoneRecipe> getRecipeType() {
+    public IRecipeType<GrindstoneRecipe> getRecipeType() {
         return HorsePowerPlugin.GRINDING_TYPE;
     }
 
@@ -40,16 +40,16 @@ public class HorsePowerGrindingCategory extends BaseHPCategory<GrindstoneRecipe>
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, GrindstoneRecipe recipe, IFocusGroup focuses) {
         builder.addSlot(RecipeIngredientRole.INPUT, 1, 1)
-                .addIngredients(recipe.getIngredient())
+                .add(recipe.getIngredient())
                 .setBackground(slot, -1, -1);
 
         builder.addSlot(RecipeIngredientRole.OUTPUT, 61, 1)
-                .addItemStack(recipe.createResult())
+                .add(recipe.createResult())
                 .setBackground(slot, -1, -1);
 
         if (recipe.getSecondaryTemplate() != null) {
             builder.addSlot(RecipeIngredientRole.OUTPUT, 81, 1)
-                    .addItemStack(recipe.createSecondary())
+                    .add(recipe.createSecondary())
                     .setBackground(slot, -1, -1)
                     .addRichTooltipCallback((slotView, tooltip) -> {
                         tooltip.add(Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.chance",

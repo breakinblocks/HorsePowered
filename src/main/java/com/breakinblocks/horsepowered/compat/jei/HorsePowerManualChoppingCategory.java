@@ -8,7 +8,7 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import mezz.jei.api.recipe.RecipeType;
+import mezz.jei.api.recipe.types.IRecipeType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -18,7 +18,6 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 
-@SuppressWarnings("deprecation")
 public class HorsePowerManualChoppingCategory extends BaseHPCategory<ChoppingRecipe> {
 
     private static final int WIDTH = 100;
@@ -30,13 +29,13 @@ public class HorsePowerManualChoppingCategory extends BaseHPCategory<ChoppingRec
         super(guiHelper, ModBlocks.CHOPPING_BLOCK.get(), "manual_chopping");
 
         this.axes = BuiltInRegistries.ITEM.stream()
-                .filter(item -> item.builtInRegistryHolder().is(ItemTags.AXES))
                 .map(ItemStack::new)
+                .filter(stack -> stack.is(ItemTags.AXES))
                 .toList();
     }
 
     @Override
-    public RecipeType<ChoppingRecipe> getRecipeType() {
+    public IRecipeType<ChoppingRecipe> getRecipeType() {
         return HorsePowerPlugin.MANUAL_CHOPPING_TYPE;
     }
 
@@ -57,11 +56,11 @@ public class HorsePowerManualChoppingCategory extends BaseHPCategory<ChoppingRec
                 .setBackground(slot, -1, -1);
 
         builder.addSlot(RecipeIngredientRole.INPUT, 10, 26)
-                .addIngredients(recipe.getIngredient())
+                .add(recipe.getIngredient())
                 .setBackground(slot, -1, -1);
 
         builder.addSlot(RecipeIngredientRole.OUTPUT, 72, 26)
-                .addItemStack(recipe.createResult())
+                .add(recipe.createResult())
                 .setBackground(slot, -1, -1);
     }
 
