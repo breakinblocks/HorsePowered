@@ -13,32 +13,40 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.joml.Matrix4f;
 
-/**
- * Common rendering utilities shared across block entity renderers.
- */
 public final class RenderUtils {
 
     private RenderUtils() {
-        // Utility class - no instantiation
     }
 
-    /**
-     * Renders an item flat (rotated 90 degrees around X) at the given position and scale.
-     */
     public static void renderFlatItem(ItemStackRenderState itemState, PoseStack poseStack, SubmitNodeCollector collector,
                                       int lightCoords, double x, double y, double z, float scale) {
+        renderFlatItem(itemState, poseStack, collector, lightCoords, x, y, z, scale, 0);
+    }
+
+    public static void renderFlatItem(ItemStackRenderState itemState, PoseStack poseStack, SubmitNodeCollector collector,
+                                      int lightCoords, double x, double y, double z, float scale, float yRotation) {
         if (itemState.isEmpty()) return;
         poseStack.pushPose();
         poseStack.translate(x, y, z);
         poseStack.scale(scale, scale, scale);
+        if (yRotation != 0) {
+            poseStack.mulPose(Axis.YP.rotationDegrees(yRotation));
+        }
         poseStack.mulPose(Axis.XP.rotationDegrees(90));
         itemState.submit(poseStack, collector, lightCoords, OverlayTexture.NO_OVERLAY, 0);
         poseStack.popPose();
     }
 
-    /**
-     * Extracts item render state from an ItemStack, clearing the state if the stack is empty.
-     */
+    public static void renderStandingItem(ItemStackRenderState itemState, PoseStack poseStack, SubmitNodeCollector collector,
+                                          int lightCoords, double x, double y, double z, float scale) {
+        if (itemState.isEmpty()) return;
+        poseStack.pushPose();
+        poseStack.translate(x, y, z);
+        poseStack.scale(scale, scale, scale);
+        itemState.submit(poseStack, collector, lightCoords, OverlayTexture.NO_OVERLAY, 0);
+        poseStack.popPose();
+    }
+
     public static void extractItemState(ItemStackRenderState itemState, ItemStack stack, Level level) {
         if (!stack.isEmpty()) {
             Minecraft.getInstance().getItemModelResolver()
@@ -48,9 +56,6 @@ public final class RenderUtils {
         }
     }
 
-    /**
-     * Adds a vertex to the buffer with all required attributes (Matrix4f variant).
-     */
     public static void addVertex(VertexConsumer builder, Matrix4f pose,
                                  float x, float y, float z, float u, float v,
                                  float nx, float ny, float nz, int packedLight, int packedOverlay) {
@@ -62,9 +67,6 @@ public final class RenderUtils {
                 .setNormal(nx, ny, nz);
     }
 
-    /**
-     * Adds a vertex to the buffer with all required attributes (PoseStack.Pose variant).
-     */
     public static void addVertex(VertexConsumer buffer, PoseStack.Pose pose,
                                  float x, float y, float z, float u, float v,
                                  float nx, float ny, float nz, int packedLight, int packedOverlay) {
@@ -76,9 +78,6 @@ public final class RenderUtils {
                 .setNormal(pose, nx, ny, nz);
     }
 
-    /**
-     * Renders a textured box using quads with proper UV coordinates scaled to face size.
-     */
     public static void renderTexturedBox(VertexConsumer buffer, PoseStack.Pose pose, TextureAtlasSprite sprite,
                                          float minX, float minY, float minZ,
                                          float maxX, float maxY, float maxZ,

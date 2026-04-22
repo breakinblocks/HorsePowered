@@ -7,13 +7,8 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.world.level.block.Blocks;
 
-/**
- * Renders the plunger for the horse-powered press.
- * The plunger moves up and down based on the press progress.
- */
 public class PlungerRenderer {
 
-    // Plunger dimensions (in block units, 1/16)
     private static final float PLUNGER_MIN_X = 4f / 16f;
     private static final float PLUNGER_MAX_X = 12f / 16f;
     private static final float PLUNGER_MIN_Y = 20f / 16f;
@@ -23,14 +18,7 @@ public class PlungerRenderer {
 
     private static final float PLUNGER_TRAVEL = 0.5f;
 
-    /**
-     * Renders the press plunger.
-     *
-     * @param poseStack The pose stack (already translated to block position)
-     * @param collector The node collector for submitting geometry
-     * @param visualProgress The progress value (0.0 = up, 1.0 = down/pressing)
-     * @param packedLight The packed light value for proper lighting
-     */
+    // visualProgress: 0.0 = raised, 1.0 = pressing down.
     public static void renderPlunger(PoseStack poseStack, SubmitNodeCollector collector, float visualProgress, int packedLight) {
         poseStack.pushPose();
 

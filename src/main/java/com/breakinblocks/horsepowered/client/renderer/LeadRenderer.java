@@ -6,13 +6,8 @@ import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.world.phys.Vec3;
 
-/**
- * Renders a lead (rope) between a horse-powered block and its attached worker mob.
- * Uses the 1.21.9+ submitCustomGeometry API for rendering with quads for proper thickness.
- */
 public class LeadRenderer {
 
-    // Leash colors (brownish rope color, similar to vanilla)
     private static final int LEASH_COLOR_R_DARK = 0x55;
     private static final int LEASH_COLOR_G_DARK = 0x33;
     private static final int LEASH_COLOR_B_DARK = 0x11;
@@ -20,28 +15,17 @@ public class LeadRenderer {
     private static final int LEASH_COLOR_G_LIGHT = 0x66;
     private static final int LEASH_COLOR_B_LIGHT = 0x33;
 
-    // Rope thickness (half-width)
     private static final float ROPE_HALF_WIDTH = 0.025f;
 
-    /**
-     * Renders a lead from a block attachment point to an entity position.
-     * Both positions should be relative to the block entity origin (0,0,0).
-     *
-     * @param blockAttachment The attachment point on the block, relative to block origin
-     * @param entityPos The position of the entity's leash attachment point, relative to block origin
-     * @param poseStack The pose stack for transformations (already translated to block position)
-     * @param collector The node collector for submitting geometry
-     */
+    // Both positions are expected in block-local coordinates (block origin = 0,0,0).
     public static void renderLead(Vec3 blockAttachment, Vec3 entityPos,
                                    PoseStack poseStack, SubmitNodeCollector collector) {
         if (entityPos == null || blockAttachment == null) return;
 
-        // Calculate the delta from block attachment to entity
         double dx = entityPos.x - blockAttachment.x;
         double dy = entityPos.y - blockAttachment.y;
         double dz = entityPos.z - blockAttachment.z;
 
-        // Translate to block attachment point
         poseStack.pushPose();
         poseStack.translate(blockAttachment.x, blockAttachment.y, blockAttachment.z);
 

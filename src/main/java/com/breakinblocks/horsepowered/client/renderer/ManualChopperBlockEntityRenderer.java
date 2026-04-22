@@ -12,10 +12,6 @@ import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * Renderer for the hand chopping block — displays the log currently being chopped
- * on top of the station surface.
- */
 public class ManualChopperBlockEntityRenderer implements BlockEntityRenderer<ManualChopperBlockEntity, ManualChopperBlockEntityRenderer.ManualChopperRenderState> {
 
     public ManualChopperBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
@@ -35,8 +31,9 @@ public class ManualChopperBlockEntityRenderer implements BlockEntityRenderer<Man
 
     @Override
     public void submit(ManualChopperRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
-        // Block is 9/16 tall — sit the item just above that surface.
-        RenderUtils.renderFlatItem(state.inputItem, poseStack, collector, state.lightCoords, 0.5D, 0.57D, 0.5D, 0.5F);
+        // Log stands upright on the chopping surface so the axe cleaves it like a real chop.
+        RenderUtils.renderStandingItem(state.inputItem, poseStack, collector, state.lightCoords,
+                0.5D, 0.71D, 0.5D, 0.6F);
     }
 
     public static class ManualChopperRenderState extends BlockEntityRenderState {

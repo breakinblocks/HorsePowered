@@ -6,36 +6,25 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.neoforged.neoforge.fluids.FluidStack;
 
-/**
- * Renders fluid in a tank for the horse-powered press.
- * Uses the 1.21.9+ submitCustomGeometry API for rendering.
- */
 public class FluidRenderer {
 
-    // Tank dimensions (in block units, 1/16)
     private static final float TANK_MIN_X = 3f / 16f;
     private static final float TANK_MAX_X = 13f / 16f;
-    private static final float TANK_MIN_Y = 1f / 16f;  // Bottom of tank
-    private static final float TANK_MAX_Y = 15f / 16f; // Top of tank (max fill)
+    private static final float TANK_MIN_Y = 1f / 16f;
+    private static final float TANK_MAX_Y = 15f / 16f;
     private static final float TANK_MIN_Z = 3f / 16f;
     private static final float TANK_MAX_Z = 13f / 16f;
 
-    // Small inset to prevent z-fighting with tank walls
+    // Inset from tank walls to avoid z-fighting.
     private static final float INSET = 0.001f;
 
-    /**
-     * Renders fluid in the full press tank (legacy single-tank layout).
-     */
     public static void renderFluid(PoseStack poseStack, SubmitNodeCollector collector,
                                     FluidStack fluidStack, int tankCapacity, int packedLight) {
         renderFluidBand(poseStack, collector, fluidStack, tankCapacity, packedLight,
                 TANK_MIN_X + INSET, TANK_MAX_X - INSET);
     }
 
-    /**
-     * Renders fluid in either the left or right half of the press tank. Used for the
-     * split input/output tank layout — input on the left, output on the right.
-     */
+    // Used by the press's split-tank layout — input on the left, output on the right.
     public static void renderFluidHalf(PoseStack poseStack, SubmitNodeCollector collector,
                                         FluidStack fluidStack, int tankCapacity, int packedLight,
                                         boolean leftHalf) {

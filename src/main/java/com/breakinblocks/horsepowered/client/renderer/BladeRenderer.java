@@ -23,14 +23,7 @@ public class BladeRenderer {
 
     private static final float BLADE_TRAVEL = 0.5f;
 
-    /**
-     * Renders the chopping blade for the chopper.
-     *
-     * @param poseStack The pose stack (already translated to block position)
-     * @param collector The node collector for submitting geometry
-     * @param visualWindup The windup value (-0.74 = down/chopped, 0 = up/raised)
-     * @param packedLight The packed light value for proper lighting
-     */
+    // visualWindup range: -0.74 (wound down / struck) .. 0 (raised).
     public static void renderBlade(PoseStack poseStack, SubmitNodeCollector collector, float visualWindup, int packedLight) {
         poseStack.pushPose();
 

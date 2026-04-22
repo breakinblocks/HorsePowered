@@ -47,7 +47,6 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
         this.itemStacks = NonNullList.withSize(inventorySize, ItemStack.EMPTY);
     }
 
-    // Abstract methods to be implemented by subclasses
     public abstract int getInventoryStackLimit();
 
     public abstract boolean isItemValidForSlot(int index, ItemStack stack);
@@ -58,7 +57,6 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
         return getInventoryStackLimit();
     }
 
-    // Container implementation
     @Override
     public int getContainerSize() {
         return itemStacks.size();
@@ -139,7 +137,6 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
         return isItemValidForSlot(index, stack);
     }
 
-    // WorldlyContainer implementation for automation
     @Override
     public int[] getSlotsForFace(Direction side) {
         if (side == Direction.DOWN) {
@@ -243,7 +240,6 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
         return true;
     }
 
-    // Methods to be overridden for recipe lookup
     public ItemStack getRecipeOutput() {
         return ItemStack.EMPTY;
     }
@@ -316,7 +312,6 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
         }
     }
 
-    // Rotation support
     public boolean canBeRotated() {
         return false;
     }

@@ -130,10 +130,6 @@ public class HandGrindstoneBlockEntity extends HPBlockEntityBase {
         return totalItemMillTime;
     }
 
-    /**
-     * Called when the player turns the grindstone
-     * @return true if the grindstone was turned
-     */
     public boolean turn() {
         if (level == null || level.isClientSide()) return false;
 

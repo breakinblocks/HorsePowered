@@ -61,10 +61,7 @@ public class ManualChopperBlockEntity extends HPBlockEntityBase {
         return findRecipe(HPRecipes.CHOPPING_TYPE.get(), stack).isPresent();
     }
 
-    /**
-     * Called when the player chops with an axe
-     * @return true if the chop completed an item
-     */
+    // Returns true when the chop consumed the input (recipe completed).
     public boolean chop(Player player, ItemStack held) {
         if (canWork()) {
             currentItemChopAmount++;

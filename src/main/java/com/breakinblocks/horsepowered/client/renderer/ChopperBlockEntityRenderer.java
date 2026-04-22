@@ -14,10 +14,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * Renderer for the horse-powered chopper.
- * Renders the leash between the block and the attached worker mob.
- */
 public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBlockEntity, ChopperBlockEntityRenderer.ChopperRenderState> {
 
     public ChopperBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
@@ -60,11 +56,12 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
         // Render chopping blade
         BladeRenderer.renderBlade(poseStack, collector, state.visualWindup, state.lightCoords);
 
-        // Render input item on top of the oak base
-        RenderUtils.renderFlatItem(state.inputItem, poseStack, collector, state.lightCoords, 0.5D, 0.44D, 0.5D, 0.5F);
+        // Log stands upright on the chopping surface so the blade cleaves it like a real axe chop.
+        RenderUtils.renderStandingItem(state.inputItem, poseStack, collector, state.lightCoords,
+                0.5D, 0.6D, 0.5D, 0.6F);
 
-        // Render output item beside the base
-        RenderUtils.renderFlatItem(state.outputItem, poseStack, collector, state.lightCoords, 0.5D, 0.2D, 0.9D, 0.3F);
+        RenderUtils.renderFlatItem(state.outputItem, poseStack, collector, state.lightCoords,
+                0.5D, 0.2D, 0.9D, 0.3F);
     }
 
     @Override

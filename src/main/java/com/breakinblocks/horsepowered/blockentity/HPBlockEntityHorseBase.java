@@ -129,7 +129,6 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
         return true;
     }
 
-    /** @return true if progress was made (item processed) */
     public abstract boolean targetReached();
 
     public abstract int getPositionOffset();
@@ -509,7 +508,6 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
         }
     }
 
-    /** @return true if progress was made (item processed) */
     private boolean moveVirtualPositionServer() {
         if (target < 0 || target >= PATH.length) {
             target = 0;

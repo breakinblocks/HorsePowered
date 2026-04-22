@@ -12,10 +12,6 @@ import net.minecraft.world.phys.Vec3;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Base render state for all horse-powered block entity renderers.
- * Contains shared fields for virtual worker rendering, leash, and working area highlights.
- */
 public class HorseBlockRenderState extends BlockEntityRenderState {
     public float partialTick;
     public boolean hasWorker;
@@ -23,18 +19,12 @@ public class HorseBlockRenderState extends BlockEntityRenderState {
     public boolean showHighlight;
     public List<Map.Entry<BlockPos, Boolean>> workingAreaPositions;
 
-    // Virtual worker position (offset from block center)
     public Vec3 workerOffset;
 
-    // Cached render entity for virtual worker display
     public Entity renderEntity;
-    // Entity position offset from block origin (for entity rendering)
     public double entityOffsetX, entityOffsetY, entityOffsetZ;
     public float entityYRot;
 
-    /**
-     * Extracts worker position, highlight, and working area data from a horse-powered block entity.
-     */
     public static void extractWorkerState(HPBlockEntityHorseBase blockEntity, HorseBlockRenderState state, float partialTick) {
         state.partialTick = partialTick;
         state.blockPos = blockEntity.getBlockPos();
@@ -78,13 +68,9 @@ public class HorseBlockRenderState extends BlockEntityRenderState {
         state.workingAreaPositions = blockEntity.getWorkingAreaPositions();
     }
 
-    /**
-     * Submits virtual worker rendering, leash, and working area highlight for a horse-powered block.
-     */
     public static void submitWorkerAndArea(HorseBlockRenderState state, PoseStack poseStack,
                                             SubmitNodeCollector collector, CameraRenderState camera) {
         if (state.hasWorker) {
-            // Render the virtual entity
             if (state.renderEntity != null) {
                 VirtualWorkerRenderer.renderEntity(
                         state.renderEntity,
@@ -93,7 +79,6 @@ public class HorseBlockRenderState extends BlockEntityRenderState {
                         poseStack, collector, camera, state.lightCoords);
             }
 
-            // Render leash
             if (state.workerOffset != null) {
                 Vec3 blockAttachment = new Vec3(0.5, 1.0, 0.5);
                 Vec3 workerPos = state.workerOffset.add(0.5, 0, 0.5);

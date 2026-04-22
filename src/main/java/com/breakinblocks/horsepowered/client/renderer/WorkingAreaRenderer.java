@@ -11,11 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Renders the working area highlight for horse-powered blocks as a single
- * combined outline rather than individual block boxes.
- * Only outer boundary faces are drawn, so the area reads as one cohesive shape.
- */
 public class WorkingAreaRenderer {
 
     // Low-opacity green for clear area, brighter red for obstructed blocks

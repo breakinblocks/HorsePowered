@@ -14,10 +14,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * Renderer for the horse-powered grindstone.
- * Renders the leash between the block and the attached worker mob.
- */
 public class GrindstoneBlockEntityRenderer implements BlockEntityRenderer<GrindstoneBlockEntity, GrindstoneBlockEntityRenderer.GrindstoneRenderState> {
 
     public GrindstoneBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
@@ -34,7 +30,6 @@ public class GrindstoneBlockEntityRenderer implements BlockEntityRenderer<Grinds
         BlockEntityRenderState.extractBase(blockEntity, state, crumblingOverlay);
         HorseBlockRenderState.extractWorkerState(blockEntity, state, partialTick);
 
-        // Extract item states for rendering
         RenderUtils.extractItemState(state.inputItem, blockEntity.getItem(0), blockEntity.getLevel());
         RenderUtils.extractItemState(state.outputItem, blockEntity.getItem(1), blockEntity.getLevel());
         RenderUtils.extractItemState(state.secondaryItem, blockEntity.getItem(2), blockEntity.getLevel());

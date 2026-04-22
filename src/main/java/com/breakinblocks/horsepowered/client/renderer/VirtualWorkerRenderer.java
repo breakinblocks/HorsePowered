@@ -10,26 +10,10 @@ import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 
-/**
- * Renders a virtual (non-world) entity from within a block entity renderer.
- * Uses EntityRenderDispatcher to render the entity at a given offset from the block position.
- */
 public class VirtualWorkerRenderer {
 
-    /**
-     * Renders a cached entity at the given offset from the block entity's origin.
-     *
-     * @param entity The cached entity to render (not in the world)
-     * @param offsetX X offset from block origin to entity position
-     * @param offsetY Y offset from block origin to entity position
-     * @param offsetZ Z offset from block origin to entity position
-     * @param yRot Entity Y rotation (already interpolated for this frame)
-     * @param partialTick Partial tick for interpolation
-     * @param poseStack Pose stack (already translated to block position)
-     * @param collector Submit node collector
-     * @param camera Camera render state
-     * @param packedLight Packed light value
-     */
+    // entity must be a detached/cached instance — the EntityRenderDispatcher is invoked directly
+    // from inside a BE renderer so it never enters the world render pipeline.
     @SuppressWarnings("unchecked")
     public static void renderEntity(Entity entity, double offsetX, double offsetY, double offsetZ,
                                      float yRot, float partialTick,

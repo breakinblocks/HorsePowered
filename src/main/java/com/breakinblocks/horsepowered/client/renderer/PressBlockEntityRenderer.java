@@ -15,10 +15,6 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.fluids.FluidStack;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * Renderer for the horse-powered press.
- * Renders the leash between the block and the attached worker mob.
- */
 public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockEntity, PressBlockEntityRenderer.PressRenderState> {
 
     public PressBlockEntityRenderer(BlockEntityRendererProvider.Context context) {

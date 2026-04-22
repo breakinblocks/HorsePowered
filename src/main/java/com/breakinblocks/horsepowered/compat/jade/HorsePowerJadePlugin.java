@@ -1,14 +1,32 @@
 package com.breakinblocks.horsepowered.compat.jade;
 
 import com.breakinblocks.horsepowered.HorsePowerMod;
-import com.breakinblocks.horsepowered.blocks.*;
-import com.breakinblocks.horsepowered.blockentity.*;
+import com.breakinblocks.horsepowered.blockentity.ChopperBlockEntity;
+import com.breakinblocks.horsepowered.blockentity.FillerBlockEntity;
+import com.breakinblocks.horsepowered.blockentity.GrindstoneBlockEntity;
+import com.breakinblocks.horsepowered.blockentity.HandGrindstoneBlockEntity;
+import com.breakinblocks.horsepowered.blockentity.HPBlockEntityBase;
+import com.breakinblocks.horsepowered.blockentity.ManualChopperBlockEntity;
+import com.breakinblocks.horsepowered.blockentity.PressBlockEntity;
+import com.breakinblocks.horsepowered.blocks.BlockChopper;
+import com.breakinblocks.horsepowered.blocks.BlockChoppingBlock;
+import com.breakinblocks.horsepowered.blocks.BlockFiller;
+import com.breakinblocks.horsepowered.blocks.BlockGrindstone;
+import com.breakinblocks.horsepowered.blocks.BlockHandGrindstone;
+import com.breakinblocks.horsepowered.blocks.BlockPress;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.FluidStack;
-import snownee.jade.api.*;
+import snownee.jade.api.BlockAccessor;
+import snownee.jade.api.IBlockComponentProvider;
+import snownee.jade.api.IServerDataProvider;
+import snownee.jade.api.ITooltip;
+import snownee.jade.api.IWailaClientRegistration;
+import snownee.jade.api.IWailaCommonRegistration;
+import snownee.jade.api.IWailaPlugin;
+import snownee.jade.api.WailaPlugin;
 import snownee.jade.api.config.IPluginConfig;
 
 @WailaPlugin
