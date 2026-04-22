@@ -4,6 +4,11 @@ import com.breakinblocks.horsepowered.Configs;
 import com.breakinblocks.horsepowered.blockentity.HandGrindstoneBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -13,6 +18,7 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -72,11 +78,11 @@ public class BlockHandGrindstone extends BlockHPBase {
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         BlockEntity be = level.getBlockEntity(pos);
         if (be instanceof HandGrindstoneBlockEntity grindstone) {
-            // If player is sneaking or holding an empty hand and grindstone can work, turn it
             if (grindstone.canWork() && !player.isShiftKeyDown()) {
                 if (!level.isClientSide) {
                     if (grindstone.turn()) {
                         player.causeFoodExhaustion(Configs.grindstoneExhaustion.get().floatValue());
+                        playTurnFeedback(level, pos);
                     }
                 }
                 return InteractionResult.sidedSuccess(level.isClientSide);
@@ -84,6 +90,17 @@ public class BlockHandGrindstone extends BlockHPBase {
         }
 
         return super.use(state, level, pos, player, hand, hit);
+    }
+
+    private static void playTurnFeedback(Level level, BlockPos pos) {
+        float pitch = 0.9F + level.getRandom().nextFloat() * 0.2F;
+        level.playSound(null, pos, SoundEvents.GRINDSTONE_USE, SoundSource.BLOCKS, 0.5F, pitch);
+        if (level instanceof ServerLevel serverLevel) {
+            serverLevel.sendParticles(
+                    new BlockParticleOption(ParticleTypes.BLOCK, Blocks.STONE.defaultBlockState()),
+                    pos.getX() + 0.5, pos.getY() + 0.65, pos.getZ() + 0.5,
+                    4, 0.15, 0.05, 0.15, 0.0);
+        }
     }
 
     @Override

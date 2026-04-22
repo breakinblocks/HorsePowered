@@ -1,8 +1,13 @@
 package com.breakinblocks.horsepowered.blocks;
 
-import com.breakinblocks.horsepowered.lib.Reference;
+import com.breakinblocks.horsepowered.blockentity.ChopperBlockEntity;
+import com.breakinblocks.horsepowered.blockentity.FillerBlockEntity;
+import com.breakinblocks.horsepowered.blockentity.GrindstoneBlockEntity;
+import com.breakinblocks.horsepowered.blockentity.HandGrindstoneBlockEntity;
+import com.breakinblocks.horsepowered.blockentity.ManualChopperBlockEntity;
+import com.breakinblocks.horsepowered.blockentity.PressBlockEntity;
 import com.breakinblocks.horsepowered.items.ModItems;
-import com.breakinblocks.horsepowered.blockentity.*;
+import com.breakinblocks.horsepowered.lib.Reference;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -22,7 +27,6 @@ public class ModBlocks {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES =
             DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, Reference.MODID);
 
-    // Blocks
     public static final RegistryObject<Block> HAND_GRINDSTONE = registerBlock("hand_grindstone",
             () -> new BlockHandGrindstone(BlockBehaviour.Properties.of()
                     .mapColor(MapColor.STONE)
@@ -55,7 +59,6 @@ public class ModBlocks {
                     .mapColor(MapColor.WOOD)
                     .strength(5.0F)));
 
-    // Block Entities
     public static final RegistryObject<BlockEntityType<HandGrindstoneBlockEntity>> HAND_GRINDSTONE_BE =
             BLOCK_ENTITIES.register("hand_grindstone", () ->
                     BlockEntityType.Builder.of(HandGrindstoneBlockEntity::new, HAND_GRINDSTONE.get()).build(null));

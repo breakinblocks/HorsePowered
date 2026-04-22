@@ -32,10 +32,8 @@ public class HorsePowerMod {
                     .title(Component.translatable("itemGroup." + Reference.MODID))
                     .icon(() -> new ItemStack(ModBlocks.HAND_GRINDSTONE.get()))
                     .displayItems((parameters, output) -> {
-                        // Items
                         output.accept(ModItems.FLOUR.get());
                         output.accept(ModItems.DOUGH.get());
-                        // Blocks
                         output.accept(ModBlocks.HAND_GRINDSTONE.get());
                         output.accept(ModBlocks.GRINDSTONE.get());
                         output.accept(ModBlocks.CHOPPING_BLOCK.get());
@@ -48,17 +46,14 @@ public class HorsePowerMod {
     public HorsePowerMod() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
-        // Register items and blocks
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
         HPRecipes.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);
 
-        // Register configs
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Configs.COMMON_SPEC);
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, Configs.CLIENT_SPEC);
 
-        // Register common setup listener
         modEventBus.addListener(this::commonSetup);
     }
 

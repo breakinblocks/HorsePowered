@@ -1,13 +1,27 @@
 package com.breakinblocks.horsepowered.compat.jade;
 
-import com.breakinblocks.horsepowered.blocks.*;
+import com.breakinblocks.horsepowered.blockentity.ChopperBlockEntity;
+import com.breakinblocks.horsepowered.blockentity.GrindstoneBlockEntity;
+import com.breakinblocks.horsepowered.blockentity.HandGrindstoneBlockEntity;
+import com.breakinblocks.horsepowered.blockentity.HPBlockEntityHorseBase;
+import com.breakinblocks.horsepowered.blockentity.ManualChopperBlockEntity;
+import com.breakinblocks.horsepowered.blockentity.PressBlockEntity;
+import com.breakinblocks.horsepowered.blocks.BlockChopper;
+import com.breakinblocks.horsepowered.blocks.BlockChoppingBlock;
+import com.breakinblocks.horsepowered.blocks.BlockGrindstone;
+import com.breakinblocks.horsepowered.blocks.BlockHandGrindstone;
+import com.breakinblocks.horsepowered.blocks.BlockPress;
 import com.breakinblocks.horsepowered.lib.Reference;
-import com.breakinblocks.horsepowered.blockentity.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
-import snownee.jade.api.*;
+import snownee.jade.api.BlockAccessor;
+import snownee.jade.api.IBlockComponentProvider;
+import snownee.jade.api.ITooltip;
+import snownee.jade.api.IWailaClientRegistration;
+import snownee.jade.api.IWailaPlugin;
+import snownee.jade.api.WailaPlugin;
 import snownee.jade.api.config.IPluginConfig;
 
 @WailaPlugin
@@ -20,7 +34,6 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
 
     @Override
     public void registerClient(IWailaClientRegistration registration) {
-        // Horse-powered grindstone
         registration.registerBlockComponent(new IBlockComponentProvider() {
             @Override
             public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
@@ -39,7 +52,6 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
             }
         }, BlockGrindstone.class);
 
-        // Horse-powered chopper
         registration.registerBlockComponent(new IBlockComponentProvider() {
             @Override
             public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
@@ -57,7 +69,6 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
             }
         }, BlockChopper.class);
 
-        // Horse-powered press
         registration.registerBlockComponent(new IBlockComponentProvider() {
             @Override
             public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
@@ -76,7 +87,6 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
             }
         }, BlockPress.class);
 
-        // Manual blocks (hand grindstone and chopping block)
         registration.registerBlockComponent(new IBlockComponentProvider() {
             @Override
             public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
@@ -134,14 +144,13 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
     }
 
     private static void appendWorkerInfo(ITooltip tooltip, HPBlockEntityHorseBase te) {
-        // Use hasWorkerForDisplay() to avoid side effects on client
+        // hasWorkerForDisplay avoids the side-effect lazy-resolve that hasWorker performs client-side.
         if (te.hasWorkerForDisplay()) {
             var worker = te.getWorker();
             if (worker != null) {
                 tooltip.add(Component.translatable("jade." + Reference.MODID + ".worker",
                         worker.getDisplayName()));
             } else {
-                // Worker is attached but entity not found yet (loading)
                 tooltip.add(Component.translatable("jade." + Reference.MODID + ".worker_attached"));
             }
         } else {

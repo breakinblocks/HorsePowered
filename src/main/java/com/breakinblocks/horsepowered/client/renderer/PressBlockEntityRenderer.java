@@ -21,9 +21,8 @@ import org.joml.Matrix4f;
 
 public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockEntity> {
 
-    // Plunger position constants - the plunger presses down into the basin
-    private static final float PLUNGER_MAX_Y = 0.7F;     // Highest position (not pressing)
-    private static final float PLUNGER_MIN_Y = 0.2F;     // Lowest position (fully pressed into basin)
+    private static final float PLUNGER_MAX_Y = 0.7F;
+    private static final float PLUNGER_MIN_Y = 0.2F;
 
     private final ItemRenderer itemRenderer;
     private final Font font;
@@ -36,27 +35,18 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
     @Override
     public void render(PressBlockEntity blockEntity, float partialTick, PoseStack poseStack,
                        MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
-
-        // Render working area highlight if active
         WorkingAreaRenderer.renderIfActive(blockEntity, poseStack, bufferSource);
-
-        // Render lead to attached worker
         LeadRenderer.renderLead(blockEntity, partialTick, poseStack, bufferSource);
-
-        // Render animated plunger
         renderPlunger(blockEntity, poseStack, bufferSource, packedLight, packedOverlay);
 
-        // Render input items on the press plate
         RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer, font,
                 blockEntity.getItem(0), 0.5, 0.35, 0.5, 0.5F, 0, packedLight, packedOverlay,
                 blockEntity.getLevel(), 0.65);
 
-        // Render output item
         RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer, font,
                 blockEntity.getItem(1), 0.5, 0.3, 0.5, 0.35F, 0, packedLight, packedOverlay,
                 blockEntity.getLevel(), 0.55);
 
-        // Render input fluid in the left half, output fluid in the right half.
         FluidStack inputFluid = blockEntity.getInputTank().getFluid();
         if (!inputFluid.isEmpty()) {
             renderFluidHalf(poseStack, bufferSource, packedLight, inputFluid, blockEntity.getInputTank().getCapacity(), true);
@@ -69,17 +59,14 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
 
     private void renderPlunger(PressBlockEntity blockEntity, PoseStack poseStack,
                                MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
-        // Get press progress from block entity
         int currentPress = blockEntity.getCurrentPressStatus();
         int totalPress = Configs.pointsForPress.get();
         if (totalPress <= 0) totalPress = 1;
 
-        // Calculate plunger Y position based on progress
         float progress = (float) currentPress / totalPress;
         float plungerTravel = PLUNGER_MAX_Y - PLUNGER_MIN_Y;
         float plungerY = PLUNGER_MAX_Y - (progress * plungerTravel);
 
-        // Get oak planks texture for plunger
         TextureAtlasSprite sprite = Minecraft.getInstance()
                 .getBlockRenderer()
                 .getBlockModel(Blocks.OAK_PLANKS.defaultBlockState())
@@ -89,7 +76,6 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
 
         VertexConsumer builder = bufferSource.getBuffer(RenderType.solid());
 
-        // Plunger dimensions (square plate that fits inside the basin)
         float plungerMinX = 0.15F;
         float plungerMaxX = 0.85F;
         float plungerMinZ = 0.15F;
@@ -130,14 +116,13 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
         float a = ((color >> 24) & 0xFF) / 255.0F;
         if (a == 0) a = 1.0F;
 
-        float width = 0.375F; // Half of the original 0.75F tank width
+        float width = 0.375F;
         float depth = 0.75F;
         float u1 = sprite.getU0();
         float u2 = sprite.getU1();
         float v1 = sprite.getV0();
         float v2 = sprite.getV1();
 
-        // Top face
         builder.vertex(matrix, 0, fluidHeight, 0).color(r, g, b, a).uv(u1, v1).uv2(packedLight).normal(0, 1, 0).endVertex();
         builder.vertex(matrix, 0, fluidHeight, depth).color(r, g, b, a).uv(u1, v2).uv2(packedLight).normal(0, 1, 0).endVertex();
         builder.vertex(matrix, width, fluidHeight, depth).color(r, g, b, a).uv(u2, v2).uv2(packedLight).normal(0, 1, 0).endVertex();

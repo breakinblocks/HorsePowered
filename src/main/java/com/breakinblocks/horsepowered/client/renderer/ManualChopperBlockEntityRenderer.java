@@ -9,10 +9,6 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 
-/**
- * Renderer for the hand chopping block — displays the log currently being chopped
- * on top of the station surface.
- */
 public class ManualChopperBlockEntityRenderer implements BlockEntityRenderer<ManualChopperBlockEntity> {
 
     private final ItemRenderer itemRenderer;
@@ -26,9 +22,12 @@ public class ManualChopperBlockEntityRenderer implements BlockEntityRenderer<Man
     @Override
     public void render(ManualChopperBlockEntity blockEntity, float partialTick, PoseStack poseStack,
                        MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
-        // Block is 9/16 tall — sit the item just above that surface.
-        RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer, font,
-                blockEntity.getItem(0), 0.5, 0.58, 0.5, 0.5F, 0, packedLight, packedOverlay,
-                blockEntity.getLevel(), 0.85);
+        // Chopping surface is at y=9/16=0.5625. Stand the log upright with its
+        // base on the surface so it reads as "a log to be chopped". FIXED scale
+        // of 0.5 means a scale of 0.6 yields ~0.3 block height — base at 0.5625,
+        // center at ~0.71.
+        RenderUtils.renderStandingItem(poseStack, bufferSource, itemRenderer, font,
+                blockEntity.getItem(0), 0.5, 0.71, 0.5, 0.6F, 0, packedLight, packedOverlay,
+                blockEntity.getLevel(), 1.05);
     }
 }

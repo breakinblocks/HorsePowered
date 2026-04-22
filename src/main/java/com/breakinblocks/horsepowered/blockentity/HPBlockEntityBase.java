@@ -31,7 +31,6 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
         this.itemStacks = NonNullList.withSize(inventorySize, ItemStack.EMPTY);
     }
 
-    // Abstract methods to be implemented by subclasses
     public abstract int getInventoryStackLimit();
 
     public abstract boolean isItemValidForSlot(int index, ItemStack stack);
@@ -42,7 +41,6 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
         return getInventoryStackLimit();
     }
 
-    // Container implementation
     @Override
     public int getContainerSize() {
         return itemStacks.size();
@@ -97,12 +95,8 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
         setChanged();
     }
 
-    /**
-     * Called when the input slot (slot 0) changes to a different item type.
-     * Subclasses should override this to reset progress timers.
-     */
+    // Fires when slot 0 swaps to a different item; subclasses override to reset progress counters.
     protected void onInputChanged() {
-        // Default: no-op. Subclasses override to reset progress.
     }
 
     public int getMaxStackSize(ItemStack stack) {
@@ -127,7 +121,6 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
         return isItemValidForSlot(index, stack);
     }
 
-    // WorldlyContainer implementation for automation
     @Override
     public int[] getSlotsForFace(Direction side) {
         if (side == Direction.DOWN) {
@@ -143,10 +136,9 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
 
     @Override
     public boolean canTakeItemThroughFace(int index, ItemStack stack, Direction direction) {
-        return index > 0; // Only output slots
+        return index > 0;
     }
 
-    // NBT serialization
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
@@ -170,7 +162,6 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
         }
     }
 
-    // Sync to client
     @Override
     public CompoundTag getUpdateTag() {
         CompoundTag tag = new CompoundTag();
@@ -192,7 +183,6 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
         }
     }
 
-    // Recipe and work logic
     public boolean canWork() {
         if (getItem(0).isEmpty()) {
             return false;
@@ -237,7 +227,6 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
         return true;
     }
 
-    // Methods to be overridden for recipe lookup
     public ItemStack getRecipeOutput() {
         return ItemStack.EMPTY;
     }
@@ -263,10 +252,6 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
         return ItemStack.isSameItemSameTags(stack1, stack2);
     }
 
-    /**
-     * Merges a result stack into the given output slot.
-     * @return true if the merge was successful
-     */
     protected boolean mergeOutput(int slot, ItemStack result) {
         ItemStack existing = getItem(slot);
         if (existing.isEmpty()) {
@@ -279,9 +264,6 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
         return false;
     }
 
-    /**
-     * Processes a secondary output with a chance roll.
-     */
     protected void processSecondary(ItemStack secondary, int chance) {
         if (!secondary.isEmpty() && level != null) {
             if (chance >= 100 || level.random.nextInt(100) < chance) {
@@ -290,7 +272,6 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
         }
     }
 
-    // Rotation support
     public boolean canBeRotated() {
         return false;
     }

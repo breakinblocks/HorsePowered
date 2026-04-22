@@ -19,9 +19,8 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBlockEntity> {
 
-    // Blade position constants - the blade sits on an oak slab base
-    private static final float BLADE_MIN_Y = 0.5F;     // Lowest position (at chopping surface)
-    private static final float BLADE_MAX_Y = 1.25F;    // Highest position (raised)
+    private static final float BLADE_MIN_Y = 0.5F;
+    private static final float BLADE_MAX_Y = 1.25F;
 
     private final ItemRenderer itemRenderer;
     private final Font font;
@@ -34,33 +33,26 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
     @Override
     public void render(ChopperBlockEntity blockEntity, float partialTick, PoseStack poseStack,
                        MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
-
         BlockState state = blockEntity.getBlockState();
-        // Skip the last-frame render when the BE is being destroyed — the state
-        // can already be AIR (no FACING property), which would throw and leave a
-        // missing-texture particle burst.
+        // On the frame after removal the state can already be AIR (no FACING property); skipping avoids
+        // a missing-texture particle burst from getValue throwing.
         if (blockEntity.isRemoved() || !state.hasProperty(BlockChopper.FACING)) {
             return;
         }
 
-        // Render working area highlight if active
         WorkingAreaRenderer.renderIfActive(blockEntity, poseStack, bufferSource);
-
-        // Render lead to attached worker
         LeadRenderer.renderLead(blockEntity, partialTick, poseStack, bufferSource);
 
         Direction facing = state.getValue(BlockChopper.FACING);
         float rotation = getRotation(facing);
 
-        // Render animated blade
         renderBlade(blockEntity, poseStack, bufferSource, packedLight, packedOverlay, rotation);
 
-        // Render input item on the chopping surface
-        RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer, font,
-                blockEntity.getItem(0), 0.5, 0.52, 0.5, 0.6F, rotation, packedLight, packedOverlay,
-                blockEntity.getLevel(), 0.85);
+        // Log stands upright on the chopping surface so the blade cleaves it like a real axe chop.
+        RenderUtils.renderStandingItem(poseStack, bufferSource, itemRenderer, font,
+                blockEntity.getItem(0), 0.5, 0.71, 0.5, 0.6F, rotation, packedLight, packedOverlay,
+                blockEntity.getLevel(), 1.05);
 
-        // Render output item
         RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer, font,
                 blockEntity.getItem(1), 0.5, 0.3, 0.5, 0.4F, rotation + 45, packedLight, packedOverlay,
                 blockEntity.getLevel(), 0.55);
@@ -68,16 +60,12 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
 
     private void renderBlade(ChopperBlockEntity blockEntity, PoseStack poseStack,
                              MultiBufferSource bufferSource, int packedLight, int packedOverlay, float rotation) {
-        // Get visual windup from block entity (-0.74 to 0)
+        // visualWindup is -0.74 (fully wound down) .. 0 (raised); map to [BLADE_MIN_Y..BLADE_MAX_Y].
         float visualWindup = blockEntity.getVisualWindup();
-
-        // Convert to blade Y position (0.74 range mapped to blade travel distance)
         float bladeTravel = BLADE_MAX_Y - BLADE_MIN_Y;
-        // visualWindup: -0.74 = down (min), 0 = up (max)
-        float normalizedProgress = (visualWindup + 0.74F) / 0.74F; // 0 to 1
+        float normalizedProgress = (visualWindup + 0.74F) / 0.74F;
         float bladeY = BLADE_MIN_Y + (normalizedProgress * bladeTravel);
 
-        // Get iron block texture for blade
         TextureAtlasSprite sprite = Minecraft.getInstance()
                 .getBlockRenderer()
                 .getBlockModel(Blocks.IRON_BLOCK.defaultBlockState())
@@ -85,20 +73,17 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
 
         poseStack.pushPose();
 
-        // Rotate blade to match block facing
         poseStack.translate(0.5, 0, 0.5);
         poseStack.mulPose(Axis.YP.rotationDegrees(rotation));
         poseStack.translate(-0.5, 0, -0.5);
 
         VertexConsumer builder = bufferSource.getBuffer(RenderType.solid());
 
-        // Blade dimensions (vertical blade - thin in Z, tall in Y)
         float bladeMinX = 0.1F;
         float bladeMaxX = 0.9F;
-        float bladeThickness = 0.05F;  // Thin blade
-        float bladeHeight = 0.5F;      // Tall blade
+        float bladeThickness = 0.05F;
+        float bladeHeight = 0.5F;
 
-        // Center the blade in Z
         float bladeMinZ = 0.5F - (bladeThickness / 2);
         float bladeMaxZ = 0.5F + (bladeThickness / 2);
 

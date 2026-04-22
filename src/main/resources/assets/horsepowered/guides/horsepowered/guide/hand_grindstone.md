@@ -18,9 +18,10 @@ The Hand Grindstone is a manual processing block that allows you to grind items 
 
 1. Place the Hand Grindstone
 2. Right-click with an item to insert it into the input slot
-3. Right-click with an empty hand to turn the grindstone
-4. The grindstone will process the item over multiple turns
-5. Right-click again to extract the output
+3. Right-click with an empty hand to turn the grindstone — each turn plays a grinding sound and spins the item on the stone
+4. The grindstone will process the item over multiple turns; the output appears on the grinding surface next to the input
+5. Right-click with an empty hand on the output to collect it
+6. Sneak + right-click to pull un-milled input back out
 
 ## Recipe
 
