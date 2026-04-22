@@ -1,23 +1,74 @@
 package com.breakinblocks.horsepowered.client.renderer;
 
+import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import org.joml.Matrix4f;
 
-/**
- * Common rendering utilities shared across block entity renderers.
- */
 public final class RenderUtils {
 
     private RenderUtils() {
-        // Utility class - no instantiation
+    }
+
+    public static void renderFlatItem(PoseStack poseStack, MultiBufferSource bufferSource,
+                                       ItemRenderer itemRenderer, Font font, ItemStack stack,
+                                       double x, double y, double z, float scale, float yRotation,
+                                       int packedLight, int packedOverlay, Level level, double countY) {
+        if (stack.isEmpty()) return;
+
+        poseStack.pushPose();
+        poseStack.translate(x, y, z);
+        poseStack.scale(scale, scale, scale);
+        if (yRotation != 0) {
+            poseStack.mulPose(Axis.YP.rotationDegrees(yRotation));
+        }
+        poseStack.mulPose(Axis.XP.rotationDegrees(90));
+
+        itemRenderer.renderStatic(stack, ItemDisplayContext.FIXED, packedLight, packedOverlay,
+                poseStack, bufferSource, level, 0);
+
+        poseStack.popPose();
+
+        if (stack.getCount() > 1 && HorsePowerConfig.renderItemAmount.get()) {
+            renderItemCountBillboard(poseStack, bufferSource, font, packedLight,
+                    stack.getCount(), x, countY, z);
+        }
+    }
+
+    public static void renderStandingItem(PoseStack poseStack, MultiBufferSource bufferSource,
+                                           ItemRenderer itemRenderer, Font font, ItemStack stack,
+                                           double x, double y, double z, float scale, float yRotation,
+                                           int packedLight, int packedOverlay, Level level, double countY) {
+        if (stack.isEmpty()) return;
+
+        poseStack.pushPose();
+        poseStack.translate(x, y, z);
+        poseStack.scale(scale, scale, scale);
+        if (yRotation != 0) {
+            poseStack.mulPose(Axis.YP.rotationDegrees(yRotation));
+        }
+
+        itemRenderer.renderStatic(stack, ItemDisplayContext.FIXED, packedLight, packedOverlay,
+                poseStack, bufferSource, level, 0);
+
+        poseStack.popPose();
+
+        if (stack.getCount() > 1 && HorsePowerConfig.renderItemAmount.get()) {
+            renderItemCountBillboard(poseStack, bufferSource, font, packedLight,
+                    stack.getCount(), x, countY, z);
+        }
     }
 
     /**

@@ -75,22 +75,10 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
         Direction facing = state.getValue(BlockChopper.FACING);
         float rotation = getRotation(facing);
 
-        // Render input item on the chopping surface (oak slab top is at Y=0.5)
-        if (!input.isEmpty()) {
-            poseStack.pushPose();
-            poseStack.translate(0.5D, 0.52D, 0.5D);
-            poseStack.scale(0.6F, 0.6F, 0.6F);
-            poseStack.mulPose(Axis.YP.rotationDegrees(rotation));
-            poseStack.mulPose(Axis.XP.rotationDegrees(90));
-
-            itemRenderer.renderStatic(input, ItemDisplayContext.FIXED, packedLight, packedOverlay,
-                    poseStack, bufferSource, blockEntity.getLevel(), 0);
-            poseStack.popPose();
-
-            if (input.getCount() > 1 && HorsePowerConfig.renderItemAmount.get()) {
-                RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, input.getCount(), 0.5D, 0.85D, 0.5D);
-            }
-        }
+        // Log stands upright on the chopping surface so the blade cleaves it like a real axe chop.
+        RenderUtils.renderStandingItem(poseStack, bufferSource, itemRenderer, font,
+                input, 0.5, 0.71, 0.5, 0.6F, rotation, packedLight, packedOverlay,
+                blockEntity.getLevel(), 1.05);
 
         // Render output item
         if (!output.isEmpty()) {

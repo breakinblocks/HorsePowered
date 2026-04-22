@@ -1,7 +1,12 @@
 package com.breakinblocks.horsepowered.blocks;
 
 import com.breakinblocks.horsepowered.HorsePowerMod;
-import com.breakinblocks.horsepowered.blockentity.*;
+import com.breakinblocks.horsepowered.blockentity.ChopperBlockEntity;
+import com.breakinblocks.horsepowered.blockentity.FillerBlockEntity;
+import com.breakinblocks.horsepowered.blockentity.GrindstoneBlockEntity;
+import com.breakinblocks.horsepowered.blockentity.HandGrindstoneBlockEntity;
+import com.breakinblocks.horsepowered.blockentity.ManualChopperBlockEntity;
+import com.breakinblocks.horsepowered.blockentity.PressBlockEntity;
 import com.breakinblocks.horsepowered.fluids.ModFluids;
 import com.breakinblocks.horsepowered.items.ModItems;
 import net.minecraft.core.registries.Registries;
