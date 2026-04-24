@@ -101,6 +101,10 @@ public class BlockFiller extends Block implements EntityBlock {
     }
 
     @Override
+    public void spawnDestroyParticles(Level level, Player player, BlockPos pos, BlockState state) {
+    }
+
+    @Override
     public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
         BlockPos filledPos = pos.relative(state.getValue(FACING));
         BlockState filledState = level.getBlockState(filledPos);
