@@ -74,7 +74,10 @@ public class HandGrindstoneBlockEntity extends HPBlockEntityBase {
         if (level == null) return Optional.empty();
         SimpleContainer container = new SimpleContainer(getItem(0));
         return level.getRecipeManager()
-                .getRecipeFor(HPRecipes.GRINDING_TYPE.get(), container, level);
+                .getAllRecipesFor(HPRecipes.GRINDING_TYPE.get()).stream()
+                .filter(r -> r.getTier().allowsHand())
+                .filter(r -> r.matches(container, level))
+                .findFirst();
     }
 
     private void millItem() {
@@ -116,8 +119,9 @@ public class HandGrindstoneBlockEntity extends HPBlockEntityBase {
 
         SimpleContainer container = new SimpleContainer(stack);
         return level.getRecipeManager()
-                .getRecipeFor(HPRecipes.GRINDING_TYPE.get(), container, level)
-                .isPresent();
+                .getAllRecipesFor(HPRecipes.GRINDING_TYPE.get()).stream()
+                .filter(r -> r.getTier().allowsHand())
+                .anyMatch(r -> r.matches(container, level));
     }
 
     @Override

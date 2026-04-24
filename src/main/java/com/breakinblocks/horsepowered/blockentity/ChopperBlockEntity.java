@@ -58,8 +58,9 @@ public class ChopperBlockEntity extends HPBlockEntityHorseBase {
 
         SimpleContainer container = new SimpleContainer(stack);
         return level.getRecipeManager()
-                .getRecipeFor(HPRecipes.CHOPPING_TYPE.get(), container, level)
-                .isPresent();
+                .getAllRecipesFor(HPRecipes.CHOPPING_TYPE.get()).stream()
+                .filter(r -> r.getTier().allowsHorse())
+                .anyMatch(r -> r.matches(container, level));
     }
 
     @Override
@@ -119,7 +120,10 @@ public class ChopperBlockEntity extends HPBlockEntityHorseBase {
         if (level == null) return Optional.empty();
         SimpleContainer container = new SimpleContainer(getItem(0));
         return level.getRecipeManager()
-                .getRecipeFor(HPRecipes.CHOPPING_TYPE.get(), container, level);
+                .getAllRecipesFor(HPRecipes.CHOPPING_TYPE.get()).stream()
+                .filter(r -> r.getTier().allowsHorse())
+                .filter(r -> r.matches(container, level))
+                .findFirst();
     }
 
     @Override

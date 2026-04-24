@@ -23,14 +23,16 @@ public class GrindstoneRecipe implements Recipe<Container> {
     private final ItemStack secondary;
     private final int secondaryChance;
     private final int time;
+    private final RecipeTier tier;
 
-    public GrindstoneRecipe(ResourceLocation id, Ingredient ingredient, ItemStack result, ItemStack secondary, int secondaryChance, int time) {
+    public GrindstoneRecipe(ResourceLocation id, Ingredient ingredient, ItemStack result, ItemStack secondary, int secondaryChance, int time, RecipeTier tier) {
         this.id = id;
         this.ingredient = ingredient;
         this.result = result;
         this.secondary = secondary;
         this.secondaryChance = Math.max(0, Math.min(100, secondaryChance));
         this.time = time;
+        this.tier = tier;
     }
 
     @Override
@@ -96,6 +98,10 @@ public class GrindstoneRecipe implements Recipe<Container> {
         return time;
     }
 
+    public RecipeTier getTier() {
+        return tier;
+    }
+
     public static class Serializer implements RecipeSerializer<GrindstoneRecipe> {
 
         @Override
@@ -107,7 +113,8 @@ public class GrindstoneRecipe implements Recipe<Container> {
                 : ItemStack.EMPTY;
             int secondaryChance = GsonHelper.getAsInt(json, "secondaryChance", 0);
             int time = GsonHelper.getAsInt(json, "time");
-            return new GrindstoneRecipe(recipeId, ingredient, result, secondary, secondaryChance, time);
+            RecipeTier tier = RecipeTier.fromString(GsonHelper.getAsString(json, "tier", "any"));
+            return new GrindstoneRecipe(recipeId, ingredient, result, secondary, secondaryChance, time, tier);
         }
 
         @Override
@@ -117,7 +124,8 @@ public class GrindstoneRecipe implements Recipe<Container> {
             ItemStack secondary = buffer.readItem();
             int secondaryChance = buffer.readInt();
             int time = buffer.readInt();
-            return new GrindstoneRecipe(recipeId, ingredient, result, secondary, secondaryChance, time);
+            RecipeTier tier = buffer.readEnum(RecipeTier.class);
+            return new GrindstoneRecipe(recipeId, ingredient, result, secondary, secondaryChance, time, tier);
         }
 
         @Override
@@ -127,6 +135,7 @@ public class GrindstoneRecipe implements Recipe<Container> {
             buffer.writeItem(recipe.secondary);
             buffer.writeInt(recipe.secondaryChance);
             buffer.writeInt(recipe.time);
+            buffer.writeEnum(recipe.tier);
         }
     }
 }

@@ -21,12 +21,14 @@ public class ChoppingRecipe implements Recipe<Container> {
     private final Ingredient ingredient;
     private final ItemStack result;
     private final int time;
+    private final RecipeTier tier;
 
-    public ChoppingRecipe(ResourceLocation id, Ingredient ingredient, ItemStack result, int time) {
+    public ChoppingRecipe(ResourceLocation id, Ingredient ingredient, ItemStack result, int time, RecipeTier tier) {
         this.id = id;
         this.ingredient = ingredient;
         this.result = result;
         this.time = time;
+        this.tier = tier;
     }
 
     @Override
@@ -84,6 +86,10 @@ public class ChoppingRecipe implements Recipe<Container> {
         return time;
     }
 
+    public RecipeTier getTier() {
+        return tier;
+    }
+
     public static class Serializer implements RecipeSerializer<ChoppingRecipe> {
 
         @Override
@@ -91,7 +97,8 @@ public class ChoppingRecipe implements Recipe<Container> {
             Ingredient ingredient = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "ingredient"));
             ItemStack result = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "result"));
             int time = GsonHelper.getAsInt(json, "time");
-            return new ChoppingRecipe(recipeId, ingredient, result, time);
+            RecipeTier tier = RecipeTier.fromString(GsonHelper.getAsString(json, "tier", "any"));
+            return new ChoppingRecipe(recipeId, ingredient, result, time, tier);
         }
 
         @Override
@@ -99,7 +106,8 @@ public class ChoppingRecipe implements Recipe<Container> {
             Ingredient ingredient = Ingredient.fromNetwork(buffer);
             ItemStack result = buffer.readItem();
             int time = buffer.readInt();
-            return new ChoppingRecipe(recipeId, ingredient, result, time);
+            RecipeTier tier = buffer.readEnum(RecipeTier.class);
+            return new ChoppingRecipe(recipeId, ingredient, result, time, tier);
         }
 
         @Override
@@ -107,6 +115,7 @@ public class ChoppingRecipe implements Recipe<Container> {
             recipe.ingredient.toNetwork(buffer);
             buffer.writeItem(recipe.result);
             buffer.writeInt(recipe.time);
+            buffer.writeEnum(recipe.tier);
         }
     }
 }
