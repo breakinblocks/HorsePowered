@@ -22,13 +22,15 @@ public class ChoppingRecipe implements Recipe<Container> {
     private final ItemStack result;
     private final int time;
     private final RecipeTier tier;
+    private final int priority;
 
-    public ChoppingRecipe(ResourceLocation id, Ingredient ingredient, ItemStack result, int time, RecipeTier tier) {
+    public ChoppingRecipe(ResourceLocation id, Ingredient ingredient, ItemStack result, int time, RecipeTier tier, int priority) {
         this.id = id;
         this.ingredient = ingredient;
         this.result = result;
         this.time = time;
         this.tier = tier;
+        this.priority = priority;
     }
 
     @Override
@@ -90,6 +92,10 @@ public class ChoppingRecipe implements Recipe<Container> {
         return tier;
     }
 
+    public int getPriority() {
+        return priority;
+    }
+
     public static class Serializer implements RecipeSerializer<ChoppingRecipe> {
 
         @Override
@@ -98,7 +104,8 @@ public class ChoppingRecipe implements Recipe<Container> {
             ItemStack result = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "result"));
             int time = GsonHelper.getAsInt(json, "time");
             RecipeTier tier = RecipeTier.fromString(GsonHelper.getAsString(json, "tier", "any"));
-            return new ChoppingRecipe(recipeId, ingredient, result, time, tier);
+            int priority = GsonHelper.getAsInt(json, "priority", 0);
+            return new ChoppingRecipe(recipeId, ingredient, result, time, tier, priority);
         }
 
         @Override
@@ -107,7 +114,8 @@ public class ChoppingRecipe implements Recipe<Container> {
             ItemStack result = buffer.readItem();
             int time = buffer.readInt();
             RecipeTier tier = buffer.readEnum(RecipeTier.class);
-            return new ChoppingRecipe(recipeId, ingredient, result, time, tier);
+            int priority = buffer.readInt();
+            return new ChoppingRecipe(recipeId, ingredient, result, time, tier, priority);
         }
 
         @Override
@@ -116,6 +124,7 @@ public class ChoppingRecipe implements Recipe<Container> {
             buffer.writeItem(recipe.result);
             buffer.writeInt(recipe.time);
             buffer.writeEnum(recipe.tier);
+            buffer.writeInt(recipe.priority);
         }
     }
 }

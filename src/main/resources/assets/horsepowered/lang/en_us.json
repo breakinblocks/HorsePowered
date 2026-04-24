@@ -13,8 +13,16 @@
   "block.horsepowered.filler": "Filler",
 
   "gui.horsepowered.jei.grinding": "Horse Grinding",
+  "gui.horsepowered.jei.grinding_hand": "Hand Grinding",
   "gui.horsepowered.jei.chopping": "Horse Chopping",
+  "gui.horsepowered.jei.chopping_hand": "Hand Chopping",
   "gui.horsepowered.jei.pressing": "Horse Pressing",
+
+  "emi.category.horsepowered.grinding": "Horse Grinding",
+  "emi.category.horsepowered.grinding_hand": "Hand Grinding",
+  "emi.category.horsepowered.chopping": "Horse Chopping",
+  "emi.category.horsepowered.chopping_hand": "Hand Chopping",
+  "emi.category.horsepowered.pressing": "Horse Pressing",
   "gui.horsepowered.jei.time": "Time: %s",
   "gui.horsepowered.jei.chops": "Chops: %s",
   "gui.horsepowered.jei.chance": "%s%% chance",

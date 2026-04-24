@@ -18,6 +18,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeManager;
 
+import java.util.Comparator;
 import java.util.List;
 
 @JeiPlugin
@@ -27,9 +28,13 @@ public class HorsePowerPlugin implements IModPlugin {
 
     public static final RecipeType<GrindstoneRecipe> GRINDING_TYPE =
             RecipeType.create(Reference.MODID, "grinding", GrindstoneRecipe.class);
+    public static final RecipeType<GrindstoneRecipe> GRINDING_HAND_TYPE =
+            RecipeType.create(Reference.MODID, "grinding_hand", GrindstoneRecipe.class);
 
     public static final RecipeType<ChoppingRecipe> CHOPPING_TYPE =
             RecipeType.create(Reference.MODID, "chopping", ChoppingRecipe.class);
+    public static final RecipeType<ChoppingRecipe> CHOPPING_HAND_TYPE =
+            RecipeType.create(Reference.MODID, "chopping_hand", ChoppingRecipe.class);
 
     public static final RecipeType<PressRecipe> PRESSING_TYPE =
             RecipeType.create(Reference.MODID, "pressing", PressRecipe.class);
@@ -44,8 +49,10 @@ public class HorsePowerPlugin implements IModPlugin {
         IGuiHelper guiHelper = registration.getJeiHelpers().getGuiHelper();
 
         registration.addRecipeCategories(
-                new HorsePowerGrindingCategory(guiHelper),
-                new HorsePowerChoppingCategory(guiHelper),
+                new HorsePowerGrindingCategory(guiHelper, GRINDING_TYPE, ModBlocks.GRINDSTONE.get(), "gui.horsepowered.jei.grinding"),
+                new HorsePowerGrindingCategory(guiHelper, GRINDING_HAND_TYPE, ModBlocks.HAND_GRINDSTONE.get(), "gui.horsepowered.jei.grinding_hand"),
+                new HorsePowerChoppingCategory(guiHelper, CHOPPING_TYPE, ModBlocks.CHOPPER.get(), "gui.horsepowered.jei.chopping"),
+                new HorsePowerChoppingCategory(guiHelper, CHOPPING_HAND_TYPE, ModBlocks.CHOPPING_BLOCK.get(), "gui.horsepowered.jei.chopping_hand"),
                 new HorsePowerPressCategory(guiHelper)
         );
     }
@@ -54,36 +61,41 @@ public class HorsePowerPlugin implements IModPlugin {
     public void registerRecipes(IRecipeRegistration registration) {
         RecipeManager recipeManager = Minecraft.getInstance().level.getRecipeManager();
 
-        // Grinding recipes
-        List<GrindstoneRecipe> grindingRecipes = recipeManager.getAllRecipesFor(HPRecipes.GRINDING_TYPE.get())
-                .stream()
-                .toList();
-        registration.addRecipes(GRINDING_TYPE, grindingRecipes);
+        Comparator<GrindstoneRecipe> grindingOrder = Comparator
+                .comparingInt(GrindstoneRecipe::getPriority).reversed()
+                .thenComparing(r -> r.getId().toString());
+        Comparator<ChoppingRecipe> choppingOrder = Comparator
+                .comparingInt(ChoppingRecipe::getPriority).reversed()
+                .thenComparing(r -> r.getId().toString());
+        Comparator<PressRecipe> pressingOrder = Comparator
+                .comparingInt(PressRecipe::getPriority).reversed()
+                .thenComparing(r -> r.getId().toString());
 
-        // Chopping recipes
-        List<ChoppingRecipe> choppingRecipes = recipeManager.getAllRecipesFor(HPRecipes.CHOPPING_TYPE.get())
-                .stream()
-                .toList();
-        registration.addRecipes(CHOPPING_TYPE, choppingRecipes);
+        List<GrindstoneRecipe> allGrinding = recipeManager.getAllRecipesFor(HPRecipes.GRINDING_TYPE.get());
+        registration.addRecipes(GRINDING_TYPE, allGrinding.stream()
+                .filter(r -> r.getTier().allowsHorse()).sorted(grindingOrder).toList());
+        registration.addRecipes(GRINDING_HAND_TYPE, allGrinding.stream()
+                .filter(r -> r.getTier().allowsHand()).sorted(grindingOrder).toList());
 
-        // Pressing recipes
-        List<PressRecipe> pressingRecipes = recipeManager.getAllRecipesFor(HPRecipes.PRESSING_TYPE.get())
-                .stream()
-                .toList();
-        registration.addRecipes(PRESSING_TYPE, pressingRecipes);
+        List<ChoppingRecipe> allChopping = recipeManager.getAllRecipesFor(HPRecipes.CHOPPING_TYPE.get());
+        registration.addRecipes(CHOPPING_TYPE, allChopping.stream()
+                .filter(r -> r.getTier().allowsHorse()).sorted(choppingOrder).toList());
+        registration.addRecipes(CHOPPING_HAND_TYPE, allChopping.stream()
+                .filter(r -> r.getTier().allowsHand()).sorted(choppingOrder).toList());
+
+        registration.addRecipes(PRESSING_TYPE,
+                recipeManager.getAllRecipesFor(HPRecipes.PRESSING_TYPE.get()).stream()
+                        .sorted(pressingOrder).toList());
     }
 
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-        // Grinding catalysts
-        registration.addRecipeCatalyst(new ItemStack(ModBlocks.HAND_GRINDSTONE.get()), GRINDING_TYPE);
+        registration.addRecipeCatalyst(new ItemStack(ModBlocks.HAND_GRINDSTONE.get()), GRINDING_HAND_TYPE);
         registration.addRecipeCatalyst(new ItemStack(ModBlocks.GRINDSTONE.get()), GRINDING_TYPE);
 
-        // Chopping catalysts
-        registration.addRecipeCatalyst(new ItemStack(ModBlocks.CHOPPING_BLOCK.get()), CHOPPING_TYPE);
+        registration.addRecipeCatalyst(new ItemStack(ModBlocks.CHOPPING_BLOCK.get()), CHOPPING_HAND_TYPE);
         registration.addRecipeCatalyst(new ItemStack(ModBlocks.CHOPPER.get()), CHOPPING_TYPE);
 
-        // Pressing catalysts
         registration.addRecipeCatalyst(new ItemStack(ModBlocks.PRESS.get()), PRESSING_TYPE);
     }
 }

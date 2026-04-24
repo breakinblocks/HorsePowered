@@ -26,13 +26,15 @@ public class PressRecipe implements Recipe<Container> {
     private final int inputCount;
     private final ItemStack result;
     private final FluidStack fluidResult;
+    private final int priority;
 
-    public PressRecipe(ResourceLocation id, Ingredient ingredient, int inputCount, ItemStack result, FluidStack fluidResult) {
+    public PressRecipe(ResourceLocation id, Ingredient ingredient, int inputCount, ItemStack result, FluidStack fluidResult, int priority) {
         this.id = id;
         this.ingredient = ingredient;
         this.inputCount = inputCount;
         this.result = result;
         this.fluidResult = fluidResult;
+        this.priority = priority;
     }
 
     @Override
@@ -99,6 +101,10 @@ public class PressRecipe implements Recipe<Container> {
         return !fluidResult.isEmpty();
     }
 
+    public int getPriority() {
+        return priority;
+    }
+
     public static class Serializer implements RecipeSerializer<PressRecipe> {
 
         @Override
@@ -118,7 +124,8 @@ public class PressRecipe implements Recipe<Container> {
                     fluidResult = new FluidStack(fluid, amount);
                 }
             }
-            return new PressRecipe(recipeId, ingredient, inputCount, result, fluidResult);
+            int priority = GsonHelper.getAsInt(json, "priority", 0);
+            return new PressRecipe(recipeId, ingredient, inputCount, result, fluidResult, priority);
         }
 
         @Override
@@ -127,7 +134,8 @@ public class PressRecipe implements Recipe<Container> {
             int inputCount = buffer.readInt();
             ItemStack result = buffer.readItem();
             FluidStack fluidResult = buffer.readFluidStack();
-            return new PressRecipe(recipeId, ingredient, inputCount, result, fluidResult);
+            int priority = buffer.readInt();
+            return new PressRecipe(recipeId, ingredient, inputCount, result, fluidResult, priority);
         }
 
         @Override
@@ -136,6 +144,7 @@ public class PressRecipe implements Recipe<Container> {
             buffer.writeInt(recipe.inputCount);
             buffer.writeItem(recipe.result);
             buffer.writeFluidStack(recipe.fluidResult);
+            buffer.writeInt(recipe.priority);
         }
     }
 }
