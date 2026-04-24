@@ -25,8 +25,8 @@ public class BlockChopper extends BlockHPBase {
 
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
-    // Bottom block shape only - filler block handles the top
-    private static final VoxelShape SHAPE = Block.box(0, 0, 0, 16, 16, 16);
+    private static final VoxelShape SHAPE = Block.box(0, 0, 0, 16, 32, 16);
+    private static final VoxelShape COLLISION_SHAPE = Block.box(0, 0, 0, 16, 16, 16);
 
     public BlockChopper(Properties properties) {
         super(properties);
@@ -69,6 +69,11 @@ public class BlockChopper extends BlockHPBase {
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return SHAPE;
+    }
+
+    @Override
+    public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        return COLLISION_SHAPE;
     }
 
     @Override

@@ -54,8 +54,8 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
     maven {
-        name = "Progwml6 maven"
-        url = "https://dvs1.progwml6.com/files/maven/"
+        name = "BlameJared"
+        url = "https://maven.blamejared.com"
     }
     maven {
         name = "CurseForge"
@@ -80,9 +80,9 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
-    // JEI (via CurseForge Maven - file ID 4712868 is JEI 15.3.0.4 for Forge 1.20.1)
-    compileOnly fg.deobf("curse.maven:jei-238222:4712868")
-    runtimeOnly fg.deobf("curse.maven:jei-238222:4712868")
+    compileOnly fg.deobf("mezz.jei:jei-1.20.1-common-api:${jei_version}")
+    compileOnly fg.deobf("mezz.jei:jei-1.20.1-forge-api:${jei_version}")
+    runtimeOnly fg.deobf("mezz.jei:jei-1.20.1-forge:${jei_version}")
 
     // Jade (via CurseForge Maven - file ID 6855440 is Jade 11.13.2 for Forge 1.20.1)
     compileOnly fg.deobf("curse.maven:jade-324717:6855440")

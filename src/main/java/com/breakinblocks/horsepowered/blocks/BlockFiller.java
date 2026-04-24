@@ -10,6 +10,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.WorldlyContainerHolder;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
@@ -29,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
  * A filler block for multi-block structures (like the chopper).
  * Delegates all interactions to the main block it's paired with.
  */
-public class BlockFiller extends Block implements EntityBlock {
+public class BlockFiller extends Block implements EntityBlock, WorldlyContainerHolder {
 
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
 
@@ -50,8 +52,7 @@ public class BlockFiller extends Block implements EntityBlock {
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        // Use standard block shape - don't delegate to avoid shape offset issues
-        return Shapes.block();
+        return Shapes.empty();
     }
 
     @Override
@@ -118,5 +119,12 @@ public class BlockFiller extends Block implements EntityBlock {
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new FillerBlockEntity(pos, state);
+    }
+
+    @Override
+    public WorldlyContainer getContainer(BlockState state, LevelAccessor level, BlockPos pos) {
+        BlockPos filledPos = pos.relative(state.getValue(FACING));
+        BlockEntity be = level.getBlockEntity(filledPos);
+        return be instanceof WorldlyContainer container ? container : null;
     }
 }
