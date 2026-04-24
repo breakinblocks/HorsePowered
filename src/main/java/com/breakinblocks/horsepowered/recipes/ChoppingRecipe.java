@@ -15,10 +15,14 @@ import net.minecraft.world.item.crafting.RecipeType;
 public class ChoppingRecipe extends BaseHPRecipe {
 
     private final int time;
+    private final RecipeTier tier;
+    private final int priority;
 
-    public ChoppingRecipe(Ingredient ingredient, ItemStackTemplate result, int time) {
+    public ChoppingRecipe(Ingredient ingredient, ItemStackTemplate result, int time, RecipeTier tier, int priority) {
         super(ingredient, result);
         this.time = time;
+        this.tier = tier;
+        this.priority = priority;
     }
 
     @Override
@@ -40,12 +44,21 @@ public class ChoppingRecipe extends BaseHPRecipe {
         return time;
     }
 
-    // Codecs - use ItemStackTemplate.CODEC to avoid bound-component issues during recipe loading
+    public RecipeTier getTier() {
+        return tier;
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+
     public static final MapCodec<ChoppingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance ->
             instance.group(
                     Ingredient.CODEC.fieldOf("ingredient").forGetter(ChoppingRecipe::getIngredient),
                     ItemStackTemplate.CODEC.fieldOf("result").forGetter(ChoppingRecipe::getResult),
-                    Codec.INT.fieldOf("time").forGetter(ChoppingRecipe::getTime)
+                    Codec.INT.fieldOf("time").forGetter(ChoppingRecipe::getTime),
+                    RecipeTier.CODEC.optionalFieldOf("tier", RecipeTier.ANY).forGetter(ChoppingRecipe::getTier),
+                    Codec.INT.optionalFieldOf("priority", 0).forGetter(ChoppingRecipe::getPriority)
             ).apply(instance, ChoppingRecipe::new)
     );
 
@@ -53,6 +66,8 @@ public class ChoppingRecipe extends BaseHPRecipe {
             Ingredient.CONTENTS_STREAM_CODEC, ChoppingRecipe::getIngredient,
             ItemStackTemplate.STREAM_CODEC, ChoppingRecipe::getResult,
             ByteBufCodecs.VAR_INT, ChoppingRecipe::getTime,
+            RecipeTier.STREAM_CODEC, ChoppingRecipe::getTier,
+            ByteBufCodecs.VAR_INT, ChoppingRecipe::getPriority,
             ChoppingRecipe::new
     );
 }

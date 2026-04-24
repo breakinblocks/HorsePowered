@@ -58,7 +58,7 @@ public class ManualChopperBlockEntity extends HPBlockEntityBase {
         // Recipe lookup is server-only; on the client, allow insertion so the
         // interaction isn't blocked (server will do the authoritative check)
         if (level != null && level.isClientSide()) return true;
-        return findRecipe(HPRecipes.CHOPPING_TYPE.get(), stack).isPresent();
+        return findRecipe(HPRecipes.CHOPPING_TYPE.get(), stack, r -> r.getTier().allowsHand()).isPresent();
     }
 
     // Returns true when the chop consumed the input (recipe completed).
@@ -113,7 +113,7 @@ public class ManualChopperBlockEntity extends HPBlockEntityBase {
     }
 
     public Optional<RecipeHolder<ChoppingRecipe>> getRecipe() {
-        return findRecipe(HPRecipes.CHOPPING_TYPE.get(), getItem(0));
+        return findRecipe(HPRecipes.CHOPPING_TYPE.get(), getItem(0), r -> r.getTier().allowsHand());
     }
 
     @Override

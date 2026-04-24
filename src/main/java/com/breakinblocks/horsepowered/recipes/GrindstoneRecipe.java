@@ -21,13 +21,18 @@ public class GrindstoneRecipe extends BaseHPRecipe {
     private final @Nullable ItemStackTemplate secondary;
     private final int secondaryChance;
     private final int time;
+    private final RecipeTier tier;
+    private final int priority;
 
     public GrindstoneRecipe(Ingredient ingredient, ItemStackTemplate result,
-                            Optional<ItemStackTemplate> secondary, int secondaryChance, int time) {
+                            Optional<ItemStackTemplate> secondary, int secondaryChance, int time,
+                            RecipeTier tier, int priority) {
         super(ingredient, result);
         this.secondary = secondary.orElse(null);
         this.secondaryChance = Math.max(0, Math.min(100, secondaryChance));
         this.time = time;
+        this.tier = tier;
+        this.priority = priority;
     }
 
     @Override
@@ -49,10 +54,6 @@ public class GrindstoneRecipe extends BaseHPRecipe {
         return secondary;
     }
 
-    /**
-     * Creates a new ItemStack from the secondary template.
-     * Safe to call at runtime when item components are bound.
-     */
     public ItemStack createSecondary() {
         return secondary != null ? secondary.create() : ItemStack.EMPTY;
     }
@@ -65,23 +66,48 @@ public class GrindstoneRecipe extends BaseHPRecipe {
         return time;
     }
 
-    // Codecs - use ItemStackTemplate.CODEC to avoid bound-component issues during recipe loading
+    public RecipeTier getTier() {
+        return tier;
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+
     public static final MapCodec<GrindstoneRecipe> CODEC = RecordCodecBuilder.mapCodec(instance ->
             instance.group(
                     Ingredient.CODEC.fieldOf("ingredient").forGetter(GrindstoneRecipe::getIngredient),
                     ItemStackTemplate.CODEC.fieldOf("result").forGetter(GrindstoneRecipe::getResult),
                     ItemStackTemplate.CODEC.optionalFieldOf("secondary").forGetter(r -> Optional.ofNullable(r.getSecondaryTemplate())),
                     Codec.INT.optionalFieldOf("secondaryChance", 0).forGetter(GrindstoneRecipe::getSecondaryChance),
-                    Codec.INT.fieldOf("time").forGetter(GrindstoneRecipe::getTime)
+                    Codec.INT.fieldOf("time").forGetter(GrindstoneRecipe::getTime),
+                    RecipeTier.CODEC.optionalFieldOf("tier", RecipeTier.ANY).forGetter(GrindstoneRecipe::getTier),
+                    Codec.INT.optionalFieldOf("priority", 0).forGetter(GrindstoneRecipe::getPriority)
             ).apply(instance, GrindstoneRecipe::new)
     );
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, GrindstoneRecipe> STREAM_CODEC = StreamCodec.composite(
-            Ingredient.CONTENTS_STREAM_CODEC, GrindstoneRecipe::getIngredient,
-            ItemStackTemplate.STREAM_CODEC, GrindstoneRecipe::getResult,
-            ByteBufCodecs.optional(ItemStackTemplate.STREAM_CODEC), r -> Optional.ofNullable(r.getSecondaryTemplate()),
-            ByteBufCodecs.VAR_INT, GrindstoneRecipe::getSecondaryChance,
-            ByteBufCodecs.VAR_INT, GrindstoneRecipe::getTime,
-            GrindstoneRecipe::new
-    );
+    public static final StreamCodec<RegistryFriendlyByteBuf, GrindstoneRecipe> STREAM_CODEC = new StreamCodec<>() {
+        @Override
+        public GrindstoneRecipe decode(RegistryFriendlyByteBuf buf) {
+            Ingredient ingredient = Ingredient.CONTENTS_STREAM_CODEC.decode(buf);
+            ItemStackTemplate result = ItemStackTemplate.STREAM_CODEC.decode(buf);
+            Optional<ItemStackTemplate> secondary = ByteBufCodecs.optional(ItemStackTemplate.STREAM_CODEC).decode(buf);
+            int secondaryChance = ByteBufCodecs.VAR_INT.decode(buf);
+            int time = ByteBufCodecs.VAR_INT.decode(buf);
+            RecipeTier tier = RecipeTier.STREAM_CODEC.decode(buf);
+            int priority = ByteBufCodecs.VAR_INT.decode(buf);
+            return new GrindstoneRecipe(ingredient, result, secondary, secondaryChance, time, tier, priority);
+        }
+
+        @Override
+        public void encode(RegistryFriendlyByteBuf buf, GrindstoneRecipe recipe) {
+            Ingredient.CONTENTS_STREAM_CODEC.encode(buf, recipe.getIngredient());
+            ItemStackTemplate.STREAM_CODEC.encode(buf, recipe.getResult());
+            ByteBufCodecs.optional(ItemStackTemplate.STREAM_CODEC).encode(buf, Optional.ofNullable(recipe.getSecondaryTemplate()));
+            ByteBufCodecs.VAR_INT.encode(buf, recipe.getSecondaryChance());
+            ByteBufCodecs.VAR_INT.encode(buf, recipe.getTime());
+            RecipeTier.STREAM_CODEC.encode(buf, recipe.getTier());
+            ByteBufCodecs.VAR_INT.encode(buf, recipe.getPriority());
+        }
+    };
 }

@@ -63,7 +63,7 @@ public class ChopperBlockEntity extends HPBlockEntityHorseBase {
         // Recipe lookup is server-only; on the client, allow insertion so the
         // interaction isn't blocked (server will do the authoritative check)
         if (level != null && level.isClientSide()) return true;
-        return findRecipe(HPRecipes.CHOPPING_TYPE.get(), stack).isPresent();
+        return findRecipe(HPRecipes.CHOPPING_TYPE.get(), stack, r -> r.getTier().allowsHorse()).isPresent();
     }
 
     @Override
@@ -130,7 +130,7 @@ public class ChopperBlockEntity extends HPBlockEntityHorseBase {
     }
 
     public Optional<RecipeHolder<ChoppingRecipe>> getRecipe() {
-        return findRecipe(HPRecipes.CHOPPING_TYPE.get(), getItem(0));
+        return findRecipe(HPRecipes.CHOPPING_TYPE.get(), getItem(0), r -> r.getTier().allowsHorse());
     }
 
     @Override

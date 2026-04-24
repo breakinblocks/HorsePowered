@@ -83,7 +83,7 @@ public class GrindstoneBlockEntity extends HPBlockEntityHorseBase {
     }
 
     public Optional<RecipeHolder<GrindstoneRecipe>> getRecipe() {
-        return findRecipe(HPRecipes.GRINDING_TYPE.get(), getItem(0));
+        return findRecipe(HPRecipes.GRINDING_TYPE.get(), getItem(0), r -> r.getTier().allowsHorse());
     }
 
     @Override
@@ -123,7 +123,7 @@ public class GrindstoneBlockEntity extends HPBlockEntityHorseBase {
         // Recipe lookup is server-only; on the client, allow insertion so the
         // interaction isn't blocked (server will do the authoritative check)
         if (level != null && level.isClientSide()) return true;
-        return findRecipe(HPRecipes.GRINDING_TYPE.get(), stack).isPresent();
+        return findRecipe(HPRecipes.GRINDING_TYPE.get(), stack, r -> r.getTier().allowsHorse()).isPresent();
     }
 
     @Override

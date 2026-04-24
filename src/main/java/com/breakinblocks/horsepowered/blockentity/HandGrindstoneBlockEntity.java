@@ -71,7 +71,7 @@ public class HandGrindstoneBlockEntity extends HPBlockEntityBase {
     }
 
     public Optional<RecipeHolder<GrindstoneRecipe>> getRecipe() {
-        return findRecipe(HPRecipes.GRINDING_TYPE.get(), getItem(0));
+        return findRecipe(HPRecipes.GRINDING_TYPE.get(), getItem(0), r -> r.getTier().allowsHand());
     }
 
     private void millItem() {
@@ -114,7 +114,7 @@ public class HandGrindstoneBlockEntity extends HPBlockEntityBase {
         // Recipe lookup is server-only; on the client, allow insertion so the
         // interaction isn't blocked (server will do the authoritative check)
         if (level != null && level.isClientSide()) return true;
-        return findRecipe(HPRecipes.GRINDING_TYPE.get(), stack).isPresent();
+        return findRecipe(HPRecipes.GRINDING_TYPE.get(), stack, r -> r.getTier().allowsHand()).isPresent();
     }
 
     @Override

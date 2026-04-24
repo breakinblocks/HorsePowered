@@ -27,9 +27,9 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 
-import org.slf4j.Logger;
-
 import java.util.Optional;
+import java.util.function.Predicate;
+import org.slf4j.Logger;
 
 public abstract class HPBlockEntityBase extends BlockEntity implements Container, WorldlyContainer {
 
@@ -306,6 +306,21 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
                 LOGGER.debug("[HorsePowered] No recipe found for type {} with input {}", type, input);
             }
             return result;
+        } catch (Exception e) {
+            LOGGER.error("[HorsePowered] Recipe lookup failed for type {} with input {}", type, input, e);
+            return Optional.empty();
+        }
+    }
+
+    protected <T extends Recipe<HPRecipeInput>> Optional<RecipeHolder<T>> findRecipe(RecipeType<T> type, ItemStack input, Predicate<T> filter) {
+        if (!(level instanceof ServerLevel serverLevel)) return Optional.empty();
+        try {
+            HPRecipeInput recipeInput = new HPRecipeInput(input);
+            return ((RecipeManager) serverLevel.recipeAccess()).recipeMap()
+                    .byType(type).stream()
+                    .filter(h -> filter.test(h.value()))
+                    .filter(h -> h.value().matches(recipeInput, level))
+                    .findFirst();
         } catch (Exception e) {
             LOGGER.error("[HorsePowered] Recipe lookup failed for type {} with input {}", type, input, e);
             return Optional.empty();

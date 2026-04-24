@@ -52,8 +52,7 @@ public class BlockFiller extends Block implements EntityBlock {
 
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        // Use standard block shape - don't delegate to avoid shape offset issues
-        return Shapes.block();
+        return Shapes.empty();
     }
 
     @Override

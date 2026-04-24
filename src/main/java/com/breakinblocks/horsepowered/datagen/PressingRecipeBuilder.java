@@ -23,6 +23,7 @@ public class PressingRecipeBuilder {
     private @Nullable SizedFluidIngredient fluidInput;
     private @Nullable ItemStackTemplate result;
     private PressRecipe.@Nullable FluidRef fluidRef;
+    private int priority = 0;
 
     private PressingRecipeBuilder(Ingredient ingredient) {
         this.ingredient = ingredient;
@@ -63,11 +64,16 @@ public class PressingRecipeBuilder {
         return this;
     }
 
+    public PressingRecipeBuilder priority(int priority) {
+        this.priority = priority;
+        return this;
+    }
+
     public void save(RecipeOutput output, String name) {
         ResourceKey<Recipe<?>> key = ResourceKey.create(Registries.RECIPE,
                 HorsePowerMod.id("pressing/" + name));
         output.accept(key, new PressRecipe(ingredient, inputCount,
                 Optional.ofNullable(fluidInput),
-                Optional.ofNullable(result), Optional.ofNullable(fluidRef)), null);
+                Optional.ofNullable(result), Optional.ofNullable(fluidRef), priority), null);
     }
 }

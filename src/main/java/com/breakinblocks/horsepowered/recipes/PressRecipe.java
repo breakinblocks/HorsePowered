@@ -50,14 +50,17 @@ public class PressRecipe extends BaseHPRecipe {
     private final int inputCount;
     private final Optional<SizedFluidIngredient> fluidInput;
     private final Optional<FluidRef> fluidRef;
+    private final int priority;
 
     public PressRecipe(Ingredient ingredient, int inputCount,
                        Optional<SizedFluidIngredient> fluidInput,
-                       Optional<ItemStackTemplate> result, Optional<FluidRef> fluidRef) {
+                       Optional<ItemStackTemplate> result, Optional<FluidRef> fluidRef,
+                       int priority) {
         super(ingredient, result.orElse(null));
         this.inputCount = inputCount;
         this.fluidInput = fluidInput;
         this.fluidRef = fluidRef;
+        this.priority = priority;
     }
 
     @Override
@@ -101,13 +104,18 @@ public class PressRecipe extends BaseHPRecipe {
         return fluidInput.isPresent();
     }
 
+    public int getPriority() {
+        return priority;
+    }
+
     public static final MapCodec<PressRecipe> CODEC = RecordCodecBuilder.mapCodec(instance ->
             instance.group(
                     Ingredient.CODEC.fieldOf("ingredient").forGetter(PressRecipe::getIngredient),
                     Codec.INT.optionalFieldOf("inputCount", 1).forGetter(PressRecipe::getInputCount),
                     SizedFluidIngredient.CODEC.optionalFieldOf("fluidInput").forGetter(PressRecipe::getFluidInput),
                     ItemStackTemplate.CODEC.optionalFieldOf("result").forGetter(r -> Optional.ofNullable(r.getResult())),
-                    FluidRef.CODEC.optionalFieldOf("fluidResult").forGetter(r -> r.fluidRef)
+                    FluidRef.CODEC.optionalFieldOf("fluidResult").forGetter(r -> r.fluidRef),
+                    Codec.INT.optionalFieldOf("priority", 0).forGetter(PressRecipe::getPriority)
             ).apply(instance, PressRecipe::new)
     );
 
@@ -117,6 +125,7 @@ public class PressRecipe extends BaseHPRecipe {
             ByteBufCodecs.optional(SizedFluidIngredient.STREAM_CODEC), PressRecipe::getFluidInput,
             ByteBufCodecs.optional(ItemStackTemplate.STREAM_CODEC), r -> Optional.ofNullable(r.getResult()),
             ByteBufCodecs.optional(FluidRef.STREAM_CODEC), r -> r.fluidRef,
+            ByteBufCodecs.VAR_INT, PressRecipe::getPriority,
             PressRecipe::new
     );
 }
