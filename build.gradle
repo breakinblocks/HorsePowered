@@ -74,6 +74,10 @@ repositories {
             includeGroup "maven.modrinth"
         }
     }
+    maven {
+        name = "Terraformers"
+        url = "https://maven.terraformersmc.com/releases/"
+    }
 }
 
 dependencies {
@@ -85,6 +89,10 @@ dependencies {
     // Jade
     compileOnly "maven.modrinth:jade:${jade_version}+neoforge"
     runtimeOnly "maven.modrinth:jade:${jade_version}+neoforge"
+
+    // EMI
+    compileOnly "dev.emi:emi-neoforge:${emi_version}:api"
+    runtimeOnly "dev.emi:emi-neoforge:${emi_version}"
 }
 
 tasks.named('processResources', ProcessResources).configure {
@@ -147,14 +155,14 @@ publishMods {
         projectSlug = "horsepowered"
         accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
         minecraftVersions.add(minecraft_version)
-        optional("jei", "jade", "guideme")
+        optional("jei", "jade", "guideme", "emi")
     }
 
     modrinth {
         projectId = "cZml36tg"
         accessToken = providers.environmentVariable("MODRINTH_TOKEN")
         minecraftVersions.add(minecraft_version)
-        optional("jei", "jade", "guideme")
+        optional("jei", "jade", "guideme", "emi")
     }
 }
 

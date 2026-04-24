@@ -19,6 +19,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
 
+import java.util.Comparator;
 import java.util.List;
 
 @JeiPlugin
@@ -28,6 +29,9 @@ public class HorsePowerPlugin implements IModPlugin {
 
     public static final RecipeType<GrindstoneRecipe> GRINDING_TYPE =
             RecipeType.create(HorsePowerMod.MOD_ID, "grinding", GrindstoneRecipe.class);
+
+    public static final RecipeType<GrindstoneRecipe> MANUAL_GRINDING_TYPE =
+            RecipeType.create(HorsePowerMod.MOD_ID, "manual_grinding", GrindstoneRecipe.class);
 
     public static final RecipeType<ChoppingRecipe> CHOPPING_TYPE =
             RecipeType.create(HorsePowerMod.MOD_ID, "chopping", ChoppingRecipe.class);
@@ -49,6 +53,7 @@ public class HorsePowerPlugin implements IModPlugin {
 
         registration.addRecipeCategories(
                 new HorsePowerGrindingCategory(guiHelper),
+                new HorsePowerManualGrindingCategory(guiHelper),
                 new HorsePowerChoppingCategory(guiHelper),
                 new HorsePowerManualChoppingCategory(guiHelper),
                 new HorsePowerPressCategory(guiHelper)
@@ -59,42 +64,40 @@ public class HorsePowerPlugin implements IModPlugin {
     public void registerRecipes(IRecipeRegistration registration) {
         RecipeManager recipeManager = Minecraft.getInstance().level.getRecipeManager();
 
-        // Grinding recipes - unwrap from RecipeHolder
-        List<GrindstoneRecipe> grindingRecipes = recipeManager.getAllRecipesFor(HPRecipes.GRINDING_TYPE.get())
-                .stream()
-                .map(RecipeHolder::value)
-                .toList();
-        registration.addRecipes(GRINDING_TYPE, grindingRecipes);
+        Comparator<GrindstoneRecipe> grindingOrder = Comparator
+                .comparingInt(GrindstoneRecipe::getPriority).reversed();
+        Comparator<ChoppingRecipe> choppingOrder = Comparator
+                .comparingInt(ChoppingRecipe::getPriority).reversed();
+        Comparator<PressRecipe> pressingOrder = Comparator
+                .comparingInt(PressRecipe::getPriority).reversed();
 
-        // Chopping recipes - unwrap from RecipeHolder
-        List<ChoppingRecipe> choppingRecipes = recipeManager.getAllRecipesFor(HPRecipes.CHOPPING_TYPE.get())
-                .stream()
-                .map(RecipeHolder::value)
-                .toList();
-        registration.addRecipes(CHOPPING_TYPE, choppingRecipes);
+        List<GrindstoneRecipe> allGrinding = recipeManager.getAllRecipesFor(HPRecipes.GRINDING_TYPE.get())
+                .stream().map(RecipeHolder::value).toList();
+        registration.addRecipes(GRINDING_TYPE, allGrinding.stream()
+                .filter(r -> r.getTier().allowsHorse()).sorted(grindingOrder).toList());
+        registration.addRecipes(MANUAL_GRINDING_TYPE, allGrinding.stream()
+                .filter(r -> r.getTier().allowsHand()).sorted(grindingOrder).toList());
 
-        // Manual chopping uses the same recipes
-        registration.addRecipes(MANUAL_CHOPPING_TYPE, choppingRecipes);
+        List<ChoppingRecipe> allChopping = recipeManager.getAllRecipesFor(HPRecipes.CHOPPING_TYPE.get())
+                .stream().map(RecipeHolder::value).toList();
+        registration.addRecipes(CHOPPING_TYPE, allChopping.stream()
+                .filter(r -> r.getTier().allowsHorse()).sorted(choppingOrder).toList());
+        registration.addRecipes(MANUAL_CHOPPING_TYPE, allChopping.stream()
+                .filter(r -> r.getTier().allowsHand()).sorted(choppingOrder).toList());
 
-        // Pressing recipes - unwrap from RecipeHolder
-        List<PressRecipe> pressingRecipes = recipeManager.getAllRecipesFor(HPRecipes.PRESSING_TYPE.get())
-                .stream()
-                .map(RecipeHolder::value)
-                .toList();
-        registration.addRecipes(PRESSING_TYPE, pressingRecipes);
+        registration.addRecipes(PRESSING_TYPE,
+                recipeManager.getAllRecipesFor(HPRecipes.PRESSING_TYPE.get()).stream()
+                        .map(RecipeHolder::value).sorted(pressingOrder).toList());
     }
 
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-        // Grinding catalysts
-        registration.addRecipeCatalyst(new ItemStack(ModBlocks.HAND_GRINDSTONE.get()), GRINDING_TYPE);
+        registration.addRecipeCatalyst(new ItemStack(ModBlocks.HAND_GRINDSTONE.get()), MANUAL_GRINDING_TYPE);
         registration.addRecipeCatalyst(new ItemStack(ModBlocks.GRINDSTONE.get()), GRINDING_TYPE);
 
-        // Chopping catalysts - manual chopping block shows axe, horse chopper doesn't
         registration.addRecipeCatalyst(new ItemStack(ModBlocks.CHOPPING_BLOCK.get()), MANUAL_CHOPPING_TYPE);
         registration.addRecipeCatalyst(new ItemStack(ModBlocks.CHOPPER.get()), CHOPPING_TYPE);
 
-        // Pressing catalysts
         registration.addRecipeCatalyst(new ItemStack(ModBlocks.PRESS.get()), PRESSING_TYPE);
     }
 }

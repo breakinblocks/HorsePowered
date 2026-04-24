@@ -2,6 +2,7 @@ package com.breakinblocks.horsepowered.datagen;
 
 import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.recipes.GrindstoneRecipe;
+import com.breakinblocks.horsepowered.recipes.RecipeTier;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -14,6 +15,8 @@ public class GrindingRecipeBuilder {
     private ItemStack secondary = ItemStack.EMPTY;
     private int secondaryChance;
     private int time = 12;
+    private RecipeTier tier = RecipeTier.ANY;
+    private int priority = 0;
 
     private GrindingRecipeBuilder(Ingredient ingredient, ItemStack result) {
         this.ingredient = ingredient;
@@ -39,8 +42,18 @@ public class GrindingRecipeBuilder {
         return this;
     }
 
+    public GrindingRecipeBuilder tier(RecipeTier tier) {
+        this.tier = tier;
+        return this;
+    }
+
+    public GrindingRecipeBuilder priority(int priority) {
+        this.priority = priority;
+        return this;
+    }
+
     public void save(RecipeOutput output, String name) {
         ResourceLocation id = HorsePowerMod.id("grinding/" + name);
-        output.accept(id, new GrindstoneRecipe(ingredient, result, secondary, secondaryChance, time), null);
+        output.accept(id, new GrindstoneRecipe(ingredient, result, secondary, secondaryChance, time, tier, priority), null);
     }
 }

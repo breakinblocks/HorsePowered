@@ -20,11 +20,15 @@ public class ChoppingRecipe implements Recipe<HPRecipeInput> {
     private final Ingredient ingredient;
     private final ItemStack result;
     private final int time;
+    private final RecipeTier tier;
+    private final int priority;
 
-    public ChoppingRecipe(Ingredient ingredient, ItemStack result, int time) {
+    public ChoppingRecipe(Ingredient ingredient, ItemStack result, int time, RecipeTier tier, int priority) {
         this.ingredient = ingredient;
         this.result = result;
         this.time = time;
+        this.tier = tier;
+        this.priority = priority;
     }
 
     @Override
@@ -64,7 +68,6 @@ public class ChoppingRecipe implements Recipe<HPRecipeInput> {
         return HPRecipes.CHOPPING_TYPE.get();
     }
 
-    // Accessors
     public Ingredient getIngredient() {
         return ingredient;
     }
@@ -77,13 +80,23 @@ public class ChoppingRecipe implements Recipe<HPRecipeInput> {
         return time;
     }
 
+    public RecipeTier getTier() {
+        return tier;
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+
     public static class Serializer implements RecipeSerializer<ChoppingRecipe> {
 
         public static final MapCodec<ChoppingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance ->
                 instance.group(
                         Ingredient.CODEC_NONEMPTY.fieldOf("ingredient").forGetter(ChoppingRecipe::getIngredient),
                         ItemStack.STRICT_CODEC.fieldOf("result").forGetter(ChoppingRecipe::getResult),
-                        Codec.INT.fieldOf("time").forGetter(ChoppingRecipe::getTime)
+                        Codec.INT.fieldOf("time").forGetter(ChoppingRecipe::getTime),
+                        RecipeTier.CODEC.optionalFieldOf("tier", RecipeTier.ANY).forGetter(ChoppingRecipe::getTier),
+                        Codec.INT.optionalFieldOf("priority", 0).forGetter(ChoppingRecipe::getPriority)
                 ).apply(instance, ChoppingRecipe::new)
         );
 
@@ -91,6 +104,8 @@ public class ChoppingRecipe implements Recipe<HPRecipeInput> {
                 Ingredient.CONTENTS_STREAM_CODEC, ChoppingRecipe::getIngredient,
                 ItemStack.STREAM_CODEC, ChoppingRecipe::getResult,
                 ByteBufCodecs.VAR_INT, ChoppingRecipe::getTime,
+                RecipeTier.STREAM_CODEC, ChoppingRecipe::getTier,
+                ByteBufCodecs.VAR_INT, ChoppingRecipe::getPriority,
                 ChoppingRecipe::new
         );
 

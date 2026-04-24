@@ -55,8 +55,9 @@ public class ManualChopperBlockEntity extends HPBlockEntityBase {
 
         HPRecipeInput input = new HPRecipeInput(stack);
         return level.getRecipeManager()
-                .getRecipeFor(HPRecipes.CHOPPING_TYPE.get(), input, level)
-                .isPresent();
+                .getAllRecipesFor(HPRecipes.CHOPPING_TYPE.get()).stream()
+                .filter(r -> r.value().getTier().allowsHand())
+                .anyMatch(r -> r.value().matches(input, level));
     }
 
     /**
@@ -115,7 +116,10 @@ public class ManualChopperBlockEntity extends HPBlockEntityBase {
         if (level == null) return Optional.empty();
         HPRecipeInput input = new HPRecipeInput(getItem(0));
         return level.getRecipeManager()
-                .getRecipeFor(HPRecipes.CHOPPING_TYPE.get(), input, level);
+                .getAllRecipesFor(HPRecipes.CHOPPING_TYPE.get()).stream()
+                .filter(r -> r.value().getTier().allowsHand())
+                .filter(r -> r.value().matches(input, level))
+                .findFirst();
     }
 
     @Override

@@ -17,6 +17,7 @@ public class PressingRecipeBuilder {
     private int inputCount = 1;
     private ItemStack result = ItemStack.EMPTY;
     private FluidStack fluidResult = FluidStack.EMPTY;
+    private int priority = 0;
 
     private PressingRecipeBuilder(Ingredient ingredient) {
         this.ingredient = ingredient;
@@ -47,8 +48,13 @@ public class PressingRecipeBuilder {
         return fluidResult(fluid, amount);
     }
 
+    public PressingRecipeBuilder priority(int priority) {
+        this.priority = priority;
+        return this;
+    }
+
     public void save(RecipeOutput output, String name) {
         ResourceLocation id = HorsePowerMod.id("pressing/" + name);
-        output.accept(id, new PressRecipe(ingredient, inputCount, result, fluidResult), null);
+        output.accept(id, new PressRecipe(ingredient, inputCount, result, fluidResult, priority), null);
     }
 }
