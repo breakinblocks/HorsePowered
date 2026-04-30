@@ -1,0 +1,10 @@
+{
+  "type": "horsepowered:pressing",
+  "fluidResult": {
+    "amount": 1000,
+    "id": "minecraft:water"
+  },
+  "ingredient": {
+    "item": "minecraft:ice"
+  }
+}

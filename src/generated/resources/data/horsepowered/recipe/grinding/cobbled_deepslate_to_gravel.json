@@ -1,0 +1,11 @@
+{
+  "type": "horsepowered:grinding",
+  "ingredient": {
+    "item": "minecraft:cobbled_deepslate"
+  },
+  "result": {
+    "count": 1,
+    "id": "minecraft:gravel"
+  },
+  "time": 8
+}

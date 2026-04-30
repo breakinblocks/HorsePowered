@@ -1,0 +1,16 @@
+{
+  "type": "horsepowered:grinding",
+  "ingredient": {
+    "item": "minecraft:raw_iron"
+  },
+  "result": {
+    "count": 12,
+    "id": "minecraft:iron_nugget"
+  },
+  "secondary": {
+    "count": 3,
+    "id": "minecraft:iron_nugget"
+  },
+  "secondaryChance": 25,
+  "time": 16
+}

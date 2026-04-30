@@ -1,0 +1,11 @@
+{
+  "type": "horsepowered:grinding",
+  "ingredient": {
+    "item": "minecraft:quartz_block"
+  },
+  "result": {
+    "count": 4,
+    "id": "minecraft:quartz"
+  },
+  "time": 8
+}

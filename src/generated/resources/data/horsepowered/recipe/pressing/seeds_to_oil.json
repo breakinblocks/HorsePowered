@@ -1,0 +1,11 @@
+{
+  "type": "horsepowered:pressing",
+  "fluidResult": {
+    "amount": 250,
+    "id": "horsepowered:seed_oil"
+  },
+  "ingredient": {
+    "item": "minecraft:wheat_seeds"
+  },
+  "inputCount": 12
+}

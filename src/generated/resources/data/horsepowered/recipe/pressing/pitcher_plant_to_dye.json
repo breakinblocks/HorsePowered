@@ -1,0 +1,10 @@
+{
+  "type": "horsepowered:pressing",
+  "ingredient": {
+    "item": "minecraft:pitcher_plant"
+  },
+  "result": {
+    "count": 8,
+    "id": "minecraft:cyan_dye"
+  }
+}

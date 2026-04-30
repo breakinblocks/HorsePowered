@@ -1,0 +1,10 @@
+{
+  "type": "horsepowered:pressing",
+  "ingredient": {
+    "item": "minecraft:lily_of_the_valley"
+  },
+  "result": {
+    "count": 4,
+    "id": "minecraft:white_dye"
+  }
+}

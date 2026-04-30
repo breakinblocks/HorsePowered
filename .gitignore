@@ -32,10 +32,6 @@ logs/
 *.log
 crash-reports/
 
-# Forge/NeoForge specific
-src/generated/
-!src/generated/resources/
-
 # OS generated files
 .DS_Store
 .DS_Store?

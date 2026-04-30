@@ -1,0 +1,10 @@
+{
+  "type": "horsepowered:pressing",
+  "ingredient": {
+    "item": "minecraft:honey_bottle"
+  },
+  "result": {
+    "count": 4,
+    "id": "minecraft:sugar"
+  }
+}

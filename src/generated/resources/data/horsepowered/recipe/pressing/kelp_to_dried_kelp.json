@@ -1,0 +1,11 @@
+{
+  "type": "horsepowered:pressing",
+  "ingredient": {
+    "item": "minecraft:kelp"
+  },
+  "inputCount": 8,
+  "result": {
+    "count": 4,
+    "id": "minecraft:dried_kelp"
+  }
+}

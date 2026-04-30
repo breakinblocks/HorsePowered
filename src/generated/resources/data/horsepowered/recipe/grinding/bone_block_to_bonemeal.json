@@ -1,0 +1,11 @@
+{
+  "type": "horsepowered:grinding",
+  "ingredient": {
+    "item": "minecraft:bone_block"
+  },
+  "result": {
+    "count": 9,
+    "id": "minecraft:bone_meal"
+  },
+  "time": 12
+}

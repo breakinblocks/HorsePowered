@@ -1,0 +1,11 @@
+{
+  "type": "horsepowered:grinding",
+  "ingredient": {
+    "item": "minecraft:netherrack"
+  },
+  "result": {
+    "count": 1,
+    "id": "minecraft:nether_brick"
+  },
+  "time": 8
+}

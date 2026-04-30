@@ -1,0 +1,11 @@
+{
+  "type": "horsepowered:grinding",
+  "ingredient": {
+    "item": "minecraft:prismarine_bricks"
+  },
+  "result": {
+    "count": 9,
+    "id": "minecraft:prismarine_shard"
+  },
+  "time": 12
+}

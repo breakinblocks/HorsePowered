@@ -1,0 +1,16 @@
+{
+  "type": "horsepowered:grinding",
+  "ingredient": {
+    "item": "minecraft:bone"
+  },
+  "result": {
+    "count": 3,
+    "id": "minecraft:bone_meal"
+  },
+  "secondary": {
+    "count": 1,
+    "id": "minecraft:bone_meal"
+  },
+  "secondaryChance": 25,
+  "time": 12
+}

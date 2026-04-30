@@ -1,0 +1,10 @@
+{
+  "type": "horsepowered:pressing",
+  "ingredient": {
+    "item": "minecraft:cactus"
+  },
+  "result": {
+    "count": 4,
+    "id": "minecraft:green_dye"
+  }
+}

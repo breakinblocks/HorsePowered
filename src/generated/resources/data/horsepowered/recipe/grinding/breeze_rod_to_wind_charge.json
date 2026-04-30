@@ -1,0 +1,11 @@
+{
+  "type": "horsepowered:grinding",
+  "ingredient": {
+    "item": "minecraft:breeze_rod"
+  },
+  "result": {
+    "count": 5,
+    "id": "minecraft:wind_charge"
+  },
+  "time": 8
+}

@@ -1,0 +1,11 @@
+{
+  "type": "horsepowered:chopping",
+  "ingredient": {
+    "item": "minecraft:melon"
+  },
+  "result": {
+    "count": 9,
+    "id": "minecraft:melon_slice"
+  },
+  "time": 1
+}

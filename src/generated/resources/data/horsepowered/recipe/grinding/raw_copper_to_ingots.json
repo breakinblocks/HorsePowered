@@ -1,0 +1,16 @@
+{
+  "type": "horsepowered:grinding",
+  "ingredient": {
+    "item": "minecraft:raw_copper"
+  },
+  "result": {
+    "count": 1,
+    "id": "minecraft:copper_ingot"
+  },
+  "secondary": {
+    "count": 1,
+    "id": "minecraft:copper_ingot"
+  },
+  "secondaryChance": 25,
+  "time": 16
+}

@@ -1,0 +1,11 @@
+{
+  "type": "horsepowered:grinding",
+  "ingredient": {
+    "item": "minecraft:soul_soil"
+  },
+  "result": {
+    "count": 1,
+    "id": "minecraft:soul_sand"
+  },
+  "time": 8
+}

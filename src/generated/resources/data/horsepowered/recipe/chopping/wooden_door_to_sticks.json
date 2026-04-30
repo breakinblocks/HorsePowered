@@ -1,0 +1,11 @@
+{
+  "type": "horsepowered:chopping",
+  "ingredient": {
+    "tag": "minecraft:wooden_doors"
+  },
+  "result": {
+    "count": 4,
+    "id": "minecraft:stick"
+  },
+  "time": 1
+}

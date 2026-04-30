@@ -1,0 +1,10 @@
+{
+  "type": "horsepowered:pressing",
+  "ingredient": {
+    "item": "minecraft:white_tulip"
+  },
+  "result": {
+    "count": 4,
+    "id": "minecraft:white_dye"
+  }
+}

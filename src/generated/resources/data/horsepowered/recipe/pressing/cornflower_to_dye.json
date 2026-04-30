@@ -1,0 +1,10 @@
+{
+  "type": "horsepowered:pressing",
+  "ingredient": {
+    "item": "minecraft:cornflower"
+  },
+  "result": {
+    "count": 4,
+    "id": "minecraft:blue_dye"
+  }
+}

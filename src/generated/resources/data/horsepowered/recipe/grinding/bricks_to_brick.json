@@ -1,0 +1,11 @@
+{
+  "type": "horsepowered:grinding",
+  "ingredient": {
+    "item": "minecraft:bricks"
+  },
+  "result": {
+    "count": 4,
+    "id": "minecraft:brick"
+  },
+  "time": 8
+}

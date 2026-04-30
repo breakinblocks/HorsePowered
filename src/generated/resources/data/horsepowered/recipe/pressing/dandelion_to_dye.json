@@ -1,0 +1,10 @@
+{
+  "type": "horsepowered:pressing",
+  "ingredient": {
+    "item": "minecraft:dandelion"
+  },
+  "result": {
+    "count": 4,
+    "id": "minecraft:yellow_dye"
+  }
+}

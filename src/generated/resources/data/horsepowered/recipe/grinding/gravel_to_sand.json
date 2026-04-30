@@ -1,0 +1,16 @@
+{
+  "type": "horsepowered:grinding",
+  "ingredient": {
+    "item": "minecraft:gravel"
+  },
+  "result": {
+    "count": 1,
+    "id": "minecraft:sand"
+  },
+  "secondary": {
+    "count": 1,
+    "id": "minecraft:flint"
+  },
+  "secondaryChance": 15,
+  "time": 8
+}

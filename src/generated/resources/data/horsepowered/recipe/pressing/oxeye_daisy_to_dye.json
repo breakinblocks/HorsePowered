@@ -1,0 +1,10 @@
+{
+  "type": "horsepowered:pressing",
+  "ingredient": {
+    "item": "minecraft:oxeye_daisy"
+  },
+  "result": {
+    "count": 4,
+    "id": "minecraft:light_gray_dye"
+  }
+}
