@@ -32,8 +32,8 @@ logs/
 *.log
 crash-reports/
 
-# Forge/NeoForge specific
-src/generated/
+# Forge/NeoForge specific — ignore datagen cache/scratch but keep the resources output tracked
+src/generated/*
 !src/generated/resources/
 
 # OS generated files
@@ -58,11 +58,12 @@ replay_pid*
 *~
 local.properties
 
-# Markdown files — only README.md, LICENSE.md, and metadata/changelogs/ are tracked
+# Markdown files — only README.md, LICENSE.md, in-resource guide pages, and changelogs are tracked
 *.md
 !README.md
 !LICENSE.md
 !metadata/changelogs/**/*.md
+!src/main/resources/**/*.md
 
 *.bat
 !gradlew.bat

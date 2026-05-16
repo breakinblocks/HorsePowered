@@ -1,0 +1,9 @@
+{
+  "type": "horsepowered:chopping",
+  "ingredient": "#minecraft:wooden_trapdoors",
+  "result": {
+    "count": 6,
+    "id": "minecraft:stick"
+  },
+  "time": 1
+}

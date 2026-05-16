@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "L": "#minecraft:logs"
+  },
+  "pattern": [
+    "I I",
+    "LLL",
+    "LLL"
+  ],
+  "result": {
+    "id": "horsepowered:chopper"
+  }
+}

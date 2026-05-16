@@ -18,9 +18,11 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.CookingBookCategory;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.material.Fluids;
+import net.neoforged.neoforge.common.NeoForgeMod;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -123,7 +125,7 @@ public class HPRecipeProvider extends RecipeProvider.Runner {
                     .unlockedBy("has_saddle", has(Items.SADDLE))
                     .save(this.output, recipeKey("crafting/work_saddle"));
 
-            SimpleCookingRecipeBuilder.smelting(Ingredient.of(ModItems.DOUGH.get()), RecipeCategory.FOOD, net.minecraft.world.item.crafting.CookingBookCategory.MISC, Items.BREAD, 0.35f, 200)
+            SimpleCookingRecipeBuilder.smelting(Ingredient.of(ModItems.DOUGH.get()), RecipeCategory.FOOD, CookingBookCategory.MISC, Items.BREAD, 0.35f, 200)
                     .unlockedBy("has_dough", has(ModItems.DOUGH.get()))
                     .save(this.output, recipeKey("smelting/dough_to_bread"));
         }
@@ -308,7 +310,7 @@ public class HPRecipeProvider extends RecipeProvider.Runner {
 
             PressingRecipeBuilder.pressing(Ingredient.of(Items.BONE_MEAL))
                     .inputCount(1)
-                    .fluidInput(net.neoforged.neoforge.common.NeoForgeMod.MILK.value(), 1000)
+                    .fluidInput(NeoForgeMod.MILK.value(), 1000)
                     .result(Items.SLIME_BALL, 1)
                     .save(this.output, "milk_to_slimeball");
         }

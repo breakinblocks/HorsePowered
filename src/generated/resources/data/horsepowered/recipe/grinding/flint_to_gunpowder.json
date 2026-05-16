@@ -1,0 +1,8 @@
+{
+  "type": "horsepowered:grinding",
+  "ingredient": "minecraft:flint",
+  "result": {
+    "id": "minecraft:gunpowder"
+  },
+  "time": 12
+}

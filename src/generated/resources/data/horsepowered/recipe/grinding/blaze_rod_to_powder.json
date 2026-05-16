@@ -1,0 +1,9 @@
+{
+  "type": "horsepowered:grinding",
+  "ingredient": "minecraft:blaze_rod",
+  "result": {
+    "count": 4,
+    "id": "minecraft:blaze_powder"
+  },
+  "time": 8
+}

@@ -1,0 +1,8 @@
+{
+  "type": "horsepowered:pressing",
+  "ingredient": "minecraft:blue_orchid",
+  "result": {
+    "count": 4,
+    "id": "minecraft:light_blue_dye"
+  }
+}

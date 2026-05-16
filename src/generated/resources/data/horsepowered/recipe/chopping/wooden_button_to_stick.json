@@ -1,0 +1,8 @@
+{
+  "type": "horsepowered:chopping",
+  "ingredient": "#minecraft:wooden_buttons",
+  "result": {
+    "id": "minecraft:stick"
+  },
+  "time": 1
+}

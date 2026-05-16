@@ -4,10 +4,12 @@ import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import java.util.Set;
 import java.util.function.Supplier;
 
 /**
@@ -40,17 +42,20 @@ public class ModBlockEntities {
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<GeneratorBlockEntity>> GENERATOR =
             registerBlockEntity("generator", GeneratorBlockEntity::new, () -> ModBlocks.GENERATOR.get());
 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<CreativeBatteryBlockEntity>> CREATIVE_BATTERY =
+            registerBlockEntity("creative_battery", CreativeBatteryBlockEntity::new, () -> ModBlocks.CREATIVE_BATTERY.get());
+
     /**
      * Helper method to register a block entity type with a single valid block.
      * The block supplier is evaluated lazily during registration, after blocks are registered.
      */
-    private static <T extends net.minecraft.world.level.block.entity.BlockEntity> DeferredHolder<BlockEntityType<?>, BlockEntityType<T>> registerBlockEntity(
+    private static <T extends BlockEntity> DeferredHolder<BlockEntityType<?>, BlockEntityType<T>> registerBlockEntity(
             String name,
             BlockEntityType.BlockEntitySupplier<T> factory,
             Supplier<Block> blockSupplier) {
         return BLOCK_ENTITIES.register(name, () -> {
             Block block = blockSupplier.get();
-            return new BlockEntityType<>(factory, java.util.Set.of(block));
+            return new BlockEntityType<>(factory, Set.of(block));
         });
     }
 }

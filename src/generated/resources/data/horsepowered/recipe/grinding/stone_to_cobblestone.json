@@ -1,0 +1,8 @@
+{
+  "type": "horsepowered:grinding",
+  "ingredient": "minecraft:stone",
+  "result": {
+    "id": "minecraft:cobblestone"
+  },
+  "time": 8
+}

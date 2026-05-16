@@ -1,0 +1,8 @@
+{
+  "type": "horsepowered:pressing",
+  "ingredient": "minecraft:sunflower",
+  "result": {
+    "count": 8,
+    "id": "minecraft:yellow_dye"
+  }
+}

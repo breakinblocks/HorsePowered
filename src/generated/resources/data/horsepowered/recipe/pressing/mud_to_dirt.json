@@ -1,0 +1,7 @@
+{
+  "type": "horsepowered:pressing",
+  "ingredient": "minecraft:mud",
+  "result": {
+    "id": "minecraft:dirt"
+  }
+}

@@ -52,13 +52,22 @@ public class BlockFiller extends Block implements EntityBlock {
 
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        return Shapes.empty();
+        return Shapes.block();
     }
 
     @Override
     protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        // Use standard block shape for collision
         return Shapes.block();
+    }
+
+    @Override
+    protected int getLightDampening(BlockState state) {
+        return 0;
+    }
+
+    @Override
+    protected boolean propagatesSkylightDown(BlockState state) {
+        return true;
     }
 
     private boolean validateFilled(Level level, BlockPos fillerPos, BlockState fillerState) {
@@ -112,7 +121,7 @@ public class BlockFiller extends Block implements EntityBlock {
     }
 
     @Override
-    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData, net.minecraft.world.entity.player.Player player) {
+    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData, Player player) {
         BlockPos filledPos = pos.relative(state.getValue(FACING));
         BlockState filledState = level.getBlockState(filledPos);
         if (filledState.getBlock() instanceof BlockHPBase) {

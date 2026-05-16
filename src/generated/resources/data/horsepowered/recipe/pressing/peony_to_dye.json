@@ -1,0 +1,8 @@
+{
+  "type": "horsepowered:pressing",
+  "ingredient": "minecraft:peony",
+  "result": {
+    "count": 8,
+    "id": "minecraft:pink_dye"
+  }
+}

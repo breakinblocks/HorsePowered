@@ -1,0 +1,9 @@
+{
+  "type": "horsepowered:pressing",
+  "fluidResult": {
+    "amount": 250,
+    "id": "horsepowered:seed_oil"
+  },
+  "ingredient": "minecraft:torchflower_seeds",
+  "inputCount": 12
+}

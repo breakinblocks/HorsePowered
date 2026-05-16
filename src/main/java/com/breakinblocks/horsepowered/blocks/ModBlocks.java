@@ -8,6 +8,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -36,6 +37,15 @@ public class ModBlocks {
                     .strength(4.0F)
                     .requiresCorrectToolForDrops()));
 
+    public static final DeferredBlock<Block> CREATIVE_BATTERY = BLOCKS.register("creative_battery",
+            registryName -> new BlockCreativeBattery(BlockBehaviour.Properties.of()
+                    .setId(ResourceKey.create(Registries.BLOCK, registryName))
+                    .mapColor(MapColor.COLOR_PURPLE)
+                    .strength(-1.0F, 3600000.0F)
+                    .noOcclusion()
+                    .noLootTable()
+                    .pushReaction(PushReaction.BLOCK)));
+
     public static final DeferredBlock<Block> CHOPPING_BLOCK = BLOCKS.register("chopping_block",
             registryName -> new BlockChoppingBlock(BlockBehaviour.Properties.of()
                     .setId(ResourceKey.create(Registries.BLOCK, registryName))
@@ -62,7 +72,7 @@ public class ModBlocks {
                     .replaceable()
                     .noCollision()
                     .strength(100.0F)
-                    .pushReaction(net.minecraft.world.level.material.PushReaction.DESTROY)
+                    .pushReaction(PushReaction.DESTROY)
                     .noLootTable()
                     .liquid(),
                     300, 300));

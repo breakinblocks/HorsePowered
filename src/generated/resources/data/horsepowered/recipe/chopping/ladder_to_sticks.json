@@ -1,0 +1,9 @@
+{
+  "type": "horsepowered:chopping",
+  "ingredient": "minecraft:ladder",
+  "result": {
+    "count": 3,
+    "id": "minecraft:stick"
+  },
+  "time": 1
+}

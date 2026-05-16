@@ -1,0 +1,9 @@
+{
+  "type": "horsepowered:chopping",
+  "ingredient": "#minecraft:warped_stems",
+  "result": {
+    "count": 4,
+    "id": "minecraft:warped_planks"
+  },
+  "time": 1
+}

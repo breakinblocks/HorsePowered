@@ -1,0 +1,8 @@
+{
+  "type": "horsepowered:pressing",
+  "ingredient": "minecraft:orange_tulip",
+  "result": {
+    "count": 4,
+    "id": "minecraft:orange_dye"
+  }
+}

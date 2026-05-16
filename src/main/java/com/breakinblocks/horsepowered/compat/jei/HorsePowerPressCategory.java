@@ -10,9 +10,11 @@ import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.types.IRecipeType;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.Holder;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 public class HorsePowerPressCategory extends BaseHPCategory<PressRecipe> {
 
@@ -55,7 +57,7 @@ public class HorsePowerPressCategory extends BaseHPCategory<PressRecipe> {
                 builder.addSlot(RecipeIngredientRole.INPUT, 1, 22)
                         .setFluidRenderer(fluidIn.amount(), false, 16, 16)
                         .addIngredients(NeoForgeTypes.FLUID_STACK, fluidIn.ingredient().fluids().stream()
-                                .map(h -> new net.neoforged.neoforge.fluids.FluidStack(h.value(), fluidIn.amount()))
+                                .map(h -> new FluidStack(h.value(), fluidIn.amount()))
                                 .toList()));
 
         if (recipe.hasFluidOutput()) {
@@ -73,21 +75,11 @@ public class HorsePowerPressCategory extends BaseHPCategory<PressRecipe> {
     public void draw(PressRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
         arrow.draw(guiGraphics, 26, 1);
 
-        if (recipe.getInputCount() > 1) {
-            String countText = "x" + recipe.getInputCount();
-            int countX = recipe.hasFluidInput() ? 22 : 1;
-            int countY = recipe.hasFluidInput() ? 24 : 24;
-            guiGraphics.text(Minecraft.getInstance().font, countText, countX, countY, 0x808080, false);
-        }
-
-        recipe.getFluidInput().ifPresent(fluidIn -> {
-            String text = fluidIn.amount() + " mB";
-            guiGraphics.text(Minecraft.getInstance().font, text, 22, 30, 0x808080, false);
-        });
-
         if (recipe.hasFluidOutput()) {
+            Font font = Minecraft.getInstance().font;
             String fluidText = recipe.getFluidResult().getAmount() + " mB";
-            guiGraphics.text(Minecraft.getInstance().font, fluidText, 55, 36, 0x808080, false);
+            int x = WIDTH - font.width(fluidText);
+            guiGraphics.text(font, fluidText, x, 36, 0x808080, false);
         }
     }
 }

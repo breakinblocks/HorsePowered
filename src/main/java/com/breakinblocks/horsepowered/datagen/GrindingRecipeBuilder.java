@@ -22,6 +22,7 @@ public class GrindingRecipeBuilder {
     private int time = 12;
     private RecipeTier tier = RecipeTier.ANY;
     private int priority = 0;
+    private float hungerCost = 0.0F;
 
     private GrindingRecipeBuilder(Ingredient ingredient, ItemStackTemplate result) {
         this.ingredient = ingredient;
@@ -57,10 +58,15 @@ public class GrindingRecipeBuilder {
         return this;
     }
 
+    public GrindingRecipeBuilder hungerCost(float hungerCost) {
+        this.hungerCost = hungerCost;
+        return this;
+    }
+
     public void save(RecipeOutput output, String name) {
         ResourceKey<Recipe<?>> key = ResourceKey.create(Registries.RECIPE,
                 HorsePowerMod.id("grinding/" + name));
         output.accept(key, new GrindstoneRecipe(ingredient, result,
-                Optional.ofNullable(secondary), secondaryChance, time, tier, priority), null);
+                Optional.ofNullable(secondary), secondaryChance, time, tier, priority, hungerCost), null);
     }
 }

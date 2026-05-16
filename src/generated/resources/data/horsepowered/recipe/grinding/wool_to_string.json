@@ -1,0 +1,9 @@
+{
+  "type": "horsepowered:grinding",
+  "ingredient": "#minecraft:wool",
+  "result": {
+    "count": 4,
+    "id": "minecraft:string"
+  },
+  "time": 8
+}

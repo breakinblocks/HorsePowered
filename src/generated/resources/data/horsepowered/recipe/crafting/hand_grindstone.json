@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "P": "minecraft:stick",
+    "S": "minecraft:stone"
+  },
+  "pattern": [
+    "S S",
+    "SSS",
+    "P P"
+  ],
+  "result": {
+    "id": "horsepowered:hand_grindstone"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "type": "horsepowered:pressing",
+  "ingredient": "minecraft:wither_rose",
+  "result": {
+    "count": 4,
+    "id": "minecraft:black_dye"
+  }
+}

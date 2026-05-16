@@ -1,27 +1,34 @@
 package com.breakinblocks.horsepowered;
 
+import com.breakinblocks.horsepowered.blockentity.HPBlockEntityBase;
 import com.breakinblocks.horsepowered.blockentity.ModBlockEntities;
+import com.breakinblocks.horsepowered.blockentity.PressBlockEntity;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
+import com.breakinblocks.horsepowered.client.ClientExtensions;
+import com.breakinblocks.horsepowered.compat.guideme.GuideMECompat;
 import com.breakinblocks.horsepowered.config.HorsePowerConfig;
-import com.breakinblocks.horsepowered.items.ModItems;
 import com.breakinblocks.horsepowered.fluids.ModFluids;
+import com.breakinblocks.horsepowered.items.ModItems;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
 import com.mojang.logging.LogUtils;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Blocks;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.fml.ModList;
-import com.breakinblocks.horsepowered.blockentity.HPBlockEntityBase;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+import net.neoforged.neoforge.fluids.FluidInteractionRegistry;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.transfer.item.WorldlyContainerWrapper;
@@ -34,7 +41,7 @@ public class HorsePowerMod {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS =
-            DeferredRegister.create(net.minecraft.core.registries.Registries.CREATIVE_MODE_TAB, MOD_ID);
+            DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MOD_ID);
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> CREATIVE_TAB = CREATIVE_MODE_TABS.register("main", () ->
             CreativeModeTab.builder()
@@ -43,7 +50,7 @@ public class HorsePowerMod {
                     .displayItems((parameters, output) -> {
                         // Guide book (only if GuideME is loaded)
                         if (ModList.get().isLoaded("guideme")) {
-                            output.accept(com.breakinblocks.horsepowered.compat.guideme.GuideMECompat.createGuideItem());
+                            output.accept(GuideMECompat.createGuideItem());
                         }
                         // Items
                         output.accept(ModItems.FLOUR.get());
@@ -57,6 +64,7 @@ public class HorsePowerMod {
                         output.accept(ModBlocks.CHOPPER.get());
                         output.accept(ModBlocks.PRESS.get());
                         output.accept(ModBlocks.GENERATOR.get());
+                        output.accept(ModBlocks.CREATIVE_BATTERY.get());
                     })
                     .build()
     );
@@ -66,7 +74,7 @@ public class HorsePowerMod {
     }
 
     public HorsePowerMod(IEventBus modEventBus, ModContainer container, Dist dist) {
-        net.neoforged.neoforge.common.NeoForgeMod.enableMilkFluid();
+        NeoForgeMod.enableMilkFluid();
 
         ModBlocks.BLOCKS.register(modEventBus);
         ModItems.ITEMS.register(modEventBus);
@@ -93,28 +101,28 @@ public class HorsePowerMod {
     private void commonSetup(final FMLCommonSetupEvent event) {
         LOGGER.info("Horse Powered common setup");
         event.enqueueWork(() -> {
-            var lavaType = net.neoforged.neoforge.common.NeoForgeMod.LAVA_TYPE.value();
+            var lavaType = NeoForgeMod.LAVA_TYPE.value();
             var oilType = ModFluids.SEED_OIL_TYPE.get();
-            var fire = net.minecraft.world.level.block.Blocks.FIRE.defaultBlockState();
-            var air = net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
+            var fire = Blocks.FIRE.defaultBlockState();
+            var air = Blocks.AIR.defaultBlockState();
 
             // Seed oil + adjacent lava → seed oil becomes fire (or air if fire can't survive)
-            net.neoforged.neoforge.fluids.FluidInteractionRegistry.addInteraction(oilType,
-                    new net.neoforged.neoforge.fluids.FluidInteractionRegistry.InteractionInformation(
+            FluidInteractionRegistry.addInteraction(oilType,
+                    new FluidInteractionRegistry.InteractionInformation(
                             lavaType,
                             fluidState -> fire));
 
             // Seed oil + adjacent fire block → seed oil becomes fire
-            net.neoforged.neoforge.fluids.FluidInteractionRegistry.addInteraction(oilType,
-                    new net.neoforged.neoforge.fluids.FluidInteractionRegistry.InteractionInformation(
+            FluidInteractionRegistry.addInteraction(oilType,
+                    new FluidInteractionRegistry.InteractionInformation(
                             (level, currentPos, relativePos, currentState) ->
-                                    level.getBlockState(relativePos).is(net.minecraft.world.level.block.Blocks.FIRE),
+                                    level.getBlockState(relativePos).is(Blocks.FIRE),
                             fluidState -> fire));
 
             // Lava + adjacent seed oil → lava becomes fire
             // This handles the case where lava flows INTO oil
-            net.neoforged.neoforge.fluids.FluidInteractionRegistry.addInteraction(lavaType,
-                    new net.neoforged.neoforge.fluids.FluidInteractionRegistry.InteractionInformation(
+            FluidInteractionRegistry.addInteraction(lavaType,
+                    new FluidInteractionRegistry.InteractionInformation(
                             oilType,
                             fluidState -> fire));
 
@@ -143,6 +151,9 @@ public class HorsePowerMod {
         event.registerBlockEntity(Capabilities.Energy.BLOCK,
                 ModBlockEntities.GENERATOR.get(),
                 (be, side) -> be.getEnergyHandler());
+        event.registerBlockEntity(Capabilities.Energy.BLOCK,
+                ModBlockEntities.CREATIVE_BATTERY.get(),
+                (be, side) -> be.getEnergyHandler());
 
         // Press exposes a directional fluid handler: insertions go to the input tank,
         // extractions drain the output tank. Prevents pipes from contaminating input
@@ -165,7 +176,7 @@ public class HorsePowerMod {
                 ModBlockEntities.FILLER.get(),
                 (be, side) -> {
                     HPBlockEntityBase mainBe = be.getFilledTileEntity();
-                    if (mainBe instanceof com.breakinblocks.horsepowered.blockentity.PressBlockEntity press) {
+                    if (mainBe instanceof PressBlockEntity press) {
                         return press.getFluidHandler();
                     }
                     return null;
@@ -182,6 +193,6 @@ public class HorsePowerMod {
      */
     private static void registerClientExtensions(ModContainer container) {
         // Delegate to client helper class - this defers class loading of client-only classes
-        com.breakinblocks.horsepowered.client.ClientExtensions.register(container);
+        ClientExtensions.register(container);
     }
 }

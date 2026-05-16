@@ -2,6 +2,7 @@ package com.breakinblocks.horsepowered.datagen;
 
 import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.recipes.PressRecipe;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.Identifier;
@@ -55,7 +56,7 @@ public class PressingRecipeBuilder {
 
     public PressingRecipeBuilder fluidResult(Fluid fluid, int amount) {
         this.fluidRef = new PressRecipe.FluidRef(
-                net.minecraft.core.registries.BuiltInRegistries.FLUID.getKey(fluid), amount);
+                BuiltInRegistries.FLUID.getKey(fluid), amount);
         return this;
     }
 

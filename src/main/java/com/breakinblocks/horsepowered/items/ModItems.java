@@ -59,4 +59,8 @@ public class ModItems {
             registryName -> new BlockItem(ModBlocks.GENERATOR.get(), new Item.Properties()
                     .setId(ResourceKey.create(Registries.ITEM, registryName))
                     .useBlockDescriptionPrefix()));
+    public static final DeferredItem<BlockItem> CREATIVE_BATTERY_ITEM = ITEMS.register("creative_battery",
+            registryName -> new BlockItem(ModBlocks.CREATIVE_BATTERY.get(), new Item.Properties()
+                    .setId(ResourceKey.create(Registries.ITEM, registryName))
+                    .useBlockDescriptionPrefix()));
 }

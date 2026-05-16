@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    "minecraft:saddle",
+    "minecraft:lead"
+  ],
+  "result": {
+    "id": "horsepowered:work_saddle"
+  }
+}

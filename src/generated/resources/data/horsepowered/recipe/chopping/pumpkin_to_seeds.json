@@ -1,0 +1,9 @@
+{
+  "type": "horsepowered:chopping",
+  "ingredient": "minecraft:pumpkin",
+  "result": {
+    "count": 4,
+    "id": "minecraft:pumpkin_seeds"
+  },
+  "time": 1
+}

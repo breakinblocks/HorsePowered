@@ -1,0 +1,9 @@
+{
+  "type": "horsepowered:chopping",
+  "ingredient": "#minecraft:jungle_logs",
+  "result": {
+    "count": 4,
+    "id": "minecraft:jungle_planks"
+  },
+  "time": 1
+}

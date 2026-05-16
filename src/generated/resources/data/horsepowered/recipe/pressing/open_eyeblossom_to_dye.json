@@ -1,0 +1,8 @@
+{
+  "type": "horsepowered:pressing",
+  "ingredient": "minecraft:open_eyeblossom",
+  "result": {
+    "count": 4,
+    "id": "minecraft:gray_dye"
+  }
+}

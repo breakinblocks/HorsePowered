@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "I": "minecraft:piston",
+    "P": "#minecraft:planks"
+  },
+  "pattern": [
+    "PPP",
+    "PIP",
+    "PPP"
+  ],
+  "result": {
+    "id": "horsepowered:press"
+  }
+}

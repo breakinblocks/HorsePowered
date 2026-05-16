@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "#minecraft:logs",
+    "#minecraft:wooden_slabs"
+  ],
+  "result": {
+    "id": "horsepowered:chopping_block"
+  }
+}

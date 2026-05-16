@@ -1,0 +1,7 @@
+{
+  "type": "horsepowered:pressing",
+  "ingredient": "minecraft:honeycomb",
+  "result": {
+    "id": "minecraft:honey_bottle"
+  }
+}

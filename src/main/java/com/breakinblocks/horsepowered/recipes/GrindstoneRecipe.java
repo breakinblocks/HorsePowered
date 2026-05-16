@@ -23,16 +23,18 @@ public class GrindstoneRecipe extends BaseHPRecipe {
     private final int time;
     private final RecipeTier tier;
     private final int priority;
+    private final float hungerCost;
 
     public GrindstoneRecipe(Ingredient ingredient, ItemStackTemplate result,
                             Optional<ItemStackTemplate> secondary, int secondaryChance, int time,
-                            RecipeTier tier, int priority) {
+                            RecipeTier tier, int priority, float hungerCost) {
         super(ingredient, result);
         this.secondary = secondary.orElse(null);
         this.secondaryChance = Math.max(0, Math.min(100, secondaryChance));
         this.time = time;
         this.tier = tier;
         this.priority = priority;
+        this.hungerCost = Math.max(0.0F, hungerCost);
     }
 
     @Override
@@ -74,6 +76,10 @@ public class GrindstoneRecipe extends BaseHPRecipe {
         return priority;
     }
 
+    public float getHungerCost() {
+        return hungerCost;
+    }
+
     public static final MapCodec<GrindstoneRecipe> CODEC = RecordCodecBuilder.mapCodec(instance ->
             instance.group(
                     Ingredient.CODEC.fieldOf("ingredient").forGetter(GrindstoneRecipe::getIngredient),
@@ -82,7 +88,8 @@ public class GrindstoneRecipe extends BaseHPRecipe {
                     Codec.INT.optionalFieldOf("secondaryChance", 0).forGetter(GrindstoneRecipe::getSecondaryChance),
                     Codec.INT.fieldOf("time").forGetter(GrindstoneRecipe::getTime),
                     RecipeTier.CODEC.optionalFieldOf("tier", RecipeTier.ANY).forGetter(GrindstoneRecipe::getTier),
-                    Codec.INT.optionalFieldOf("priority", 0).forGetter(GrindstoneRecipe::getPriority)
+                    Codec.INT.optionalFieldOf("priority", 0).forGetter(GrindstoneRecipe::getPriority),
+                    Codec.FLOAT.optionalFieldOf("hungerCost", 0.0F).forGetter(GrindstoneRecipe::getHungerCost)
             ).apply(instance, GrindstoneRecipe::new)
     );
 
@@ -96,7 +103,8 @@ public class GrindstoneRecipe extends BaseHPRecipe {
             int time = ByteBufCodecs.VAR_INT.decode(buf);
             RecipeTier tier = RecipeTier.STREAM_CODEC.decode(buf);
             int priority = ByteBufCodecs.VAR_INT.decode(buf);
-            return new GrindstoneRecipe(ingredient, result, secondary, secondaryChance, time, tier, priority);
+            float hungerCost = ByteBufCodecs.FLOAT.decode(buf);
+            return new GrindstoneRecipe(ingredient, result, secondary, secondaryChance, time, tier, priority, hungerCost);
         }
 
         @Override
@@ -108,6 +116,7 @@ public class GrindstoneRecipe extends BaseHPRecipe {
             ByteBufCodecs.VAR_INT.encode(buf, recipe.getTime());
             RecipeTier.STREAM_CODEC.encode(buf, recipe.getTier());
             ByteBufCodecs.VAR_INT.encode(buf, recipe.getPriority());
+            ByteBufCodecs.FLOAT.encode(buf, recipe.getHungerCost());
         }
     };
 }

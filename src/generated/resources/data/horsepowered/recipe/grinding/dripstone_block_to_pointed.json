@@ -1,0 +1,9 @@
+{
+  "type": "horsepowered:grinding",
+  "ingredient": "minecraft:dripstone_block",
+  "result": {
+    "count": 4,
+    "id": "minecraft:pointed_dripstone"
+  },
+  "time": 8
+}

@@ -1,0 +1,9 @@
+{
+  "type": "horsepowered:chopping",
+  "ingredient": "#minecraft:bamboo_blocks",
+  "result": {
+    "count": 4,
+    "id": "minecraft:bamboo_planks"
+  },
+  "time": 1
+}

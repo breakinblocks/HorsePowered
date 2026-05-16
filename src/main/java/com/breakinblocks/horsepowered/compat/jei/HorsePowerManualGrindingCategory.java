@@ -2,6 +2,7 @@ package com.breakinblocks.horsepowered.compat.jei;
 
 import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
+import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import com.breakinblocks.horsepowered.recipes.GrindstoneRecipe;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
@@ -16,7 +17,7 @@ import net.minecraft.network.chat.Component;
 public class HorsePowerManualGrindingCategory extends BaseHPCategory<GrindstoneRecipe> {
 
     private static final int WIDTH = 100;
-    private static final int HEIGHT = 36;
+    private static final int HEIGHT = 46;
 
     public HorsePowerManualGrindingCategory(IGuiHelper guiHelper) {
         super(guiHelper, ModBlocks.HAND_GRINDSTONE.get(), "manual_grinding");
@@ -62,12 +63,20 @@ public class HorsePowerManualGrindingCategory extends BaseHPCategory<GrindstoneR
     public void draw(GrindstoneRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
         arrow.draw(guiGraphics, 26, 1);
 
-        Component timeText = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.time", recipe.getTime());
-        guiGraphics.text(Minecraft.getInstance().font, timeText, 1, 24, 0x808080, false);
+        int pointsPerTurn = HorsePowerConfig.pointsPerRotation.get();
+        int turns = Math.max(1, (recipe.getTime() + pointsPerTurn - 1) / pointsPerTurn);
+        Component turnText = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.turns", turns);
+        guiGraphics.text(Minecraft.getInstance().font, turnText, 1, 24, 0x808080, false);
 
         if (recipe.getSecondaryTemplate() != null && recipe.getSecondaryChance() > 0) {
             String chanceText = recipe.getSecondaryChance() + "%";
             guiGraphics.text(Minecraft.getInstance().font, chanceText, 81, 24, 0x808080, false);
+        }
+
+        if (recipe.getHungerCost() > 0.0F) {
+            Component hungerText = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.hunger",
+                    String.format("%.2f", recipe.getHungerCost()));
+            guiGraphics.text(Minecraft.getInstance().font, hungerText, 1, 34, 0x808080, false);
         }
     }
 }

@@ -1,0 +1,9 @@
+{
+  "type": "horsepowered:chopping",
+  "ingredient": "#minecraft:acacia_logs",
+  "result": {
+    "count": 4,
+    "id": "minecraft:acacia_planks"
+  },
+  "time": 1
+}

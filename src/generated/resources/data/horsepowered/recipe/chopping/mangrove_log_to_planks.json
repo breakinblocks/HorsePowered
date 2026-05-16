@@ -1,0 +1,9 @@
+{
+  "type": "horsepowered:chopping",
+  "ingredient": "#minecraft:mangrove_logs",
+  "result": {
+    "count": 4,
+    "id": "minecraft:mangrove_planks"
+  },
+  "time": 1
+}

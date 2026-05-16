@@ -1,0 +1,8 @@
+{
+  "type": "horsepowered:pressing",
+  "ingredient": "minecraft:rose_bush",
+  "result": {
+    "count": 8,
+    "id": "minecraft:red_dye"
+  }
+}

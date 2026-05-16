@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "horsepowered:flour",
+    "minecraft:water_bucket"
+  ],
+  "result": {
+    "id": "horsepowered:dough"
+  }
+}

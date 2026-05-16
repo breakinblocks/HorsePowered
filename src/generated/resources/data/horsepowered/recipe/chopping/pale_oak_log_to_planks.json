@@ -1,0 +1,9 @@
+{
+  "type": "horsepowered:chopping",
+  "ingredient": "#minecraft:pale_oak_logs",
+  "result": {
+    "count": 4,
+    "id": "minecraft:pale_oak_planks"
+  },
+  "time": 1
+}

@@ -1,0 +1,14 @@
+{
+  "type": "horsepowered:grinding",
+  "ingredient": "minecraft:raw_gold",
+  "result": {
+    "count": 12,
+    "id": "minecraft:gold_nugget"
+  },
+  "secondary": {
+    "count": 3,
+    "id": "minecraft:gold_nugget"
+  },
+  "secondaryChance": 25,
+  "time": 16
+}

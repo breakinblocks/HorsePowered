@@ -22,10 +22,15 @@ A Minecraft NeoForge mod that adds horse-powered machinery for grinding, choppin
 - **Horse Grindstone** — An automated grindstone powered by a horse walking in circles. Continuously grinds items without manual intervention.
 - **Horse Chopper** — An automated chopping machine. Attach a horse to chop logs into planks automatically.
 - **Horse Press** — Press items to extract fluids or produce other outputs. Recipes can also consume fluids from the press's internal tank to make new items. Right-click with a bucket to fill or drain the tank.
+- **Horse Powered Generator** — Converts horse labor into Forge Energy (FE). Generates 80 FE/tick while a worker walks, stores up to 100,000 FE, and pushes power to any adjacent energy handler. Requires a redstone signal to run.
 
 ### Tools
 
 - **Work Saddle** — Right-click any creature in the `horsepowered:valid_worker` tag (tamed or untamed) to capture it onto the saddle, then right-click a block to release it. Lets you transport workers across long distances without leashing them home.
+
+### Creative-Only
+
+- **Creative Battery** — A creative-mode test block for energy setups. Holds up to `Integer.MAX_VALUE` FE and accepts/outputs power at the same rate. Pushes stored energy to adjacent blocks every tick.
 
 ### Seed Oil
 
@@ -46,7 +51,7 @@ Pressing seeds (wheat, melon, pumpkin, beetroot, or torchflower) in the Horse Pr
 5. Insert items by right-clicking the machine while holding the input material
 6. Extract finished products by right-clicking with an empty hand
 
-**Tip:** Shift+Right-click a horse-powered machine with an empty hand to visualize the required 7x7 working area. Green = clear, Red = obstructed.
+**Tip:** Shift+Right-click a horse-powered machine with an empty hand to visualize the required 7x7 working area. The walking ring must be clear and the floor beneath it must be sturdy. Green = clear, Red = obstructed. Levers placed inside the ring are allowed, so you can wire redstone toggles right onto the machine's floor (the Generator uses this for its on/off control).
 
 ## Included Recipes
 
@@ -87,6 +92,7 @@ All Horse Powered machines support item automation via hoppers, pipes, and other
 - **Jade** — Block tooltips showing machine status, inventory, worker info, and progress
 - **GuideME** — In-game guidebook (when installed, not required)
 - **Farmer's Delight** — Conditional meat-cutting recipes for the chopper
+- **Forge Energy (FE)** — The Horse Powered Generator exposes the standard FE capability and works with any mod that accepts FE (cables, machines, batteries)
 
 ## Configuration
 
@@ -111,6 +117,11 @@ Horse Powered uses data-driven JSON recipes that can be added or modified via da
 - `horsepowered:chopping` — Chopping recipes
 - `horsepowered:pressing` — Press recipes (supports item OR fluid output)
 
+**Optional fields available on every grinding and chopping recipe:**
+- `tier` — restricts which station can run the recipe. `"any"` (default) runs on both manual and horse-powered stations, `"hand"` is manual-only, `"horse"` is horse-powered-only.
+- `priority` — integer that controls display order in JEI. Lower values appear first; ties keep their natural order.
+- `hungerCost` — float (default `0.0`). On manual stations, this is added to the player's food exhaustion every chop or every turn, on top of the config baseline. Has no effect on horse-powered stations. JEI shows it as a "Hunger" line on the manual category only when greater than zero.
+
 #### Grinding Recipe
 ```json
 {
@@ -119,7 +130,10 @@ Horse Powered uses data-driven JSON recipes that can be added or modified via da
   "result": { "id": "minecraft:bone_meal", "count": 3 },
   "secondary": { "id": "minecraft:bone_meal", "count": 1 },
   "secondaryChance": 25,
-  "time": 12
+  "time": 12,
+  "tier": "any",
+  "priority": 0,
+  "hungerCost": 0.5
 }
 ```
 - `ingredient` — Item or `#tag` reference
@@ -134,7 +148,10 @@ Horse Powered uses data-driven JSON recipes that can be added or modified via da
   "type": "horsepowered:chopping",
   "ingredient": "#minecraft:oak_logs",
   "result": { "id": "minecraft:oak_planks", "count": 4 },
-  "time": 1
+  "time": 1,
+  "tier": "any",
+  "priority": 0,
+  "hungerCost": 0.0
 }
 ```
 
@@ -191,7 +208,7 @@ Use NeoForge conditions to add recipes that only load when a specific mod is pre
 
 ### Custom Worker Mobs
 
-By default, horses, donkeys, mules, llamas, and trader llamas can power machines. To add more, create an entity type tag at `data/horsepowered/tags/entity_types/valid_worker.json`:
+By default, horses, donkeys, mules, llamas, and trader llamas can power machines and can be picked up by the Work Saddle. To add more, create an entity type tag at `data/horsepowered/tags/entity_type/valid_worker.json`:
 
 ```json
 {

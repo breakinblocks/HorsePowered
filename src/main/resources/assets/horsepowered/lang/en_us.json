@@ -18,6 +18,7 @@
   "block.horsepowered.chopper": "Horse Chopper",
   "block.horsepowered.press": "Horse Press",
   "block.horsepowered.generator": "Horse Powered Generator",
+  "block.horsepowered.creative_battery": "Creative Battery",
   "block.horsepowered.filler": "Horse Chopper",
 
   "gui.horsepowered.jei.grinding": "Horse Grinding",
@@ -27,7 +28,9 @@
   "gui.horsepowered.jei.pressing": "Horse Pressing",
   "gui.horsepowered.jei.time": "Time: %s",
   "gui.horsepowered.jei.chops": "Chops: %s",
+  "gui.horsepowered.jei.turns": "Turns: %s",
   "gui.horsepowered.jei.chance": "%s%% chance",
+  "gui.horsepowered.jei.hunger": "Hunger: %s",
 
   "config.jade.plugin_horsepowered.grindstone": "Horse Grindstone",
   "config.jade.plugin_horsepowered.chopper": "Horse Chopper",

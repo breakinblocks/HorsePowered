@@ -1,0 +1,12 @@
+{
+  "type": "horsepowered:grinding",
+  "ingredient": "minecraft:cobblestone",
+  "result": {
+    "id": "minecraft:gravel"
+  },
+  "secondary": {
+    "id": "minecraft:flint"
+  },
+  "secondaryChance": 10,
+  "time": 8
+}

@@ -3,10 +3,13 @@ package com.breakinblocks.horsepowered.items;
 import com.breakinblocks.horsepowered.HorsePowerMod;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.InteractionHand;
@@ -33,7 +36,7 @@ import java.util.function.Consumer;
 public class WorkSaddleItem extends Item {
 
     public static final TagKey<EntityType<?>> VALID_WORKER =
-            TagKey.create(net.minecraft.core.registries.Registries.ENTITY_TYPE, HorsePowerMod.id("valid_worker"));
+            TagKey.create(Registries.ENTITY_TYPE, HorsePowerMod.id("valid_worker"));
 
     public WorkSaddleItem(Properties properties) {
         super(properties);
@@ -113,10 +116,10 @@ public class WorkSaddleItem extends Item {
         Player player = context.getPlayer();
 
         if (serverLevel.getEntity(entity.getUUID()) != null) {
-            if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+            if (player instanceof ServerPlayer serverPlayer) {
                 serverPlayer.sendSystemMessage(
                         Component.translatable("item.horsepowered.work_saddle.duplicate")
-                                .withStyle(net.minecraft.ChatFormatting.RED),
+                                .withStyle(ChatFormatting.RED),
                         true);
             }
             return InteractionResult.FAIL;
@@ -151,7 +154,7 @@ public class WorkSaddleItem extends Item {
         if (data != null) {
             consumer.accept(Component.translatable("item.horsepowered.work_saddle.contains",
                     Component.translatable(data.type().getDescriptionId()))
-                    .withStyle(net.minecraft.ChatFormatting.GRAY));
+                    .withStyle(ChatFormatting.GRAY));
         }
     }
 }

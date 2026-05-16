@@ -2,6 +2,7 @@ package com.breakinblocks.horsepowered.compat.jei;
 
 import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
+import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import com.breakinblocks.horsepowered.recipes.ChoppingRecipe;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
@@ -21,7 +22,7 @@ import java.util.List;
 public class HorsePowerManualChoppingCategory extends BaseHPCategory<ChoppingRecipe> {
 
     private static final int WIDTH = 100;
-    private static final int HEIGHT = 60;
+    private static final int HEIGHT = 66;
 
     private final List<ItemStack> axes;
 
@@ -68,8 +69,16 @@ public class HorsePowerManualChoppingCategory extends BaseHPCategory<ChoppingRec
     public void draw(ChoppingRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
         arrow.draw(guiGraphics, 38, 26);
 
-        Component timeText = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.chops", recipe.getTime());
-        int textWidth = Minecraft.getInstance().font.width(timeText);
-        guiGraphics.text(Minecraft.getInstance().font, timeText, (WIDTH - textWidth) / 2, 48, 0x808080, false);
+        int chops = recipe.getTime() * HorsePowerConfig.choppingMultiplier.get();
+        Component chopText = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.chops", chops);
+        int chopWidth = Minecraft.getInstance().font.width(chopText);
+        guiGraphics.text(Minecraft.getInstance().font, chopText, (WIDTH - chopWidth) / 2, 48, 0x808080, false);
+
+        if (recipe.getHungerCost() > 0.0F) {
+            Component hungerText = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.hunger",
+                    String.format("%.2f", recipe.getHungerCost()));
+            int hungerWidth = Minecraft.getInstance().font.width(hungerText);
+            guiGraphics.text(Minecraft.getInstance().font, hungerText, (WIDTH - hungerWidth) / 2, 58, 0x808080, false);
+        }
     }
 }

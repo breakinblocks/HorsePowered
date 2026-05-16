@@ -116,6 +116,12 @@ public class GeneratorBlockEntity extends HPBlockEntityHorseBase {
         return -1;
     }
 
+    private void markDirtyForSave() {
+        if (level != null) {
+            level.blockEntityChanged(worldPosition);
+        }
+    }
+
     private final class GeneratorEnergy extends SimpleEnergyHandler {
         GeneratorEnergy() {
             super(MAX_ENERGY, 0, MAX_ENERGY);
@@ -126,13 +132,13 @@ public class GeneratorBlockEntity extends HPBlockEntityHorseBase {
             int previous = this.energy;
             this.energy = Math.min(this.capacity, this.energy + amount);
             if (this.energy != previous) {
-                setChanged();
+                markDirtyForSave();
             }
         }
 
         @Override
         protected void onEnergyChanged(int previousAmount) {
-            setChanged();
+            markDirtyForSave();
         }
     }
 }

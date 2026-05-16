@@ -1,0 +1,11 @@
+{
+  "type": "horsepowered:pressing",
+  "fluidInput": {
+    "amount": 1000,
+    "ingredient": "minecraft:milk"
+  },
+  "ingredient": "minecraft:bone_meal",
+  "result": {
+    "id": "minecraft:slime_ball"
+  }
+}

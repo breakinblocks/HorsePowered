@@ -1,0 +1,9 @@
+{
+  "type": "horsepowered:grinding",
+  "ingredient": "minecraft:glowstone",
+  "result": {
+    "count": 4,
+    "id": "minecraft:glowstone_dust"
+  },
+  "time": 8
+}

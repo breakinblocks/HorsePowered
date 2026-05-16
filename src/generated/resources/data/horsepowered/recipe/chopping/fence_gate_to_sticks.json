@@ -1,0 +1,9 @@
+{
+  "type": "horsepowered:chopping",
+  "ingredient": "#minecraft:fence_gates",
+  "result": {
+    "count": 4,
+    "id": "minecraft:stick"
+  },
+  "time": 1
+}

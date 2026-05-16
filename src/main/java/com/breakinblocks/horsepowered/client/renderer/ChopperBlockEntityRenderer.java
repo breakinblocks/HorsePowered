@@ -1,7 +1,9 @@
 package com.breakinblocks.horsepowered.client.renderer;
 
 import com.breakinblocks.horsepowered.blockentity.ChopperBlockEntity;
+import com.breakinblocks.horsepowered.blocks.BlockChopper;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -10,6 +12,8 @@ import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -39,12 +43,24 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
         }
         HorseBlockRenderState.extractWorkerState(blockEntity, state, partialTick);
 
-        // Extract blade animation value
         state.visualWindup = blockEntity.getVisualWindup();
 
-        // Extract item states for rendering
+        BlockState blockState = blockEntity.getBlockState();
+        state.facingRotation = blockState.hasProperty(BlockChopper.FACING)
+                ? rotationFor(blockState.getValue(BlockChopper.FACING))
+                : 0;
+
         RenderUtils.extractItemState(state.inputItem, blockEntity.getItem(0), blockEntity.getLevel());
         RenderUtils.extractItemState(state.outputItem, blockEntity.getItem(1), blockEntity.getLevel());
+    }
+
+    private static float rotationFor(Direction facing) {
+        return switch (facing) {
+            case SOUTH -> 180f;
+            case WEST -> 90f;
+            case EAST -> 270f;
+            default -> 0f;
+        };
     }
 
     @Override
@@ -53,10 +69,15 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
 
         HorseBlockRenderState.submitWorkerAndArea(state, poseStack, collector, camera);
 
-        // Render chopping blade
+        poseStack.pushPose();
+        if (state.facingRotation != 0) {
+            poseStack.translate(0.5F, 0F, 0.5F);
+            poseStack.mulPose(Axis.YP.rotationDegrees(state.facingRotation));
+            poseStack.translate(-0.5F, 0F, -0.5F);
+        }
         BladeRenderer.renderBlade(poseStack, collector, state.visualWindup, state.lightCoords);
+        poseStack.popPose();
 
-        // Log stands upright on the chopping surface so the blade cleaves it like a real axe chop.
         RenderUtils.renderStandingItem(state.inputItem, poseStack, collector, state.lightCoords,
                 0.5D, 0.6D, 0.5D, 0.6F);
 
@@ -79,6 +100,7 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
     public static class ChopperRenderState extends HorseBlockRenderState {
         public boolean skipSubmit;
         public float visualWindup;
+        public float facingRotation;
         public final ItemStackRenderState inputItem = new ItemStackRenderState();
         public final ItemStackRenderState outputItem = new ItemStackRenderState();
     }

@@ -1,0 +1,9 @@
+{
+  "type": "horsepowered:pressing",
+  "fluidResult": {
+    "amount": 500,
+    "id": "minecraft:water"
+  },
+  "ingredient": "minecraft:pointed_dripstone",
+  "inputCount": 4
+}

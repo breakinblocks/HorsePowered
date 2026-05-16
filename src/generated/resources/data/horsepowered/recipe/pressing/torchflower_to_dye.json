@@ -1,0 +1,8 @@
+{
+  "type": "horsepowered:pressing",
+  "ingredient": "minecraft:torchflower",
+  "result": {
+    "count": 4,
+    "id": "minecraft:orange_dye"
+  }
+}

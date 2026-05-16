@@ -1,0 +1,8 @@
+{
+  "type": "horsepowered:pressing",
+  "ingredient": "minecraft:lilac",
+  "result": {
+    "count": 8,
+    "id": "minecraft:magenta_dye"
+  }
+}
