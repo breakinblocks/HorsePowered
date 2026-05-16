@@ -125,16 +125,23 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
 
         poseStack.pushPose();
 
-        // Center the blade - swap width/depth so blade extends along Z axis (rotated 90 degrees)
+        Direction facing = blockEntity.getBlockState().getValue(BlockChopper.FACING);
+        float yRot = getRotation(facing);
+        if (yRot != 0) {
+            poseStack.translate(0.5F, 0F, 0.5F);
+            poseStack.mulPose(Axis.YP.rotationDegrees(yRot));
+            poseStack.translate(-0.5F, 0F, -0.5F);
+        }
+
         float halfWidth = BLADE_WIDTH / 2;
         float halfDepth = BLADE_DEPTH / 2;
 
-        float minX = 0.5F - halfDepth;
-        float maxX = 0.5F + halfDepth;
+        float minX = 0.5F - halfWidth;
+        float maxX = 0.5F + halfWidth;
         float minY = bladeY;
         float maxY = bladeY + BLADE_HEIGHT;
-        float minZ = 0.5F - halfWidth;
-        float maxZ = 0.5F + halfWidth;
+        float minZ = 0.5F - halfDepth;
+        float maxZ = 0.5F + halfDepth;
 
         Matrix4f pose = poseStack.last().pose();
 
