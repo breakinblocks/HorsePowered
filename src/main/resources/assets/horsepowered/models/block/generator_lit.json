@@ -1,0 +1,6 @@
+{
+  "parent": "horsepowered:block/generator",
+  "textures": {
+    "torch": "minecraft:block/redstone_torch"
+  }
+}

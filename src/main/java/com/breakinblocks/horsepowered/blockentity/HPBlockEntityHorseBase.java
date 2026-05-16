@@ -2,6 +2,7 @@ package com.breakinblocks.horsepowered.blockentity;
 
 import com.google.common.collect.Lists;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -15,6 +16,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.LeverBlock;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -47,6 +49,7 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
 
     protected AABB[] searchAreas = new AABB[PATH_POINTS];
     protected List<BlockPos> searchPos = null;
+    protected List<BlockPos> floorPos = null;
     protected int origin = -1;
     protected int target = -1;
 
@@ -91,13 +94,16 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
 
     /**
      * Validates that the area around the block is clear for the horse to walk.
-     * Default implementation checks a 7x7 area (excluding center 3x3) at Y=0 and Y=1.
+     * Default implementation checks a 7x7 area (excluding center 3x3) at Y=0 and Y=1,
+     * plus a sturdy floor at Y=-1. Levers are allowed inside the ring so the area
+     * can host redstone toggles for the block.
      */
     public boolean validateArea() {
         if (level == null) return false;
 
         if (searchPos == null) {
             searchPos = Lists.newArrayList();
+            floorPos = Lists.newArrayList();
             for (int x = -3; x <= 3; x++) {
                 for (int z = -3; z <= 3; z++) {
                     if ((x <= 1 && x >= -1) && (z <= 1 && z >= -1)) {
@@ -105,13 +111,21 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
                     }
                     searchPos.add(worldPosition.offset(x, 0, z));
                     searchPos.add(worldPosition.offset(x, 1, z));
+                    floorPos.add(worldPosition.offset(x, -1, z));
                 }
             }
         }
 
         for (BlockPos pos : searchPos) {
             BlockState state = level.getBlockState(pos);
+            if (state.getBlock() instanceof LeverBlock) continue;
             if (!state.canBeReplaced()) {
+                return false;
+            }
+        }
+        for (BlockPos pos : floorPos) {
+            BlockState state = level.getBlockState(pos);
+            if (!state.isFaceSturdy(level, pos, Direction.UP)) {
                 return false;
             }
         }
@@ -172,8 +186,12 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
                 prevVirtualYRot = loadedYRot;
             }
 
-            cachedRenderEntity = null;
-            cachedRenderEntityType = null;
+            // Only invalidate the cached render entity when the worker identity changed.
+            // Resetting it on every position sync would restart the walk animation each tick.
+            if (cachedRenderEntityType != null && !cachedRenderEntityType.equals(workerEntityTypeId)) {
+                cachedRenderEntity = null;
+                cachedRenderEntityType = null;
+            }
         } else {
             workerEntityData = null;
             workerEntityTypeId = null;
@@ -422,8 +440,16 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
         if (searchPos != null) {
             for (BlockPos pos : searchPos) {
                 BlockState state = level.getBlockState(pos);
-                boolean isClear = state.canBeReplaced();
+                boolean isClear = state.canBeReplaced() || state.getBlock() instanceof LeverBlock;
                 positions.add(Map.entry(pos, isClear));
+            }
+        }
+        if (floorPos != null) {
+            for (BlockPos pos : floorPos) {
+                BlockState state = level.getBlockState(pos);
+                if (!state.isFaceSturdy(level, pos, Direction.UP)) {
+                    positions.add(Map.entry(pos, false));
+                }
             }
         }
         return positions;

@@ -23,4 +23,7 @@ public class ModItems {
             () -> new BucketItem(ModFluids.SEED_OIL_SOURCE.get(), new Item.Properties()
                     .craftRemainder(Items.BUCKET)
                     .stacksTo(1)));
+
+    public static final DeferredItem<WorkSaddleItem> WORK_SADDLE = ITEMS.register("work_saddle",
+            () -> new WorkSaddleItem(new Item.Properties().stacksTo(1)));
 }

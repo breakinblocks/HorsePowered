@@ -79,11 +79,28 @@ public class HPRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_planks", has(ItemTags.PLANKS))
                 .save(output, HorsePowerMod.id("crafting/press"));
 
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, ModBlocks.GENERATOR.get())
+                .pattern("SRS")
+                .pattern("DGD")
+                .pattern("DDD")
+                .define('S', Items.POLISHED_DEEPSLATE_SLAB)
+                .define('R', Items.LIGHTNING_ROD)
+                .define('D', Items.POLISHED_DEEPSLATE)
+                .define('G', ModBlocks.GRINDSTONE.get())
+                .unlockedBy("has_grindstone", has(ModBlocks.GRINDSTONE.get()))
+                .save(output, HorsePowerMod.id("crafting/generator"));
+
         ShapelessRecipeBuilder.shapeless(RecipeCategory.FOOD, ModItems.DOUGH.get())
                 .requires(ModItems.FLOUR.get())
                 .requires(Items.WATER_BUCKET)
                 .unlockedBy("has_flour", has(ModItems.FLOUR.get()))
                 .save(output, HorsePowerMod.id("crafting/dough"));
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, ModItems.WORK_SADDLE.get())
+                .requires(Items.SADDLE)
+                .requires(Items.LEAD)
+                .unlockedBy("has_saddle", has(Items.SADDLE))
+                .save(output, HorsePowerMod.id("crafting/work_saddle"));
 
         SimpleCookingRecipeBuilder.smelting(Ingredient.of(ModItems.DOUGH.get()), RecipeCategory.FOOD,
                         Items.BREAD, 0.35f, 200)

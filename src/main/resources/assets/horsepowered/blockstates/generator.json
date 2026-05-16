@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "powered=false": {"model": "horsepowered:block/generator"},
+    "powered=true": {"model": "horsepowered:block/generator_lit"}
+  }
+}

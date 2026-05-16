@@ -42,12 +42,15 @@ public class HorsePowerMod {
                         output.accept(ModItems.FLOUR.get());
                         output.accept(ModItems.DOUGH.get());
                         output.accept(ModItems.SEED_OIL_BUCKET.get());
+                        output.accept(ModItems.WORK_SADDLE.get());
                         // Blocks
                         output.accept(ModBlocks.HAND_GRINDSTONE.get());
                         output.accept(ModBlocks.GRINDSTONE.get());
                         output.accept(ModBlocks.CHOPPING_BLOCK.get());
                         output.accept(ModBlocks.CHOPPER.get());
                         output.accept(ModBlocks.PRESS.get());
+                        output.accept(ModBlocks.GENERATOR.get());
+                        output.accept(ModBlocks.CREATIVE_BATTERY.get());
                     })
                     .build()
     );
@@ -133,6 +136,14 @@ public class HorsePowerMod {
                     }
                     return null;
                 });
+
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK,
+                ModBlocks.GENERATOR_BE.get(),
+                (be, side) -> be.getEnergyHandler());
+
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK,
+                ModBlocks.CREATIVE_BATTERY_BE.get(),
+                (be, side) -> be.getEnergyHandler());
     }
 
     /**
