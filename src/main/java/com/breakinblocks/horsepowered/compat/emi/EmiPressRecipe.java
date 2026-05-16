@@ -51,7 +51,7 @@ public class EmiPressRecipe extends BasicEmiRecipe {
     @Override
     public void addWidgets(WidgetHolder widgets) {
         widgets.addSlot(inputs.get(0), 0, 0);
-        widgets.addFillingArrow(26, 1, 200);
+        widgets.addFillingArrow(26, 1, 10000);
         widgets.addSlot(outputs.get(0), 60, 0).recipeContext(this);
 
         if (fluidOutput) {

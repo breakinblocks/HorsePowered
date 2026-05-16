@@ -34,6 +34,7 @@
   "emi.category.horsepowered.pressing": "Horse Pressing",
   "gui.horsepowered.jei.time": "Time: %s",
   "gui.horsepowered.jei.chops": "Chops: %s",
+  "gui.horsepowered.jei.turns": "Turns: %s",
   "gui.horsepowered.jei.chance": "%s%% chance",
 
   "config.jade.plugin_horsepowered.grindstone": "Horse Grindstone",

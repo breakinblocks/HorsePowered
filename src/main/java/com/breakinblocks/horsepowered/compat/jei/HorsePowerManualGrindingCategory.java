@@ -2,6 +2,7 @@ package com.breakinblocks.horsepowered.compat.jei;
 
 import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
+import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import com.breakinblocks.horsepowered.recipes.GrindstoneRecipe;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
@@ -87,8 +88,10 @@ public class HorsePowerManualGrindingCategory implements IRecipeCategory<Grindst
     public void draw(GrindstoneRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
         arrow.draw(guiGraphics, 26, 1);
 
-        Component timeText = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.time", recipe.getTime());
-        guiGraphics.drawString(Minecraft.getInstance().font, timeText, 1, 24, 0x808080, false);
+        int pointsPerTurn = HorsePowerConfig.pointsPerRotation.get();
+        int turns = Math.max(1, (recipe.getTime() + pointsPerTurn - 1) / pointsPerTurn);
+        Component turnText = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.turns", turns);
+        guiGraphics.drawString(Minecraft.getInstance().font, turnText, 1, 24, 0x808080, false);
 
         if (!recipe.getSecondary().isEmpty() && recipe.getSecondaryChance() > 0) {
             String chanceText = recipe.getSecondaryChance() + "%";

@@ -2,6 +2,7 @@ package com.breakinblocks.horsepowered.compat.jei;
 
 import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
+import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import com.breakinblocks.horsepowered.recipes.ChoppingRecipe;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
@@ -92,12 +93,11 @@ public class HorsePowerManualChoppingCategory implements IRecipeCategory<Choppin
 
     @Override
     public void draw(ChoppingRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
-        // Draw arrow between input and output
         arrow.draw(guiGraphics, 38, 26);
 
-        // Draw chop count (time = number of chops)
-        Component timeText = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.chops", recipe.getTime());
-        int textWidth = Minecraft.getInstance().font.width(timeText);
-        guiGraphics.drawString(Minecraft.getInstance().font, timeText, (WIDTH - textWidth) / 2, 48, 0x808080, false);
+        int chops = recipe.getTime() * HorsePowerConfig.choppingMultiplier.get();
+        Component chopText = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.chops", chops);
+        int textWidth = Minecraft.getInstance().font.width(chopText);
+        guiGraphics.drawString(Minecraft.getInstance().font, chopText, (WIDTH - textWidth) / 2, 48, 0x808080, false);
     }
 }
