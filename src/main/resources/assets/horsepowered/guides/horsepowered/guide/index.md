@@ -33,8 +33,12 @@ Start by crafting a [Hand Grindstone](hand_grindstone.md) for manual grinding, o
 ### Tools
 - [Work Saddle](work_saddle.md) - Capture and transport workers across long distances
 
+### Creative-Only
+- [Creative Battery](creative_battery.md) - Infinite-capacity FE tank for testing energy setups
+
 ## Tips
 
 - Horses and other creatures can be attached to horse-powered blocks by leading them with a lead and right-clicking the block
-- Horse-powered blocks require a clear 7x7 area around them for the animal to walk
+- Horse-powered blocks require a clear 7x7 working area around them with a sturdy floor below
+- Levers placed inside the working area are allowed, so you can host redstone toggles right on the floor (useful for the Generator)
 - Shift+Right-click a horse-powered block with an empty hand to see its required working area

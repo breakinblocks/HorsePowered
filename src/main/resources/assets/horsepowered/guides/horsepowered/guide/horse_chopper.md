@@ -47,7 +47,9 @@ The Horse Chopper is an automated chopping machine powered by a horse or other c
 ## Automation
 
 The Horse Chopper can be automated with hoppers:
-- Insert items from the top or sides
+- Insert items from the top or sides — both halves of the 2-block model accept inserts
 - Extract output items from the bottom
+
+Because the upper half is a fully solid block (with its own hitbox), you can place hoppers and other blocks directly adjacent to it instead of building scaffold-and-break workarounds.
 
 This makes it ideal for automated wood processing farms.
