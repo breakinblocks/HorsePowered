@@ -14,6 +14,7 @@ import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -67,7 +68,6 @@ public class HorsePowerPressCategory implements IRecipeCategory<PressRecipe> {
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, PressRecipe recipe, IFocusGroup focuses) {
-        // Input slot with count - left side
         builder.addSlot(RecipeIngredientRole.INPUT, 1, 1)
                 .addItemStacks(Arrays.stream(recipe.getIngredient().getItems())
                         .map(stack -> {
@@ -78,7 +78,6 @@ public class HorsePowerPressCategory implements IRecipeCategory<PressRecipe> {
                         .toList())
                 .setBackground(slot, -1, -1);
 
-        // Output - either item or fluid
         if (recipe.hasFluidOutput()) {
             builder.addSlot(RecipeIngredientRole.OUTPUT, 61, 1)
                     .setFluidRenderer(recipe.getFluidResult().getAmount(), false, 16, 32)
@@ -92,19 +91,13 @@ public class HorsePowerPressCategory implements IRecipeCategory<PressRecipe> {
 
     @Override
     public void draw(PressRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
-        // Draw arrow between input and output
         arrow.draw(guiGraphics, 26, 1);
 
-        // Draw input count if more than 1
-        if (recipe.getInputCount() > 1) {
-            String countText = "x" + recipe.getInputCount();
-            guiGraphics.drawString(Minecraft.getInstance().font, countText, 1, 24, 0x808080, false);
-        }
-
-        // Draw fluid amount if fluid output
         if (recipe.hasFluidOutput()) {
+            Font font = Minecraft.getInstance().font;
             String fluidText = recipe.getFluidResult().getAmount() + " mB";
-            guiGraphics.drawString(Minecraft.getInstance().font, fluidText, 55, 36, 0x808080, false);
+            int x = WIDTH - font.width(fluidText);
+            guiGraphics.drawString(font, fluidText, x, 36, 0x808080, false);
         }
     }
 }
