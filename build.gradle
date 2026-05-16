@@ -93,6 +93,10 @@ dependencies {
     // EMI
     compileOnly "dev.emi:emi-neoforge:${emi_version}:api"
     runtimeOnly "dev.emi:emi-neoforge:${emi_version}"
+
+    // GuideMe (in-game guidebook)
+    compileOnly "org.appliedenergistics:guideme:${guideme_version}"
+    runtimeOnly "org.appliedenergistics:guideme:${guideme_version}"
 }
 
 tasks.named('processResources', ProcessResources).configure {
