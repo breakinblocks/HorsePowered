@@ -14,13 +14,19 @@ public class EmiChoppingRecipe extends BasicEmiRecipe {
 
     private final int time;
     private final boolean manual;
+    private final float hungerCost;
 
     public EmiChoppingRecipe(EmiRecipeCategory category, ChoppingRecipe recipe) {
-        super(category, null, 78, 28);
+        super(category, null, 78, heightFor(category, recipe));
         this.time = recipe.getTime();
         this.manual = category == HorsePoweredEmiPlugin.MANUAL_CHOPPING;
+        this.hungerCost = recipe.getHungerCost();
         this.inputs.add(EmiIngredient.of(recipe.getIngredient()));
         this.outputs.add(EmiStack.of(recipe.getResult()));
+    }
+
+    private static int heightFor(EmiRecipeCategory category, ChoppingRecipe recipe) {
+        return category == HorsePoweredEmiPlugin.MANUAL_CHOPPING && recipe.getHungerCost() > 0.0F ? 38 : 28;
     }
 
     @Override
@@ -33,5 +39,12 @@ public class EmiChoppingRecipe extends BasicEmiRecipe {
         widgets.addText(
                 Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.chops", chops),
                 26, 20, 0x808080, false);
+
+        if (manual && hungerCost > 0.0F) {
+            widgets.addText(
+                    Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.hunger",
+                            String.format("%.2f", hungerCost)),
+                    26, 30, 0x808080, false);
+        }
     }
 }

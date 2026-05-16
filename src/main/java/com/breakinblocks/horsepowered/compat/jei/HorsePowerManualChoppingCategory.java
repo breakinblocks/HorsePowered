@@ -28,7 +28,7 @@ public class HorsePowerManualChoppingCategory implements IRecipeCategory<Choppin
     public static final ResourceLocation UID = ResourceLocation.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "manual_chopping");
 
     private static final int WIDTH = 100;
-    private static final int HEIGHT = 60;
+    private static final int HEIGHT = 66;
 
     private final IDrawable icon;
     private final IDrawable slot;
@@ -97,7 +97,18 @@ public class HorsePowerManualChoppingCategory implements IRecipeCategory<Choppin
 
         int chops = recipe.getTime() * HorsePowerConfig.choppingMultiplier.get();
         Component chopText = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.chops", chops);
-        int textWidth = Minecraft.getInstance().font.width(chopText);
-        guiGraphics.drawString(Minecraft.getInstance().font, chopText, (WIDTH - textWidth) / 2, 48, 0x808080, false);
+        int chopWidth = Minecraft.getInstance().font.width(chopText);
+        guiGraphics.drawString(Minecraft.getInstance().font, chopText, (WIDTH - chopWidth) / 2, 48, 0x808080, false);
+
+        if (recipe.getHungerCost() > 0.0F) {
+            Component hungerText = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.hunger",
+                    formatHunger(recipe.getHungerCost()));
+            int hungerWidth = Minecraft.getInstance().font.width(hungerText);
+            guiGraphics.drawString(Minecraft.getInstance().font, hungerText, (WIDTH - hungerWidth) / 2, 58, 0x808080, false);
+        }
+    }
+
+    private static String formatHunger(float value) {
+        return String.format("%.2f", value);
     }
 }

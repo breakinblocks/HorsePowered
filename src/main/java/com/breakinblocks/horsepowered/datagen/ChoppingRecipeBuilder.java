@@ -15,6 +15,7 @@ public class ChoppingRecipeBuilder {
     private int time = 1;
     private RecipeTier tier = RecipeTier.ANY;
     private int priority = 0;
+    private float hungerCost = 0.0F;
 
     private ChoppingRecipeBuilder(Ingredient ingredient, ItemStack result) {
         this.ingredient = ingredient;
@@ -44,8 +45,13 @@ public class ChoppingRecipeBuilder {
         return this;
     }
 
+    public ChoppingRecipeBuilder hungerCost(float hungerCost) {
+        this.hungerCost = hungerCost;
+        return this;
+    }
+
     public void save(RecipeOutput output, String name) {
         ResourceLocation id = HorsePowerMod.id("chopping/" + name);
-        output.accept(id, new ChoppingRecipe(ingredient, result, time, tier, priority), null);
+        output.accept(id, new ChoppingRecipe(ingredient, result, time, tier, priority, hungerCost), null);
     }
 }

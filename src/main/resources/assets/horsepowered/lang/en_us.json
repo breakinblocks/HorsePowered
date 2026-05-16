@@ -36,6 +36,7 @@
   "gui.horsepowered.jei.chops": "Chops: %s",
   "gui.horsepowered.jei.turns": "Turns: %s",
   "gui.horsepowered.jei.chance": "%s%% chance",
+  "gui.horsepowered.jei.hunger": "Hunger: %s",
 
   "config.jade.plugin_horsepowered.grindstone": "Horse Grindstone",
   "config.jade.plugin_horsepowered.chopper": "Horse Chopper",

@@ -79,8 +79,9 @@ public class BlockHandGrindstone extends BlockHPBase {
         if (be instanceof HandGrindstoneBlockEntity grindstone) {
             if (grindstone.canWork() && !player.isShiftKeyDown()) {
                 if (!level.isClientSide) {
+                    float recipeHunger = grindstone.getRecipe().map(r -> r.value().getHungerCost()).orElse(0.0F);
                     if (grindstone.turn()) {
-                        player.causeFoodExhaustion(HorsePowerConfig.grindstoneExhaustion.get().floatValue());
+                        player.causeFoodExhaustion(HorsePowerConfig.grindstoneExhaustion.get().floatValue() + recipeHunger);
                         playTurnFeedback(level, pos);
                     }
                 }

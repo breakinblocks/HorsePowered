@@ -24,7 +24,7 @@ public class HorsePowerManualGrindingCategory implements IRecipeCategory<Grindst
     public static final ResourceLocation UID = ResourceLocation.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "manual_grinding");
 
     private static final int WIDTH = 100;
-    private static final int HEIGHT = 36;
+    private static final int HEIGHT = 46;
 
     private final IDrawable icon;
     private final IDrawable slot;
@@ -96,6 +96,12 @@ public class HorsePowerManualGrindingCategory implements IRecipeCategory<Grindst
         if (!recipe.getSecondary().isEmpty() && recipe.getSecondaryChance() > 0) {
             String chanceText = recipe.getSecondaryChance() + "%";
             guiGraphics.drawString(Minecraft.getInstance().font, chanceText, 81, 24, 0x808080, false);
+        }
+
+        if (recipe.getHungerCost() > 0.0F) {
+            Component hungerText = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.hunger",
+                    String.format("%.2f", recipe.getHungerCost()));
+            guiGraphics.drawString(Minecraft.getInstance().font, hungerText, 1, 34, 0x808080, false);
         }
     }
 }

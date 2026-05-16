@@ -22,13 +22,15 @@ public class ChoppingRecipe implements Recipe<HPRecipeInput> {
     private final int time;
     private final RecipeTier tier;
     private final int priority;
+    private final float hungerCost;
 
-    public ChoppingRecipe(Ingredient ingredient, ItemStack result, int time, RecipeTier tier, int priority) {
+    public ChoppingRecipe(Ingredient ingredient, ItemStack result, int time, RecipeTier tier, int priority, float hungerCost) {
         this.ingredient = ingredient;
         this.result = result;
         this.time = time;
         this.tier = tier;
         this.priority = priority;
+        this.hungerCost = Math.max(0.0F, hungerCost);
     }
 
     @Override
@@ -88,6 +90,10 @@ public class ChoppingRecipe implements Recipe<HPRecipeInput> {
         return priority;
     }
 
+    public float getHungerCost() {
+        return hungerCost;
+    }
+
     public static class Serializer implements RecipeSerializer<ChoppingRecipe> {
 
         public static final MapCodec<ChoppingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance ->
@@ -96,18 +102,33 @@ public class ChoppingRecipe implements Recipe<HPRecipeInput> {
                         ItemStack.STRICT_CODEC.fieldOf("result").forGetter(ChoppingRecipe::getResult),
                         Codec.INT.fieldOf("time").forGetter(ChoppingRecipe::getTime),
                         RecipeTier.CODEC.optionalFieldOf("tier", RecipeTier.ANY).forGetter(ChoppingRecipe::getTier),
-                        Codec.INT.optionalFieldOf("priority", 0).forGetter(ChoppingRecipe::getPriority)
+                        Codec.INT.optionalFieldOf("priority", 0).forGetter(ChoppingRecipe::getPriority),
+                        Codec.FLOAT.optionalFieldOf("hungerCost", 0.0F).forGetter(ChoppingRecipe::getHungerCost)
                 ).apply(instance, ChoppingRecipe::new)
         );
 
-        public static final StreamCodec<RegistryFriendlyByteBuf, ChoppingRecipe> STREAM_CODEC = StreamCodec.composite(
-                Ingredient.CONTENTS_STREAM_CODEC, ChoppingRecipe::getIngredient,
-                ItemStack.STREAM_CODEC, ChoppingRecipe::getResult,
-                ByteBufCodecs.VAR_INT, ChoppingRecipe::getTime,
-                RecipeTier.STREAM_CODEC, ChoppingRecipe::getTier,
-                ByteBufCodecs.VAR_INT, ChoppingRecipe::getPriority,
-                ChoppingRecipe::new
-        );
+        public static final StreamCodec<RegistryFriendlyByteBuf, ChoppingRecipe> STREAM_CODEC = new StreamCodec<>() {
+            @Override
+            public ChoppingRecipe decode(RegistryFriendlyByteBuf buf) {
+                Ingredient ingredient = Ingredient.CONTENTS_STREAM_CODEC.decode(buf);
+                ItemStack result = ItemStack.STREAM_CODEC.decode(buf);
+                int time = ByteBufCodecs.VAR_INT.decode(buf);
+                RecipeTier tier = RecipeTier.STREAM_CODEC.decode(buf);
+                int priority = ByteBufCodecs.VAR_INT.decode(buf);
+                float hungerCost = ByteBufCodecs.FLOAT.decode(buf);
+                return new ChoppingRecipe(ingredient, result, time, tier, priority, hungerCost);
+            }
+
+            @Override
+            public void encode(RegistryFriendlyByteBuf buf, ChoppingRecipe recipe) {
+                Ingredient.CONTENTS_STREAM_CODEC.encode(buf, recipe.getIngredient());
+                ItemStack.STREAM_CODEC.encode(buf, recipe.getResult());
+                ByteBufCodecs.VAR_INT.encode(buf, recipe.getTime());
+                RecipeTier.STREAM_CODEC.encode(buf, recipe.getTier());
+                ByteBufCodecs.VAR_INT.encode(buf, recipe.getPriority());
+                ByteBufCodecs.FLOAT.encode(buf, recipe.getHungerCost());
+            }
+        };
 
         @Override
         public MapCodec<ChoppingRecipe> codec() {

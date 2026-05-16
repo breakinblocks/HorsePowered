@@ -47,12 +47,13 @@ public class BlockChoppingBlock extends BlockHPBase {
             // Axe strike: chop an already-placed log
             if (stack.is(ItemTags.AXES) && chopper.canWork()) {
                 if (!level.isClientSide) {
+                    float recipeHunger = chopper.getRecipe().map(r -> r.value().getHungerCost()).orElse(0.0F);
                     boolean finishedChop = chopper.chop(player, stack);
                     if (finishedChop && HorsePowerConfig.shouldDamageAxe.get()) {
                         EquipmentSlot slot = hand == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
                         stack.hurtAndBreak(1, player, slot);
                     }
-                    player.causeFoodExhaustion(HorsePowerConfig.choppingBlockExhaustion.get().floatValue());
+                    player.causeFoodExhaustion(HorsePowerConfig.choppingBlockExhaustion.get().floatValue() + recipeHunger);
                     playStrikeFeedback(level, pos, chopper.getItem(0));
                 }
                 return ItemInteractionResult.sidedSuccess(level.isClientSide);
