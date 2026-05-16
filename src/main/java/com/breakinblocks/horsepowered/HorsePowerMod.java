@@ -1,15 +1,19 @@
 package com.breakinblocks.horsepowered;
 
+import com.breakinblocks.horsepowered.blockentity.PressBlockEntity;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
+import com.breakinblocks.horsepowered.client.ClientExtensions;
 import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import com.breakinblocks.horsepowered.fluids.ModFluids;
 import com.breakinblocks.horsepowered.items.ModItems;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
 import com.mojang.logging.LogUtils;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Blocks;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -19,7 +23,9 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+import net.neoforged.neoforge.fluids.FluidInteractionRegistry;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.slf4j.Logger;
@@ -31,7 +37,7 @@ public class HorsePowerMod {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS =
-            DeferredRegister.create(net.minecraft.core.registries.Registries.CREATIVE_MODE_TAB, MOD_ID);
+            DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MOD_ID);
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> CREATIVE_TAB = CREATIVE_MODE_TABS.register("main", () ->
             CreativeModeTab.builder()
@@ -88,25 +94,25 @@ public class HorsePowerMod {
     private void commonSetup(final FMLCommonSetupEvent event) {
         LOGGER.info("Horse Powered common setup");
         event.enqueueWork(() -> {
-            var lavaType = net.neoforged.neoforge.common.NeoForgeMod.LAVA_TYPE.value();
+            var lavaType = NeoForgeMod.LAVA_TYPE.value();
             var oilType = ModFluids.SEED_OIL_TYPE.get();
-            var fire = net.minecraft.world.level.block.Blocks.FIRE.defaultBlockState();
+            var fire = Blocks.FIRE.defaultBlockState();
 
             // Seed oil + adjacent lava → fire
-            net.neoforged.neoforge.fluids.FluidInteractionRegistry.addInteraction(oilType,
-                    new net.neoforged.neoforge.fluids.FluidInteractionRegistry.InteractionInformation(
+            FluidInteractionRegistry.addInteraction(oilType,
+                    new FluidInteractionRegistry.InteractionInformation(
                             lavaType, fluidState -> fire));
 
             // Seed oil + adjacent fire block → fire
-            net.neoforged.neoforge.fluids.FluidInteractionRegistry.addInteraction(oilType,
-                    new net.neoforged.neoforge.fluids.FluidInteractionRegistry.InteractionInformation(
+            FluidInteractionRegistry.addInteraction(oilType,
+                    new FluidInteractionRegistry.InteractionInformation(
                             (level, currentPos, relativePos, currentState) ->
-                                    level.getBlockState(relativePos).is(net.minecraft.world.level.block.Blocks.FIRE),
+                                    level.getBlockState(relativePos).is(Blocks.FIRE),
                             fluidState -> fire));
 
             // Lava + adjacent seed oil → fire
-            net.neoforged.neoforge.fluids.FluidInteractionRegistry.addInteraction(lavaType,
-                    new net.neoforged.neoforge.fluids.FluidInteractionRegistry.InteractionInformation(
+            FluidInteractionRegistry.addInteraction(lavaType,
+                    new FluidInteractionRegistry.InteractionInformation(
                             oilType, fluidState -> fire));
 
             LOGGER.info("Registered seed oil fluid interactions");
@@ -131,7 +137,7 @@ public class HorsePowerMod {
                 ModBlocks.FILLER_BE.get(),
                 (be, side) -> {
                     var mainBe = be.getFilledTileEntity();
-                    if (mainBe instanceof com.breakinblocks.horsepowered.blockentity.PressBlockEntity press) {
+                    if (mainBe instanceof PressBlockEntity press) {
                         return press.getFluidHandler();
                     }
                     return null;
@@ -152,6 +158,6 @@ public class HorsePowerMod {
      */
     private static void registerClientExtensions(ModContainer container) {
         // Delegate to client helper class - this defers class loading of client-only classes
-        com.breakinblocks.horsepowered.client.ClientExtensions.register(container);
+        ClientExtensions.register(container);
     }
 }

@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "D": {
+      "item": "minecraft:polished_deepslate"
+    },
+    "G": {
+      "item": "horsepowered:grindstone"
+    },
+    "R": {
+      "item": "minecraft:lightning_rod"
+    },
+    "S": {
+      "item": "minecraft:polished_deepslate_slab"
+    }
+  },
+  "pattern": [
+    "SRS",
+    "DGD",
+    "DDD"
+  ],
+  "result": {
+    "count": 1,
+    "id": "horsepowered:generator"
+  }
+}

@@ -32,6 +32,9 @@ logs/
 *.log
 crash-reports/
 
+# Datagen scratch — keep the generated resources tracked, drop the hash cache
+src/generated/resources/.cache/
+
 # OS generated files
 .DS_Store
 .DS_Store?
@@ -57,8 +60,9 @@ local.properties
 *.bat
 !gradlew.bat
 
-# Markdown files — only README.md, LICENSE.md, and metadata/changelogs/ are tracked
+# Markdown files — only README.md, LICENSE.md, in-resource guide pages, and changelogs are tracked
 *.md
 !README.md
 !LICENSE.md
 !metadata/changelogs/**/*.md
+!src/main/resources/**/*.md

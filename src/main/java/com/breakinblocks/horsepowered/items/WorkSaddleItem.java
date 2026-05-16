@@ -6,6 +6,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -34,7 +35,7 @@ import java.util.Optional;
 public class WorkSaddleItem extends Item {
 
     public static final TagKey<EntityType<?>> VALID_WORKER =
-            TagKey.create(net.minecraft.core.registries.Registries.ENTITY_TYPE, HorsePowerMod.id("valid_worker"));
+            TagKey.create(Registries.ENTITY_TYPE, HorsePowerMod.id("valid_worker"));
 
     public WorkSaddleItem(Properties properties) {
         super(properties);

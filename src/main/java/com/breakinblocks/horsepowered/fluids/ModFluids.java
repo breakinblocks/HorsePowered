@@ -3,6 +3,7 @@ package com.breakinblocks.horsepowered.fluids;
 import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.items.ModItems;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
@@ -19,7 +20,7 @@ public class ModFluids {
             DeferredRegister.create(NeoForgeRegistries.FLUID_TYPES, HorsePowerMod.MOD_ID);
 
     public static final DeferredRegister<Fluid> FLUIDS =
-            DeferredRegister.create(net.minecraft.core.registries.Registries.FLUID, HorsePowerMod.MOD_ID);
+            DeferredRegister.create(Registries.FLUID, HorsePowerMod.MOD_ID);
 
     // Seed oil - viscous plant-based oil
     public static final DeferredHolder<FluidType, FluidType> SEED_OIL_TYPE = FLUID_TYPES.register("seed_oil",
