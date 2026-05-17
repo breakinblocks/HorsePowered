@@ -26,7 +26,7 @@ import org.joml.Matrix4f;
 
 public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBlockEntity> {
 
-    private static final ResourceLocation STONE_TEXTURE = ResourceLocation.withDefaultNamespace("block/stone");
+    private static final ResourceLocation BLADE_TEXTURE = ResourceLocation.withDefaultNamespace("block/iron_block");
 
     // Blade dimensions (in blocks)
     private static final float BLADE_WIDTH = 0.625F;   // 10/16
@@ -119,8 +119,7 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
         float progress = (windup + 0.74F) / 0.74F;
         float bladeY = BLADE_MIN_Y + (BLADE_MAX_Y - BLADE_MIN_Y) * progress;
 
-        // Get stone texture from block atlas
-        TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(STONE_TEXTURE);
+        TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(BLADE_TEXTURE);
         VertexConsumer builder = bufferSource.getBuffer(RenderType.solid());
 
         poseStack.pushPose();
