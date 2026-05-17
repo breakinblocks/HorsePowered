@@ -1,5 +1,6 @@
 package com.breakinblocks.horsepowered.compat.jei;
 
+import com.breakinblocks.horsepowered.Configs;
 import com.breakinblocks.horsepowered.recipes.GrindstoneRecipe;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
@@ -19,7 +20,10 @@ import net.minecraft.world.level.block.Block;
 
 public class HorsePowerGrindingCategory implements IRecipeCategory<GrindstoneRecipe> {
 
+    private static final int WIDTH = 100;
+
     private final RecipeType<GrindstoneRecipe> recipeType;
+    private final boolean manual;
     private final IDrawable background;
     private final IDrawable icon;
     private final IDrawable slot;
@@ -28,10 +32,11 @@ public class HorsePowerGrindingCategory implements IRecipeCategory<GrindstoneRec
 
     public HorsePowerGrindingCategory(IGuiHelper guiHelper, RecipeType<GrindstoneRecipe> recipeType, Block iconBlock, String titleKey) {
         this.recipeType = recipeType;
-        this.background = guiHelper.createBlankDrawable(100, 36);
+        this.manual = recipeType == HorsePowerPlugin.GRINDING_HAND_TYPE;
+        this.background = guiHelper.createBlankDrawable(WIDTH, manual ? 46 : 36);
         this.icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(iconBlock));
         this.slot = guiHelper.getSlotDrawable();
-        this.arrow = guiHelper.drawableBuilder(new ResourceLocation("jei", "textures/jei/gui/gui_vanilla.png"), 82, 128, 24, 17).build();
+        this.arrow = guiHelper.getRecipeArrow();
         this.title = Component.translatable(titleKey);
     }
 
@@ -80,12 +85,25 @@ public class HorsePowerGrindingCategory implements IRecipeCategory<GrindstoneRec
     public void draw(GrindstoneRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
         arrow.draw(guiGraphics, 26, 1);
 
-        Component timeText = Component.translatable("gui.horsepowered.jei.time", recipe.getTime());
-        guiGraphics.drawString(Minecraft.getInstance().font, timeText, 1, 24, 0x808080, false);
+        Component primaryText;
+        if (manual) {
+            int pointsPerTurn = Configs.pointsPerRotation.get();
+            int turns = Math.max(1, (recipe.getTime() + pointsPerTurn - 1) / pointsPerTurn);
+            primaryText = Component.translatable("gui.horsepowered.jei.turns", turns);
+        } else {
+            primaryText = Component.translatable("gui.horsepowered.jei.time", recipe.getTime());
+        }
+        guiGraphics.drawString(Minecraft.getInstance().font, primaryText, 1, 24, 0x808080, false);
 
         if (!recipe.getSecondary().isEmpty() && recipe.getSecondaryChance() > 0) {
             String chanceText = recipe.getSecondaryChance() + "%";
             guiGraphics.drawString(Minecraft.getInstance().font, chanceText, 81, 24, 0x808080, false);
+        }
+
+        if (manual && recipe.getHungerCost() > 0.0F) {
+            Component hungerText = Component.translatable("gui.horsepowered.jei.hunger",
+                    String.format("%.2f", recipe.getHungerCost()));
+            guiGraphics.drawString(Minecraft.getInstance().font, hungerText, 1, 34, 0x808080, false);
         }
     }
 }

@@ -53,13 +53,13 @@ public class HorsePoweredEmiPlugin implements EmiPlugin {
         RecipeManager rm = registry.getRecipeManager();
 
         Comparator<GrindstoneRecipe> grindOrder = Comparator
-                .comparingInt(GrindstoneRecipe::getPriority).reversed()
+                .comparingInt(GrindstoneRecipe::getPriority)
                 .thenComparing(r -> r.getId().toString());
         Comparator<ChoppingRecipe> chopOrder = Comparator
-                .comparingInt(ChoppingRecipe::getPriority).reversed()
+                .comparingInt(ChoppingRecipe::getPriority)
                 .thenComparing(r -> r.getId().toString());
         Comparator<PressRecipe> pressOrder = Comparator
-                .comparingInt(PressRecipe::getPriority).reversed()
+                .comparingInt(PressRecipe::getPriority)
                 .thenComparing(r -> r.getId().toString());
 
         List<GrindstoneRecipe> allGrinding = rm.getAllRecipesFor(HPRecipes.GRINDING_TYPE.get());

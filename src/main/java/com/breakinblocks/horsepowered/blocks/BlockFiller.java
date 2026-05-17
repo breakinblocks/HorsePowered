@@ -52,13 +52,22 @@ public class BlockFiller extends Block implements EntityBlock, WorldlyContainerH
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        return Shapes.empty();
+        return Shapes.block();
     }
 
     @Override
     public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        // Use standard block shape for collision
         return Shapes.block();
+    }
+
+    @Override
+    public int getLightBlock(BlockState state, BlockGetter level, BlockPos pos) {
+        return 0;
+    }
+
+    @Override
+    public boolean propagatesSkylightDown(BlockState state, BlockGetter level, BlockPos pos) {
+        return true;
     }
 
     private boolean validateFilled(Level level, BlockPos fillerPos, BlockState fillerState) {

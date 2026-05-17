@@ -1,5 +1,6 @@
 package com.breakinblocks.horsepowered.compat.emi;
 
+import com.breakinblocks.horsepowered.Configs;
 import com.breakinblocks.horsepowered.recipes.ChoppingRecipe;
 import dev.emi.emi.api.recipe.BasicEmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
@@ -11,21 +12,38 @@ import net.minecraft.network.chat.Component;
 public class EmiChoppingRecipe extends BasicEmiRecipe {
 
     private final int time;
+    private final boolean manual;
+    private final float hungerCost;
 
     public EmiChoppingRecipe(EmiRecipeCategory category, ChoppingRecipe recipe) {
-        super(category, recipe.getId(), 78, 28);
+        super(category, recipe.getId(), 78, heightFor(category, recipe));
         this.time = recipe.getTime();
+        this.manual = category == HorsePoweredEmiPlugin.CHOPPING_HAND;
+        this.hungerCost = recipe.getHungerCost();
         this.inputs.add(EmiIngredient.of(recipe.getIngredient()));
         this.outputs.add(EmiStack.of(recipe.getResult()));
+    }
+
+    private static int heightFor(EmiRecipeCategory category, ChoppingRecipe recipe) {
+        return category == HorsePoweredEmiPlugin.CHOPPING_HAND && recipe.getHungerCost() > 0.0F ? 38 : 28;
     }
 
     @Override
     public void addWidgets(WidgetHolder widgets) {
         widgets.addSlot(inputs.get(0), 0, 0);
-        widgets.addFillingArrow(26, 1, 200);
+        widgets.addFillingArrow(26, 1, 10000);
         widgets.addSlot(outputs.get(0), 60, 0).recipeContext(this);
+
+        int chops = manual ? time * Configs.choppingMultiplier.get() : time;
         widgets.addText(
-                Component.translatable("gui.horsepowered.jei.chops", time),
+                Component.translatable("gui.horsepowered.jei.chops", chops),
                 26, 20, 0x808080, false);
+
+        if (manual && hungerCost > 0.0F) {
+            widgets.addText(
+                    Component.translatable("gui.horsepowered.jei.hunger",
+                            String.format("%.2f", hungerCost)),
+                    26, 30, 0x808080, false);
+        }
     }
 }

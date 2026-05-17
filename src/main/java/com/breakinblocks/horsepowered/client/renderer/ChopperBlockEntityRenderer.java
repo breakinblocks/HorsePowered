@@ -41,6 +41,7 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
         }
 
         WorkingAreaRenderer.renderIfActive(blockEntity, poseStack, bufferSource);
+        GhostWorkerRenderer.render(blockEntity, partialTick, poseStack, bufferSource, packedLight);
         LeadRenderer.renderLead(blockEntity, partialTick, poseStack, bufferSource);
 
         Direction facing = state.getValue(BlockChopper.FACING);

@@ -6,6 +6,7 @@ import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
@@ -14,12 +15,14 @@ import java.util.Arrays;
 
 public class EmiPressRecipe extends BasicEmiRecipe {
 
+    private static final int WIDTH = 78;
+
     private final int inputCount;
     private final boolean fluidOutput;
     private final int fluidAmount;
 
     public EmiPressRecipe(EmiRecipeCategory category, PressRecipe recipe) {
-        super(category, recipe.getId(), 78, 36);
+        super(category, recipe.getId(), WIDTH, 36);
         this.inputCount = recipe.getInputCount();
         this.fluidOutput = recipe.hasFluidOutput();
         this.fluidAmount = fluidOutput ? recipe.getFluidResult().getAmount() : 0;
@@ -48,18 +51,13 @@ public class EmiPressRecipe extends BasicEmiRecipe {
     @Override
     public void addWidgets(WidgetHolder widgets) {
         widgets.addSlot(inputs.get(0), 0, 0);
-        widgets.addFillingArrow(26, 1, 200);
+        widgets.addFillingArrow(26, 1, 10000);
         widgets.addSlot(outputs.get(0), 60, 0).recipeContext(this);
 
-        if (inputCount > 1) {
-            widgets.addText(
-                    Component.literal("x" + inputCount),
-                    0, 20, 0x808080, false);
-        }
         if (fluidOutput) {
-            widgets.addText(
-                    Component.literal(fluidAmount + " mB"),
-                    54, 20, 0x808080, false);
+            Component text = Component.literal(fluidAmount + " mB");
+            int x = WIDTH - Minecraft.getInstance().font.width(text);
+            widgets.addText(text, x, 20, 0x808080, false);
         }
     }
 }

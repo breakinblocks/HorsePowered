@@ -25,6 +25,9 @@ minecraft {
             workingDirectory project.file('run')
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
+            // Mixin refmap remap so dependency mods' mixins resolve in the dev env (needed by EMI, Jade).
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
             mods {
                 "${mod_id}" {
                     source sourceSets.main
@@ -34,9 +37,6 @@ minecraft {
 
         client {
             property 'forge.enabledGameTestNamespaces', mod_id
-            // Mixin compatibility fix for Jade
-            property 'mixin.env.remapRefMap', 'true'
-            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
         }
 
         server {

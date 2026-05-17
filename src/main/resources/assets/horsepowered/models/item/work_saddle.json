@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "minecraft:item/saddle"
+  },
+  "overrides": [
+    { "predicate": { "horsepowered:carrying": 1 }, "model": "horsepowered:item/work_saddle_carrying" }
+  ]
+}

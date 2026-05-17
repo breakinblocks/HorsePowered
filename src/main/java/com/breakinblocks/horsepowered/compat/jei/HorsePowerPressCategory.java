@@ -14,6 +14,7 @@ import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -25,6 +26,8 @@ public class HorsePowerPressCategory implements IRecipeCategory<PressRecipe> {
 
     public static final ResourceLocation UID = new ResourceLocation(Reference.MODID, "pressing");
 
+    private static final int WIDTH = 82;
+
     private final IDrawable background;
     private final IDrawable icon;
     private final IDrawable slot;
@@ -32,11 +35,10 @@ public class HorsePowerPressCategory implements IRecipeCategory<PressRecipe> {
     private final Component title;
 
     public HorsePowerPressCategory(IGuiHelper guiHelper) {
-        // Use blank background - we'll draw slots and arrow programmatically
-        this.background = guiHelper.createBlankDrawable(82, 50);
+        this.background = guiHelper.createBlankDrawable(WIDTH, 50);
         this.icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(ModBlocks.PRESS.get()));
         this.slot = guiHelper.getSlotDrawable();
-        this.arrow = guiHelper.drawableBuilder(new ResourceLocation("jei", "textures/jei/gui/gui_vanilla.png"), 82, 128, 24, 17).build();
+        this.arrow = guiHelper.getRecipeArrow();
         this.title = Component.translatable("gui." + Reference.MODID + ".jei.pressing");
     }
 
@@ -87,19 +89,13 @@ public class HorsePowerPressCategory implements IRecipeCategory<PressRecipe> {
 
     @Override
     public void draw(PressRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
-        // Draw arrow between input and output
         arrow.draw(guiGraphics, 26, 1);
 
-        // Draw input count if more than 1
-        if (recipe.getInputCount() > 1) {
-            String countText = "x" + recipe.getInputCount();
-            guiGraphics.drawString(Minecraft.getInstance().font, countText, 1, 24, 0x808080, false);
-        }
-
-        // Draw fluid amount if fluid output
         if (recipe.hasFluidOutput()) {
+            Font font = Minecraft.getInstance().font;
             String fluidText = recipe.getFluidResult().getAmount() + " mB";
-            guiGraphics.drawString(Minecraft.getInstance().font, fluidText, 55, 36, 0x808080, false);
+            int x = WIDTH - font.width(fluidText);
+            guiGraphics.drawString(font, fluidText, x, 36, 0x808080, false);
         }
     }
 }

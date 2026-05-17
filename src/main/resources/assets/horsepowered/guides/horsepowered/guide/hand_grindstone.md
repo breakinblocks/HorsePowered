@@ -23,16 +23,24 @@ The Hand Grindstone is a manual processing block that allows you to grind items 
 5. Right-click with an empty hand on the output to collect it
 6. Sneak + right-click to pull un-milled input back out
 
+## Display & Pickup Sides
+
+The Hand Grindstone displays its contents based on the direction the block is facing:
+- **Input on top**: spinning preview of the un-milled item
+- **Player's left** (block's clockwise side relative to facing): extra input display
+- **Player's right** (block's counter-clockwise side): output display — right-click here to pick up the finished product
+- **Player's side / front**: secondary output display
+
 ## Recipe
 
 <RecipeFor id="horsepowered:hand_grindstone" />
 
 ## Notes
 
-- Each turn consumes a small amount of hunger (configurable)
+- Each turn consumes a small amount of hunger (configurable). Recipes may also specify an extra `hungerCost` per turn that adds on top of the config baseline.
 - Multiple items can be inserted for batch processing
 - Works with the same recipes as the Horse Grindstone
-- Output items appear in dedicated slots on the grindstone surface
+- The number of turns required per recipe is shown in JEI / EMI on the manual category
 
 ## Example Recipes
 

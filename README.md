@@ -20,6 +20,15 @@ A Minecraft Forge mod that adds horse-powered machinery for grinding, chopping, 
 - **Horse Grindstone** - An automated grindstone powered by a horse walking in circles. Continuously grinds items without manual intervention.
 - **Horse Chopper** - An automated chopping machine. Attach a horse to chop logs into planks automatically.
 - **Horse Press** - Press items to extract fluids or produce other outputs. Perfect for making oils, juices, and other liquids.
+- **Horse Powered Generator** - Converts horse labor directly into Forge Energy. Generates 80 FE/tick while a worker walks, buffers 100,000 FE, and pushes power to any adjacent FE consumer. Requires a redstone signal to run (toggle with a lever inside the working ring).
+
+### Tools
+
+- **Work Saddle** - Captures any valid worker (horse, donkey, mule, llama, trader llama) into a portable item and releases it elsewhere on right-click. Carrying saddle shows a tooltip with the stored mob.
+
+### Creative-Only
+
+- **Creative Battery** - Infinite-capacity FE source/sink for testing energy setups. Holds `Integer.MAX_VALUE` FE and pushes stored energy to adjacent FE consumers every tick.
 
 ## Getting Started
 
@@ -65,9 +74,20 @@ Example grinding recipe (`data/yourpack/recipes/grinding/custom_recipe.json`):
   "type": "horsepowered:grinding",
   "ingredient": { "item": "minecraft:wheat" },
   "result": { "item": "yourmod:flour", "count": 1 },
-  "time": 12
+  "time": 12,
+  "tier": 1,
+  "priority": 0,
+  "hungerCost": 0.1
 }
 ```
+
+#### Optional Recipe Fields
+
+All three recipe types accept the following optional fields:
+
+- **`tier`** (int, default `0`) - Restricts which stations can run the recipe. Higher tiers require the corresponding higher-tier station upgrade.
+- **`priority`** (int, default `0`) - Sort order for recipe selection and JEI / EMI display. Lower values sort first.
+- **`hungerCost`** (float, default `0.0`) - On manual stations (Hand Grindstone, Chopping Block), this value is added to the player's food exhaustion every chop or turn, on top of the existing config baseline. Has no effect on horse-powered stations. JEI and EMI display a "Hunger" line on the manual category when the value is greater than zero.
 
 ### Custom Worker Mobs
 

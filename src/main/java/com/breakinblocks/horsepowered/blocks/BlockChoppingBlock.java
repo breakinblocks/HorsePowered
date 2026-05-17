@@ -2,6 +2,7 @@ package com.breakinblocks.horsepowered.blocks;
 
 import com.breakinblocks.horsepowered.Configs;
 import com.breakinblocks.horsepowered.blockentity.ManualChopperBlockEntity;
+import com.breakinblocks.horsepowered.recipes.ChoppingRecipe;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
@@ -48,11 +49,12 @@ public class BlockChoppingBlock extends BlockHPBase {
             // Axe strike: chop an already-placed log
             if (held.is(ItemTags.AXES) && chopper.canWork()) {
                 if (!level.isClientSide) {
+                    float recipeHunger = chopper.getRecipe().map(ChoppingRecipe::getHungerCost).orElse(0.0F);
                     boolean finishedChop = chopper.chop(player, held);
                     if (finishedChop && Configs.shouldDamageAxe.get()) {
                         held.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(hand));
                     }
-                    player.causeFoodExhaustion(Configs.choppingBlockExhaustion.get().floatValue());
+                    player.causeFoodExhaustion(Configs.choppingBlockExhaustion.get().floatValue() + recipeHunger);
                     playStrikeFeedback(level, pos, chopper.getItem(0));
                 }
                 return InteractionResult.sidedSuccess(level.isClientSide);

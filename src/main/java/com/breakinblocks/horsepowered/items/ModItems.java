@@ -15,6 +15,9 @@ public class ModItems {
     public static final RegistryObject<Item> FLOUR = ITEMS.register("flour", () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> DOUGH = ITEMS.register("dough", () -> new Item(new Item.Properties()));
 
+    public static final RegistryObject<WorkSaddleItem> WORK_SADDLE = ITEMS.register("work_saddle",
+            () -> new WorkSaddleItem(new Item.Properties().stacksTo(1)));
+
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
     }

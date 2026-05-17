@@ -144,12 +144,11 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
     }
 
     private static void appendWorkerInfo(ITooltip tooltip, HPBlockEntityHorseBase te) {
-        // hasWorkerForDisplay avoids the side-effect lazy-resolve that hasWorker performs client-side.
         if (te.hasWorkerForDisplay()) {
-            var worker = te.getWorker();
-            if (worker != null) {
+            String name = te.getWorkerDisplayName();
+            if (name != null && !name.isEmpty()) {
                 tooltip.add(Component.translatable("jade." + Reference.MODID + ".worker",
-                        worker.getDisplayName()));
+                        Component.literal(name)));
             } else {
                 tooltip.add(Component.translatable("jade." + Reference.MODID + ".worker_attached"));
             }

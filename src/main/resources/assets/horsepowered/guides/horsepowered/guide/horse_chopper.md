@@ -39,7 +39,7 @@ The Horse Chopper is an automated chopping machine powered by a horse or other c
 
 ## Notes
 
-- The chopper is two blocks tall
+- The chopper is two blocks tall, and both halves now have a full hitbox so hoppers, scaffolding, and other attachments can be placed directly against either block
 - Unlike the manual Chopping Block, no axe is required
 - The creature requires a clear path around the chopper
 - Right-click with an empty hand to release the attached creature
@@ -47,6 +47,7 @@ The Horse Chopper is an automated chopping machine powered by a horse or other c
 ## Automation
 
 The Horse Chopper can be automated with hoppers:
+- Hoppers placed against any side of the upper half feed into the chopper through the filler container delegation
 - Insert items from the top or sides
 - Extract output items from the bottom
 

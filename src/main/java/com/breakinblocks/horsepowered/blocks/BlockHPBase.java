@@ -12,7 +12,6 @@ import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.LeadItem;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -72,8 +71,8 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
                 Containers.dropContents(level, pos, te);
                 level.updateNeighbourForOutputSignal(pos, this);
 
-                // Drop lead if horse was attached
                 if (te instanceof HPBlockEntityHorseBase horseTe && horseTe.hasWorker()) {
+                    horseTe.releaseWorkerToWorld();
                     Containers.dropItemStack(level, pos.getX(), pos.getY() + 1, pos.getZ(), new ItemStack(Items.LEAD));
                 }
             }
@@ -118,14 +117,9 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
             }
         }
 
-        // Handle attaching a leashed creature
-        if (horseTE != null && ((stack.getItem() instanceof LeadItem && creature != null) || creature != null)) {
+        if (horseTE != null && creature != null) {
             if (!horseTE.hasWorker()) {
-                // Detach leash but don't drop it - give the lead back to the player
                 creature.dropLeash(true, false);
-                if (!level.isClientSide) {
-                    ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(Items.LEAD));
-                }
                 horseTE.setWorker(creature);
                 onWorkerAttached(player, creature);
                 return InteractionResult.sidedSuccess(level.isClientSide);

@@ -1,5 +1,6 @@
 package com.breakinblocks.horsepowered.compat.jei;
 
+import com.breakinblocks.horsepowered.Configs;
 import com.breakinblocks.horsepowered.recipes.ChoppingRecipe;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
@@ -19,7 +20,10 @@ import net.minecraft.world.level.block.Block;
 
 public class HorsePowerChoppingCategory implements IRecipeCategory<ChoppingRecipe> {
 
+    private static final int WIDTH = 82;
+
     private final RecipeType<ChoppingRecipe> recipeType;
+    private final boolean manual;
     private final IDrawable background;
     private final IDrawable icon;
     private final IDrawable slot;
@@ -28,10 +32,11 @@ public class HorsePowerChoppingCategory implements IRecipeCategory<ChoppingRecip
 
     public HorsePowerChoppingCategory(IGuiHelper guiHelper, RecipeType<ChoppingRecipe> recipeType, Block iconBlock, String titleKey) {
         this.recipeType = recipeType;
-        this.background = guiHelper.createBlankDrawable(82, 36);
+        this.manual = recipeType == HorsePowerPlugin.CHOPPING_HAND_TYPE;
+        this.background = guiHelper.createBlankDrawable(WIDTH, manual ? 46 : 36);
         this.icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(iconBlock));
         this.slot = guiHelper.getSlotDrawable();
-        this.arrow = guiHelper.drawableBuilder(new ResourceLocation("jei", "textures/jei/gui/gui_vanilla.png"), 82, 128, 24, 17).build();
+        this.arrow = guiHelper.getRecipeArrow();
         this.title = Component.translatable(titleKey);
     }
 
@@ -70,7 +75,14 @@ public class HorsePowerChoppingCategory implements IRecipeCategory<ChoppingRecip
     public void draw(ChoppingRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
         arrow.draw(guiGraphics, 26, 1);
 
-        Component timeText = Component.translatable("gui.horsepowered.jei.chops", recipe.getTime());
-        guiGraphics.drawString(Minecraft.getInstance().font, timeText, 26, 24, 0x808080, false);
+        int chops = manual ? recipe.getTime() * Configs.choppingMultiplier.get() : recipe.getTime();
+        Component chopText = Component.translatable("gui.horsepowered.jei.chops", chops);
+        guiGraphics.drawString(Minecraft.getInstance().font, chopText, 26, 24, 0x808080, false);
+
+        if (manual && recipe.getHungerCost() > 0.0F) {
+            Component hungerText = Component.translatable("gui.horsepowered.jei.hunger",
+                    String.format("%.2f", recipe.getHungerCost()));
+            guiGraphics.drawString(Minecraft.getInstance().font, hungerText, 26, 34, 0x808080, false);
+        }
     }
 }

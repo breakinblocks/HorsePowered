@@ -62,13 +62,13 @@ public class HorsePowerPlugin implements IModPlugin {
         RecipeManager recipeManager = Minecraft.getInstance().level.getRecipeManager();
 
         Comparator<GrindstoneRecipe> grindingOrder = Comparator
-                .comparingInt(GrindstoneRecipe::getPriority).reversed()
+                .comparingInt(GrindstoneRecipe::getPriority)
                 .thenComparing(r -> r.getId().toString());
         Comparator<ChoppingRecipe> choppingOrder = Comparator
-                .comparingInt(ChoppingRecipe::getPriority).reversed()
+                .comparingInt(ChoppingRecipe::getPriority)
                 .thenComparing(r -> r.getId().toString());
         Comparator<PressRecipe> pressingOrder = Comparator
-                .comparingInt(PressRecipe::getPriority).reversed()
+                .comparingInt(PressRecipe::getPriority)
                 .thenComparing(r -> r.getId().toString());
 
         List<GrindstoneRecipe> allGrinding = recipeManager.getAllRecipesFor(HPRecipes.GRINDING_TYPE.get());

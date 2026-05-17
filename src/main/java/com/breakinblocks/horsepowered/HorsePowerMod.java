@@ -34,11 +34,14 @@ public class HorsePowerMod {
                     .displayItems((parameters, output) -> {
                         output.accept(ModItems.FLOUR.get());
                         output.accept(ModItems.DOUGH.get());
+                        output.accept(ModItems.WORK_SADDLE.get());
                         output.accept(ModBlocks.HAND_GRINDSTONE.get());
                         output.accept(ModBlocks.GRINDSTONE.get());
                         output.accept(ModBlocks.CHOPPING_BLOCK.get());
                         output.accept(ModBlocks.CHOPPER.get());
                         output.accept(ModBlocks.PRESS.get());
+                        output.accept(ModBlocks.GENERATOR.get());
+                        output.accept(ModBlocks.CREATIVE_BATTERY.get());
                     })
                     .build()
     );

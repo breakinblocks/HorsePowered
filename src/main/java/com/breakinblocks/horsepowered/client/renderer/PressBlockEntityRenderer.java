@@ -36,6 +36,7 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
     public void render(PressBlockEntity blockEntity, float partialTick, PoseStack poseStack,
                        MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
         WorkingAreaRenderer.renderIfActive(blockEntity, poseStack, bufferSource);
+        GhostWorkerRenderer.render(blockEntity, partialTick, poseStack, bufferSource, packedLight);
         LeadRenderer.renderLead(blockEntity, partialTick, poseStack, bufferSource);
         renderPlunger(blockEntity, poseStack, bufferSource, packedLight, packedOverlay);
 

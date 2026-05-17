@@ -2,6 +2,7 @@ package com.breakinblocks.horsepowered.blocks;
 
 import com.breakinblocks.horsepowered.Configs;
 import com.breakinblocks.horsepowered.blockentity.HandGrindstoneBlockEntity;
+import com.breakinblocks.horsepowered.recipes.GrindstoneRecipe;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -80,8 +81,9 @@ public class BlockHandGrindstone extends BlockHPBase {
         if (be instanceof HandGrindstoneBlockEntity grindstone) {
             if (grindstone.canWork() && !player.isShiftKeyDown()) {
                 if (!level.isClientSide) {
+                    float recipeHunger = grindstone.getRecipe().map(GrindstoneRecipe::getHungerCost).orElse(0.0F);
                     if (grindstone.turn()) {
-                        player.causeFoodExhaustion(Configs.grindstoneExhaustion.get().floatValue());
+                        player.causeFoodExhaustion(Configs.grindstoneExhaustion.get().floatValue() + recipeHunger);
                         playTurnFeedback(level, pos);
                     }
                 }

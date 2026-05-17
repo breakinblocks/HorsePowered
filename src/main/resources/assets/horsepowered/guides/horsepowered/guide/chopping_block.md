@@ -27,10 +27,11 @@ The Chopping Block is a manual processing station for chopping logs and other it
 
 ## Notes
 
-- Using the chopping block causes hunger exhaustion (configurable)
+- Using the chopping block causes hunger exhaustion (configurable). Recipes may also specify an extra `hungerCost` per chop that adds on top of the config baseline.
 - Axes may take durability damage when chopping (configurable)
 - Works with the same recipes as the Horse Chopper
 - Different logs can produce different amounts of planks
+- The number of chops required per recipe is shown in JEI / EMI on the manual category
 
 ## Example Recipes
 

@@ -23,6 +23,7 @@ public class GrindstoneBlockEntityRenderer implements BlockEntityRenderer<Grinds
     public void render(GrindstoneBlockEntity blockEntity, float partialTick, PoseStack poseStack,
                        MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
         WorkingAreaRenderer.renderIfActive(blockEntity, poseStack, bufferSource);
+        GhostWorkerRenderer.render(blockEntity, partialTick, poseStack, bufferSource, packedLight);
         LeadRenderer.renderLead(blockEntity, partialTick, poseStack, bufferSource);
 
         RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer, font,

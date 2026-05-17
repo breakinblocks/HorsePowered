@@ -32,9 +32,10 @@ logs/
 *.log
 crash-reports/
 
-# Forge/NeoForge specific
-src/generated/
+# Forge/NeoForge specific — ignore datagen scratch but keep the resources output tracked
+src/generated/*
 !src/generated/resources/
+src/generated/resources/.cache/
 
 # OS generated files
 .DS_Store
@@ -57,5 +58,3 @@ replay_pid*
 *.swp
 *~
 local.properties
-
-gradle/wrapper/
