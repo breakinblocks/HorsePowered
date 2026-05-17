@@ -63,4 +63,8 @@ public class ModItems {
             registryName -> new BlockItem(ModBlocks.CREATIVE_BATTERY.get(), new Item.Properties()
                     .setId(ResourceKey.create(Registries.ITEM, registryName))
                     .useBlockDescriptionPrefix()));
+    public static final DeferredItem<BlockItem> DRYING_RACK_ITEM = ITEMS.register("drying_rack",
+            registryName -> new BlockItem(ModBlocks.DRYING_RACK.get(), new Item.Properties()
+                    .setId(ResourceKey.create(Registries.ITEM, registryName))
+                    .useBlockDescriptionPrefix()));
 }

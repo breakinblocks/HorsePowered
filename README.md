@@ -24,6 +24,10 @@ A Minecraft NeoForge mod that adds horse-powered machinery for grinding, choppin
 - **Horse Press** — Press items to extract fluids or produce other outputs. Recipes can also consume fluids from the press's internal tank to make new items. Right-click with a bucket to fill or drain the tank.
 - **Horse Powered Generator** — Converts horse labor into Forge Energy (FE). Generates 80 FE/tick while a worker walks, stores up to 100,000 FE, and pushes power to any adjacent energy handler. Requires a redstone signal to run.
 
+### Passive Machines
+
+- **Drying Rack**: A wooden 2x2 multiblock rack that dries 8 items at once. Each slot ticks independently. Right-click to place / take items. Hoppers and pipes can feed input from any side and extract only finished outputs, never half-dried items.
+
 ### Tools
 
 - **Work Saddle** — Right-click any creature in the `horsepowered:valid_worker` tag (tamed or untamed) to capture it onto the saddle, then right-click a block to release it. Lets you transport workers across long distances without leashing them home.
@@ -78,6 +82,17 @@ Horse Powered ships with a comprehensive set of vanilla recipes out of the box. 
 - **Water extraction** — ice, snow, snowball, packed ice, wet sponge, mud, pointed dripstone
 - **Other** — sugar cane to paper, honey bottle to sugar, honeycomb to honey, cactus to green dye, magma block to magma cream, kelp to dried kelp
 
+### Drying (6 recipes)
+The Drying Rack is passive (slower than other machines because no worker drives it).
+- **Kelp** to Dried Kelp (1000 ticks / 50s)
+- **Wet Sponge** to Sponge (2000 ticks / 100s)
+- **Rotten Flesh** to Leather (1000 ticks / 50s)
+- **Mud** to Dirt (1000 ticks / 50s)
+- **Clay** to Terracotta (4000 ticks / 200s)
+- **Saplings** (any) to Dead Bush (1500 ticks / 75s)
+
+Jade tooltip shows per-slot progress and remaining time when you look at a specific slot.
+
 ### Farmer's Delight Compat (11 recipes)
 When Farmer's Delight is installed, the chopper gains meat-cutting recipes:
 - Beef, porkchop, chicken, cod, salmon, mutton (raw and cooked variants)
@@ -116,6 +131,7 @@ Horse Powered uses data-driven JSON recipes that can be added or modified via da
 - `horsepowered:grinding` — Grindstone recipes (supports secondary output with chance)
 - `horsepowered:chopping` — Chopping recipes
 - `horsepowered:pressing` — Press recipes (supports item OR fluid output)
+- `horsepowered:drying` — Drying Rack recipes (item-in, item-out, with a time in ticks)
 
 **Optional fields available on every grinding and chopping recipe:**
 - `tier` — restricts which station can run the recipe. `"any"` (default) runs on both manual and horse-powered stations, `"hand"` is manual-only, `"horse"` is horse-powered-only.
@@ -190,6 +206,16 @@ Horse Powered uses data-driven JSON recipes that can be added or modified via da
 - `result` — Item output (omit for fluid-only)
 - `fluidResult` — Fluid output with `id` and `amount` in mB (omit for item-only)
 - A recipe can combine `fluidInput` with either `result`, `fluidResult`, or both
+
+#### Drying Recipe
+```json
+{
+  "type": "horsepowered:drying",
+  "ingredient": { "item": "minecraft:kelp" },
+  "result": { "id": "minecraft:dried_kelp", "count": 1 },
+  "time": 1000
+}
+```
 
 ### Conditional Recipes (Mod Compat)
 

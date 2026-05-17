@@ -4,6 +4,7 @@ import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.events.HPDatapackSync;
 import com.breakinblocks.horsepowered.recipes.ChoppingRecipe;
+import com.breakinblocks.horsepowered.recipes.DryingRackRecipe;
 import com.breakinblocks.horsepowered.recipes.GrindstoneRecipe;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
 import com.breakinblocks.horsepowered.recipes.PressRecipe;
@@ -42,6 +43,9 @@ public class HorsePowerPlugin implements IModPlugin {
     public static final IRecipeType<PressRecipe> PRESSING_TYPE =
             IRecipeType.create(HorsePowerMod.MOD_ID, "pressing", PressRecipe.class);
 
+    public static final IRecipeType<DryingRackRecipe> DRYING_TYPE =
+            IRecipeType.create(HorsePowerMod.MOD_ID, "drying", DryingRackRecipe.class);
+
     @Override
     public Identifier getPluginUid() {
         return UID;
@@ -56,7 +60,8 @@ public class HorsePowerPlugin implements IModPlugin {
                 new HorsePowerManualGrindingCategory(guiHelper),
                 new HorsePowerChoppingCategory(guiHelper),
                 new HorsePowerManualChoppingCategory(guiHelper),
-                new HorsePowerPressCategory(guiHelper)
+                new HorsePowerPressCategory(guiHelper),
+                new HorsePowerDryingCategory(guiHelper)
         );
     }
 
@@ -85,6 +90,9 @@ public class HorsePowerPlugin implements IModPlugin {
 
         registration.addRecipes(PRESSING_TYPE, recipeMap.byType(HPRecipes.PRESSING_TYPE.get())
                 .stream().map(RecipeHolder::value).sorted(pressOrder).toList());
+
+        registration.addRecipes(DRYING_TYPE, recipeMap.byType(HPRecipes.DRYING_TYPE.get())
+                .stream().map(RecipeHolder::value).toList());
     }
 
     @Override
@@ -96,5 +104,7 @@ public class HorsePowerPlugin implements IModPlugin {
         registration.addCraftingStation(CHOPPING_TYPE, new ItemStack(ModBlocks.CHOPPER.get()));
 
         registration.addCraftingStation(PRESSING_TYPE, new ItemStack(ModBlocks.PRESS.get()));
+
+        registration.addCraftingStation(DRYING_TYPE, new ItemStack(ModBlocks.DRYING_RACK.get()));
     }
 }

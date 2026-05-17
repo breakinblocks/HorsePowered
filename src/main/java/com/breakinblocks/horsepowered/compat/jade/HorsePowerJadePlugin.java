@@ -2,6 +2,7 @@ package com.breakinblocks.horsepowered.compat.jade;
 
 import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.blockentity.ChopperBlockEntity;
+import com.breakinblocks.horsepowered.blockentity.DryingRackBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.FillerBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.GrindstoneBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.HandGrindstoneBlockEntity;
@@ -10,14 +11,19 @@ import com.breakinblocks.horsepowered.blockentity.ManualChopperBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.PressBlockEntity;
 import com.breakinblocks.horsepowered.blocks.BlockChopper;
 import com.breakinblocks.horsepowered.blocks.BlockChoppingBlock;
+import com.breakinblocks.horsepowered.blocks.BlockDryingRack;
 import com.breakinblocks.horsepowered.blocks.BlockFiller;
 import com.breakinblocks.horsepowered.blocks.BlockGrindstone;
 import com.breakinblocks.horsepowered.blocks.BlockHandGrindstone;
 import com.breakinblocks.horsepowered.blocks.BlockPress;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.neoforged.neoforge.fluids.FluidStack;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
@@ -37,6 +43,12 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
     public static final Identifier PRESS = Identifier.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "press");
     public static final Identifier MANUAL = Identifier.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "manual");
     public static final Identifier FILLER = Identifier.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "filler");
+    public static final Identifier DRYING_RACK = Identifier.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "drying_rack");
+
+    private static final String KEY_DR_SLOT = "dr_slot";
+    private static final String KEY_DR_PROGRESS = "dr_progress";
+    private static final String KEY_DR_TIME = "dr_time";
+    private static final String KEY_DR_FINISHED = "dr_finished";
 
     // NBT keys for server data
     private static final String KEY_CURRENT = "hp_current";
@@ -117,6 +129,29 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
                 return PRESS;
             }
         }, PressBlockEntity.class);
+
+        registration.registerBlockDataProvider(new IServerDataProvider<BlockAccessor>() {
+            @Override
+            public void appendServerData(CompoundTag data, BlockAccessor accessor) {
+                BlockState state = accessor.getBlockState();
+                BlockPos pos = accessor.getPosition();
+                HitResult hit = accessor.getHitResult();
+                if (!(hit instanceof BlockHitResult bhr)) return;
+                DryingRackBlockEntity main = BlockDryingRack.getMainBlockEntity(accessor.getLevel(), state, pos);
+                if (main == null) return;
+                int slot = BlockDryingRack.slotForHit(state, pos, bhr);
+                if (slot < 0) return;
+                data.putInt(KEY_DR_SLOT, slot);
+                data.putInt(KEY_DR_PROGRESS, main.getProgress(slot));
+                data.putInt(KEY_DR_TIME, main.getRecipeTime(slot));
+                data.putBoolean(KEY_DR_FINISHED, main.isFinished(slot));
+            }
+
+            @Override
+            public Identifier getUid() {
+                return DRYING_RACK;
+            }
+        }, BlockDryingRack.class);
 
         // Server data provider for filler blocks - get data from the main block
         registration.registerBlockDataProvider(new IServerDataProvider<BlockAccessor>() {
@@ -260,6 +295,42 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
             }
         }, BlockFiller.class);
 
+        registration.registerBlockComponent(new IBlockComponentProvider() {
+            @Override
+            public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
+                BlockState state = accessor.getBlockState();
+                BlockPos pos = accessor.getPosition();
+                DryingRackBlockEntity main = BlockDryingRack.getMainBlockEntity(accessor.getLevel(), state, pos);
+                if (main == null) return;
+                CompoundTag data = accessor.getServerData();
+                if (!data.contains(KEY_DR_SLOT)) return;
+                int slot = data.getIntOr(KEY_DR_SLOT, -1);
+                if (slot < 0) return;
+                ItemStack stack = main.getItem(slot);
+                if (stack.isEmpty()) {
+                    tooltip.add(Component.translatable("jade." + HorsePowerMod.MOD_ID + ".drying_empty"));
+                    return;
+                }
+                if (data.getBooleanOr(KEY_DR_FINISHED, false)) {
+                    tooltip.add(Component.translatable("jade." + HorsePowerMod.MOD_ID + ".drying_done",
+                            stack.getHoverName()));
+                    return;
+                }
+                int progress = data.getIntOr(KEY_DR_PROGRESS, 0);
+                int time = data.getIntOr(KEY_DR_TIME, 0);
+                if (time <= 0) return;
+                int percent = (progress * 100) / time;
+                int remainingTicks = Math.max(0, time - progress);
+                tooltip.add(Component.translatable("jade." + HorsePowerMod.MOD_ID + ".drying",
+                        stack.getHoverName(), percent, formatTime(remainingTicks)));
+            }
+
+            @Override
+            public Identifier getUid() {
+                return DRYING_RACK;
+            }
+        }, BlockDryingRack.class);
+
         // Manual blocks (hand grindstone and chopping block)
         registration.registerBlockComponent(new IBlockComponentProvider() {
             @Override
@@ -294,6 +365,15 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
                 return MANUAL;
             }
         }, BlockChoppingBlock.class);
+    }
+
+    private static String formatTime(int ticks) {
+        int totalSeconds = ticks / 20;
+        if (totalSeconds < 60) return totalSeconds + "s";
+        int minutes = totalSeconds / 60;
+        int seconds = totalSeconds % 60;
+        if (seconds == 0) return minutes + "m";
+        return minutes + "m " + seconds + "s";
     }
 
     private static void appendItemInfo(ITooltip tooltip, ItemStack stack, String type) {

@@ -45,6 +45,9 @@ public class ModBlockEntities {
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<CreativeBatteryBlockEntity>> CREATIVE_BATTERY =
             registerBlockEntity("creative_battery", CreativeBatteryBlockEntity::new, () -> ModBlocks.CREATIVE_BATTERY.get());
 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<DryingRackBlockEntity>> DRYING_RACK =
+            registerBlockEntity("drying_rack", DryingRackBlockEntity::new, () -> ModBlocks.DRYING_RACK.get());
+
     /**
      * Helper method to register a block entity type with a single valid block.
      * The block supplier is evaluated lazily during registration, after blocks are registered.

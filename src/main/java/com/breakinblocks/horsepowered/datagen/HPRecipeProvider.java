@@ -54,6 +54,7 @@ public class HPRecipeProvider extends RecipeProvider.Runner {
             buildChoppingRecipes();
             buildGrindingRecipes();
             buildPressingRecipes();
+            buildDryingRecipes();
         }
 
         private void buildCraftingRecipes() {
@@ -124,6 +125,15 @@ public class HPRecipeProvider extends RecipeProvider.Runner {
                     .requires(Items.LEAD)
                     .unlockedBy("has_saddle", has(Items.SADDLE))
                     .save(this.output, recipeKey("crafting/work_saddle"));
+
+            ShapedRecipeBuilder.shaped(this.registries.lookupOrThrow(Registries.ITEM), RecipeCategory.DECORATIONS, ModBlocks.DRYING_RACK.get())
+                    .pattern("SSS")
+                    .pattern("P P")
+                    .pattern("SSS")
+                    .define('S', Items.STICK)
+                    .define('P', ItemTags.PLANKS)
+                    .unlockedBy("has_planks", has(ItemTags.PLANKS))
+                    .save(this.output, recipeKey("crafting/drying_rack"));
 
             SimpleCookingRecipeBuilder.smelting(Ingredient.of(ModItems.DOUGH.get()), RecipeCategory.FOOD, CookingBookCategory.MISC, Items.BREAD, 0.35f, 200)
                     .unlockedBy("has_dough", has(ModItems.DOUGH.get()))
@@ -313,6 +323,27 @@ public class HPRecipeProvider extends RecipeProvider.Runner {
                     .fluidInput(NeoForgeMod.MILK.value(), 1000)
                     .result(Items.SLIME_BALL, 1)
                     .save(this.output, "milk_to_slimeball");
+        }
+
+        private void buildDryingRecipes() {
+            DryingRecipeBuilder.drying(Ingredient.of(Items.KELP), Items.DRIED_KELP)
+                    .time(1000)
+                    .save(this.output, "kelp_to_dried_kelp");
+            DryingRecipeBuilder.drying(Ingredient.of(Items.WET_SPONGE), Items.SPONGE)
+                    .time(2000)
+                    .save(this.output, "wet_sponge_to_sponge");
+            DryingRecipeBuilder.drying(Ingredient.of(Items.ROTTEN_FLESH), Items.LEATHER)
+                    .time(1000)
+                    .save(this.output, "rotten_flesh_to_leather");
+            DryingRecipeBuilder.drying(Ingredient.of(Items.MUD), Items.DIRT)
+                    .time(1000)
+                    .save(this.output, "mud_to_dirt");
+            DryingRecipeBuilder.drying(Ingredient.of(Items.CLAY), Items.TERRACOTTA)
+                    .time(4000)
+                    .save(this.output, "clay_to_terracotta");
+            DryingRecipeBuilder.drying(tag(ItemTags.SAPLINGS), Items.DEAD_BUSH)
+                    .time(1500)
+                    .save(this.output, "saplings_to_dead_bush");
         }
 
         private void chop(Ingredient input, Item result, int count, int time, String name) {

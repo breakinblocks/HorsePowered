@@ -44,6 +44,14 @@ public class HPRecipes {
                 }
             });
 
+    public static final DeferredHolder<RecipeType<?>, RecipeType<DryingRackRecipe>> DRYING_TYPE =
+            RECIPE_TYPES.register("drying", () -> new RecipeType<>() {
+                @Override
+                public String toString() {
+                    return HorsePowerMod.MOD_ID + ":drying";
+                }
+            });
+
     // Recipe Serializers - RecipeSerializer is now a record of MapCodec + StreamCodec in 26.1
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<GrindstoneRecipe>> GRINDING_SERIALIZER =
             RECIPE_SERIALIZERS.register("grinding", () -> new RecipeSerializer<>(GrindstoneRecipe.CODEC, GrindstoneRecipe.STREAM_CODEC));
@@ -54,6 +62,9 @@ public class HPRecipes {
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<PressRecipe>> PRESSING_SERIALIZER =
             RECIPE_SERIALIZERS.register("pressing", () -> new RecipeSerializer<>(PressRecipe.CODEC, PressRecipe.STREAM_CODEC));
 
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<DryingRackRecipe>> DRYING_SERIALIZER =
+            RECIPE_SERIALIZERS.register("drying", () -> new RecipeSerializer<>(DryingRackRecipe.CODEC, DryingRackRecipe.STREAM_CODEC));
+
     // Recipe Book Categories
     public static final DeferredHolder<RecipeBookCategory, RecipeBookCategory> GRINDING_CATEGORY =
             RECIPE_BOOK_CATEGORIES.register("grinding", RecipeBookCategory::new);
@@ -63,4 +74,7 @@ public class HPRecipes {
 
     public static final DeferredHolder<RecipeBookCategory, RecipeBookCategory> PRESSING_CATEGORY =
             RECIPE_BOOK_CATEGORIES.register("pressing", RecipeBookCategory::new);
+
+    public static final DeferredHolder<RecipeBookCategory, RecipeBookCategory> DRYING_CATEGORY =
+            RECIPE_BOOK_CATEGORIES.register("drying", RecipeBookCategory::new);
 }

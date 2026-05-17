@@ -64,6 +64,7 @@ public class HorsePowerMod {
                         output.accept(ModBlocks.CHOPPER.get());
                         output.accept(ModBlocks.PRESS.get());
                         output.accept(ModBlocks.GENERATOR.get());
+                        output.accept(ModBlocks.DRYING_RACK.get());
                         output.accept(ModBlocks.CREATIVE_BATTERY.get());
                     })
                     .build()
@@ -147,6 +148,9 @@ public class HorsePowerMod {
                 (be, side) -> new WorldlyContainerWrapper(be, side));
         event.registerBlockEntity(Capabilities.Item.BLOCK,
                 ModBlockEntities.CHOPPING_BLOCK.get(),
+                (be, side) -> new WorldlyContainerWrapper(be, side));
+        event.registerBlockEntity(Capabilities.Item.BLOCK,
+                ModBlockEntities.DRYING_RACK.get(),
                 (be, side) -> new WorldlyContainerWrapper(be, side));
         event.registerBlockEntity(Capabilities.Energy.BLOCK,
                 ModBlockEntities.GENERATOR.get(),

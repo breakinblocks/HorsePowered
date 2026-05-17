@@ -1,0 +1,8 @@
+{
+  "type": "horsepowered:drying",
+  "ingredient": "#minecraft:saplings",
+  "result": {
+    "id": "minecraft:dead_bush"
+  },
+  "time": 1500
+}

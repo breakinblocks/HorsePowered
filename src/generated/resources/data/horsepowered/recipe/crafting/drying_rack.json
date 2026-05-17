@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "P": "#minecraft:planks",
+    "S": "minecraft:stick"
+  },
+  "pattern": [
+    "SSS",
+    "P P",
+    "SSS"
+  ],
+  "result": {
+    "id": "horsepowered:drying_rack"
+  }
+}

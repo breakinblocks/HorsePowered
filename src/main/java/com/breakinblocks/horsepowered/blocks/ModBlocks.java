@@ -46,6 +46,13 @@ public class ModBlocks {
                     .noLootTable()
                     .pushReaction(PushReaction.BLOCK)));
 
+    public static final DeferredBlock<Block> DRYING_RACK = BLOCKS.register("drying_rack",
+            registryName -> new BlockDryingRack(BlockBehaviour.Properties.of()
+                    .setId(ResourceKey.create(Registries.BLOCK, registryName))
+                    .mapColor(MapColor.WOOD)
+                    .strength(1.5F)
+                    .noOcclusion()));
+
     public static final DeferredBlock<Block> CHOPPING_BLOCK = BLOCKS.register("chopping_block",
             registryName -> new BlockChoppingBlock(BlockBehaviour.Properties.of()
                     .setId(ResourceKey.create(Registries.BLOCK, registryName))
