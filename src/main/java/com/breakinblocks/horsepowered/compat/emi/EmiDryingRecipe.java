@@ -1,5 +1,6 @@
 package com.breakinblocks.horsepowered.compat.emi;
 
+import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.recipes.DryingRackRecipe;
 import dev.emi.emi.api.recipe.BasicEmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
@@ -28,8 +29,8 @@ public class EmiDryingRecipe extends BasicEmiRecipe {
         widgets.addFillingArrow(26, 1, time * 50);
         widgets.addSlot(outputs.get(0), 60, 0).recipeContext(this);
 
-        Component text = Component.literal(formatTime(time));
-        int x = WIDTH - Minecraft.getInstance().font.width(text);
+        Component text = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.time", formatTime(time));
+        int x = (WIDTH - Minecraft.getInstance().font.width(text)) / 2;
         widgets.addText(text, x, 20, 0x808080, false);
     }
 

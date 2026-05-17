@@ -79,9 +79,9 @@ public class HorsePowerDryingCategory implements IRecipeCategory<DryingRackRecip
         arrow.draw(guiGraphics, 26, 1);
 
         Font font = Minecraft.getInstance().font;
-        String timeText = formatTime(recipe.getTime());
-        int x = WIDTH - font.width(timeText);
-        guiGraphics.drawString(font, timeText, x, 22, 0x808080, false);
+        Component timeText = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.time", formatTime(recipe.getTime()));
+        int textWidth = font.width(timeText);
+        guiGraphics.drawString(font, timeText, (WIDTH - textWidth) / 2, 24, 0x808080, false);
     }
 
     private static String formatTime(int ticks) {
