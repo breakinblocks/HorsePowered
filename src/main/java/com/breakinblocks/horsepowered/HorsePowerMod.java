@@ -1,6 +1,8 @@
 package com.breakinblocks.horsepowered;
 
+import com.breakinblocks.horsepowered.blockentity.DryingRackBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.PressBlockEntity;
+import com.breakinblocks.horsepowered.blocks.BlockDryingRack;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.client.ClientExtensions;
 import com.breakinblocks.horsepowered.config.HorsePowerConfig;
@@ -56,6 +58,7 @@ public class HorsePowerMod {
                         output.accept(ModBlocks.CHOPPER.get());
                         output.accept(ModBlocks.PRESS.get());
                         output.accept(ModBlocks.GENERATOR.get());
+                        output.accept(ModBlocks.DRYING_RACK.get());
                         output.accept(ModBlocks.CREATIVE_BATTERY.get());
                     })
                     .build()
@@ -150,6 +153,13 @@ public class HorsePowerMod {
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK,
                 ModBlocks.CREATIVE_BATTERY_BE.get(),
                 (be, side) -> be.getEnergyHandler());
+
+        event.registerBlock(Capabilities.ItemHandler.BLOCK,
+                (level, pos, state, be, side) -> {
+                    DryingRackBlockEntity main = BlockDryingRack.getMainBlockEntity(level, state, pos);
+                    return main == null ? null : main.getItemHandler();
+                },
+                ModBlocks.DRYING_RACK.get());
     }
 
     /**

@@ -27,7 +27,7 @@ The Chopping Block is a manual processing station for chopping logs and other it
 
 ## Hunger Cost
 
-Every axe strike consumes a small baseline amount of hunger (configurable). Individual chopping recipes can also declare a `hungerCost` in their JSON, which is **added on top** of the baseline only on the Chopping Block — the Horse Chopper ignores it. When a recipe has a hunger cost, JEI and EMI show a "Hunger" line on the manual-chopping category.
+Every axe strike consumes a small baseline amount of hunger (configurable). Individual chopping recipes can also declare a `hungerCost` in their JSON, which is **added on top** of the baseline only on the Chopping Block. The Horse Chopper ignores it. When a recipe has a hunger cost, JEI and EMI show a "Hunger" line on the manual-chopping category.
 
 ## Notes
 
@@ -35,13 +35,6 @@ Every axe strike consumes a small baseline amount of hunger (configurable). Indi
 - Works with the same recipes as the Horse Chopper (unless the recipe is restricted with a `tier` of `"horse"`)
 - Different logs can produce different amounts of planks
 - Manual chopping takes more strikes per recipe than horse chopping by a configurable multiplier; JEI and EMI display the actual chop count
-
-## Example Recipes
-
-Common items you can chop:
-- Oak Log to Oak Planks (4)
-- Birch Log to Birch Planks (4)
-- Other wood types follow the same pattern
 
 ## Tips
 

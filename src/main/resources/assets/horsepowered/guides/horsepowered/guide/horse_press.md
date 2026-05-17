@@ -52,9 +52,3 @@ The Horse Press can produce fluids from certain recipes:
 - The creature requires a clear path around the press
 - Right-click with an empty hand to release the attached creature
 
-## Example Recipes
-
-Common pressing operations:
-- Seeds to Seed Oil (requires mod support)
-- Leaves to Water
-- Various fruits to juice (with mod support)

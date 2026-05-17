@@ -32,6 +32,7 @@ public class HPRecipeProvider extends RecipeProvider {
         buildChoppingRecipes(output);
         buildGrindingRecipes(output);
         buildPressingRecipes(output);
+        buildDryingRecipes(output);
     }
 
     // ==================== CRAFTING ====================
@@ -101,6 +102,15 @@ public class HPRecipeProvider extends RecipeProvider {
                 .requires(Items.LEAD)
                 .unlockedBy("has_saddle", has(Items.SADDLE))
                 .save(output, HorsePowerMod.id("crafting/work_saddle"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ModBlocks.DRYING_RACK.get())
+                .pattern("SSS")
+                .pattern("P P")
+                .pattern("SSS")
+                .define('S', Items.STICK)
+                .define('P', ItemTags.PLANKS)
+                .unlockedBy("has_planks", has(ItemTags.PLANKS))
+                .save(output, HorsePowerMod.id("crafting/drying_rack"));
 
         SimpleCookingRecipeBuilder.smelting(Ingredient.of(ModItems.DOUGH.get()), RecipeCategory.FOOD,
                         Items.BREAD, 0.35f, 200)
@@ -311,6 +321,29 @@ public class HPRecipeProvider extends RecipeProvider {
                 .inputCount(8)
                 .result(Items.DRIED_KELP, 4)
                 .save(output, "kelp_to_dried_kelp");
+    }
+
+    // ==================== DRYING ====================
+
+    private void buildDryingRecipes(RecipeOutput output) {
+        DryingRecipeBuilder.drying(Ingredient.of(Items.KELP), Items.DRIED_KELP)
+                .time(1000)
+                .save(output, "kelp_to_dried_kelp");
+        DryingRecipeBuilder.drying(Ingredient.of(Items.WET_SPONGE), Items.SPONGE)
+                .time(2000)
+                .save(output, "wet_sponge_to_sponge");
+        DryingRecipeBuilder.drying(Ingredient.of(Items.ROTTEN_FLESH), Items.LEATHER)
+                .time(1000)
+                .save(output, "rotten_flesh_to_leather");
+        DryingRecipeBuilder.drying(Ingredient.of(Items.MUD), Items.DIRT)
+                .time(1000)
+                .save(output, "mud_to_dirt");
+        DryingRecipeBuilder.drying(Ingredient.of(Items.CLAY), Items.TERRACOTTA)
+                .time(4000)
+                .save(output, "clay_to_terracotta");
+        DryingRecipeBuilder.drying(Ingredient.of(ItemTags.SAPLINGS), Items.DEAD_BUSH)
+                .time(1500)
+                .save(output, "saplings_to_dead_bush");
     }
 
     // ==================== HELPERS ====================

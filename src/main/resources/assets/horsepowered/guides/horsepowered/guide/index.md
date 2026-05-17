@@ -24,6 +24,9 @@ Start by crafting a [Hand Grindstone](hand_grindstone.md) for manual grinding, o
 - [Hand Grindstone](hand_grindstone.md) - Grind items by hand
 - [Chopping Block](chopping_block.md) - Chop logs with an axe
 
+### Passive Machines
+- [Drying Rack](drying_rack.md) - Dry up to 8 items at once, no power or labor needed
+
 ### Horse-Powered Machines
 - [Horse Grindstone](horse_grindstone.md) - Automated grinding powered by a horse
 - [Horse Chopper](horse_chopper.md) - Automated chopping powered by a horse

@@ -1,0 +1,11 @@
+{
+  "type": "horsepowered:drying",
+  "ingredient": {
+    "item": "minecraft:mud"
+  },
+  "result": {
+    "count": 1,
+    "id": "minecraft:dirt"
+  },
+  "time": 1000
+}

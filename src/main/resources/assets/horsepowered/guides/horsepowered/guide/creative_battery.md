@@ -23,7 +23,7 @@ The Creative Battery is a creative-mode test block for prototyping energy setups
 
 ## Usage
 
-- As a **source**: insert it into the build, fill it once from a Generator (or `/setblock`), and it will keep pushing power until something consumes it. Once drained it stops pushing — wire a generator in if you want a perpetual supply.
+- As a **source**: insert it into the build, fill it once from a Generator (or `/setblock`), and it will keep pushing power until something consumes it. Once drained it stops pushing, so wire a generator in if you want a perpetual supply.
 - As a **sink**: connect the output of a machine and watch the buffer fill. The battery accepts as much as anything offers.
 
 ## Restrictions

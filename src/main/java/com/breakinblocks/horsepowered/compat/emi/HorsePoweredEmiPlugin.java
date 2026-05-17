@@ -3,6 +3,7 @@ package com.breakinblocks.horsepowered.compat.emi;
 import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.recipes.ChoppingRecipe;
+import com.breakinblocks.horsepowered.recipes.DryingRackRecipe;
 import com.breakinblocks.horsepowered.recipes.GrindstoneRecipe;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
 import com.breakinblocks.horsepowered.recipes.PressRecipe;
@@ -36,6 +37,9 @@ public class HorsePoweredEmiPlugin implements EmiPlugin {
     public static final EmiRecipeCategory PRESSING = new EmiRecipeCategory(
             ResourceLocation.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "pressing"),
             EmiStack.of(ModBlocks.PRESS.get()));
+    public static final EmiRecipeCategory DRYING = new EmiRecipeCategory(
+            ResourceLocation.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "drying"),
+            EmiStack.of(ModBlocks.DRYING_RACK.get()));
 
     @Override
     public void register(EmiRegistry registry) {
@@ -44,12 +48,14 @@ public class HorsePoweredEmiPlugin implements EmiPlugin {
         registry.addCategory(CHOPPING);
         registry.addCategory(MANUAL_CHOPPING);
         registry.addCategory(PRESSING);
+        registry.addCategory(DRYING);
 
         registry.addWorkstation(GRINDING, EmiStack.of(ModBlocks.GRINDSTONE.get()));
         registry.addWorkstation(MANUAL_GRINDING, EmiStack.of(ModBlocks.HAND_GRINDSTONE.get()));
         registry.addWorkstation(CHOPPING, EmiStack.of(ModBlocks.CHOPPER.get()));
         registry.addWorkstation(MANUAL_CHOPPING, EmiStack.of(ModBlocks.CHOPPING_BLOCK.get()));
         registry.addWorkstation(PRESSING, EmiStack.of(ModBlocks.PRESS.get()));
+        registry.addWorkstation(DRYING, EmiStack.of(ModBlocks.DRYING_RACK.get()));
 
         RecipeManager rm = registry.getRecipeManager();
 
@@ -74,5 +80,9 @@ public class HorsePoweredEmiPlugin implements EmiPlugin {
         rm.getAllRecipesFor(HPRecipes.PRESSING_TYPE.get()).stream()
                 .map(RecipeHolder::value).sorted(pressOrder)
                 .forEach(r -> registry.addRecipe(new EmiPressRecipe(PRESSING, r)));
+
+        rm.getAllRecipesFor(HPRecipes.DRYING_TYPE.get()).stream()
+                .map(RecipeHolder::value)
+                .forEach(r -> registry.addRecipe(new EmiDryingRecipe(DRYING, r)));
     }
 }

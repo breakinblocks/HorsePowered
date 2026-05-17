@@ -1,0 +1,11 @@
+{
+  "type": "horsepowered:drying",
+  "ingredient": {
+    "item": "minecraft:wet_sponge"
+  },
+  "result": {
+    "count": 1,
+    "id": "minecraft:sponge"
+  },
+  "time": 2000
+}
