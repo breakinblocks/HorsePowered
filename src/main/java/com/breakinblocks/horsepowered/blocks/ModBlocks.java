@@ -2,6 +2,7 @@ package com.breakinblocks.horsepowered.blocks;
 
 import com.breakinblocks.horsepowered.blockentity.ChopperBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.CreativeBatteryBlockEntity;
+import com.breakinblocks.horsepowered.blockentity.DryingRackBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.FillerBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.GeneratorBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.GrindstoneBlockEntity;
@@ -63,6 +64,12 @@ public class ModBlocks {
                     .strength(4.0F)
                     .requiresCorrectToolForDrops()));
 
+    public static final RegistryObject<Block> DRYING_RACK = registerBlock("drying_rack",
+            () -> new BlockDryingRack(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.WOOD)
+                    .strength(1.5F)
+                    .noOcclusion()));
+
     public static final RegistryObject<Block> CREATIVE_BATTERY = registerBlock("creative_battery",
             () -> new BlockCreativeBattery(BlockBehaviour.Properties.of()
                     .mapColor(MapColor.COLOR_PURPLE)
@@ -99,6 +106,10 @@ public class ModBlocks {
     public static final RegistryObject<BlockEntityType<GeneratorBlockEntity>> GENERATOR_BE =
             BLOCK_ENTITIES.register("generator", () ->
                     BlockEntityType.Builder.of(GeneratorBlockEntity::new, GENERATOR.get()).build(null));
+
+    public static final RegistryObject<BlockEntityType<DryingRackBlockEntity>> DRYING_RACK_BE =
+            BLOCK_ENTITIES.register("drying_rack", () ->
+                    BlockEntityType.Builder.of(DryingRackBlockEntity::new, DRYING_RACK.get()).build(null));
 
     public static final RegistryObject<BlockEntityType<CreativeBatteryBlockEntity>> CREATIVE_BATTERY_BE =
             BLOCK_ENTITIES.register("creative_battery", () ->

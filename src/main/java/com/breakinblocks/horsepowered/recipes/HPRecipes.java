@@ -41,6 +41,14 @@ public class HPRecipes {
                 }
             });
 
+    public static final RegistryObject<RecipeType<DryingRackRecipe>> DRYING_TYPE =
+            RECIPE_TYPES.register("drying", () -> new RecipeType<>() {
+                @Override
+                public String toString() {
+                    return Reference.MODID + ":drying";
+                }
+            });
+
     // Recipe Serializers
     public static final RegistryObject<RecipeSerializer<GrindstoneRecipe>> GRINDING_SERIALIZER =
             RECIPE_SERIALIZERS.register("grinding", GrindstoneRecipe.Serializer::new);
@@ -50,6 +58,9 @@ public class HPRecipes {
 
     public static final RegistryObject<RecipeSerializer<PressRecipe>> PRESSING_SERIALIZER =
             RECIPE_SERIALIZERS.register("pressing", PressRecipe.Serializer::new);
+
+    public static final RegistryObject<RecipeSerializer<DryingRackRecipe>> DRYING_SERIALIZER =
+            RECIPE_SERIALIZERS.register("drying", DryingRackRecipe.Serializer::new);
 
     public static void register(IEventBus eventBus) {
         RECIPE_TYPES.register(eventBus);

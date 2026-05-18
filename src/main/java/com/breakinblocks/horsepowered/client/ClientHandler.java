@@ -2,6 +2,7 @@ package com.breakinblocks.horsepowered.client;
 
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.client.renderer.ChopperBlockEntityRenderer;
+import com.breakinblocks.horsepowered.client.renderer.DryingRackBlockEntityRenderer;
 import com.breakinblocks.horsepowered.client.renderer.GeneratorBlockEntityRenderer;
 import com.breakinblocks.horsepowered.client.renderer.GrindstoneBlockEntityRenderer;
 import com.breakinblocks.horsepowered.client.renderer.HandGrindstoneBlockEntityRenderer;
@@ -29,6 +30,7 @@ public class ClientHandler {
         event.registerBlockEntityRenderer(ModBlocks.CHOPPER_BE.get(), ChopperBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(ModBlocks.PRESS_BE.get(), PressBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(ModBlocks.GENERATOR_BE.get(), GeneratorBlockEntityRenderer::new);
+        event.registerBlockEntityRenderer(ModBlocks.DRYING_RACK_BE.get(), DryingRackBlockEntityRenderer::new);
     }
 
     @SubscribeEvent

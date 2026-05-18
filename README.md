@@ -22,6 +22,10 @@ A Minecraft Forge mod that adds horse-powered machinery for grinding, chopping, 
 - **Horse Press** - Press items to extract fluids or produce other outputs. Perfect for making oils, juices, and other liquids.
 - **Horse Powered Generator** - Converts horse labor directly into Forge Energy. Generates 80 FE/tick while a worker walks, buffers 100,000 FE, and pushes power to any adjacent FE consumer. Requires a redstone signal to run (toggle with a lever inside the working ring).
 
+### Passive Machines
+
+- **Drying Rack** - 2x2 multiblock that dries 8 items in a 4x2 grid. Each slot ticks independently. Right-click empty-handed to retrieve an item, or with an item to insert. Hoppers can insert from any side and only extract finished items. Default recipes include kelp to dried kelp, wet sponge to sponge, rotten flesh to leather, mud to dirt, clay to terracotta, and saplings to dead bush.
+
 ### Tools
 
 - **Work Saddle** - Captures any valid worker (horse, donkey, mule, llama, trader llama) into a portable item and releases it elsewhere on right-click. Carrying saddle shows a tooltip with the stored mob.
@@ -67,6 +71,7 @@ Horse Powered uses data-driven JSON recipes that can be added or modified via da
 - `horsepowered:grinding` - Grindstone recipes
 - `horsepowered:chopping` - Chopping block recipes
 - `horsepowered:pressing` - Press recipes (supports item and fluid outputs)
+- `horsepowered:drying` - Drying rack recipes (1 input -> 1 output over time)
 
 Example grinding recipe (`data/yourpack/recipes/grinding/custom_recipe.json`):
 ```json

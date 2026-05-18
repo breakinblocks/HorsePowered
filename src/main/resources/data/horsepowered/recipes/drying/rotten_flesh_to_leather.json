@@ -1,0 +1,11 @@
+{
+  "type": "horsepowered:drying",
+  "ingredient": {
+    "item": "minecraft:rotten_flesh"
+  },
+  "result": {
+    "item": "minecraft:leather",
+    "count": 1
+  },
+  "time": 1000
+}

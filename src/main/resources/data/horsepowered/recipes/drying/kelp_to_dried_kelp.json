@@ -1,0 +1,11 @@
+{
+  "type": "horsepowered:drying",
+  "ingredient": {
+    "item": "minecraft:kelp"
+  },
+  "result": {
+    "item": "minecraft:dried_kelp",
+    "count": 1
+  },
+  "time": 1000
+}

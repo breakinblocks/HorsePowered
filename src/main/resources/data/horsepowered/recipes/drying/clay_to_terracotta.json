@@ -1,0 +1,11 @@
+{
+  "type": "horsepowered:drying",
+  "ingredient": {
+    "item": "minecraft:clay"
+  },
+  "result": {
+    "item": "minecraft:terracotta",
+    "count": 1
+  },
+  "time": 4000
+}

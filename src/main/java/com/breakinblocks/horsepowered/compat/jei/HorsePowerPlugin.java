@@ -3,6 +3,7 @@ package com.breakinblocks.horsepowered.compat.jei;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.lib.Reference;
 import com.breakinblocks.horsepowered.recipes.ChoppingRecipe;
+import com.breakinblocks.horsepowered.recipes.DryingRackRecipe;
 import com.breakinblocks.horsepowered.recipes.GrindstoneRecipe;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
 import com.breakinblocks.horsepowered.recipes.PressRecipe;
@@ -39,6 +40,9 @@ public class HorsePowerPlugin implements IModPlugin {
     public static final RecipeType<PressRecipe> PRESSING_TYPE =
             RecipeType.create(Reference.MODID, "pressing", PressRecipe.class);
 
+    public static final RecipeType<DryingRackRecipe> DRYING_TYPE =
+            RecipeType.create(Reference.MODID, "drying", DryingRackRecipe.class);
+
     @Override
     public ResourceLocation getPluginUid() {
         return UID;
@@ -53,7 +57,8 @@ public class HorsePowerPlugin implements IModPlugin {
                 new HorsePowerGrindingCategory(guiHelper, GRINDING_HAND_TYPE, ModBlocks.HAND_GRINDSTONE.get(), "gui.horsepowered.jei.grinding_hand"),
                 new HorsePowerChoppingCategory(guiHelper, CHOPPING_TYPE, ModBlocks.CHOPPER.get(), "gui.horsepowered.jei.chopping"),
                 new HorsePowerChoppingCategory(guiHelper, CHOPPING_HAND_TYPE, ModBlocks.CHOPPING_BLOCK.get(), "gui.horsepowered.jei.chopping_hand"),
-                new HorsePowerPressCategory(guiHelper)
+                new HorsePowerPressCategory(guiHelper),
+                new HorsePowerDryingCategory(guiHelper)
         );
     }
 
@@ -86,6 +91,9 @@ public class HorsePowerPlugin implements IModPlugin {
         registration.addRecipes(PRESSING_TYPE,
                 recipeManager.getAllRecipesFor(HPRecipes.PRESSING_TYPE.get()).stream()
                         .sorted(pressingOrder).toList());
+
+        registration.addRecipes(DRYING_TYPE,
+                recipeManager.getAllRecipesFor(HPRecipes.DRYING_TYPE.get()));
     }
 
     @Override
@@ -97,5 +105,7 @@ public class HorsePowerPlugin implements IModPlugin {
         registration.addRecipeCatalyst(new ItemStack(ModBlocks.CHOPPER.get()), CHOPPING_TYPE);
 
         registration.addRecipeCatalyst(new ItemStack(ModBlocks.PRESS.get()), PRESSING_TYPE);
+
+        registration.addRecipeCatalyst(new ItemStack(ModBlocks.DRYING_RACK.get()), DRYING_TYPE);
     }
 }

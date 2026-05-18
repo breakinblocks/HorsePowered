@@ -15,6 +15,7 @@
   "block.horsepowered.press": "Horse Press",
   "block.horsepowered.generator": "Horse Powered Generator",
   "block.horsepowered.creative_battery": "Creative Battery",
+  "block.horsepowered.drying_rack": "Drying Rack",
   "block.horsepowered.filler": "Filler",
 
   "gui.horsepowered.jei.grinding": "Horse Grinding",
@@ -22,12 +23,14 @@
   "gui.horsepowered.jei.chopping": "Horse Chopping",
   "gui.horsepowered.jei.chopping_hand": "Hand Chopping",
   "gui.horsepowered.jei.pressing": "Horse Pressing",
+  "gui.horsepowered.jei.drying": "Drying",
 
   "emi.category.horsepowered.grinding": "Horse Grinding",
   "emi.category.horsepowered.grinding_hand": "Hand Grinding",
   "emi.category.horsepowered.chopping": "Horse Chopping",
   "emi.category.horsepowered.chopping_hand": "Hand Chopping",
   "emi.category.horsepowered.pressing": "Horse Pressing",
+  "emi.category.horsepowered.drying": "Drying",
   "gui.horsepowered.jei.time": "Time: %s",
   "gui.horsepowered.jei.chops": "Chops: %s",
   "gui.horsepowered.jei.turns": "Turns: %s",
@@ -38,6 +41,7 @@
   "config.jade.plugin_horsepowered.chopper": "Horse Chopper",
   "config.jade.plugin_horsepowered.press": "Horse Press",
   "config.jade.plugin_horsepowered.manual": "Manual Blocks",
+  "config.jade.plugin_horsepowered.drying_rack": "Drying Rack",
 
   "jade.horsepowered.input": "Input: %s x%s",
   "jade.horsepowered.output": "Output: %s x%s",
@@ -49,5 +53,8 @@
   "jade.horsepowered.worker": "Worker: %s",
   "jade.horsepowered.worker_attached": "Worker attached (loading...)",
   "jade.horsepowered.no_worker": "No worker attached",
-  "jade.horsepowered.obstructed": "Area obstructed!"
+  "jade.horsepowered.obstructed": "Area obstructed!",
+  "jade.horsepowered.drying": "Drying: %s %s%% (%s left)",
+  "jade.horsepowered.drying_done": "Dried: %s",
+  "jade.horsepowered.drying_empty": "Slot empty"
 }

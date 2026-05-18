@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "bonus_rolls": 0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "horsepowered:drying_rack",
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "horsepowered:drying_rack",
+              "properties": {
+                "part": "main"
+              }
+            }
+          ]
+        }
+      ],
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "variants": {
+    "facing=north,part=main": { "model": "horsepowered:block/drying_rack_forward" },
+    "facing=south,part=main": { "model": "horsepowered:block/drying_rack_forward", "y": 180 },
+    "facing=east,part=main":  { "model": "horsepowered:block/drying_rack_forward", "y": 90 },
+    "facing=west,part=main":  { "model": "horsepowered:block/drying_rack_forward", "y": 270 },
+
+    "facing=north,part=right": { "model": "horsepowered:block/drying_rack_right_forward" },
+    "facing=south,part=right": { "model": "horsepowered:block/drying_rack_right_forward", "y": 180 },
+    "facing=east,part=right":  { "model": "horsepowered:block/drying_rack_right_forward", "y": 90 },
+    "facing=west,part=right":  { "model": "horsepowered:block/drying_rack_right_forward", "y": 270 },
+
+    "facing=north,part=forward": { "model": "horsepowered:block/drying_rack_main" },
+    "facing=south,part=forward": { "model": "horsepowered:block/drying_rack_main", "y": 180 },
+    "facing=east,part=forward":  { "model": "horsepowered:block/drying_rack_main", "y": 90 },
+    "facing=west,part=forward":  { "model": "horsepowered:block/drying_rack_main", "y": 270 },
+
+    "facing=north,part=right_forward": { "model": "horsepowered:block/drying_rack_right" },
+    "facing=south,part=right_forward": { "model": "horsepowered:block/drying_rack_right", "y": 180 },
+    "facing=east,part=right_forward":  { "model": "horsepowered:block/drying_rack_right", "y": 90 },
+    "facing=west,part=right_forward":  { "model": "horsepowered:block/drying_rack_right", "y": 270 }
+  }
+}

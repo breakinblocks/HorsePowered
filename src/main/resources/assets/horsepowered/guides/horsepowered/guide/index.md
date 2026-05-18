@@ -30,6 +30,9 @@ Start by crafting a [Hand Grindstone](hand_grindstone.md) for manual grinding, o
 - [Horse Press](horse_press.md) - Press items into fluids or other products
 - [Horse Powered Generator](horse_generator.md) - Convert horsepower into Forge Energy
 
+### Passive Machines
+- [Drying Rack](drying_rack.md) - 2x2 multiblock that dries 8 items in parallel
+
 ### Tools
 - [Work Saddle](work_saddle.md) - Capture and transport workers across long distances
 
