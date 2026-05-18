@@ -60,6 +60,15 @@ public class ModBlocks {
                     .mapColor(MapColor.WOOD)
                     .strength(2.5F)));
 
+    public static final DeferredBlock<Block> GRANITE_ANVIL = BLOCKS.register("granite_anvil",
+            registryName -> new BlockGraniteAnvil(BlockBehaviour.Properties.of()
+                    .setId(ResourceKey.create(Registries.BLOCK, registryName))
+                    .mapColor(MapColor.TERRACOTTA_PINK)
+                    .strength(2.5F)
+                    .sound(SoundType.STONE)
+                    .requiresCorrectToolForDrops()
+                    .noOcclusion()));
+
     public static final DeferredBlock<Block> CHOPPER = BLOCKS.register("chopper",
             registryName -> new BlockChopper(BlockBehaviour.Properties.of()
                     .setId(ResourceKey.create(Registries.BLOCK, registryName))

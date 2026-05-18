@@ -3,7 +3,7 @@ package com.breakinblocks.horsepowered.compat.jei;
 import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.config.HorsePowerConfig;
-import com.breakinblocks.horsepowered.recipes.ChoppingRecipe;
+import com.breakinblocks.horsepowered.recipes.CrushingRecipe;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
@@ -16,28 +16,30 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Blocks;
 
 import java.util.List;
 
-public class HorsePowerManualChoppingCategory extends BaseHPCategory<ChoppingRecipe> {
+public class HorsePowerCrushingCategory extends BaseHPCategory<CrushingRecipe> {
 
     private static final int WIDTH = 100;
     private static final int HEIGHT = 66;
 
-    private final List<ItemStack> axes;
+    private final List<ItemStack> pickaxes;
 
-    public HorsePowerManualChoppingCategory(IGuiHelper guiHelper) {
-        super(guiHelper, ModBlocks.CHOPPING_BLOCK.get(), "manual_chopping");
+    public HorsePowerCrushingCategory(IGuiHelper guiHelper) {
+        super(guiHelper, ModBlocks.GRANITE_ANVIL.get(), "crushing");
 
-        this.axes = BuiltInRegistries.ITEM.stream()
+        this.pickaxes = BuiltInRegistries.ITEM.stream()
                 .map(ItemStack::new)
-                .filter(stack -> stack.is(ItemTags.AXES))
+                .filter(stack -> stack.is(ItemTags.PICKAXES))
+                .filter(stack -> stack.isCorrectToolForDrops(Blocks.IRON_ORE.defaultBlockState()))
                 .toList();
     }
 
     @Override
-    public IRecipeType<ChoppingRecipe> getRecipeType() {
-        return HorsePowerPlugin.MANUAL_CHOPPING_TYPE;
+    public IRecipeType<CrushingRecipe> getRecipeType() {
+        return HorsePowerPlugin.CRUSHING_TYPE;
     }
 
     @Override
@@ -51,9 +53,9 @@ public class HorsePowerManualChoppingCategory extends BaseHPCategory<ChoppingRec
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, ChoppingRecipe recipe, IFocusGroup focuses) {
+    public void setRecipe(IRecipeLayoutBuilder builder, CrushingRecipe recipe, IFocusGroup focuses) {
         builder.addSlot(RecipeIngredientRole.CRAFTING_STATION, 42, 1)
-                .addItemStacks(axes)
+                .addItemStacks(pickaxes)
                 .setBackground(slot, -1, -1);
 
         builder.addSlot(RecipeIngredientRole.INPUT, 10, 26)
@@ -66,13 +68,13 @@ public class HorsePowerManualChoppingCategory extends BaseHPCategory<ChoppingRec
     }
 
     @Override
-    public void draw(ChoppingRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
+    public void draw(CrushingRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
         arrow.draw(guiGraphics, 38, 26);
 
-        int chops = recipe.getTime() * HorsePowerConfig.choppingMultiplier.get();
-        Component chopText = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.chops", chops);
-        int chopWidth = Minecraft.getInstance().font.width(chopText);
-        guiGraphics.text(Minecraft.getInstance().font, chopText, (WIDTH - chopWidth) / 2, 48, 0xFF808080, false);
+        int strikes = recipe.getTime() * HorsePowerConfig.crushingMultiplier.get();
+        Component strikeText = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.strikes", strikes);
+        int strikeWidth = Minecraft.getInstance().font.width(strikeText);
+        guiGraphics.text(Minecraft.getInstance().font, strikeText, (WIDTH - strikeWidth) / 2, 48, 0xFF808080, false);
 
         if (recipe.getHungerCost() > 0.0F) {
             Component hungerText = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.hunger",

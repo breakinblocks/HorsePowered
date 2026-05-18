@@ -53,6 +53,6 @@ public class HorsePowerChoppingCategory extends BaseHPCategory<ChoppingRecipe> {
         arrow.draw(guiGraphics, 26, 1);
 
         Component timeText = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.chops", recipe.getTime());
-        guiGraphics.text(Minecraft.getInstance().font, timeText, 26, 24, 0x808080, false);
+        guiGraphics.text(Minecraft.getInstance().font, timeText, 26, 24, 0xFF808080, false);
     }
 }

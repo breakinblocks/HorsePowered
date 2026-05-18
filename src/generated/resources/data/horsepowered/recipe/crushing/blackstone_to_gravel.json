@@ -1,0 +1,8 @@
+{
+  "type": "horsepowered:crushing",
+  "ingredient": "minecraft:blackstone",
+  "result": {
+    "id": "minecraft:gravel"
+  },
+  "time": 2
+}

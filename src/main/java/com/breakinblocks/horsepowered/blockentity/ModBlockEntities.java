@@ -51,6 +51,9 @@ public class ModBlockEntities {
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<WoodenHopperBlockEntity>> WOODEN_HOPPER =
             registerBlockEntity("wooden_hopper", WoodenHopperBlockEntity::new, () -> ModBlocks.WOODEN_HOPPER.get());
 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<GraniteAnvilBlockEntity>> GRANITE_ANVIL =
+            registerBlockEntity("granite_anvil", GraniteAnvilBlockEntity::new, () -> ModBlocks.GRANITE_ANVIL.get());
+
     /**
      * Helper method to register a block entity type with a single valid block.
      * The block supplier is evaluated lazily during registration, after blocks are registered.

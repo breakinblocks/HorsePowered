@@ -1,0 +1,8 @@
+{
+  "type": "horsepowered:crushing",
+  "ingredient": "minecraft:tuff",
+  "result": {
+    "id": "minecraft:gravel"
+  },
+  "time": 2
+}

@@ -71,4 +71,8 @@ public class ModItems {
             registryName -> new BlockItem(ModBlocks.WOODEN_HOPPER.get(), new Item.Properties()
                     .setId(ResourceKey.create(Registries.ITEM, registryName))
                     .useBlockDescriptionPrefix()));
+    public static final DeferredItem<BlockItem> GRANITE_ANVIL_ITEM = ITEMS.register("granite_anvil",
+            registryName -> new BlockItem(ModBlocks.GRANITE_ANVIL.get(), new Item.Properties()
+                    .setId(ResourceKey.create(Registries.ITEM, registryName))
+                    .useBlockDescriptionPrefix()));
 }

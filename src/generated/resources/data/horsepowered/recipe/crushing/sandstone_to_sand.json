@@ -1,0 +1,9 @@
+{
+  "type": "horsepowered:crushing",
+  "ingredient": "minecraft:sandstone",
+  "result": {
+    "count": 4,
+    "id": "minecraft:sand"
+  },
+  "time": 2
+}

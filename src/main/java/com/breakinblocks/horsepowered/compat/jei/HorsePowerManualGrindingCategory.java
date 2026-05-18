@@ -66,17 +66,17 @@ public class HorsePowerManualGrindingCategory extends BaseHPCategory<GrindstoneR
         int pointsPerTurn = HorsePowerConfig.pointsPerRotation.get();
         int turns = Math.max(1, (recipe.getTime() + pointsPerTurn - 1) / pointsPerTurn);
         Component turnText = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.turns", turns);
-        guiGraphics.text(Minecraft.getInstance().font, turnText, 1, 24, 0x808080, false);
+        guiGraphics.text(Minecraft.getInstance().font, turnText, 1, 24, 0xFF808080, false);
 
         if (recipe.getSecondaryTemplate() != null && recipe.getSecondaryChance() > 0) {
             String chanceText = recipe.getSecondaryChance() + "%";
-            guiGraphics.text(Minecraft.getInstance().font, chanceText, 81, 24, 0x808080, false);
+            guiGraphics.text(Minecraft.getInstance().font, chanceText, 81, 24, 0xFF808080, false);
         }
 
         if (recipe.getHungerCost() > 0.0F) {
             Component hungerText = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.hunger",
                     String.format("%.2f", recipe.getHungerCost()));
-            guiGraphics.text(Minecraft.getInstance().font, hungerText, 1, 34, 0x808080, false);
+            guiGraphics.text(Minecraft.getInstance().font, hungerText, 1, 34, 0xFF808080, false);
         }
     }
 }

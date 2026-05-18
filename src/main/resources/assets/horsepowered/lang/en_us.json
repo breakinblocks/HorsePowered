@@ -20,6 +20,7 @@
   "block.horsepowered.generator": "Horse Powered Generator",
   "block.horsepowered.creative_battery": "Creative Battery",
   "block.horsepowered.drying_rack": "Drying Rack",
+  "block.horsepowered.granite_anvil": "Granite Anvil",
   "block.horsepowered.wooden_hopper": "Wooden Hopper",
   "block.horsepowered.filler": "Horse Chopper",
 
@@ -29,6 +30,8 @@
   "gui.horsepowered.jei.manual_chopping": "Manual Chopping",
   "gui.horsepowered.jei.pressing": "Horse Pressing",
   "gui.horsepowered.jei.drying": "Drying",
+  "gui.horsepowered.jei.crushing": "Crushing",
+  "gui.horsepowered.jei.strikes": "Strikes: %s",
   "gui.horsepowered.jei.time": "Time: %s",
   "gui.horsepowered.jei.chops": "Chops: %s",
   "gui.horsepowered.jei.turns": "Turns: %s",
@@ -41,9 +44,11 @@
   "config.jade.plugin_horsepowered.manual": "Manual Blocks",
   "config.jade.plugin_horsepowered.filler": "Multi-block Extension",
   "config.jade.plugin_horsepowered.drying_rack": "Drying Rack",
+  "config.jade.plugin_horsepowered.granite_anvil": "Granite Anvil",
 
   "jade.horsepowered.input": "Input: %s x%s",
   "jade.horsepowered.output": "Output: %s x%s",
+  "jade.horsepowered.strikes_remaining": "Strikes remaining: %s",
   "jade.horsepowered.secondary": "Secondary: %s x%s",
   "jade.horsepowered.fluid": "Fluid: %s %s/%s mB",
   "jade.horsepowered.fluid_input": "Input Fluid: %s %s/%s mB",

@@ -23,7 +23,8 @@ public class HPDatapackSync {
                 HPRecipes.GRINDING_TYPE.get(),
                 HPRecipes.CHOPPING_TYPE.get(),
                 HPRecipes.PRESSING_TYPE.get(),
-                HPRecipes.DRYING_TYPE.get());
+                HPRecipes.DRYING_TYPE.get(),
+                HPRecipes.CRUSHING_TYPE.get());
     }
 
     @SubscribeEvent

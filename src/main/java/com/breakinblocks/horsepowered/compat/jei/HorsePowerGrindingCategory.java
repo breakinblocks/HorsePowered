@@ -63,11 +63,11 @@ public class HorsePowerGrindingCategory extends BaseHPCategory<GrindstoneRecipe>
         arrow.draw(guiGraphics, 26, 1);
 
         Component timeText = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.time", recipe.getTime());
-        guiGraphics.text(Minecraft.getInstance().font, timeText, 1, 24, 0x808080, false);
+        guiGraphics.text(Minecraft.getInstance().font, timeText, 1, 24, 0xFF808080, false);
 
         if (recipe.getSecondaryTemplate() != null && recipe.getSecondaryChance() > 0) {
             String chanceText = recipe.getSecondaryChance() + "%";
-            guiGraphics.text(Minecraft.getInstance().font, chanceText, 81, 24, 0x808080, false);
+            guiGraphics.text(Minecraft.getInstance().font, chanceText, 81, 24, 0xFF808080, false);
         }
     }
 }

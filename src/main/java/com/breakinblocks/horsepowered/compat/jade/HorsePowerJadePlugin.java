@@ -4,6 +4,7 @@ import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.blockentity.ChopperBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.DryingRackBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.FillerBlockEntity;
+import com.breakinblocks.horsepowered.blockentity.GraniteAnvilBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.GrindstoneBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.HandGrindstoneBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.HPBlockEntityBase;
@@ -13,6 +14,7 @@ import com.breakinblocks.horsepowered.blocks.BlockChopper;
 import com.breakinblocks.horsepowered.blocks.BlockChoppingBlock;
 import com.breakinblocks.horsepowered.blocks.BlockDryingRack;
 import com.breakinblocks.horsepowered.blocks.BlockFiller;
+import com.breakinblocks.horsepowered.blocks.BlockGraniteAnvil;
 import com.breakinblocks.horsepowered.blocks.BlockGrindstone;
 import com.breakinblocks.horsepowered.blocks.BlockHandGrindstone;
 import com.breakinblocks.horsepowered.blocks.BlockPress;
@@ -44,6 +46,7 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
     public static final Identifier MANUAL = Identifier.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "manual");
     public static final Identifier FILLER = Identifier.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "filler");
     public static final Identifier DRYING_RACK = Identifier.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "drying_rack");
+    public static final Identifier GRANITE_ANVIL = Identifier.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "granite_anvil");
 
     private static final String KEY_DR_SLOT = "dr_slot";
     private static final String KEY_DR_PROGRESS = "dr_progress";
@@ -353,6 +356,26 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
                 return MANUAL;
             }
         }, BlockChoppingBlock.class);
+
+        registration.registerBlockComponent(new IBlockComponentProvider() {
+            @Override
+            public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
+                if (accessor.getBlockEntity() instanceof GraniteAnvilBlockEntity te) {
+                    appendItemInfo(tooltip, te.getItem(0), "input");
+                    appendItemInfo(tooltip, te.getItem(1), "output");
+                    if (!te.getItem(0).isEmpty()) {
+                        int remaining = Math.max(0, te.getTotalCrushAmount() - te.getCurrentCrushAmount());
+                        tooltip.add(Component.translatable(
+                                "jade." + HorsePowerMod.MOD_ID + ".strikes_remaining", remaining));
+                    }
+                }
+            }
+
+            @Override
+            public Identifier getUid() {
+                return GRANITE_ANVIL;
+            }
+        }, BlockGraniteAnvil.class);
     }
 
     private static String formatTime(int ticks) {

@@ -55,6 +55,7 @@ public class HPRecipeProvider extends RecipeProvider.Runner {
             buildGrindingRecipes();
             buildPressingRecipes();
             buildDryingRecipes();
+            buildCrushingRecipes();
         }
 
         private void buildCraftingRecipes() {
@@ -143,6 +144,14 @@ public class HPRecipeProvider extends RecipeProvider.Runner {
                     .define('C', Items.CHEST)
                     .unlockedBy("has_chest", has(Items.CHEST))
                     .save(this.output, recipeKey("crafting/wooden_hopper"));
+
+            ShapedRecipeBuilder.shaped(this.registries.lookupOrThrow(Registries.ITEM), RecipeCategory.DECORATIONS, ModBlocks.GRANITE_ANVIL.get())
+                    .pattern("GGG")
+                    .pattern("DDD")
+                    .define('G', Items.GRANITE)
+                    .define('D', Items.POLISHED_DEEPSLATE)
+                    .unlockedBy("has_granite", has(Items.GRANITE))
+                    .save(this.output, recipeKey("crafting/granite_anvil"));
 
             SimpleCookingRecipeBuilder.smelting(Ingredient.of(ModItems.DOUGH.get()), RecipeCategory.FOOD, CookingBookCategory.MISC, Items.BREAD, 0.35f, 200)
                     .unlockedBy("has_dough", has(ModItems.DOUGH.get()))
@@ -355,8 +364,27 @@ public class HPRecipeProvider extends RecipeProvider.Runner {
                     .save(this.output, "saplings_to_dead_bush");
         }
 
+        private void buildCrushingRecipes() {
+            crush(Ingredient.of(Items.STONE), Items.COBBLESTONE, 1, 1, "stone_to_cobblestone");
+            crush(Ingredient.of(Items.DEEPSLATE), Items.COBBLED_DEEPSLATE, 1, 2, "deepslate_to_cobbled_deepslate");
+            crush(Ingredient.of(Items.COBBLESTONE), Items.GRAVEL, 1, 1, "cobblestone_to_gravel");
+            crush(Ingredient.of(Items.COBBLED_DEEPSLATE), Items.GRAVEL, 1, 2, "cobbled_deepslate_to_gravel");
+            crush(Ingredient.of(Items.GRAVEL), Items.SAND, 1, 1, "gravel_to_sand");
+            crush(Ingredient.of(Items.SANDSTONE), Items.SAND, 4, 2, "sandstone_to_sand");
+            crush(Ingredient.of(Items.RED_SANDSTONE), Items.RED_SAND, 4, 2, "red_sandstone_to_red_sand");
+            crush(Ingredient.of(Items.BASALT), Items.SMOOTH_BASALT, 1, 2, "basalt_to_smooth_basalt");
+            crush(Ingredient.of(Items.BLACKSTONE), Items.GRAVEL, 1, 2, "blackstone_to_gravel");
+            crush(Ingredient.of(Items.TUFF), Items.GRAVEL, 1, 2, "tuff_to_gravel");
+        }
+
         private void chop(Ingredient input, Item result, int count, int time, String name) {
             ChoppingRecipeBuilder.chopping(input, result, count)
+                    .time(time)
+                    .save(this.output, name);
+        }
+
+        private void crush(Ingredient input, Item result, int count, int time, String name) {
+            CrushingRecipeBuilder.crushing(input, result, count)
                     .time(time)
                     .save(this.output, name);
         }

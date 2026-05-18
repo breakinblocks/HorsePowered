@@ -54,7 +54,7 @@ public class HorsePowerDryingCategory extends BaseHPCategory<DryingRackRecipe> {
 
         Component timeText = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.time", formatTime(recipe.getTime()));
         int textWidth = Minecraft.getInstance().font.width(timeText);
-        guiGraphics.text(Minecraft.getInstance().font, timeText, (WIDTH - textWidth) / 2, 24, 0x808080, false);
+        guiGraphics.text(Minecraft.getInstance().font, timeText, (WIDTH - textWidth) / 2, 24, 0xFF808080, false);
     }
 
     private static String formatTime(int ticks) {

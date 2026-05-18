@@ -4,6 +4,7 @@ import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.events.HPDatapackSync;
 import com.breakinblocks.horsepowered.recipes.ChoppingRecipe;
+import com.breakinblocks.horsepowered.recipes.CrushingRecipe;
 import com.breakinblocks.horsepowered.recipes.DryingRackRecipe;
 import com.breakinblocks.horsepowered.recipes.GrindstoneRecipe;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
@@ -46,6 +47,9 @@ public class HorsePowerPlugin implements IModPlugin {
     public static final IRecipeType<DryingRackRecipe> DRYING_TYPE =
             IRecipeType.create(HorsePowerMod.MOD_ID, "drying", DryingRackRecipe.class);
 
+    public static final IRecipeType<CrushingRecipe> CRUSHING_TYPE =
+            IRecipeType.create(HorsePowerMod.MOD_ID, "crushing", CrushingRecipe.class);
+
     @Override
     public Identifier getPluginUid() {
         return UID;
@@ -61,7 +65,8 @@ public class HorsePowerPlugin implements IModPlugin {
                 new HorsePowerChoppingCategory(guiHelper),
                 new HorsePowerManualChoppingCategory(guiHelper),
                 new HorsePowerPressCategory(guiHelper),
-                new HorsePowerDryingCategory(guiHelper)
+                new HorsePowerDryingCategory(guiHelper),
+                new HorsePowerCrushingCategory(guiHelper)
         );
     }
 
@@ -93,6 +98,10 @@ public class HorsePowerPlugin implements IModPlugin {
 
         registration.addRecipes(DRYING_TYPE, recipeMap.byType(HPRecipes.DRYING_TYPE.get())
                 .stream().map(RecipeHolder::value).toList());
+
+        Comparator<CrushingRecipe> crushOrder = Comparator.comparingInt(CrushingRecipe::getPriority);
+        registration.addRecipes(CRUSHING_TYPE, recipeMap.byType(HPRecipes.CRUSHING_TYPE.get())
+                .stream().map(RecipeHolder::value).sorted(crushOrder).toList());
     }
 
     @Override
@@ -106,5 +115,7 @@ public class HorsePowerPlugin implements IModPlugin {
         registration.addCraftingStation(PRESSING_TYPE, new ItemStack(ModBlocks.PRESS.get()));
 
         registration.addCraftingStation(DRYING_TYPE, new ItemStack(ModBlocks.DRYING_RACK.get()));
+
+        registration.addCraftingStation(CRUSHING_TYPE, new ItemStack(ModBlocks.GRANITE_ANVIL.get()));
     }
 }

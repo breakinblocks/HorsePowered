@@ -79,7 +79,7 @@ public class HorsePowerPressCategory extends BaseHPCategory<PressRecipe> {
             Font font = Minecraft.getInstance().font;
             String fluidText = recipe.getFluidResult().getAmount() + " mB";
             int x = WIDTH - font.width(fluidText);
-            guiGraphics.text(font, fluidText, x, 36, 0x808080, false);
+            guiGraphics.text(font, fluidText, x, 36, 0xFF808080, false);
         }
     }
 }

@@ -1,0 +1,8 @@
+{
+  "type": "horsepowered:crushing",
+  "ingredient": "minecraft:deepslate",
+  "result": {
+    "id": "minecraft:cobbled_deepslate"
+  },
+  "time": 2
+}
