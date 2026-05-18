@@ -1,0 +1,11 @@
+{
+  "type": "horsepowered:crushing",
+  "ingredient": {
+    "item": "minecraft:cobbled_deepslate"
+  },
+  "result": {
+    "item": "minecraft:gravel",
+    "count": 1
+  },
+  "time": 2
+}

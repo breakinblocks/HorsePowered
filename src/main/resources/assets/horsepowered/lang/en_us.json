@@ -18,6 +18,7 @@
   "block.horsepowered.drying_rack": "Drying Rack",
   "block.horsepowered.wooden_hopper": "Wooden Hopper",
   "block.horsepowered.filler": "Horse Chopper",
+  "block.horsepowered.granite_anvil": "Granite Anvil",
 
   "gui.horsepowered.jei.grinding": "Horse Grinding",
   "gui.horsepowered.jei.grinding_hand": "Hand Grinding",
@@ -25,6 +26,7 @@
   "gui.horsepowered.jei.chopping_hand": "Hand Chopping",
   "gui.horsepowered.jei.pressing": "Horse Pressing",
   "gui.horsepowered.jei.drying": "Drying",
+  "gui.horsepowered.jei.crushing": "Crushing",
 
   "emi.category.horsepowered.grinding": "Horse Grinding",
   "emi.category.horsepowered.grinding_hand": "Hand Grinding",
@@ -32,9 +34,11 @@
   "emi.category.horsepowered.chopping_hand": "Hand Chopping",
   "emi.category.horsepowered.pressing": "Horse Pressing",
   "emi.category.horsepowered.drying": "Drying",
+  "emi.category.horsepowered.crushing": "Crushing",
   "gui.horsepowered.jei.time": "Time: %s",
   "gui.horsepowered.jei.chops": "Chops: %s",
   "gui.horsepowered.jei.turns": "Turns: %s",
+  "gui.horsepowered.jei.strikes": "Strikes: %s",
   "gui.horsepowered.jei.chance": "%s%% chance",
   "gui.horsepowered.jei.hunger": "Hunger: %s",
 
@@ -43,9 +47,11 @@
   "config.jade.plugin_horsepowered.press": "Horse Press",
   "config.jade.plugin_horsepowered.manual": "Manual Blocks",
   "config.jade.plugin_horsepowered.drying_rack": "Drying Rack",
+  "config.jade.plugin_horsepowered.granite_anvil": "Granite Anvil",
 
   "jade.horsepowered.input": "Input: %s x%s",
   "jade.horsepowered.output": "Output: %s x%s",
+  "jade.horsepowered.strikes_remaining": "Strikes remaining: %s",
   "jade.horsepowered.secondary": "Secondary: %s x%s",
   "jade.horsepowered.fluid": "Fluid: %s %s/%s mB",
   "jade.horsepowered.fluid_input": "Input Fluid: %s %s/%s mB",

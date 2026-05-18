@@ -15,13 +15,17 @@ public class Configs {
     // Common settings
     public static ForgeConfigSpec.BooleanValue shouldDamageAxe;
     public static ForgeConfigSpec.BooleanValue choppingBlockDrop;
+    public static ForgeConfigSpec.BooleanValue shouldDamageGraniteAnvilPickaxe;
+    public static ForgeConfigSpec.BooleanValue graniteAnvilDrop;
     public static ForgeConfigSpec.IntValue pointsForWindup;
     public static ForgeConfigSpec.IntValue pointsPerRotation;
     public static ForgeConfigSpec.IntValue pointsForPress;
     public static ForgeConfigSpec.IntValue choppingMultiplier;
+    public static ForgeConfigSpec.IntValue crushingMultiplier;
     public static ForgeConfigSpec.IntValue pressFluidTankSize;
     public static ForgeConfigSpec.DoubleValue grindstoneExhaustion;
     public static ForgeConfigSpec.DoubleValue choppingBlockExhaustion;
+    public static ForgeConfigSpec.DoubleValue graniteAnvilExhaustion;
 
     static {
         // Client config
@@ -82,6 +86,22 @@ public class Configs {
             choppingBlockExhaustion = builder
                     .comment("The exhaustion amount added to the player when using the chopping block (0 to disable)")
                     .defineInRange("choppingBlockExhaustion", 0.1D, 0.0D, 40.0D);
+
+            shouldDamageGraniteAnvilPickaxe = builder
+                    .comment("If the pickaxe used on the granite anvil should be damaged")
+                    .define("shouldDamageGraniteAnvilPickaxe", true);
+
+            graniteAnvilDrop = builder
+                    .comment("If true the granite anvil will drop the result items. If false it will put them in internal inventory.")
+                    .define("graniteAnvilDrop", true);
+
+            crushingMultiplier = builder
+                    .comment("The multiplier for granite anvil crushing time")
+                    .defineInRange("crushingMultiplier", 4, 1, Integer.MAX_VALUE);
+
+            graniteAnvilExhaustion = builder
+                    .comment("The exhaustion amount added to the player when using the granite anvil (0 to disable)")
+                    .defineInRange("graniteAnvilExhaustion", 0.15D, 0.0D, 40.0D);
         }
         builder.pop();
         COMMON_SPEC = builder.build();

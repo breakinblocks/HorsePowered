@@ -4,6 +4,7 @@ import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.client.renderer.ChopperBlockEntityRenderer;
 import com.breakinblocks.horsepowered.client.renderer.DryingRackBlockEntityRenderer;
 import com.breakinblocks.horsepowered.client.renderer.GeneratorBlockEntityRenderer;
+import com.breakinblocks.horsepowered.client.renderer.GraniteAnvilBlockEntityRenderer;
 import com.breakinblocks.horsepowered.client.renderer.GrindstoneBlockEntityRenderer;
 import com.breakinblocks.horsepowered.client.renderer.HandGrindstoneBlockEntityRenderer;
 import com.breakinblocks.horsepowered.client.renderer.ManualChopperBlockEntityRenderer;
@@ -31,6 +32,7 @@ public class ClientHandler {
         event.registerBlockEntityRenderer(ModBlocks.PRESS_BE.get(), PressBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(ModBlocks.GENERATOR_BE.get(), GeneratorBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(ModBlocks.DRYING_RACK_BE.get(), DryingRackBlockEntityRenderer::new);
+        event.registerBlockEntityRenderer(ModBlocks.GRANITE_ANVIL_BE.get(), GraniteAnvilBlockEntityRenderer::new);
     }
 
     @SubscribeEvent

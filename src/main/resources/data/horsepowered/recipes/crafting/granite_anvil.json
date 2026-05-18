@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "D": {
+      "item": "minecraft:polished_deepslate"
+    },
+    "G": {
+      "item": "minecraft:granite"
+    }
+  },
+  "pattern": [
+    "GGG",
+    "DDD"
+  ],
+  "result": {
+    "item": "horsepowered:granite_anvil",
+    "count": 1
+  }
+}

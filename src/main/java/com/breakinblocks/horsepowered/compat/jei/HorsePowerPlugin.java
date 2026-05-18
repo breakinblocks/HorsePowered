@@ -3,6 +3,7 @@ package com.breakinblocks.horsepowered.compat.jei;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.lib.Reference;
 import com.breakinblocks.horsepowered.recipes.ChoppingRecipe;
+import com.breakinblocks.horsepowered.recipes.CrushingRecipe;
 import com.breakinblocks.horsepowered.recipes.DryingRackRecipe;
 import com.breakinblocks.horsepowered.recipes.GrindstoneRecipe;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
@@ -43,6 +44,9 @@ public class HorsePowerPlugin implements IModPlugin {
     public static final RecipeType<DryingRackRecipe> DRYING_TYPE =
             RecipeType.create(Reference.MODID, "drying", DryingRackRecipe.class);
 
+    public static final RecipeType<CrushingRecipe> CRUSHING_TYPE =
+            RecipeType.create(Reference.MODID, "crushing", CrushingRecipe.class);
+
     @Override
     public ResourceLocation getPluginUid() {
         return UID;
@@ -58,7 +62,8 @@ public class HorsePowerPlugin implements IModPlugin {
                 new HorsePowerChoppingCategory(guiHelper, CHOPPING_TYPE, ModBlocks.CHOPPER.get(), "gui.horsepowered.jei.chopping"),
                 new HorsePowerChoppingCategory(guiHelper, CHOPPING_HAND_TYPE, ModBlocks.CHOPPING_BLOCK.get(), "gui.horsepowered.jei.chopping_hand"),
                 new HorsePowerPressCategory(guiHelper),
-                new HorsePowerDryingCategory(guiHelper)
+                new HorsePowerDryingCategory(guiHelper),
+                new HorsePowerCrushingCategory(guiHelper)
         );
     }
 
@@ -74,6 +79,9 @@ public class HorsePowerPlugin implements IModPlugin {
                 .thenComparing(r -> r.getId().toString());
         Comparator<PressRecipe> pressingOrder = Comparator
                 .comparingInt(PressRecipe::getPriority)
+                .thenComparing(r -> r.getId().toString());
+        Comparator<CrushingRecipe> crushingOrder = Comparator
+                .comparingInt(CrushingRecipe::getPriority)
                 .thenComparing(r -> r.getId().toString());
 
         List<GrindstoneRecipe> allGrinding = recipeManager.getAllRecipesFor(HPRecipes.GRINDING_TYPE.get());
@@ -94,6 +102,10 @@ public class HorsePowerPlugin implements IModPlugin {
 
         registration.addRecipes(DRYING_TYPE,
                 recipeManager.getAllRecipesFor(HPRecipes.DRYING_TYPE.get()));
+
+        registration.addRecipes(CRUSHING_TYPE,
+                recipeManager.getAllRecipesFor(HPRecipes.CRUSHING_TYPE.get()).stream()
+                        .sorted(crushingOrder).toList());
     }
 
     @Override
@@ -107,5 +119,7 @@ public class HorsePowerPlugin implements IModPlugin {
         registration.addRecipeCatalyst(new ItemStack(ModBlocks.PRESS.get()), PRESSING_TYPE);
 
         registration.addRecipeCatalyst(new ItemStack(ModBlocks.DRYING_RACK.get()), DRYING_TYPE);
+
+        registration.addRecipeCatalyst(new ItemStack(ModBlocks.GRANITE_ANVIL.get()), CRUSHING_TYPE);
     }
 }

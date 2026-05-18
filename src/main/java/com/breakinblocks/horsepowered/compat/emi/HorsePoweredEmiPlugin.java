@@ -3,6 +3,7 @@ package com.breakinblocks.horsepowered.compat.emi;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.lib.Reference;
 import com.breakinblocks.horsepowered.recipes.ChoppingRecipe;
+import com.breakinblocks.horsepowered.recipes.CrushingRecipe;
 import com.breakinblocks.horsepowered.recipes.DryingRackRecipe;
 import com.breakinblocks.horsepowered.recipes.GrindstoneRecipe;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
@@ -39,6 +40,9 @@ public class HorsePoweredEmiPlugin implements EmiPlugin {
     public static final EmiRecipeCategory DRYING = new EmiRecipeCategory(
             new ResourceLocation(Reference.MODID, "drying"),
             EmiStack.of(ModBlocks.DRYING_RACK.get()));
+    public static final EmiRecipeCategory CRUSHING = new EmiRecipeCategory(
+            new ResourceLocation(Reference.MODID, "crushing"),
+            EmiStack.of(ModBlocks.GRANITE_ANVIL.get()));
 
     @Override
     public void register(EmiRegistry registry) {
@@ -48,6 +52,7 @@ public class HorsePoweredEmiPlugin implements EmiPlugin {
         registry.addCategory(CHOPPING_HAND);
         registry.addCategory(PRESSING);
         registry.addCategory(DRYING);
+        registry.addCategory(CRUSHING);
 
         registry.addWorkstation(GRINDING, EmiStack.of(ModBlocks.GRINDSTONE.get()));
         registry.addWorkstation(GRINDING_HAND, EmiStack.of(ModBlocks.HAND_GRINDSTONE.get()));
@@ -55,6 +60,7 @@ public class HorsePoweredEmiPlugin implements EmiPlugin {
         registry.addWorkstation(CHOPPING_HAND, EmiStack.of(ModBlocks.CHOPPING_BLOCK.get()));
         registry.addWorkstation(PRESSING, EmiStack.of(ModBlocks.PRESS.get()));
         registry.addWorkstation(DRYING, EmiStack.of(ModBlocks.DRYING_RACK.get()));
+        registry.addWorkstation(CRUSHING, EmiStack.of(ModBlocks.GRANITE_ANVIL.get()));
 
         RecipeManager rm = registry.getRecipeManager();
 
@@ -85,5 +91,11 @@ public class HorsePoweredEmiPlugin implements EmiPlugin {
 
         rm.getAllRecipesFor(HPRecipes.DRYING_TYPE.get())
                 .forEach(r -> registry.addRecipe(new EmiDryingRecipe(DRYING, r)));
+
+        Comparator<CrushingRecipe> crushOrder = Comparator
+                .comparingInt(CrushingRecipe::getPriority)
+                .thenComparing(r -> r.getId().toString());
+        rm.getAllRecipesFor(HPRecipes.CRUSHING_TYPE.get()).stream().sorted(crushOrder)
+                .forEach(r -> registry.addRecipe(new EmiCrushingRecipe(CRUSHING, r)));
     }
 }
