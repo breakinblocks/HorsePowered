@@ -1,0 +1,9 @@
+{
+  "variants": {
+    "facing=down":  { "model": "horsepowered:block/wooden_hopper" },
+    "facing=east":  { "model": "horsepowered:block/wooden_hopper_side", "y": 90 },
+    "facing=north": { "model": "horsepowered:block/wooden_hopper_side" },
+    "facing=south": { "model": "horsepowered:block/wooden_hopper_side", "y": 180 },
+    "facing=west":  { "model": "horsepowered:block/wooden_hopper_side", "y": 270 }
+  }
+}

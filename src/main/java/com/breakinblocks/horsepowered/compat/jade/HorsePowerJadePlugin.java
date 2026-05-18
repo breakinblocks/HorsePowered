@@ -369,6 +369,7 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
                 return MANUAL;
             }
         }, BlockChoppingBlock.class);
+
     }
 
     private static String formatTime(int ticks) {

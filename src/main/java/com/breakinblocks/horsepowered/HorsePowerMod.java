@@ -28,6 +28,7 @@ import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.fluids.FluidInteractionRegistry;
+import net.neoforged.neoforge.items.wrapper.InvWrapper;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.slf4j.Logger;
@@ -59,6 +60,7 @@ public class HorsePowerMod {
                         output.accept(ModBlocks.PRESS.get());
                         output.accept(ModBlocks.GENERATOR.get());
                         output.accept(ModBlocks.DRYING_RACK.get());
+                        output.accept(ModBlocks.WOODEN_HOPPER.get());
                         output.accept(ModBlocks.CREATIVE_BATTERY.get());
                     })
                     .build()
@@ -160,6 +162,10 @@ public class HorsePowerMod {
                     return main == null ? null : main.getItemHandler();
                 },
                 ModBlocks.DRYING_RACK.get());
+
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK,
+                ModBlocks.WOODEN_HOPPER_BE.get(),
+                (be, side) -> new InvWrapper(be));
     }
 
     /**

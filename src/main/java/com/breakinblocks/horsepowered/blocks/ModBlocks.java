@@ -10,6 +10,7 @@ import com.breakinblocks.horsepowered.blockentity.GrindstoneBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.HandGrindstoneBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.ManualChopperBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.PressBlockEntity;
+import com.breakinblocks.horsepowered.blockentity.WoodenHopperBlockEntity;
 import com.breakinblocks.horsepowered.fluids.ModFluids;
 import com.breakinblocks.horsepowered.items.ModItems;
 import net.minecraft.core.registries.Registries;
@@ -17,6 +18,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
@@ -71,6 +73,13 @@ public class ModBlocks {
             () -> new BlockDryingRack(BlockBehaviour.Properties.of()
                     .mapColor(MapColor.WOOD)
                     .strength(1.5F)
+                    .noOcclusion()));
+
+    public static final DeferredBlock<Block> WOODEN_HOPPER = registerBlock("wooden_hopper",
+            () -> new BlockWoodenHopper(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.WOOD)
+                    .strength(2.0F)
+                    .sound(SoundType.WOOD)
                     .noOcclusion()));
 
     public static final DeferredBlock<Block> CREATIVE_BATTERY = registerBlock("creative_battery",
@@ -134,6 +143,10 @@ public class ModBlocks {
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<FillerBlockEntity>> FILLER_BE =
             BLOCK_ENTITIES.register("filler", () ->
                     BlockEntityType.Builder.of(FillerBlockEntity::new, FILLER.get()).build(null));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<WoodenHopperBlockEntity>> WOODEN_HOPPER_BE =
+            BLOCK_ENTITIES.register("wooden_hopper", () ->
+                    BlockEntityType.Builder.of(WoodenHopperBlockEntity::new, WOODEN_HOPPER.get()).build(null));
 
     private static <T extends Block> DeferredBlock<T> registerBlock(String name, Supplier<T> block) {
         DeferredBlock<T> registeredBlock = BLOCKS.register(name, block);

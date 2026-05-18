@@ -112,6 +112,15 @@ public class HPRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_planks", has(ItemTags.PLANKS))
                 .save(output, HorsePowerMod.id("crafting/drying_rack"));
 
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, ModBlocks.WOODEN_HOPPER.get())
+                .pattern("S S")
+                .pattern("SCS")
+                .pattern(" S ")
+                .define('S', Items.STICK)
+                .define('C', Items.CHEST)
+                .unlockedBy("has_chest", has(Items.CHEST))
+                .save(output, HorsePowerMod.id("crafting/wooden_hopper"));
+
         SimpleCookingRecipeBuilder.smelting(Ingredient.of(ModItems.DOUGH.get()), RecipeCategory.FOOD,
                         Items.BREAD, 0.35f, 200)
                 .unlockedBy("has_dough", has(ModItems.DOUGH.get()))
