@@ -6,6 +6,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
@@ -89,4 +90,12 @@ public class ModBlocks {
                     .setId(ResourceKey.create(Registries.BLOCK, registryName))
                     .mapColor(MapColor.WOOD)
                     .strength(5.0F)));
+
+    public static final DeferredBlock<Block> WOODEN_HOPPER = BLOCKS.register("wooden_hopper",
+            registryName -> new BlockWoodenHopper(BlockBehaviour.Properties.of()
+                    .setId(ResourceKey.create(Registries.BLOCK, registryName))
+                    .mapColor(MapColor.WOOD)
+                    .strength(2.0F)
+                    .sound(SoundType.WOOD)
+                    .noOcclusion()));
 }

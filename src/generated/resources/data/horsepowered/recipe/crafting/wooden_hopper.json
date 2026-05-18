@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "C": "minecraft:chest",
+    "S": "minecraft:stick"
+  },
+  "pattern": [
+    "S S",
+    "SCS",
+    " S "
+  ],
+  "result": {
+    "id": "horsepowered:wooden_hopper"
+  }
+}

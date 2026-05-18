@@ -31,6 +31,7 @@ import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.fluids.FluidInteractionRegistry;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.transfer.item.VanillaContainerWrapper;
 import net.neoforged.neoforge.transfer.item.WorldlyContainerWrapper;
 import org.slf4j.Logger;
 
@@ -48,16 +49,13 @@ public class HorsePowerMod {
                     .title(Component.translatable("itemGroup." + MOD_ID))
                     .icon(() -> new ItemStack(ModBlocks.HAND_GRINDSTONE.get()))
                     .displayItems((parameters, output) -> {
-                        // Guide book (only if GuideME is loaded)
                         if (ModList.get().isLoaded("guideme")) {
                             output.accept(GuideMECompat.createGuideItem());
                         }
-                        // Items
                         output.accept(ModItems.FLOUR.get());
                         output.accept(ModItems.DOUGH.get());
                         output.accept(ModItems.SEED_OIL_BUCKET.get());
                         output.accept(ModItems.WORK_SADDLE.get());
-                        // Blocks
                         output.accept(ModBlocks.HAND_GRINDSTONE.get());
                         output.accept(ModBlocks.GRINDSTONE.get());
                         output.accept(ModBlocks.CHOPPING_BLOCK.get());
@@ -65,6 +63,7 @@ public class HorsePowerMod {
                         output.accept(ModBlocks.PRESS.get());
                         output.accept(ModBlocks.GENERATOR.get());
                         output.accept(ModBlocks.DRYING_RACK.get());
+                        output.accept(ModBlocks.WOODEN_HOPPER.get());
                         output.accept(ModBlocks.CREATIVE_BATTERY.get());
                     })
                     .build()
@@ -107,21 +106,17 @@ public class HorsePowerMod {
             var fire = Blocks.FIRE.defaultBlockState();
             var air = Blocks.AIR.defaultBlockState();
 
-            // Seed oil + adjacent lava → seed oil becomes fire (or air if fire can't survive)
             FluidInteractionRegistry.addInteraction(oilType,
                     new FluidInteractionRegistry.InteractionInformation(
                             lavaType,
                             fluidState -> fire));
 
-            // Seed oil + adjacent fire block → seed oil becomes fire
             FluidInteractionRegistry.addInteraction(oilType,
                     new FluidInteractionRegistry.InteractionInformation(
                             (level, currentPos, relativePos, currentState) ->
                                     level.getBlockState(relativePos).is(Blocks.FIRE),
                             fluidState -> fire));
 
-            // Lava + adjacent seed oil → lava becomes fire
-            // This handles the case where lava flows INTO oil
             FluidInteractionRegistry.addInteraction(lavaType,
                     new FluidInteractionRegistry.InteractionInformation(
                             oilType,
@@ -132,8 +127,6 @@ public class HorsePowerMod {
     }
 
     private static void registerCapabilities(RegisterCapabilitiesEvent event) {
-        // Register item handler capabilities for all block entities that implement WorldlyContainer.
-        // This allows hoppers and other automation to interact with HP blocks.
         event.registerBlockEntity(Capabilities.Item.BLOCK,
                 ModBlockEntities.CHOPPER.get(),
                 (be, side) -> new WorldlyContainerWrapper(be, side));
@@ -159,14 +152,10 @@ public class HorsePowerMod {
                 ModBlockEntities.CREATIVE_BATTERY.get(),
                 (be, side) -> be.getEnergyHandler());
 
-        // Press exposes a directional fluid handler: insertions go to the input tank,
-        // extractions drain the output tank. Prevents pipes from contaminating input
-        // with arbitrary fluids or stealing reagents mid-process.
         event.registerBlockEntity(Capabilities.Fluid.BLOCK,
                 ModBlockEntities.PRESS.get(),
                 (be, side) -> be.getFluidHandler());
 
-        // Filler delegates to its main block - look up the main block's capability directly
         event.registerBlockEntity(Capabilities.Item.BLOCK,
                 ModBlockEntities.FILLER.get(),
                 (be, side) -> {
@@ -185,18 +174,16 @@ public class HorsePowerMod {
                     }
                     return null;
                 });
+
+        event.registerBlockEntity(Capabilities.Item.BLOCK,
+                ModBlockEntities.WOODEN_HOPPER.get(),
+                (be, side) -> VanillaContainerWrapper.of(be));
     }
 
     private void buildCreativeContents(final BuildCreativeModeTabContentsEvent event) {
-        // Items are added via the creative tab builder
     }
 
-    /**
-     * Client-only extension registration.
-     * This method is only called on the client side to avoid loading client classes on server.
-     */
     private static void registerClientExtensions(ModContainer container) {
-        // Delegate to client helper class - this defers class loading of client-only classes
         ClientExtensions.register(container);
     }
 }

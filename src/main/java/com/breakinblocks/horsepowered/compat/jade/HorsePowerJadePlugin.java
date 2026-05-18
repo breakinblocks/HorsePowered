@@ -50,7 +50,6 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
     private static final String KEY_DR_TIME = "dr_time";
     private static final String KEY_DR_FINISHED = "dr_finished";
 
-    // NBT keys for server data
     private static final String KEY_CURRENT = "hp_current";
     private static final String KEY_TOTAL = "hp_total";
     private static final String KEY_HAS_WORKER = "hp_has_worker";
@@ -68,7 +67,6 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
 
     @Override
     public void register(IWailaCommonRegistration registration) {
-        // Register server data providers to sync progress from server
         registration.registerBlockDataProvider(new IServerDataProvider<BlockAccessor>() {
             @Override
             public void appendServerData(CompoundTag data, BlockAccessor accessor) {
@@ -153,7 +151,6 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
             }
         }, BlockDryingRack.class);
 
-        // Server data provider for filler blocks - get data from the main block
         registration.registerBlockDataProvider(new IServerDataProvider<BlockAccessor>() {
             @Override
             public void appendServerData(CompoundTag data, BlockAccessor accessor) {
@@ -197,7 +194,6 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
 
     @Override
     public void registerClient(IWailaClientRegistration registration) {
-        // Horse-powered grindstone
         registration.registerBlockComponent(new IBlockComponentProvider() {
             @Override
             public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
@@ -206,7 +202,6 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
                     appendItemInfo(tooltip, te.getItem(1), "output");
                     appendItemInfo(tooltip, te.getItem(2), "secondary");
 
-                    // Use server data for progress
                     CompoundTag data = accessor.getServerData();
                     appendProgressFromData(tooltip, data);
                     appendWorkerInfoFromData(tooltip, data);
@@ -219,7 +214,6 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
             }
         }, BlockGrindstone.class);
 
-        // Horse-powered chopper
         registration.registerBlockComponent(new IBlockComponentProvider() {
             @Override
             public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
@@ -227,7 +221,6 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
                     appendItemInfo(tooltip, te.getItem(0), "input");
                     appendItemInfo(tooltip, te.getItem(1), "output");
 
-                    // Use server data for progress
                     CompoundTag data = accessor.getServerData();
                     appendProgressFromData(tooltip, data);
                     appendWorkerInfoFromData(tooltip, data);
@@ -240,7 +233,6 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
             }
         }, BlockChopper.class);
 
-        // Horse-powered press
         registration.registerBlockComponent(new IBlockComponentProvider() {
             @Override
             public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
@@ -248,7 +240,6 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
                     appendItemInfo(tooltip, te.getItem(0), "input");
                     appendItemInfo(tooltip, te.getItem(1), "output");
 
-                    // Use server data for fluid info
                     CompoundTag data = accessor.getServerData();
                     appendFluidInfoFromData(tooltip, data);
 
@@ -263,7 +254,6 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
             }
         }, BlockPress.class);
 
-        // Filler block - show info from the main block
         registration.registerBlockComponent(new IBlockComponentProvider() {
             @Override
             public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
@@ -281,7 +271,6 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
                         appendItemInfo(tooltip, te.getItem(2), "secondary");
                     }
 
-                    // Use server data for progress
                     CompoundTag data = accessor.getServerData();
                     appendFluidInfoFromData(tooltip, data);
                     appendProgressFromData(tooltip, data);
@@ -331,7 +320,6 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
             }
         }, BlockDryingRack.class);
 
-        // Manual blocks (hand grindstone and chopping block)
         registration.registerBlockComponent(new IBlockComponentProvider() {
             @Override
             public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {

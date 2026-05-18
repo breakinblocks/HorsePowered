@@ -135,6 +135,15 @@ public class HPRecipeProvider extends RecipeProvider.Runner {
                     .unlockedBy("has_planks", has(ItemTags.PLANKS))
                     .save(this.output, recipeKey("crafting/drying_rack"));
 
+            ShapedRecipeBuilder.shaped(this.registries.lookupOrThrow(Registries.ITEM), RecipeCategory.REDSTONE, ModBlocks.WOODEN_HOPPER.get())
+                    .pattern("S S")
+                    .pattern("SCS")
+                    .pattern(" S ")
+                    .define('S', Items.STICK)
+                    .define('C', Items.CHEST)
+                    .unlockedBy("has_chest", has(Items.CHEST))
+                    .save(this.output, recipeKey("crafting/wooden_hopper"));
+
             SimpleCookingRecipeBuilder.smelting(Ingredient.of(ModItems.DOUGH.get()), RecipeCategory.FOOD, CookingBookCategory.MISC, Items.BREAD, 0.35f, 200)
                     .unlockedBy("has_dough", has(ModItems.DOUGH.get()))
                     .save(this.output, recipeKey("smelting/dough_to_bread"));

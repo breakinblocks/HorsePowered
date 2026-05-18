@@ -67,4 +67,8 @@ public class ModItems {
             registryName -> new BlockItem(ModBlocks.DRYING_RACK.get(), new Item.Properties()
                     .setId(ResourceKey.create(Registries.ITEM, registryName))
                     .useBlockDescriptionPrefix()));
+    public static final DeferredItem<BlockItem> WOODEN_HOPPER_ITEM = ITEMS.register("wooden_hopper",
+            registryName -> new BlockItem(ModBlocks.WOODEN_HOPPER.get(), new Item.Properties()
+                    .setId(ResourceKey.create(Registries.ITEM, registryName))
+                    .useBlockDescriptionPrefix()));
 }
