@@ -56,6 +56,7 @@ public class HorsePowerMod {
                         output.accept(ModBlocks.HAND_GRINDSTONE.get());
                         output.accept(ModBlocks.GRINDSTONE.get());
                         output.accept(ModBlocks.CHOPPING_BLOCK.get());
+                        output.accept(ModBlocks.GRANITE_ANVIL.get());
                         output.accept(ModBlocks.CHOPPER.get());
                         output.accept(ModBlocks.PRESS.get());
                         output.accept(ModBlocks.GENERATOR.get());

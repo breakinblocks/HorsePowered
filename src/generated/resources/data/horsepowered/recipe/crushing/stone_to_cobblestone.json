@@ -1,0 +1,11 @@
+{
+  "type": "horsepowered:crushing",
+  "ingredient": {
+    "item": "minecraft:stone"
+  },
+  "result": {
+    "count": 1,
+    "id": "minecraft:cobblestone"
+  },
+  "time": 1
+}

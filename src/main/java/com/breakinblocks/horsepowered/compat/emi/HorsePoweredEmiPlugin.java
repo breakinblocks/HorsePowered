@@ -3,6 +3,7 @@ package com.breakinblocks.horsepowered.compat.emi;
 import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.recipes.ChoppingRecipe;
+import com.breakinblocks.horsepowered.recipes.CrushingRecipe;
 import com.breakinblocks.horsepowered.recipes.DryingRackRecipe;
 import com.breakinblocks.horsepowered.recipes.GrindstoneRecipe;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
@@ -40,6 +41,9 @@ public class HorsePoweredEmiPlugin implements EmiPlugin {
     public static final EmiRecipeCategory DRYING = new EmiRecipeCategory(
             ResourceLocation.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "drying"),
             EmiStack.of(ModBlocks.DRYING_RACK.get()));
+    public static final EmiRecipeCategory CRUSHING = new EmiRecipeCategory(
+            ResourceLocation.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "crushing"),
+            EmiStack.of(ModBlocks.GRANITE_ANVIL.get()));
 
     @Override
     public void register(EmiRegistry registry) {
@@ -49,6 +53,7 @@ public class HorsePoweredEmiPlugin implements EmiPlugin {
         registry.addCategory(MANUAL_CHOPPING);
         registry.addCategory(PRESSING);
         registry.addCategory(DRYING);
+        registry.addCategory(CRUSHING);
 
         registry.addWorkstation(GRINDING, EmiStack.of(ModBlocks.GRINDSTONE.get()));
         registry.addWorkstation(MANUAL_GRINDING, EmiStack.of(ModBlocks.HAND_GRINDSTONE.get()));
@@ -56,12 +61,14 @@ public class HorsePoweredEmiPlugin implements EmiPlugin {
         registry.addWorkstation(MANUAL_CHOPPING, EmiStack.of(ModBlocks.CHOPPING_BLOCK.get()));
         registry.addWorkstation(PRESSING, EmiStack.of(ModBlocks.PRESS.get()));
         registry.addWorkstation(DRYING, EmiStack.of(ModBlocks.DRYING_RACK.get()));
+        registry.addWorkstation(CRUSHING, EmiStack.of(ModBlocks.GRANITE_ANVIL.get()));
 
         RecipeManager rm = registry.getRecipeManager();
 
         Comparator<GrindstoneRecipe> grindOrder = Comparator.comparingInt(GrindstoneRecipe::getPriority);
         Comparator<ChoppingRecipe> chopOrder = Comparator.comparingInt(ChoppingRecipe::getPriority);
         Comparator<PressRecipe> pressOrder = Comparator.comparingInt(PressRecipe::getPriority);
+        Comparator<CrushingRecipe> crushOrder = Comparator.comparingInt(CrushingRecipe::getPriority);
 
         List<GrindstoneRecipe> allGrinding = rm.getAllRecipesFor(HPRecipes.GRINDING_TYPE.get())
                 .stream().map(RecipeHolder::value).toList();
@@ -84,5 +91,9 @@ public class HorsePoweredEmiPlugin implements EmiPlugin {
         rm.getAllRecipesFor(HPRecipes.DRYING_TYPE.get()).stream()
                 .map(RecipeHolder::value)
                 .forEach(r -> registry.addRecipe(new EmiDryingRecipe(DRYING, r)));
+
+        rm.getAllRecipesFor(HPRecipes.CRUSHING_TYPE.get()).stream()
+                .map(RecipeHolder::value).sorted(crushOrder)
+                .forEach(r -> registry.addRecipe(new EmiCrushingRecipe(CRUSHING, r)));
     }
 }

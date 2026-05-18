@@ -6,6 +6,7 @@ import com.breakinblocks.horsepowered.blockentity.CreativeBatteryBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.DryingRackBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.FillerBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.GeneratorBlockEntity;
+import com.breakinblocks.horsepowered.blockentity.GraniteAnvilBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.GrindstoneBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.HandGrindstoneBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.ManualChopperBlockEntity;
@@ -52,6 +53,14 @@ public class ModBlocks {
             () -> new BlockChoppingBlock(BlockBehaviour.Properties.of()
                     .mapColor(MapColor.WOOD)
                     .strength(2.5F)));
+
+    public static final DeferredBlock<Block> GRANITE_ANVIL = registerBlock("granite_anvil",
+            () -> new BlockGraniteAnvil(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.TERRACOTTA_PINK)
+                    .strength(2.5F)
+                    .sound(SoundType.STONE)
+                    .requiresCorrectToolForDrops()
+                    .noOcclusion()));
 
     public static final DeferredBlock<Block> CHOPPER = registerBlock("chopper",
             () -> new BlockChopper(BlockBehaviour.Properties.of()
@@ -147,6 +156,10 @@ public class ModBlocks {
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<WoodenHopperBlockEntity>> WOODEN_HOPPER_BE =
             BLOCK_ENTITIES.register("wooden_hopper", () ->
                     BlockEntityType.Builder.of(WoodenHopperBlockEntity::new, WOODEN_HOPPER.get()).build(null));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<GraniteAnvilBlockEntity>> GRANITE_ANVIL_BE =
+            BLOCK_ENTITIES.register("granite_anvil", () ->
+                    BlockEntityType.Builder.of(GraniteAnvilBlockEntity::new, GRANITE_ANVIL.get()).build(null));
 
     private static <T extends Block> DeferredBlock<T> registerBlock(String name, Supplier<T> block) {
         DeferredBlock<T> registeredBlock = BLOCKS.register(name, block);

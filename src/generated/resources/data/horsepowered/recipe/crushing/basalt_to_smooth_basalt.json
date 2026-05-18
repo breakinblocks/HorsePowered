@@ -1,0 +1,11 @@
+{
+  "type": "horsepowered:crushing",
+  "ingredient": {
+    "item": "minecraft:basalt"
+  },
+  "result": {
+    "count": 1,
+    "id": "minecraft:smooth_basalt"
+  },
+  "time": 2
+}

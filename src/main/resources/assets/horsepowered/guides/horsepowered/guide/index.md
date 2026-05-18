@@ -23,6 +23,7 @@ Start by crafting a [Hand Grindstone](hand_grindstone.md) for manual grinding, o
 ### Manual Machines
 - [Hand Grindstone](hand_grindstone.md) - Grind items by hand
 - [Chopping Block](chopping_block.md) - Chop logs with an axe
+- [Granite Anvil](granite_anvil.md) - Crush stone-tier materials with a pickaxe
 
 ### Passive Machines
 - [Drying Rack](drying_rack.md) - Dry up to 8 items at once, no power or labor needed
