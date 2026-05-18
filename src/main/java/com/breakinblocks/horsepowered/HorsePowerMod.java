@@ -42,6 +42,7 @@ public class HorsePowerMod {
                         output.accept(ModBlocks.PRESS.get());
                         output.accept(ModBlocks.GENERATOR.get());
                         output.accept(ModBlocks.DRYING_RACK.get());
+                        output.accept(ModBlocks.WOODEN_HOPPER.get());
                         output.accept(ModBlocks.CREATIVE_BATTERY.get());
                     })
                     .build()

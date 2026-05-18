@@ -9,11 +9,13 @@ import com.breakinblocks.horsepowered.blockentity.GrindstoneBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.HandGrindstoneBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.ManualChopperBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.PressBlockEntity;
+import com.breakinblocks.horsepowered.blockentity.WoodenHopperBlockEntity;
 import com.breakinblocks.horsepowered.items.ModItems;
 import com.breakinblocks.horsepowered.lib.Reference;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
@@ -83,6 +85,13 @@ public class ModBlocks {
                     .mapColor(MapColor.WOOD)
                     .strength(5.0F)));
 
+    public static final RegistryObject<Block> WOODEN_HOPPER = registerBlock("wooden_hopper",
+            () -> new BlockWoodenHopper(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.WOOD)
+                    .strength(2.0F)
+                    .sound(SoundType.WOOD)
+                    .noOcclusion()));
+
     public static final RegistryObject<BlockEntityType<HandGrindstoneBlockEntity>> HAND_GRINDSTONE_BE =
             BLOCK_ENTITIES.register("hand_grindstone", () ->
                     BlockEntityType.Builder.of(HandGrindstoneBlockEntity::new, HAND_GRINDSTONE.get()).build(null));
@@ -118,6 +127,10 @@ public class ModBlocks {
     public static final RegistryObject<BlockEntityType<FillerBlockEntity>> FILLER_BE =
             BLOCK_ENTITIES.register("filler", () ->
                     BlockEntityType.Builder.of(FillerBlockEntity::new, FILLER.get()).build(null));
+
+    public static final RegistryObject<BlockEntityType<WoodenHopperBlockEntity>> WOODEN_HOPPER_BE =
+            BLOCK_ENTITIES.register("wooden_hopper", () ->
+                    BlockEntityType.Builder.of(WoodenHopperBlockEntity::new, WOODEN_HOPPER.get()).build(null));
 
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block) {
         RegistryObject<T> registeredBlock = BLOCKS.register(name, block);

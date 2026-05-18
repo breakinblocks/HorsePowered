@@ -16,7 +16,8 @@
   "block.horsepowered.generator": "Horse Powered Generator",
   "block.horsepowered.creative_battery": "Creative Battery",
   "block.horsepowered.drying_rack": "Drying Rack",
-  "block.horsepowered.filler": "Filler",
+  "block.horsepowered.wooden_hopper": "Wooden Hopper",
+  "block.horsepowered.filler": "Horse Chopper",
 
   "gui.horsepowered.jei.grinding": "Horse Grinding",
   "gui.horsepowered.jei.grinding_hand": "Hand Grinding",

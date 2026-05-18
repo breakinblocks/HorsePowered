@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/hopper",
+  "textures": {
+    "particle": "horsepowered:block/wooden_hopper_outside",
+    "top": "horsepowered:block/wooden_hopper_top",
+    "side": "horsepowered:block/wooden_hopper_outside",
+    "inside": "horsepowered:block/wooden_hopper_inside"
+  }
+}
