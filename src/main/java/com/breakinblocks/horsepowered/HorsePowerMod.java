@@ -58,6 +58,7 @@ public class HorsePowerMod {
                         output.accept(ModBlocks.GRINDSTONE.get());
                         output.accept(ModBlocks.CHOPPING_BLOCK.get());
                         output.accept(ModBlocks.GRANITE_ANVIL.get());
+                        output.accept(ModBlocks.ANIMAL_TRAP.get());
                         output.accept(ModBlocks.CHOPPER.get());
                         output.accept(ModBlocks.PRESS.get());
                         output.accept(ModBlocks.GENERATOR.get());
@@ -168,6 +169,10 @@ public class HorsePowerMod {
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK,
                 ModBlocks.WOODEN_HOPPER_BE.get(),
                 (be, side) -> new InvWrapper(be));
+
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK,
+                ModBlocks.ANIMAL_TRAP_BE.get(),
+                (be, side) -> be.getInventory());
     }
 
     /**

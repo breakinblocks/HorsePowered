@@ -4,6 +4,7 @@ import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.items.ModItems;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
@@ -12,7 +13,11 @@ import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.data.recipes.SimpleCookingRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BiomeTags;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -34,6 +39,36 @@ public class HPRecipeProvider extends RecipeProvider {
         buildPressingRecipes(output);
         buildDryingRecipes(output);
         buildCrushingRecipes(output);
+        buildTrappingRecipes(output);
+    }
+
+    private static final TagKey<Biome> FISH_HABITAT =
+            TagKey.create(Registries.BIOME, HorsePowerMod.id("fish_habitat"));
+
+    private void buildTrappingRecipes(RecipeOutput output) {
+        trap(output, Ingredient.of(Items.WHEAT), EntityType.COW, 1200, "cow");
+        trap(output, Ingredient.of(Items.CARROT), EntityType.PIG, 1200, "pig");
+        trap(output, Ingredient.of(Items.SHORT_GRASS), EntityType.SHEEP, 1200, "sheep");
+        trap(output, Ingredient.of(Items.WHEAT_SEEDS), EntityType.CHICKEN, 900, "chicken");
+        trap(output, Ingredient.of(Items.DANDELION), EntityType.RABBIT, 1500, "rabbit");
+        trap(output, Ingredient.of(Items.APPLE), EntityType.GOAT, 1500, "goat");
+        trap(output, Ingredient.of(Items.RED_MUSHROOM), EntityType.MOOSHROOM, 1800, "mooshroom");
+
+        TrappingRecipeBuilder.trap(Ingredient.of(Items.NETHER_WART), EntityType.STRIDER)
+                .time(1800)
+                .biome(BiomeTags.IS_NETHER)
+                .save(output, "strider");
+
+        TrappingRecipeBuilder.trap(Ingredient.of(Items.KELP), EntityType.SALMON)
+                .time(1500)
+                .biome(FISH_HABITAT)
+                .waterlogged()
+                .save(output, "salmon");
+    }
+
+    private static void trap(RecipeOutput output, Ingredient bait,
+                             EntityType<?> entity, int time, String name) {
+        TrappingRecipeBuilder.trap(bait, entity).time(time).save(output, name);
     }
 
     // ==================== CRAFTING ====================
@@ -138,6 +173,17 @@ public class HPRecipeProvider extends RecipeProvider {
                 .define('F', Items.FLINT)
                 .unlockedBy("has_dead_bush", has(Items.DEAD_BUSH))
                 .save(output, HorsePowerMod.id("crafting/flint_and_tinder"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ModBlocks.ANIMAL_TRAP.get())
+                .pattern("WSW")
+                .pattern("CPC")
+                .pattern("WSW")
+                .define('W', ItemTags.WOODEN_SLABS)
+                .define('S', Items.SMOOTH_STONE)
+                .define('C', Items.CHAIN)
+                .define('P', ItemTags.WOODEN_PRESSURE_PLATES)
+                .unlockedBy("has_chain", has(Items.CHAIN))
+                .save(output, HorsePowerMod.id("crafting/animal_trap"));
 
         SimpleCookingRecipeBuilder.smelting(Ingredient.of(ModItems.DOUGH.get()), RecipeCategory.FOOD,
                         Items.BREAD, 0.35f, 200)

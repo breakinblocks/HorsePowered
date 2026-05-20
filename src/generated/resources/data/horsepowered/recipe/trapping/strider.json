@@ -1,0 +1,9 @@
+{
+  "type": "horsepowered:trapping",
+  "bait": {
+    "item": "minecraft:nether_wart"
+  },
+  "biome": "minecraft:is_nether",
+  "entity": "minecraft:strider",
+  "time": 1800
+}

@@ -1,0 +1,8 @@
+{
+  "type": "horsepowered:trapping",
+  "bait": {
+    "item": "minecraft:apple"
+  },
+  "entity": "minecraft:goat",
+  "time": 1500
+}

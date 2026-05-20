@@ -56,6 +56,14 @@ public class HPRecipes {
                 }
             });
 
+    public static final DeferredHolder<RecipeType<?>, RecipeType<TrappingRecipe>> TRAPPING_TYPE =
+            RECIPE_TYPES.register("trapping", () -> new RecipeType<>() {
+                @Override
+                public String toString() {
+                    return HorsePowerMod.MOD_ID + ":trapping";
+                }
+            });
+
     // Recipe Serializers
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<GrindstoneRecipe>> GRINDING_SERIALIZER =
             RECIPE_SERIALIZERS.register("grinding", GrindstoneRecipe.Serializer::new);
@@ -71,4 +79,7 @@ public class HPRecipes {
 
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<CrushingRecipe>> CRUSHING_SERIALIZER =
             RECIPE_SERIALIZERS.register("crushing", CrushingRecipe.Serializer::new);
+
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<TrappingRecipe>> TRAPPING_SERIALIZER =
+            RECIPE_SERIALIZERS.register("trapping", TrappingRecipe.Serializer::new);
 }

@@ -1,0 +1,153 @@
+package com.breakinblocks.horsepowered.recipes;
+
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
+
+import java.util.Optional;
+
+public class TrappingRecipe implements Recipe<HPRecipeInput> {
+
+    private final Ingredient bait;
+    private final ResourceLocation entityId;
+    private final int time;
+    private final int priority;
+    private final Optional<TagKey<Biome>> biome;
+    private final boolean waterlogged;
+
+    public TrappingRecipe(Ingredient bait, ResourceLocation entityId, int time, int priority,
+                          Optional<TagKey<Biome>> biome, boolean waterlogged) {
+        this.bait = bait;
+        this.entityId = entityId;
+        this.time = Math.max(1, time);
+        this.priority = priority;
+        this.biome = biome;
+        this.waterlogged = waterlogged;
+    }
+
+    @Override
+    public boolean matches(HPRecipeInput input, Level level) {
+        return bait.test(input.getItem(0));
+    }
+
+    @Override
+    public ItemStack assemble(HPRecipeInput input, HolderLookup.Provider registries) {
+        return ItemStack.EMPTY;
+    }
+
+    @Override
+    public boolean canCraftInDimensions(int width, int height) {
+        return true;
+    }
+
+    @Override
+    public ItemStack getResultItem(HolderLookup.Provider registries) {
+        return ItemStack.EMPTY;
+    }
+
+    @Override
+    public NonNullList<Ingredient> getIngredients() {
+        NonNullList<Ingredient> list = NonNullList.create();
+        list.add(bait);
+        return list;
+    }
+
+    @Override
+    public RecipeSerializer<?> getSerializer() {
+        return HPRecipes.TRAPPING_SERIALIZER.get();
+    }
+
+    @Override
+    public RecipeType<?> getType() {
+        return HPRecipes.TRAPPING_TYPE.get();
+    }
+
+    public Ingredient getBait() {
+        return bait;
+    }
+
+    public ResourceLocation getEntityId() {
+        return entityId;
+    }
+
+    public int getTime() {
+        return time;
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+
+    public Optional<TagKey<Biome>> getBiome() {
+        return biome;
+    }
+
+    public boolean isWaterlogged() {
+        return waterlogged;
+    }
+
+    public static class Serializer implements RecipeSerializer<TrappingRecipe> {
+
+        public static final MapCodec<TrappingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance ->
+                instance.group(
+                        Ingredient.CODEC_NONEMPTY.fieldOf("bait").forGetter(TrappingRecipe::getBait),
+                        ResourceLocation.CODEC.fieldOf("entity").forGetter(TrappingRecipe::getEntityId),
+                        Codec.INT.optionalFieldOf("time", 1200).forGetter(TrappingRecipe::getTime),
+                        Codec.INT.optionalFieldOf("priority", 0).forGetter(TrappingRecipe::getPriority),
+                        TagKey.codec(Registries.BIOME).optionalFieldOf("biome").forGetter(TrappingRecipe::getBiome),
+                        Codec.BOOL.optionalFieldOf("waterlogged", false).forGetter(TrappingRecipe::isWaterlogged)
+                ).apply(instance, TrappingRecipe::new)
+        );
+
+        public static final StreamCodec<RegistryFriendlyByteBuf, TrappingRecipe> STREAM_CODEC = new StreamCodec<>() {
+            @Override
+            public TrappingRecipe decode(RegistryFriendlyByteBuf buf) {
+                Ingredient bait = Ingredient.CONTENTS_STREAM_CODEC.decode(buf);
+                ResourceLocation entityId = ResourceLocation.STREAM_CODEC.decode(buf);
+                int time = ByteBufCodecs.VAR_INT.decode(buf);
+                int priority = ByteBufCodecs.VAR_INT.decode(buf);
+                Optional<TagKey<Biome>> biome = buf.readBoolean()
+                        ? Optional.of(TagKey.create(Registries.BIOME, ResourceLocation.STREAM_CODEC.decode(buf)))
+                        : Optional.empty();
+                boolean waterlogged = ByteBufCodecs.BOOL.decode(buf);
+                return new TrappingRecipe(bait, entityId, time, priority, biome, waterlogged);
+            }
+
+            @Override
+            public void encode(RegistryFriendlyByteBuf buf, TrappingRecipe recipe) {
+                Ingredient.CONTENTS_STREAM_CODEC.encode(buf, recipe.bait);
+                ResourceLocation.STREAM_CODEC.encode(buf, recipe.entityId);
+                ByteBufCodecs.VAR_INT.encode(buf, recipe.time);
+                ByteBufCodecs.VAR_INT.encode(buf, recipe.priority);
+                buf.writeBoolean(recipe.biome.isPresent());
+                recipe.biome.ifPresent(tag -> ResourceLocation.STREAM_CODEC.encode(buf, tag.location()));
+                ByteBufCodecs.BOOL.encode(buf, recipe.waterlogged);
+            }
+        };
+
+        @Override
+        public MapCodec<TrappingRecipe> codec() {
+            return CODEC;
+        }
+
+        @Override
+        public StreamCodec<RegistryFriendlyByteBuf, TrappingRecipe> streamCodec() {
+            return STREAM_CODEC;
+        }
+    }
+}

@@ -1,6 +1,7 @@
 package com.breakinblocks.horsepowered.blocks;
 
 import com.breakinblocks.horsepowered.HorsePowerMod;
+import com.breakinblocks.horsepowered.blockentity.AnimalTrapBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.ChopperBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.CreativeBatteryBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.DryingRackBlockEntity;
@@ -104,6 +105,14 @@ public class ModBlocks {
                     .mapColor(MapColor.WOOD)
                     .strength(5.0F)));
 
+    public static final DeferredBlock<Block> ANIMAL_TRAP = registerBlock("animal_trap",
+            () -> new BlockAnimalTrap(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.WOOD)
+                    .strength(2.0F)
+                    .sound(SoundType.WOOD)
+                    .requiresCorrectToolForDrops()
+                    .noOcclusion()));
+
     // Seed oil liquid block — highly flammable so fire chain-spreads through it
     public static final DeferredBlock<LiquidBlock> SEED_OIL_BLOCK = BLOCKS.register("seed_oil",
             () -> new FlammableLiquidBlock(ModFluids.SEED_OIL_SOURCE.get(), BlockBehaviour.Properties.of()
@@ -160,6 +169,10 @@ public class ModBlocks {
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<GraniteAnvilBlockEntity>> GRANITE_ANVIL_BE =
             BLOCK_ENTITIES.register("granite_anvil", () ->
                     BlockEntityType.Builder.of(GraniteAnvilBlockEntity::new, GRANITE_ANVIL.get()).build(null));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<AnimalTrapBlockEntity>> ANIMAL_TRAP_BE =
+            BLOCK_ENTITIES.register("animal_trap", () ->
+                    BlockEntityType.Builder.of(AnimalTrapBlockEntity::new, ANIMAL_TRAP.get()).build(null));
 
     private static <T extends Block> DeferredBlock<T> registerBlock(String name, Supplier<T> block) {
         DeferredBlock<T> registeredBlock = BLOCKS.register(name, block);

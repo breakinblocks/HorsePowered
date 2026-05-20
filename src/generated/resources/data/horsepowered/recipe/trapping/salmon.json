@@ -1,0 +1,10 @@
+{
+  "type": "horsepowered:trapping",
+  "bait": {
+    "item": "minecraft:kelp"
+  },
+  "biome": "horsepowered:fish_habitat",
+  "entity": "minecraft:salmon",
+  "time": 1500,
+  "waterlogged": true
+}

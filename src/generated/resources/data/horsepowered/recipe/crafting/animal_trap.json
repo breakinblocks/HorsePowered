@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "C": {
+      "item": "minecraft:chain"
+    },
+    "P": {
+      "tag": "minecraft:wooden_pressure_plates"
+    },
+    "S": {
+      "item": "minecraft:smooth_stone"
+    },
+    "W": {
+      "tag": "minecraft:wooden_slabs"
+    }
+  },
+  "pattern": [
+    "WSW",
+    "CPC",
+    "WSW"
+  ],
+  "result": {
+    "count": 1,
+    "id": "horsepowered:animal_trap"
+  }
+}

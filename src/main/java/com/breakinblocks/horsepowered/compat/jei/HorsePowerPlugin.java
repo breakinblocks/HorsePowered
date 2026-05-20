@@ -8,6 +8,7 @@ import com.breakinblocks.horsepowered.recipes.DryingRackRecipe;
 import com.breakinblocks.horsepowered.recipes.GrindstoneRecipe;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
 import com.breakinblocks.horsepowered.recipes.PressRecipe;
+import com.breakinblocks.horsepowered.recipes.TrappingRecipe;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.helpers.IGuiHelper;
@@ -50,6 +51,9 @@ public class HorsePowerPlugin implements IModPlugin {
     public static final RecipeType<CrushingRecipe> CRUSHING_TYPE =
             RecipeType.create(HorsePowerMod.MOD_ID, "crushing", CrushingRecipe.class);
 
+    public static final RecipeType<TrappingRecipe> TRAPPING_TYPE =
+            RecipeType.create(HorsePowerMod.MOD_ID, "trapping", TrappingRecipe.class);
+
     @Override
     public ResourceLocation getPluginUid() {
         return UID;
@@ -66,7 +70,8 @@ public class HorsePowerPlugin implements IModPlugin {
                 new HorsePowerManualChoppingCategory(guiHelper),
                 new HorsePowerPressCategory(guiHelper),
                 new HorsePowerDryingCategory(guiHelper),
-                new HorsePowerCrushingCategory(guiHelper)
+                new HorsePowerCrushingCategory(guiHelper),
+                new HorsePowerTrappingCategory(guiHelper)
         );
     }
 
@@ -104,6 +109,11 @@ public class HorsePowerPlugin implements IModPlugin {
         registration.addRecipes(CRUSHING_TYPE,
                 recipeManager.getAllRecipesFor(HPRecipes.CRUSHING_TYPE.get()).stream()
                         .map(RecipeHolder::value).sorted(crushingOrder).toList());
+
+        Comparator<TrappingRecipe> trappingOrder = Comparator.comparingInt(TrappingRecipe::getPriority);
+        registration.addRecipes(TRAPPING_TYPE,
+                recipeManager.getAllRecipesFor(HPRecipes.TRAPPING_TYPE.get()).stream()
+                        .map(RecipeHolder::value).sorted(trappingOrder).toList());
     }
 
     @Override
@@ -119,5 +129,7 @@ public class HorsePowerPlugin implements IModPlugin {
         registration.addRecipeCatalyst(new ItemStack(ModBlocks.DRYING_RACK.get()), DRYING_TYPE);
 
         registration.addRecipeCatalyst(new ItemStack(ModBlocks.GRANITE_ANVIL.get()), CRUSHING_TYPE);
+
+        registration.addRecipeCatalyst(new ItemStack(ModBlocks.ANIMAL_TRAP.get()), TRAPPING_TYPE);
     }
 }
