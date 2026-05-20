@@ -1,0 +1,117 @@
+---
+navigation:
+  title: Animal Trap
+  position: 8
+item_ids:
+  - horsepowered:animal_trap
+---
+
+# Animal Trap
+
+The Animal Trap is a passive wooden cage that lures and captures passive animals using bait. Once an animal is caught it stays inside the trap as stored NBT (not as a live entity) and produces its normal death drops every couple of minutes into the trap's internal inventory. Hoppers below the trap pull the drops out for processing, automation, or storage.
+
+<Row>
+<ItemImage id="horsepowered:animal_trap" scale="4" />
+</Row>
+
+## Usage
+
+1. Place the Animal Trap on the ground. It can be waterlogged for fish recipes.
+2. Right-click the trap with a valid bait item (wheat for a cow, kelp for salmon, and so on). The bait drops into the trap's bait slot and begins spinning inside the cage.
+3. Wait. Every recipe has a minimum trapping time. Jade shows the countdown.
+4. Once the minimum time has elapsed the trap rolls a 5% chance per second to capture the target animal. Average extra wait is around 20 seconds.
+5. On a successful capture the bait is consumed and the animal appears spinning inside the cage. From this point on the trap produces drops every 2.5 minutes.
+6. Pull the drops out with a hopper below the trap, or break the trap and take everything with you.
+
+## Bait Recipes
+
+Default trapping recipes that ship with the mod:
+
+| Animal | Bait | Wait | Extra Conditions |
+|---|---|---|---|
+| Cow | Wheat | 60s | None |
+| Pig | Carrot | 60s | None |
+| Sheep | Short Grass | 60s | None |
+| Chicken | Wheat Seeds | 45s | None |
+| Rabbit | Dandelion | 75s | None |
+| Goat | Apple | 75s | None |
+| Mooshroom | Red Mushroom | 90s | None |
+| Strider | Nether Wart | 90s | Biome must be in `#minecraft:is_nether` |
+| Salmon | Kelp | 75s | Biome must be in `#horsepowered:fish_habitat` and the trap must be waterlogged |
+
+`#horsepowered:fish_habitat` aggregates `#minecraft:is_river`, `#minecraft:is_ocean`, and `#minecraft:is_deep_ocean`, so any river or ocean biome counts.
+
+## Drops
+
+When the captured animal is set, the trap rolls the entity's vanilla death loot table every 2.5 minutes. Drops land in the five output slots inside the trap. If those slots fill up the next roll's items pop out on top of the trap as item entities.
+
+Examples of what each captured animal produces over time:
+
+* Cow: beef and leather
+* Pig: porkchop
+* Chicken: chicken and feathers
+* Sheep: mutton plus wool when shorn
+* Rabbit: rabbit, rabbit hide, occasionally rabbit's foot
+* Goat: nothing on its loot table by default (vanilla goats only drop horns when ramming a block, which the trap cannot reproduce)
+* Mooshroom: beef and leather, same as cow
+* Strider: string and the occasional saddle reroll on the loot table
+* Salmon: raw salmon
+
+The damage source used is generic, so drops are always in their raw form. Cooked variants are not produced.
+
+## Player Interactions
+
+* Right-click with bait: insert bait into the bait slot.
+* Right-click with an empty hand: drop every item in the trap on the ground (the bait if any, plus all output slots). The captured animal stays inside.
+* Sneak + right-click: release the captured animal back into the world. The trap returns to empty.
+* Mine the trap with a stone-tier or better axe: the trap drops as an item with its full NBT preserved, including any captured animal and any items still in the output slots. Place it again anywhere and it picks up exactly where it left off, including the drop timer.
+
+## Hopper Automation
+
+* Hoppers feeding into the trap can only insert valid bait into the bait slot. Random items are rejected by the slot's validity check, so an upstream hopper containing junk will not pollute the trap.
+* Hoppers below the trap pull only from the five drop slots. The bait slot is extraction-locked even while empty, so an automated bait-pulling setup is not possible.
+* The block is fully waterloggable, so a hopper or pipe can sit in flowing water under a fish trap without breaking the water column.
+
+## Biome and Waterlog Conditions
+
+When a recipe specifies a biome tag or a waterlogged requirement, the trap only counts dice rolls when those conditions are met. The bait stays, the timer keeps running, but no animal is ever caught until you relocate or waterlog the trap.
+
+Jade calls this out in red as `Wrong biome` or `Needs water` when bait is loaded but the conditions are not satisfied.
+
+## Crafting Recipe
+
+<RecipeFor id="horsepowered:animal_trap" />
+
+Wooden slabs go in the four corners, smooth stone fills the top and bottom centre, iron chains sit on the sides, and a wooden pressure plate goes in the middle.
+
+## Adding Custom Bait Recipes
+
+Modpack makers can add their own trap recipes at `data/<namespace>/recipe/trapping/<recipe>.json`. Recipe fields:
+
+* `bait`: Ingredient. The item that triggers the recipe.
+* `entity`: ResourceLocation of the entity to capture. Can be any modded mob, not just vanilla animals.
+* `time`: optional, minimum wait in ticks before the dice roll begins. Default 1200.
+* `priority`: optional, sort order in JEI and EMI. Lower numbers display first.
+* `biome`: optional, biome tag. The trap must be inside a biome in that tag for the dice roll to count.
+* `waterlogged`: optional boolean. When true the trap must be waterlogged for the dice roll to count.
+
+Example for capturing a sniffer with a torchflower seed in a flower forest:
+
+```json
+{
+  "type": "horsepowered:trapping",
+  "bait": { "item": "minecraft:torchflower_seeds" },
+  "entity": "minecraft:sniffer",
+  "time": 2400,
+  "biome": "#minecraft:is_overworld"
+}
+```
+
+The recipe's drops still come from the captured entity's loot table, so you do not declare drops on the trap recipe itself.
+
+## Notes
+
+* The captured animal renders inside the cage like a vanilla mob spawner mob, spinning slowly. The same renderer is used for the bait item before capture.
+* Mining preserves the captured entity through `DataComponents.BLOCK_ENTITY_DATA`, the same component vanilla containers use for inventory persistence.
+* Jade shows live progress, the captured animal's name, and a countdown until the next drop. It also lists the contents of the trap's inventory.
+* JEI and EMI both have a Trapping category showing every registered recipe along with its bait, time, conditions, and the expected animal (rendered as the matching spawn egg).

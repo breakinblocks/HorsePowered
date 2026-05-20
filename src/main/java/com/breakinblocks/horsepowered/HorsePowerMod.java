@@ -56,10 +56,12 @@ public class HorsePowerMod {
                         output.accept(ModItems.DOUGH.get());
                         output.accept(ModItems.SEED_OIL_BUCKET.get());
                         output.accept(ModItems.WORK_SADDLE.get());
+                        output.accept(ModItems.FLINT_AND_TINDER.get());
                         output.accept(ModBlocks.HAND_GRINDSTONE.get());
                         output.accept(ModBlocks.GRINDSTONE.get());
                         output.accept(ModBlocks.CHOPPING_BLOCK.get());
                         output.accept(ModBlocks.GRANITE_ANVIL.get());
+                        output.accept(ModBlocks.ANIMAL_TRAP.get());
                         output.accept(ModBlocks.CHOPPER.get());
                         output.accept(ModBlocks.PRESS.get());
                         output.accept(ModBlocks.GENERATOR.get());

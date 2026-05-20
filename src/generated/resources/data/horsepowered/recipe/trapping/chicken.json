@@ -1,0 +1,6 @@
+{
+  "type": "horsepowered:trapping",
+  "bait": "minecraft:wheat_seeds",
+  "entity": "minecraft:chicken",
+  "time": 900
+}

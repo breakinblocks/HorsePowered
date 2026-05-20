@@ -1,0 +1,6 @@
+{
+  "type": "horsepowered:trapping",
+  "bait": "minecraft:red_mushroom",
+  "entity": "minecraft:mooshroom",
+  "time": 1800
+}

@@ -1,0 +1,6 @@
+{
+  "type": "horsepowered:trapping",
+  "bait": "minecraft:dandelion",
+  "entity": "minecraft:rabbit",
+  "time": 1500
+}

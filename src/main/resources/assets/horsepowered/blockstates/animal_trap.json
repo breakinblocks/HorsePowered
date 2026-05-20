@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "waterlogged=false": { "model": "horsepowered:block/animal_trap" },
+    "waterlogged=true": { "model": "horsepowered:block/animal_trap" }
+  }
+}

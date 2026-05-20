@@ -183,11 +183,12 @@ public class BlockDryingRack extends Block implements EntityBlock {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        if (level.isClientSide()) return null;
         if (state.getValue(PART) != DryingRackPart.MAIN) return null;
         if (type != ModBlockEntities.DRYING_RACK.get()) return null;
         @SuppressWarnings("unchecked")
-        BlockEntityTicker<T> ticker = (BlockEntityTicker<T>) (BlockEntityTicker<DryingRackBlockEntity>) DryingRackBlockEntity::serverTick;
+        BlockEntityTicker<T> ticker = level.isClientSide()
+                ? (BlockEntityTicker<T>) (BlockEntityTicker<DryingRackBlockEntity>) DryingRackBlockEntity::clientTick
+                : (BlockEntityTicker<T>) (BlockEntityTicker<DryingRackBlockEntity>) DryingRackBlockEntity::serverTick;
         return ticker;
     }
 }

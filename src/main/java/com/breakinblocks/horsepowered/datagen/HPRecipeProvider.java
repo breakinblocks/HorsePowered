@@ -14,13 +14,16 @@ import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.data.recipes.SimpleCookingRecipeBuilder;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.BiomeTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.CookingBookCategory;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.common.NeoForgeMod;
 
@@ -56,6 +59,35 @@ public class HPRecipeProvider extends RecipeProvider.Runner {
             buildPressingRecipes();
             buildDryingRecipes();
             buildCrushingRecipes();
+            buildTrappingRecipes();
+        }
+
+        private static final TagKey<Biome> FISH_HABITAT =
+                TagKey.create(Registries.BIOME, HorsePowerMod.id("fish_habitat"));
+
+        private void buildTrappingRecipes() {
+            trap(Ingredient.of(Items.WHEAT), EntityType.COW, 1200, "cow");
+            trap(Ingredient.of(Items.CARROT), EntityType.PIG, 1200, "pig");
+            trap(Ingredient.of(Items.SHORT_GRASS), EntityType.SHEEP, 1200, "sheep");
+            trap(Ingredient.of(Items.WHEAT_SEEDS), EntityType.CHICKEN, 900, "chicken");
+            trap(Ingredient.of(Items.DANDELION), EntityType.RABBIT, 1500, "rabbit");
+            trap(Ingredient.of(Items.APPLE), EntityType.GOAT, 1500, "goat");
+            trap(Ingredient.of(Items.RED_MUSHROOM), EntityType.MOOSHROOM, 1800, "mooshroom");
+
+            TrappingRecipeBuilder.trap(Ingredient.of(Items.NETHER_WART), EntityType.STRIDER)
+                    .time(1800)
+                    .biome(BiomeTags.IS_NETHER)
+                    .save(this.output, "strider");
+
+            TrappingRecipeBuilder.trap(Ingredient.of(Items.KELP), EntityType.SALMON)
+                    .time(1500)
+                    .biome(FISH_HABITAT)
+                    .waterlogged()
+                    .save(this.output, "salmon");
+        }
+
+        private void trap(Ingredient bait, EntityType<?> entity, int time, String name) {
+            TrappingRecipeBuilder.trap(bait, entity).time(time).save(this.output, name);
         }
 
         private void buildCraftingRecipes() {
@@ -152,6 +184,26 @@ public class HPRecipeProvider extends RecipeProvider.Runner {
                     .define('D', Items.POLISHED_DEEPSLATE)
                     .unlockedBy("has_granite", has(Items.GRANITE))
                     .save(this.output, recipeKey("crafting/granite_anvil"));
+
+            ShapedRecipeBuilder.shaped(this.registries.lookupOrThrow(Registries.ITEM), RecipeCategory.DECORATIONS, ModBlocks.ANIMAL_TRAP.get())
+                    .pattern("WSW")
+                    .pattern("CPC")
+                    .pattern("WSW")
+                    .define('W', ItemTags.WOODEN_SLABS)
+                    .define('S', Items.SMOOTH_STONE)
+                    .define('C', Items.IRON_CHAIN)
+                    .define('P', ItemTags.WOODEN_PRESSURE_PLATES)
+                    .unlockedBy("has_chain", has(Items.IRON_CHAIN))
+                    .save(this.output, recipeKey("crafting/animal_trap"));
+
+            ShapedRecipeBuilder.shaped(this.registries.lookupOrThrow(Registries.ITEM), RecipeCategory.TOOLS, ModItems.FLINT_AND_TINDER.get())
+                    .pattern("BBB")
+                    .pattern("BFB")
+                    .pattern("BBB")
+                    .define('B', Items.DEAD_BUSH)
+                    .define('F', Items.FLINT)
+                    .unlockedBy("has_dead_bush", has(Items.DEAD_BUSH))
+                    .save(this.output, recipeKey("crafting/flint_and_tinder"));
 
             SimpleCookingRecipeBuilder.smelting(Ingredient.of(ModItems.DOUGH.get()), RecipeCategory.FOOD, CookingBookCategory.MISC, Items.BREAD, 0.35f, 200)
                     .unlockedBy("has_dough", has(ModItems.DOUGH.get()))

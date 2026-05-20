@@ -1,0 +1,5 @@
+{
+  "type": "horsepowered:trapping",
+  "bait": "minecraft:short_grass",
+  "entity": "minecraft:sheep"
+}

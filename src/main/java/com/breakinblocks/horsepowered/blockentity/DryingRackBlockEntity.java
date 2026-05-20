@@ -70,6 +70,29 @@ public class DryingRackBlockEntity extends BlockEntity implements WorldlyContain
         return slot >= 0 && slot < SLOT_COUNT && progress[slot] == FINISHED;
     }
 
+    public ItemStack getOutputPreview(int slot) {
+        if (slot < 0 || slot >= SLOT_COUNT || level == null) return ItemStack.EMPTY;
+        if (progress[slot] == FINISHED) return ItemStack.EMPTY;
+        ItemStack input = items.get(slot);
+        if (input.isEmpty()) return ItemStack.EMPTY;
+        Optional<RecipeHolder<DryingRackRecipe>> recipe = ((RecipeManager) level.recipeAccess())
+                .getRecipeFor(HPRecipes.DRYING_TYPE.get(), new HPRecipeInput(input), level);
+        return recipe.map(holder -> holder.value().createResult()).orElse(ItemStack.EMPTY);
+    }
+
+    public static void clientTick(Level level, BlockPos pos, BlockState state, DryingRackBlockEntity be) {
+        if (!level.isClientSide()) return;
+        for (int slot = 0; slot < SLOT_COUNT; slot++) {
+            if (be.items.get(slot).isEmpty()) continue;
+            if (be.progress[slot] == FINISHED) continue;
+            int time = be.recipeTime[slot];
+            if (time <= 0) continue;
+            if (be.progress[slot] < time) {
+                be.progress[slot]++;
+            }
+        }
+    }
+
     public boolean interactSlot(int slot, ItemStack handStack, Consumer<ItemStack> giveBack) {
         if (slot < 0 || slot >= SLOT_COUNT || level == null) return false;
         ItemStack present = items.get(slot);

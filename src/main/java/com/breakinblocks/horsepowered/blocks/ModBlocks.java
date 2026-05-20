@@ -107,4 +107,13 @@ public class ModBlocks {
                     .strength(2.0F)
                     .sound(SoundType.WOOD)
                     .noOcclusion()));
+
+    public static final DeferredBlock<Block> ANIMAL_TRAP = BLOCKS.register("animal_trap",
+            registryName -> new BlockAnimalTrap(BlockBehaviour.Properties.of()
+                    .setId(ResourceKey.create(Registries.BLOCK, registryName))
+                    .mapColor(MapColor.WOOD)
+                    .strength(2.0F)
+                    .sound(SoundType.WOOD)
+                    .requiresCorrectToolForDrops()
+                    .noOcclusion()));
 }

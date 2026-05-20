@@ -9,6 +9,7 @@ import com.breakinblocks.horsepowered.recipes.DryingRackRecipe;
 import com.breakinblocks.horsepowered.recipes.GrindstoneRecipe;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
 import com.breakinblocks.horsepowered.recipes.PressRecipe;
+import com.breakinblocks.horsepowered.recipes.TrappingRecipe;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.helpers.IGuiHelper;
@@ -50,6 +51,9 @@ public class HorsePowerPlugin implements IModPlugin {
     public static final IRecipeType<CrushingRecipe> CRUSHING_TYPE =
             IRecipeType.create(HorsePowerMod.MOD_ID, "crushing", CrushingRecipe.class);
 
+    public static final IRecipeType<TrappingRecipe> TRAPPING_TYPE =
+            IRecipeType.create(HorsePowerMod.MOD_ID, "trapping", TrappingRecipe.class);
+
     @Override
     public Identifier getPluginUid() {
         return UID;
@@ -66,7 +70,8 @@ public class HorsePowerPlugin implements IModPlugin {
                 new HorsePowerManualChoppingCategory(guiHelper),
                 new HorsePowerPressCategory(guiHelper),
                 new HorsePowerDryingCategory(guiHelper),
-                new HorsePowerCrushingCategory(guiHelper)
+                new HorsePowerCrushingCategory(guiHelper),
+                new HorsePowerTrappingCategory(guiHelper)
         );
     }
 
@@ -102,6 +107,10 @@ public class HorsePowerPlugin implements IModPlugin {
         Comparator<CrushingRecipe> crushOrder = Comparator.comparingInt(CrushingRecipe::getPriority);
         registration.addRecipes(CRUSHING_TYPE, recipeMap.byType(HPRecipes.CRUSHING_TYPE.get())
                 .stream().map(RecipeHolder::value).sorted(crushOrder).toList());
+
+        Comparator<TrappingRecipe> trapOrder = Comparator.comparingInt(TrappingRecipe::getPriority);
+        registration.addRecipes(TRAPPING_TYPE, recipeMap.byType(HPRecipes.TRAPPING_TYPE.get())
+                .stream().map(RecipeHolder::value).sorted(trapOrder).toList());
     }
 
     @Override
@@ -117,5 +126,7 @@ public class HorsePowerPlugin implements IModPlugin {
         registration.addCraftingStation(DRYING_TYPE, new ItemStack(ModBlocks.DRYING_RACK.get()));
 
         registration.addCraftingStation(CRUSHING_TYPE, new ItemStack(ModBlocks.GRANITE_ANVIL.get()));
+
+        registration.addCraftingStation(TRAPPING_TYPE, new ItemStack(ModBlocks.ANIMAL_TRAP.get()));
     }
 }

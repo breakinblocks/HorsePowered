@@ -8,6 +8,7 @@
   "item.horsepowered.work_saddle": "Work Saddle",
   "item.horsepowered.work_saddle.contains": "Carrying: %s",
   "item.horsepowered.work_saddle.duplicate": "That worker is already in the world",
+  "item.horsepowered.flint_and_tinder": "Flint and Tinder",
 
   "fluid_type.horsepowered.seed_oil": "Seed Oil",
   "block.horsepowered.seed_oil": "Seed Oil",
@@ -21,6 +22,7 @@
   "block.horsepowered.creative_battery": "Creative Battery",
   "block.horsepowered.drying_rack": "Drying Rack",
   "block.horsepowered.granite_anvil": "Granite Anvil",
+  "block.horsepowered.animal_trap": "Animal Trap",
   "block.horsepowered.wooden_hopper": "Wooden Hopper",
   "block.horsepowered.filler": "Horse Chopper",
 
@@ -32,6 +34,11 @@
   "gui.horsepowered.jei.drying": "Drying",
   "gui.horsepowered.jei.crushing": "Crushing",
   "gui.horsepowered.jei.strikes": "Strikes: %s",
+  "gui.horsepowered.jei.trapping": "Trapping",
+  "gui.horsepowered.jei.trap_time": "Min wait: %s",
+  "gui.horsepowered.jei.trap_chance": "5%% Chance/sec",
+  "gui.horsepowered.jei.trap_biome": "Biome: %s",
+  "gui.horsepowered.jei.trap_waterlogged": "Requires water",
   "gui.horsepowered.jei.time": "Time: %s",
   "gui.horsepowered.jei.chops": "Chops: %s",
   "gui.horsepowered.jei.turns": "Turns: %s",
@@ -45,6 +52,7 @@
   "config.jade.plugin_horsepowered.filler": "Multi-block Extension",
   "config.jade.plugin_horsepowered.drying_rack": "Drying Rack",
   "config.jade.plugin_horsepowered.granite_anvil": "Granite Anvil",
+  "config.jade.plugin_horsepowered.animal_trap": "Animal Trap",
 
   "jade.horsepowered.input": "Input: %s x%s",
   "jade.horsepowered.output": "Output: %s x%s",
@@ -60,5 +68,13 @@
   "jade.horsepowered.obstructed": "Area obstructed!",
   "jade.horsepowered.drying": "Drying: %s %s%% (%s left)",
   "jade.horsepowered.drying_done": "Dried: %s",
-  "jade.horsepowered.drying_empty": "Slot empty"
+  "jade.horsepowered.drying_empty": "Slot empty",
+  "jade.horsepowered.trap_empty": "Empty",
+  "jade.horsepowered.trap_progress": "Trapping... %s",
+  "jade.horsepowered.trap_set": "Trap set",
+  "jade.horsepowered.trap_caught": "Caught: %s",
+  "jade.horsepowered.trap_next_drop": "Next drop: %s",
+  "jade.horsepowered.trap_wrong_biome": "Wrong biome",
+  "jade.horsepowered.trap_needs_water": "Needs water",
+  "biome.horsepowered.fish_habitat": "Rivers and Oceans"
 }

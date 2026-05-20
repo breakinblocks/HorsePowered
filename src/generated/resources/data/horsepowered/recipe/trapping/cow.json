@@ -1,0 +1,5 @@
+{
+  "type": "horsepowered:trapping",
+  "bait": "minecraft:wheat",
+  "entity": "minecraft:cow"
+}

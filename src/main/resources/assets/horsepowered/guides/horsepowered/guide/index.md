@@ -27,6 +27,7 @@ Start by crafting a [Hand Grindstone](hand_grindstone.md) for manual grinding, o
 
 ### Passive Machines
 - [Drying Rack](drying_rack.md) - Dry up to 8 items at once, no power or labor needed
+- [Animal Trap](animal_trap.md) for capturing passive animals with bait and farming their drops over time
 
 ### Horse-Powered Machines
 - [Horse Grindstone](horse_grindstone.md) - Automated grinding powered by a horse

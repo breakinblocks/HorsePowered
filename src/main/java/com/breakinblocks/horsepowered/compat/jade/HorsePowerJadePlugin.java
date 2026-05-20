@@ -4,6 +4,7 @@ import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.blockentity.ChopperBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.DryingRackBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.FillerBlockEntity;
+import com.breakinblocks.horsepowered.blockentity.AnimalTrapBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.GraniteAnvilBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.GrindstoneBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.HandGrindstoneBlockEntity;
@@ -14,6 +15,7 @@ import com.breakinblocks.horsepowered.blocks.BlockChopper;
 import com.breakinblocks.horsepowered.blocks.BlockChoppingBlock;
 import com.breakinblocks.horsepowered.blocks.BlockDryingRack;
 import com.breakinblocks.horsepowered.blocks.BlockFiller;
+import com.breakinblocks.horsepowered.blocks.BlockAnimalTrap;
 import com.breakinblocks.horsepowered.blocks.BlockGraniteAnvil;
 import com.breakinblocks.horsepowered.blocks.BlockGrindstone;
 import com.breakinblocks.horsepowered.blocks.BlockHandGrindstone;
@@ -47,11 +49,21 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
     public static final Identifier FILLER = Identifier.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "filler");
     public static final Identifier DRYING_RACK = Identifier.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "drying_rack");
     public static final Identifier GRANITE_ANVIL = Identifier.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "granite_anvil");
+    public static final Identifier ANIMAL_TRAP = Identifier.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "animal_trap");
 
     private static final String KEY_DR_SLOT = "dr_slot";
     private static final String KEY_DR_PROGRESS = "dr_progress";
     private static final String KEY_DR_TIME = "dr_time";
     private static final String KEY_DR_FINISHED = "dr_finished";
+
+    private static final String KEY_AT_PROGRESS = "at_progress";
+    private static final String KEY_AT_TIME = "at_time";
+    private static final String KEY_AT_DROP_TIMER = "at_drop_timer";
+    private static final String KEY_AT_HAS_ENTITY = "at_has_entity";
+    private static final String KEY_AT_ENTITY_ID = "at_entity_id";
+    private static final String KEY_AT_BIOME_OK = "at_biome_ok";
+    private static final String KEY_AT_WATER_OK = "at_water_ok";
+    private static final String KEY_AT_HAS_BAIT = "at_has_bait";
 
     private static final String KEY_CURRENT = "hp_current";
     private static final String KEY_TOTAL = "hp_total";
@@ -193,6 +205,42 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
                 return FILLER;
             }
         }, FillerBlockEntity.class);
+
+        registration.registerBlockDataProvider(new IServerDataProvider<BlockAccessor>() {
+            @Override
+            public void appendServerData(CompoundTag data, BlockAccessor accessor) {
+                if (!(accessor.getBlockEntity() instanceof AnimalTrapBlockEntity te)) return;
+                data.putInt(KEY_AT_PROGRESS, te.getTrapProgress());
+                data.putInt(KEY_AT_TIME, te.getTrapTime());
+                data.putInt(KEY_AT_DROP_TIMER, te.getDropTimer());
+                data.putBoolean(KEY_AT_HAS_ENTITY, te.hasCapturedEntity());
+                if (te.getCapturedEntityType() != null) {
+                    data.putString(KEY_AT_ENTITY_ID,
+                            net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE
+                                    .getKey(te.getCapturedEntityType()).toString());
+                }
+                ItemStack bait = te.getItem(AnimalTrapBlockEntity.BAIT_SLOT);
+                data.putBoolean(KEY_AT_HAS_BAIT, !bait.isEmpty());
+                if (!bait.isEmpty()) {
+                    te.findTrappingRecipe(bait).ifPresent(holder -> {
+                        var recipe = holder.value();
+                        BlockState state = accessor.getBlockState();
+                        boolean biomeOk = recipe.getBiome().isEmpty()
+                                || accessor.getLevel().getBiome(accessor.getPosition()).is(recipe.getBiome().get());
+                        boolean waterOk = !recipe.isWaterlogged()
+                                || (state.hasProperty(net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED)
+                                        && state.getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED));
+                        data.putBoolean(KEY_AT_BIOME_OK, biomeOk);
+                        data.putBoolean(KEY_AT_WATER_OK, waterOk);
+                    });
+                }
+            }
+
+            @Override
+            public Identifier getUid() {
+                return ANIMAL_TRAP;
+            }
+        }, AnimalTrapBlockEntity.class);
     }
 
     @Override
@@ -376,6 +424,69 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
                 return GRANITE_ANVIL;
             }
         }, BlockGraniteAnvil.class);
+
+        registration.registerBlockComponent(new IBlockComponentProvider() {
+            @Override
+            public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
+                if (!(accessor.getBlockEntity() instanceof AnimalTrapBlockEntity te)) return;
+                CompoundTag data = accessor.getServerData();
+
+                for (int slot = 0; slot < AnimalTrapBlockEntity.INVENTORY_SIZE; slot++) {
+                    ItemStack stack = te.getItem(slot);
+                    String key = slot == AnimalTrapBlockEntity.BAIT_SLOT ? "input" : "output";
+                    appendItemInfo(tooltip, stack, key);
+                }
+
+                if (data.getBooleanOr(KEY_AT_HAS_ENTITY, false)) {
+                    Component entityName = Component.literal("?");
+                    String id = data.getStringOr(KEY_AT_ENTITY_ID, "");
+                    if (!id.isEmpty()) {
+                        Identifier rl = Identifier.tryParse(id);
+                        if (rl != null) {
+                            net.minecraft.world.entity.EntityType<?> type =
+                                    net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getValue(rl);
+                            if (type != null) entityName = Component.translatable(type.getDescriptionId());
+                        }
+                    }
+                    tooltip.add(Component.translatable(
+                            "jade." + HorsePowerMod.MOD_ID + ".trap_caught", entityName));
+                    int nextDropTicks = Math.max(0,
+                            AnimalTrapBlockEntity.DROP_INTERVAL_TICKS - data.getIntOr(KEY_AT_DROP_TIMER, 0));
+                    tooltip.add(Component.translatable(
+                            "jade." + HorsePowerMod.MOD_ID + ".trap_next_drop", formatTime(nextDropTicks)));
+                    return;
+                }
+
+                if (!data.getBooleanOr(KEY_AT_HAS_BAIT, false)) {
+                    tooltip.add(Component.translatable("jade." + HorsePowerMod.MOD_ID + ".trap_empty"));
+                    return;
+                }
+
+                int progress = data.getIntOr(KEY_AT_PROGRESS, 0);
+                int time = data.getIntOr(KEY_AT_TIME, 0);
+                if (time > 0 && progress < time) {
+                    int remaining = Math.max(0, time - progress);
+                    tooltip.add(Component.translatable(
+                            "jade." + HorsePowerMod.MOD_ID + ".trap_progress", formatTime(remaining)));
+                } else {
+                    tooltip.add(Component.translatable("jade." + HorsePowerMod.MOD_ID + ".trap_set"));
+                }
+
+                if (data.contains(KEY_AT_BIOME_OK) && !data.getBooleanOr(KEY_AT_BIOME_OK, true)) {
+                    tooltip.add(Component.translatable("jade." + HorsePowerMod.MOD_ID + ".trap_wrong_biome")
+                            .withStyle(style -> style.withColor(0xFF5555)));
+                }
+                if (data.contains(KEY_AT_WATER_OK) && !data.getBooleanOr(KEY_AT_WATER_OK, true)) {
+                    tooltip.add(Component.translatable("jade." + HorsePowerMod.MOD_ID + ".trap_needs_water")
+                            .withStyle(style -> style.withColor(0xFF5555)));
+                }
+            }
+
+            @Override
+            public Identifier getUid() {
+                return ANIMAL_TRAP;
+            }
+        }, BlockAnimalTrap.class);
     }
 
     private static String formatTime(int ticks) {

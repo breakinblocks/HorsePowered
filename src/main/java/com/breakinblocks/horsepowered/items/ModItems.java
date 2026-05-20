@@ -7,6 +7,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.BucketItem;
+import net.minecraft.world.item.FlintAndSteelItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -34,6 +35,11 @@ public class ModItems {
             registryName -> new WorkSaddleItem(new Item.Properties()
                     .setId(ResourceKey.create(Registries.ITEM, registryName))
                     .stacksTo(1)));
+
+    public static final DeferredItem<FlintAndSteelItem> FLINT_AND_TINDER = ITEMS.register("flint_and_tinder",
+            registryName -> new FlintAndSteelItem(new Item.Properties()
+                    .setId(ResourceKey.create(Registries.ITEM, registryName))
+                    .durability(16)));
 
     public static final DeferredItem<BlockItem> HAND_GRINDSTONE_ITEM = ITEMS.register("hand_grindstone",
             registryName -> new BlockItem(ModBlocks.HAND_GRINDSTONE.get(), new Item.Properties()
@@ -73,6 +79,10 @@ public class ModItems {
                     .useBlockDescriptionPrefix()));
     public static final DeferredItem<BlockItem> GRANITE_ANVIL_ITEM = ITEMS.register("granite_anvil",
             registryName -> new BlockItem(ModBlocks.GRANITE_ANVIL.get(), new Item.Properties()
+                    .setId(ResourceKey.create(Registries.ITEM, registryName))
+                    .useBlockDescriptionPrefix()));
+    public static final DeferredItem<BlockItem> ANIMAL_TRAP_ITEM = ITEMS.register("animal_trap",
+            registryName -> new BlockItem(ModBlocks.ANIMAL_TRAP.get(), new Item.Properties()
                     .setId(ResourceKey.create(Registries.ITEM, registryName))
                     .useBlockDescriptionPrefix()));
 }
