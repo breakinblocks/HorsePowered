@@ -130,6 +130,15 @@ public class HPRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_granite", has(Items.GRANITE))
                 .save(output, HorsePowerMod.id("crafting/granite_anvil"));
 
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.FLINT_AND_TINDER.get())
+                .pattern("BBB")
+                .pattern("BFB")
+                .pattern("BBB")
+                .define('B', Items.DEAD_BUSH)
+                .define('F', Items.FLINT)
+                .unlockedBy("has_dead_bush", has(Items.DEAD_BUSH))
+                .save(output, HorsePowerMod.id("crafting/flint_and_tinder"));
+
         SimpleCookingRecipeBuilder.smelting(Ingredient.of(ModItems.DOUGH.get()), RecipeCategory.FOOD,
                         Items.BREAD, 0.35f, 200)
                 .unlockedBy("has_dough", has(ModItems.DOUGH.get()))

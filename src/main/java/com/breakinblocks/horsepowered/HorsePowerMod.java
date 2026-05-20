@@ -52,6 +52,7 @@ public class HorsePowerMod {
                         output.accept(ModItems.DOUGH.get());
                         output.accept(ModItems.SEED_OIL_BUCKET.get());
                         output.accept(ModItems.WORK_SADDLE.get());
+                        output.accept(ModItems.FLINT_AND_TINDER.get());
                         // Blocks
                         output.accept(ModBlocks.HAND_GRINDSTONE.get());
                         output.accept(ModBlocks.GRINDSTONE.get());

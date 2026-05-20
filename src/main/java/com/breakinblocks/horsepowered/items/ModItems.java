@@ -3,6 +3,7 @@ package com.breakinblocks.horsepowered.items;
 import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.fluids.ModFluids;
 import net.minecraft.world.item.BucketItem;
+import net.minecraft.world.item.FlintAndSteelItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -26,4 +27,7 @@ public class ModItems {
 
     public static final DeferredItem<WorkSaddleItem> WORK_SADDLE = ITEMS.register("work_saddle",
             () -> new WorkSaddleItem(new Item.Properties().stacksTo(1)));
+
+    public static final DeferredItem<FlintAndSteelItem> FLINT_AND_TINDER = ITEMS.register("flint_and_tinder",
+            () -> new FlintAndSteelItem(new Item.Properties().durability(16)));
 }
