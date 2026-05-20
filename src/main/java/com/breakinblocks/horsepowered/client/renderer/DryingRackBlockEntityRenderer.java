@@ -17,6 +17,9 @@ import net.minecraft.world.phys.AABB;
 
 public class DryingRackBlockEntityRenderer implements BlockEntityRenderer<DryingRackBlockEntity> {
 
+    private static final float FADE_START = 0.7F;
+    private static final float FADE_SPAN = 1.0F - FADE_START;
+
     private final ItemRenderer itemRenderer;
     private final Font font;
 
@@ -51,8 +54,35 @@ public class DryingRackBlockEntityRenderer implements BlockEntityRenderer<Drying
             double x = 0.5 + rightOffset * rightDir.getStepX() + forwardOffset * facing.getStepX();
             double z = 0.5 + rightOffset * rightDir.getStepZ() + forwardOffset * facing.getStepZ();
 
-            RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer, font, stack,
-                    x, y, z, 0.45F, 0F, packedLight, packedOverlay, be.getLevel(), y + 0.05);
+            int progress = be.getProgress(slot);
+            int time = be.getRecipeTime(slot);
+            boolean finished = be.isFinished(slot);
+
+            if (finished || progress <= 0 || time <= 0) {
+                RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer, font, stack,
+                        x, y, z, 0.45F, 0F, packedLight, packedOverlay, be.getLevel(), y + 0.05);
+                continue;
+            }
+
+            float effectiveProgress = Math.min((float) time, (float) progress + partialTick);
+            float ratio = effectiveProgress / (float) time;
+            if (ratio < FADE_START) {
+                RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer, font, stack,
+                        x, y, z, 0.45F, 0F, packedLight, packedOverlay, be.getLevel(), y + 0.05);
+                continue;
+            }
+
+            float fade = (ratio - FADE_START) / FADE_SPAN;
+            float inputAlpha = 1F - fade;
+            float outputAlpha = fade;
+            ItemStack output = be.getOutputPreview(slot);
+
+            RenderUtils.renderFlatItemFading(poseStack, bufferSource, itemRenderer, stack,
+                    x, y, z, 0.45F, 0F, packedLight, packedOverlay, be.getLevel(), inputAlpha);
+            if (!output.isEmpty()) {
+                RenderUtils.renderFlatItemFading(poseStack, bufferSource, itemRenderer, output,
+                        x, y, z, 0.45F, 0F, packedLight, packedOverlay, be.getLevel(), outputAlpha);
+            }
         }
     }
 

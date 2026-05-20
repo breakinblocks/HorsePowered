@@ -47,6 +47,27 @@ public final class RenderUtils {
         }
     }
 
+    public static void renderFlatItemFading(PoseStack poseStack, MultiBufferSource bufferSource,
+                                            ItemRenderer itemRenderer, ItemStack stack,
+                                            double x, double y, double z, float scale, float yRotation,
+                                            int packedLight, int packedOverlay, Level level, float alpha) {
+        if (stack.isEmpty() || alpha <= 0F) return;
+
+        poseStack.pushPose();
+        poseStack.translate(x, y, z);
+        poseStack.scale(scale, scale, scale);
+        if (yRotation != 0) {
+            poseStack.mulPose(Axis.YP.rotationDegrees(yRotation));
+        }
+        poseStack.mulPose(Axis.XP.rotationDegrees(90));
+
+        MultiBufferSource alphaSource = new TransparentMultiBufferSource(bufferSource, alpha);
+        itemRenderer.renderStatic(stack, ItemDisplayContext.FIXED, packedLight, packedOverlay,
+                poseStack, alphaSource, level, 0);
+
+        poseStack.popPose();
+    }
+
     public static void renderStandingItem(PoseStack poseStack, MultiBufferSource bufferSource,
                                            ItemRenderer itemRenderer, Font font, ItemStack stack,
                                            double x, double y, double z, float scale, float yRotation,
