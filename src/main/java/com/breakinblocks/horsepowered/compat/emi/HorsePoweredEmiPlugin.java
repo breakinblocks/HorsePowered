@@ -8,6 +8,7 @@ import com.breakinblocks.horsepowered.recipes.DryingRackRecipe;
 import com.breakinblocks.horsepowered.recipes.GrindstoneRecipe;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
 import com.breakinblocks.horsepowered.recipes.PressRecipe;
+import com.breakinblocks.horsepowered.recipes.TrappingRecipe;
 import dev.emi.emi.api.EmiEntrypoint;
 import dev.emi.emi.api.EmiPlugin;
 import dev.emi.emi.api.EmiRegistry;
@@ -43,6 +44,9 @@ public class HorsePoweredEmiPlugin implements EmiPlugin {
     public static final EmiRecipeCategory CRUSHING = new EmiRecipeCategory(
             new ResourceLocation(Reference.MODID, "crushing"),
             EmiStack.of(ModBlocks.GRANITE_ANVIL.get()));
+    public static final EmiRecipeCategory TRAPPING = new EmiRecipeCategory(
+            new ResourceLocation(Reference.MODID, "trapping"),
+            EmiStack.of(ModBlocks.ANIMAL_TRAP.get()));
 
     @Override
     public void register(EmiRegistry registry) {
@@ -53,6 +57,7 @@ public class HorsePoweredEmiPlugin implements EmiPlugin {
         registry.addCategory(PRESSING);
         registry.addCategory(DRYING);
         registry.addCategory(CRUSHING);
+        registry.addCategory(TRAPPING);
 
         registry.addWorkstation(GRINDING, EmiStack.of(ModBlocks.GRINDSTONE.get()));
         registry.addWorkstation(GRINDING_HAND, EmiStack.of(ModBlocks.HAND_GRINDSTONE.get()));
@@ -61,6 +66,7 @@ public class HorsePoweredEmiPlugin implements EmiPlugin {
         registry.addWorkstation(PRESSING, EmiStack.of(ModBlocks.PRESS.get()));
         registry.addWorkstation(DRYING, EmiStack.of(ModBlocks.DRYING_RACK.get()));
         registry.addWorkstation(CRUSHING, EmiStack.of(ModBlocks.GRANITE_ANVIL.get()));
+        registry.addWorkstation(TRAPPING, EmiStack.of(ModBlocks.ANIMAL_TRAP.get()));
 
         RecipeManager rm = registry.getRecipeManager();
 
@@ -97,5 +103,11 @@ public class HorsePoweredEmiPlugin implements EmiPlugin {
                 .thenComparing(r -> r.getId().toString());
         rm.getAllRecipesFor(HPRecipes.CRUSHING_TYPE.get()).stream().sorted(crushOrder)
                 .forEach(r -> registry.addRecipe(new EmiCrushingRecipe(CRUSHING, r)));
+
+        Comparator<TrappingRecipe> trapOrder = Comparator
+                .comparingInt(TrappingRecipe::getPriority)
+                .thenComparing(r -> r.getId().toString());
+        rm.getAllRecipesFor(HPRecipes.TRAPPING_TYPE.get()).stream().sorted(trapOrder)
+                .forEach(r -> registry.addRecipe(new EmiTrappingRecipe(TRAPPING, r)));
     }
 }

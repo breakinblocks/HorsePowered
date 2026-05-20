@@ -1,0 +1,6 @@
+{
+  "type": "horsepowered:trapping",
+  "bait": { "item": "minecraft:wheat" },
+  "entity": "minecraft:cow",
+  "time": 1200
+}

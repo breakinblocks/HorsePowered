@@ -8,6 +8,7 @@ import com.breakinblocks.horsepowered.recipes.DryingRackRecipe;
 import com.breakinblocks.horsepowered.recipes.GrindstoneRecipe;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
 import com.breakinblocks.horsepowered.recipes.PressRecipe;
+import com.breakinblocks.horsepowered.recipes.TrappingRecipe;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.helpers.IGuiHelper;
@@ -47,6 +48,9 @@ public class HorsePowerPlugin implements IModPlugin {
     public static final RecipeType<CrushingRecipe> CRUSHING_TYPE =
             RecipeType.create(Reference.MODID, "crushing", CrushingRecipe.class);
 
+    public static final RecipeType<TrappingRecipe> TRAPPING_TYPE =
+            RecipeType.create(Reference.MODID, "trapping", TrappingRecipe.class);
+
     @Override
     public ResourceLocation getPluginUid() {
         return UID;
@@ -63,7 +67,8 @@ public class HorsePowerPlugin implements IModPlugin {
                 new HorsePowerChoppingCategory(guiHelper, CHOPPING_HAND_TYPE, ModBlocks.CHOPPING_BLOCK.get(), "gui.horsepowered.jei.chopping_hand"),
                 new HorsePowerPressCategory(guiHelper),
                 new HorsePowerDryingCategory(guiHelper),
-                new HorsePowerCrushingCategory(guiHelper)
+                new HorsePowerCrushingCategory(guiHelper),
+                new HorsePowerTrappingCategory(guiHelper)
         );
     }
 
@@ -106,6 +111,13 @@ public class HorsePowerPlugin implements IModPlugin {
         registration.addRecipes(CRUSHING_TYPE,
                 recipeManager.getAllRecipesFor(HPRecipes.CRUSHING_TYPE.get()).stream()
                         .sorted(crushingOrder).toList());
+
+        Comparator<TrappingRecipe> trapOrder = Comparator
+                .comparingInt(TrappingRecipe::getPriority)
+                .thenComparing(r -> r.getId().toString());
+        registration.addRecipes(TRAPPING_TYPE,
+                recipeManager.getAllRecipesFor(HPRecipes.TRAPPING_TYPE.get()).stream()
+                        .sorted(trapOrder).toList());
     }
 
     @Override
@@ -121,5 +133,7 @@ public class HorsePowerPlugin implements IModPlugin {
         registration.addRecipeCatalyst(new ItemStack(ModBlocks.DRYING_RACK.get()), DRYING_TYPE);
 
         registration.addRecipeCatalyst(new ItemStack(ModBlocks.GRANITE_ANVIL.get()), CRUSHING_TYPE);
+
+        registration.addRecipeCatalyst(new ItemStack(ModBlocks.ANIMAL_TRAP.get()), TRAPPING_TYPE);
     }
 }

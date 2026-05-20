@@ -1,6 +1,7 @@
 package com.breakinblocks.horsepowered.client;
 
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
+import com.breakinblocks.horsepowered.client.renderer.AnimalTrapBlockEntityRenderer;
 import com.breakinblocks.horsepowered.client.renderer.ChopperBlockEntityRenderer;
 import com.breakinblocks.horsepowered.client.renderer.DryingRackBlockEntityRenderer;
 import com.breakinblocks.horsepowered.client.renderer.GeneratorBlockEntityRenderer;
@@ -33,6 +34,7 @@ public class ClientHandler {
         event.registerBlockEntityRenderer(ModBlocks.GENERATOR_BE.get(), GeneratorBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(ModBlocks.DRYING_RACK_BE.get(), DryingRackBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(ModBlocks.GRANITE_ANVIL_BE.get(), GraniteAnvilBlockEntityRenderer::new);
+        event.registerBlockEntityRenderer(ModBlocks.ANIMAL_TRAP_BE.get(), AnimalTrapBlockEntityRenderer::new);
     }
 
     @SubscribeEvent

@@ -1,5 +1,6 @@
 package com.breakinblocks.horsepowered.blocks;
 
+import com.breakinblocks.horsepowered.blockentity.AnimalTrapBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.ChopperBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.CreativeBatteryBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.DryingRackBlockEntity;
@@ -101,6 +102,14 @@ public class ModBlocks {
                     .requiresCorrectToolForDrops()
                     .noOcclusion()));
 
+    public static final RegistryObject<Block> ANIMAL_TRAP = registerBlock("animal_trap",
+            () -> new BlockAnimalTrap(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.WOOD)
+                    .strength(2.0F)
+                    .sound(SoundType.WOOD)
+                    .requiresCorrectToolForDrops()
+                    .noOcclusion()));
+
     public static final RegistryObject<BlockEntityType<HandGrindstoneBlockEntity>> HAND_GRINDSTONE_BE =
             BLOCK_ENTITIES.register("hand_grindstone", () ->
                     BlockEntityType.Builder.of(HandGrindstoneBlockEntity::new, HAND_GRINDSTONE.get()).build(null));
@@ -144,6 +153,10 @@ public class ModBlocks {
     public static final RegistryObject<BlockEntityType<GraniteAnvilBlockEntity>> GRANITE_ANVIL_BE =
             BLOCK_ENTITIES.register("granite_anvil", () ->
                     BlockEntityType.Builder.of(GraniteAnvilBlockEntity::new, GRANITE_ANVIL.get()).build(null));
+
+    public static final RegistryObject<BlockEntityType<AnimalTrapBlockEntity>> ANIMAL_TRAP_BE =
+            BLOCK_ENTITIES.register("animal_trap", () ->
+                    BlockEntityType.Builder.of(AnimalTrapBlockEntity::new, ANIMAL_TRAP.get()).build(null));
 
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block) {
         RegistryObject<T> registeredBlock = BLOCKS.register(name, block);

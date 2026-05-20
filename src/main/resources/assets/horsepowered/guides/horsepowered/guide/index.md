@@ -32,6 +32,7 @@ Start by crafting a [Hand Grindstone](hand_grindstone.md) for manual grinding, o
 
 ### Passive Machines
 - [Drying Rack](drying_rack.md) - 2x2 multiblock that dries 8 items in parallel
+- [Animal Trap](animal_trap.md) for capturing passive animals with bait and farming their drops over time
 
 ### Tools
 - [Work Saddle](work_saddle.md) - Capture and transport workers across long distances
