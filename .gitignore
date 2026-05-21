@@ -19,6 +19,7 @@ classes/
 .classpath
 .project
 .settings/
+.eclipse/
 bin/
 
 # VSCode
