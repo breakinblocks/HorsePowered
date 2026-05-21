@@ -36,6 +36,7 @@ Start by crafting a [Hand Grindstone](hand_grindstone.md) for manual grinding, o
 - [Horse Powered Generator](horse_generator.md) - Convert horsepower into Forge Energy
 
 ### Tools
+- [Flint and Tinder](flint_and_tinder.md) - Slow, low-durability fire starter that must be held to light
 - [Work Saddle](work_saddle.md) - Capture and transport workers across long distances
 
 ### Creative-Only
