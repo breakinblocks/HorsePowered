@@ -45,4 +45,7 @@ Levers placed inside the working area do not invalidate it, so the generator can
 
 - Connect the sides, top, or bottom to any FE-compatible cable or machine to extract power
 - The generator only runs while it has redstone power AND its buffer is below capacity
+- The floor blocks under the worker's path scale generation speed: a packed-ice ring effectively doubles output. See [Horse Path & Speed](horse_path.md)
+- A few non-path blocks (chests, hoppers, etc.) are tolerated inside the ring; configurable in `config/horsepowered-common.toml`
+- Mining the generator with a stone-tier or better pickaxe preserves its stored charge as a data component on the dropped item, so you can move it without losing power
 - Right-click with an empty hand and no shift to release the attached worker

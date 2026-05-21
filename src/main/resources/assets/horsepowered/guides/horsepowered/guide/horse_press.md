@@ -49,6 +49,6 @@ The Horse Press can produce fluids from certain recipes:
 
 - The press is two blocks tall
 - Some recipes require multiple input items
-- The creature requires a clear path around the press
+- The creature requires a clear path around the press; the floor blocks under that path scale how fast it works. See [Horse Path & Speed](horse_path.md)
 - Right-click with an empty hand to release the attached creature
 

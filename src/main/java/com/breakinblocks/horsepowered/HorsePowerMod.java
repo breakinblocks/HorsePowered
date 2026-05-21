@@ -92,6 +92,8 @@ public class HorsePowerMod {
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::buildCreativeContents);
         modEventBus.addListener(HorsePowerMod::registerCapabilities);
+        modEventBus.addListener((net.neoforged.fml.event.config.ModConfigEvent.Loading e) -> HorsePowerConfig.invalidatePathSpeedCache());
+        modEventBus.addListener((net.neoforged.fml.event.config.ModConfigEvent.Reloading e) -> HorsePowerConfig.invalidatePathSpeedCache());
 
         // Client-only setup - registration is handled by @EventBusSubscriber in HorsePowerClient
         if (dist.isClient()) {
