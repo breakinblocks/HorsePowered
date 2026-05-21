@@ -1,7 +1,6 @@
 package com.breakinblocks.horsepowered.items;
 
 import com.breakinblocks.horsepowered.lib.Reference;
-import net.minecraft.world.item.FlintAndSteelItem;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -19,8 +18,8 @@ public class ModItems {
     public static final RegistryObject<WorkSaddleItem> WORK_SADDLE = ITEMS.register("work_saddle",
             () -> new WorkSaddleItem(new Item.Properties().stacksTo(1)));
 
-    public static final RegistryObject<FlintAndSteelItem> FLINT_AND_TINDER = ITEMS.register("flint_and_tinder",
-            () -> new FlintAndSteelItem(new Item.Properties().durability(16)));
+    public static final RegistryObject<FlintAndTinderItem> FLINT_AND_TINDER = ITEMS.register("flint_and_tinder",
+            () -> new FlintAndTinderItem(new Item.Properties().durability(8)));
 
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);

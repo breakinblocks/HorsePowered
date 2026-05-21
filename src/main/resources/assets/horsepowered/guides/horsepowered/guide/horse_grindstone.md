@@ -40,7 +40,7 @@ The Horse Grindstone is an automated grinding machine powered by a horse or othe
 ## Notes
 
 - The creature requires a clear path to walk around the grindstone
-- Any block in the working area (except air and replaceable blocks) will prevent operation
+- A few non-replaceable blocks (chests, hoppers, etc.) are tolerated inside the ring; the floor under the path also affects work speed. See [Horse Path & Speed](horse_path.md)
 - Right-click with an empty hand to release the attached creature back to a lead
 - If the creature dies or escapes, a lead will be dropped
 

@@ -3,6 +3,8 @@ package com.breakinblocks.horsepowered.blocks;
 import com.breakinblocks.horsepowered.blockentity.GeneratorBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.HPBlockEntityHorseBase;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -13,10 +15,14 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class BlockGenerator extends BlockHPBase {
 
@@ -47,6 +53,25 @@ public class BlockGenerator extends BlockHPBase {
 
     @Override
     public void emptiedOutput(Level level, BlockPos pos) {
+    }
+
+    @Override
+    public List<ItemStack> getDrops(BlockState state, LootParams.Builder params) {
+        List<ItemStack> drops = super.getDrops(state, params);
+        BlockEntity be = params.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
+        if (!(be instanceof GeneratorBlockEntity gen)) return drops;
+        if (gen.getEnergyHandler().getEnergyStored() <= 0) return drops;
+
+        CompoundTag beTag = gen.saveWithoutMetadata();
+        if (beTag.isEmpty()) return drops;
+
+        for (ItemStack drop : drops) {
+            if (drop.is(this.asItem())) {
+                drop.addTagElement("BlockEntityTag", beTag);
+                break;
+            }
+        }
+        return drops;
     }
 
     @Nullable
