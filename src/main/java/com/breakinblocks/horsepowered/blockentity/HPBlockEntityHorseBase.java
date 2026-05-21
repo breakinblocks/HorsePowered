@@ -1,5 +1,6 @@
 package com.breakinblocks.horsepowered.blockentity;
 
+import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -31,8 +32,10 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
 
@@ -81,6 +84,8 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
 
     private static final double MOVEMENT_SPEED = 0.12;
 
+    protected double pathSpeedMultiplier = 1.0;
+
     public HPBlockEntityHorseBase(BlockEntityType<?> type, BlockPos pos, BlockState state, int inventorySize) {
         super(type, pos, state, inventorySize);
     }
@@ -113,11 +118,16 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
             }
         }
 
+        int obstructions = 0;
+        int tolerance = HorsePowerConfig.pathObstructionTolerance.get();
         for (BlockPos pos : searchPos) {
             BlockState state = level.getBlockState(pos);
             if (state.getBlock() instanceof LeverBlock) continue;
             if (!state.canBeReplaced()) {
-                return false;
+                obstructions++;
+                if (obstructions > tolerance) {
+                    return false;
+                }
             }
         }
         for (BlockPos pos : floorPos) {
@@ -126,7 +136,26 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
                 return false;
             }
         }
+        pathSpeedMultiplier = computePathSpeedMultiplier();
         return true;
+    }
+
+    private double computePathSpeedMultiplier() {
+        if (level == null) return 1.0;
+        Set<BlockPos> seen = new HashSet<>();
+        double sum = 0;
+        int count = 0;
+        int floorY = worldPosition.getY() - 1;
+        for (int i = 0; i < PATH_POINTS; i++) {
+            double pathX = worldPosition.getX() + 0.5 + PATH[i][0] * 2;
+            double pathZ = worldPosition.getZ() + 0.5 + PATH[i][1] * 2;
+            BlockPos pos = new BlockPos((int) Math.floor(pathX), floorY, (int) Math.floor(pathZ));
+            if (!seen.add(pos)) continue;
+            Identifier id = BuiltInRegistries.BLOCK.getKey(level.getBlockState(pos).getBlock());
+            sum += HorsePowerConfig.getPathSpeedMultiplier(id);
+            count++;
+        }
+        return count > 0 ? sum / count : 1.0;
     }
 
     public abstract boolean targetReached();
@@ -141,6 +170,7 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
         origin = input.getIntOr("origin", -1);
         valid = input.getBooleanOr("valid", false);
         running = input.getBooleanOr("running", true);
+        pathSpeedMultiplier = input.getDoubleOr("pathSpeedMultiplier", 1.0);
 
         boolean hadWorkerBefore = hasVirtualWorker;
         String previousTypeId = workerEntityTypeId;
@@ -195,6 +225,7 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
         output.putInt("origin", origin);
         output.putBoolean("valid", valid);
         output.putBoolean("running", running);
+        output.putDouble("pathSpeedMultiplier", pathSpeedMultiplier);
 
         output.putBoolean("hasVirtualWorker", hasVirtualWorker);
         if (hasVirtualWorker) {
@@ -476,9 +507,10 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
         validationTimer--;
         if (validationTimer <= 0) {
             boolean wasValid = valid;
+            double previousMultiplier = pathSpeedMultiplier;
             valid = validateArea();
             validationTimer = valid ? 220 : 60;
-            if (wasValid != valid) {
+            if (wasValid != valid || Math.abs(previousMultiplier - pathSpeedMultiplier) > 1.0e-6) {
                 setChanged();
             }
         }
@@ -560,8 +592,9 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
         double dist = Math.sqrt(dx * dx + dz * dz);
 
         if (dist > 0.1) {
-            double stepX = (dx / dist) * MOVEMENT_SPEED;
-            double stepZ = (dz / dist) * MOVEMENT_SPEED;
+            double speed = MOVEMENT_SPEED * pathSpeedMultiplier;
+            double stepX = (dx / dist) * speed;
+            double stepZ = (dz / dist) * speed;
 
             virtualX += stepX;
             virtualZ += stepZ;

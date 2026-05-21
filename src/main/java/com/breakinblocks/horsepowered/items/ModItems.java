@@ -7,7 +7,6 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.BucketItem;
-import net.minecraft.world.item.FlintAndSteelItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -36,10 +35,10 @@ public class ModItems {
                     .setId(ResourceKey.create(Registries.ITEM, registryName))
                     .stacksTo(1)));
 
-    public static final DeferredItem<FlintAndSteelItem> FLINT_AND_TINDER = ITEMS.register("flint_and_tinder",
-            registryName -> new FlintAndSteelItem(new Item.Properties()
+    public static final DeferredItem<FlintAndTinderItem> FLINT_AND_TINDER = ITEMS.register("flint_and_tinder",
+            registryName -> new FlintAndTinderItem(new Item.Properties()
                     .setId(ResourceKey.create(Registries.ITEM, registryName))
-                    .durability(16)));
+                    .durability(8)));
 
     public static final DeferredItem<BlockItem> HAND_GRINDSTONE_ITEM = ITEMS.register("hand_grindstone",
             registryName -> new BlockItem(ModBlocks.HAND_GRINDSTONE.get(), new Item.Properties()

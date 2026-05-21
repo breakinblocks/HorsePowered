@@ -41,7 +41,7 @@ The Horse Chopper is an automated chopping machine powered by a horse or other c
 
 - The chopper is two blocks tall
 - Unlike the manual Chopping Block, no axe is required
-- The creature requires a clear path around the chopper
+- The creature requires a clear path around the chopper; the floor blocks under that path scale how fast it works. See [Horse Path & Speed](horse_path.md)
 - Right-click with an empty hand to release the attached creature
 
 ## Automation

@@ -28,6 +28,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,8 +36,14 @@ public class BlockHandGrindstone extends BlockHPBase {
 
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 
-    private static final VoxelShape SHAPE = Block.box(1, 0, 1, 15, 14, 15);
-    private static final VoxelShape COLLISION_SHAPE = Block.box(1, 0, 1, 15, 10, 15);
+    private static final VoxelShape SHAPE = Shapes.or(
+            Block.box(1, 0, 1, 15, 4, 15),
+            Block.box(6.5, 4, 6.5, 9.5, 10, 9.5)
+    );
+    private static final VoxelShape COLLISION_SHAPE = SHAPE;
+
+    private static final float STEM_MIN = 6.5F / 16F;
+    private static final float STEM_MAX = 9.5F / 16F;
 
     public BlockHandGrindstone(Properties properties) {
         super(properties);
@@ -78,7 +85,7 @@ public class BlockHandGrindstone extends BlockHPBase {
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         BlockEntity be = level.getBlockEntity(pos);
         if (be instanceof HandGrindstoneBlockEntity grindstone) {
-            if (grindstone.canWork() && !player.isShiftKeyDown()) {
+            if (grindstone.canWork() && !player.isShiftKeyDown() && isStemHit(pos, hit)) {
                 if (!level.isClientSide()) {
                     float recipeHunger = grindstone.getRecipe().map(r -> r.value().getHungerCost()).orElse(0.0F);
                     if (grindstone.turn()) {
@@ -91,6 +98,12 @@ public class BlockHandGrindstone extends BlockHPBase {
         }
 
         return super.useWithoutItem(state, level, pos, player, hit);
+    }
+
+    private static boolean isStemHit(BlockPos pos, BlockHitResult hit) {
+        double hitX = hit.getLocation().x - pos.getX();
+        double hitZ = hit.getLocation().z - pos.getZ();
+        return hitX >= STEM_MIN && hitX <= STEM_MAX && hitZ >= STEM_MIN && hitZ <= STEM_MAX;
     }
 
     private static void playTurnFeedback(Level level, BlockPos pos) {
@@ -111,19 +124,23 @@ public class BlockHandGrindstone extends BlockHPBase {
 
     @Override
     public int getSlot(BlockState state, float hitX, float hitY, float hitZ) {
-        Direction facing = state.getValue(FACING).getOpposite();
-
-        // Determine which slot based on hit position and facing
-        if (hitX >= 0.3125 && hitX <= 0.6875 && hitY >= 0.52 && hitZ >= 0.625 && hitZ <= 0.9375) {
-            return facing == Direction.NORTH ? 2 : facing == Direction.SOUTH ? -2 : facing == Direction.EAST ? 1 : 0;
-        } else if (hitX >= 0.3125 && hitX <= 0.6875 && hitY >= 0.52 && hitZ >= 0.0625 && hitZ <= 0.375) {
-            return facing == Direction.NORTH ? -2 : facing == Direction.SOUTH ? 2 : facing == Direction.EAST ? 0 : 1;
-        } else if (hitX >= 0.0625 && hitX <= 0.375 && hitY >= 0.52 && hitZ >= 0.3125 && hitZ <= 0.6875) {
-            return facing == Direction.NORTH ? 0 : facing == Direction.SOUTH ? 1 : facing == Direction.EAST ? 2 : -2;
-        } else if (hitX >= 0.625 && hitX <= 0.9375 && hitY >= 0.52 && hitZ >= 0.3125 && hitZ <= 0.6875) {
-            return facing == Direction.NORTH ? 1 : facing == Direction.SOUTH ? 0 : facing == Direction.EAST ? -2 : 2;
+        if (hitX >= STEM_MIN && hitX <= STEM_MAX && hitZ >= STEM_MIN && hitZ <= STEM_MAX) {
+            return -2;
         }
 
+        double dx = hitX - 0.5;
+        double dz = hitZ - 0.5;
+        Direction side;
+        if (Math.abs(dx) > Math.abs(dz)) {
+            side = dx > 0 ? Direction.EAST : Direction.WEST;
+        } else {
+            side = dz > 0 ? Direction.SOUTH : Direction.NORTH;
+        }
+
+        Direction front = state.getValue(FACING);
+        if (side == front.getClockWise()) return 0;
+        if (side == front.getCounterClockWise()) return 1;
+        if (side == front) return 2;
         return -2;
     }
 

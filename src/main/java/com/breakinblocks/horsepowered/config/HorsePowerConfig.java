@@ -1,6 +1,11 @@
 package com.breakinblocks.horsepowered.config;
 
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.common.ModConfigSpec;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class HorsePowerConfig {
 
@@ -26,6 +31,12 @@ public class HorsePowerConfig {
     public static ModConfigSpec.DoubleValue grindstoneExhaustion;
     public static ModConfigSpec.DoubleValue choppingBlockExhaustion;
     public static ModConfigSpec.DoubleValue graniteAnvilExhaustion;
+
+    public static ModConfigSpec.IntValue pathObstructionTolerance;
+    public static ModConfigSpec.DoubleValue pathSpeedDefault;
+    public static ModConfigSpec.ConfigValue<List<? extends String>> pathSpeedEntries;
+
+    private static volatile Map<Identifier, Double> cachedPathSpeedMap;
 
     static {
         // Client config
@@ -108,6 +119,76 @@ public class HorsePowerConfig {
         }
         commonBuilder.pop();
 
+        commonBuilder.comment("Horse path settings").push("horse_path");
+        {
+            pathObstructionTolerance = commonBuilder
+                    .comment("How many non-replaceable blocks (chests, hoppers, gears, etc.) are tolerated in the horse's 7x7 working ring before validation fails. Levers are always allowed.")
+                    .defineInRange("pathObstructionTolerance", 2, 0, 40);
+
+            pathSpeedDefault = commonBuilder
+                    .comment("Speed multiplier used for any path floor block not listed in pathSpeedEntries.")
+                    .defineInRange("pathSpeedDefault", 1.0D, 0.0D, 10.0D);
+
+            pathSpeedEntries = commonBuilder
+                    .comment(
+                            "Per-block speed multipliers for the floor blocks under the horse's circular path.",
+                            "Format: \"namespace:block_id=multiplier\". Multipliers below 1.0 slow the worker, above 1.0 speed it up.",
+                            "The final path speed is the average of the multipliers of every unique floor block the path crosses.")
+                    .defineListAllowEmpty("pathSpeedEntries",
+                            List.of(
+                                    "minecraft:grass_block=0.5",
+                                    "minecraft:dirt=0.5",
+                                    "minecraft:coarse_dirt=0.5",
+                                    "minecraft:rooted_dirt=0.5",
+                                    "minecraft:dirt_path=1.0",
+                                    "minecraft:packed_ice=2.0"),
+                            () -> "minecraft:stone=1.0",
+                            HorsePowerConfig::isValidSpeedEntry);
+        }
+        commonBuilder.pop();
+
         COMMON_SPEC = commonBuilder.build();
+    }
+
+    private static boolean isValidSpeedEntry(Object obj) {
+        if (!(obj instanceof String s)) return false;
+        int eq = s.indexOf('=');
+        if (eq <= 0 || eq == s.length() - 1) return false;
+        if (Identifier.tryParse(s.substring(0, eq).trim()) == null) return false;
+        try {
+            Double.parseDouble(s.substring(eq + 1).trim());
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    public static double getPathSpeedMultiplier(Identifier blockId) {
+        Map<Identifier, Double> map = cachedPathSpeedMap;
+        if (map == null) {
+            map = parseSpeedMap();
+            cachedPathSpeedMap = map;
+        }
+        Double value = map.get(blockId);
+        return value != null ? value : pathSpeedDefault.get();
+    }
+
+    public static void invalidatePathSpeedCache() {
+        cachedPathSpeedMap = null;
+    }
+
+    private static Map<Identifier, Double> parseSpeedMap() {
+        Map<Identifier, Double> map = new HashMap<>();
+        for (String entry : pathSpeedEntries.get()) {
+            int eq = entry.indexOf('=');
+            if (eq <= 0) continue;
+            Identifier id = Identifier.tryParse(entry.substring(0, eq).trim());
+            if (id == null) continue;
+            try {
+                map.put(id, Double.parseDouble(entry.substring(eq + 1).trim()));
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        return map;
     }
 }

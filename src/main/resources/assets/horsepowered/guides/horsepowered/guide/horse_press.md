@@ -52,7 +52,7 @@ The Horse Press has an internal fluid tank used for both producing and consuming
 - The press is two blocks tall
 - Some recipes require multiple input items
 - Some recipes require a specific fluid in the tank in addition to the item input
-- The creature requires a clear path around the press
+- The creature requires a clear path around the press; the floor blocks under that path scale how fast it works. See [Horse Path & Speed](horse_path.md)
 - Right-click with an empty hand to release the attached creature
 
 ## Example Recipes

@@ -4,6 +4,11 @@ import com.breakinblocks.horsepowered.blockentity.GeneratorBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.HPBlockEntityHorseBase;
 import com.breakinblocks.horsepowered.blockentity.ModBlockEntities;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.TypedEntityData;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -14,10 +19,15 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.storage.TagValueOutput;
+import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class BlockGenerator extends BlockHPBase {
 
@@ -53,6 +63,29 @@ public class BlockGenerator extends BlockHPBase {
 
     @Override
     public void emptiedOutput(Level level, BlockPos pos) {
+    }
+
+    @Override
+    protected List<ItemStack> getDrops(BlockState state, LootParams.Builder params) {
+        List<ItemStack> drops = super.getDrops(state, params);
+        BlockEntity be = params.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
+        if (!(be instanceof GeneratorBlockEntity gen)) return drops;
+        if (gen.getEnergyHandler().getAmountAsInt() <= 0) return drops;
+
+        TagValueOutput out = TagValueOutput.createWithContext(
+                ProblemReporter.DISCARDING, params.getLevel().registryAccess());
+        gen.saveCustomOnly(out);
+        CompoundTag beTag = out.buildResult();
+        if (beTag.isEmpty()) return drops;
+
+        TypedEntityData<BlockEntityType<?>> data = TypedEntityData.of(gen.getType(), beTag);
+        for (ItemStack drop : drops) {
+            if (drop.is(this.asItem())) {
+                drop.set(DataComponents.BLOCK_ENTITY_DATA, data);
+                break;
+            }
+        }
+        return drops;
     }
 
     @Nullable
