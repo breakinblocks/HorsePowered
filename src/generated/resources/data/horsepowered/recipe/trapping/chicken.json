@@ -3,6 +3,8 @@
   "bait": {
     "item": "minecraft:wheat_seeds"
   },
+  "baitConsumeChance": 10.0,
+  "baitConsumed": true,
   "entity": "minecraft:chicken",
   "time": 900
 }

@@ -3,5 +3,7 @@
   "bait": {
     "item": "minecraft:short_grass"
   },
+  "baitConsumeChance": 10.0,
+  "baitConsumed": true,
   "entity": "minecraft:sheep"
 }

@@ -3,6 +3,8 @@
   "bait": {
     "item": "minecraft:kelp"
   },
+  "baitConsumeChance": 10.0,
+  "baitConsumed": true,
   "biome": "horsepowered:fish_habitat",
   "entity": "minecraft:salmon",
   "time": 1500,

@@ -24,18 +24,22 @@ public class EmiTrappingRecipe extends BasicEmiRecipe {
     private final int time;
     private final Optional<TagKey<Biome>> biome;
     private final boolean waterlogged;
+    private final boolean baitConsumed;
+    private final double baitConsumeChance;
 
     public EmiTrappingRecipe(EmiRecipeCategory category, TrappingRecipe recipe) {
         super(category, null, 160, heightFor(recipe));
         this.time = recipe.getTime();
         this.biome = recipe.getBiome();
         this.waterlogged = recipe.isWaterlogged();
+        this.baitConsumed = recipe.isBaitConsumed();
+        this.baitConsumeChance = recipe.getBaitConsumeChance();
         this.inputs.add(EmiIngredient.of(recipe.getBait()));
         this.outputs.add(EmiStack.of(outputDisplayStack(recipe)));
     }
 
     private static int heightFor(TrappingRecipe recipe) {
-        int lines = 2;
+        int lines = 3;
         if (recipe.getBiome().isPresent()) lines++;
         if (recipe.isWaterlogged()) lines++;
         return 26 + lines * 10;
@@ -63,6 +67,8 @@ public class EmiTrappingRecipe extends BasicEmiRecipe {
                 Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.trap_chance"),
                 0, y, 0x808080, false);
         y += 10;
+        widgets.addText(baitConsumedLabel(), 0, y, 0x808080, false);
+        y += 10;
 
         if (biome.isPresent()) {
             widgets.addText(
@@ -76,6 +82,21 @@ public class EmiTrappingRecipe extends BasicEmiRecipe {
                     Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.trap_waterlogged"),
                     0, y, 0x6688AA, false);
         }
+    }
+
+    private Component baitConsumedLabel() {
+        if (!baitConsumed) {
+            return Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.trap_bait_consumed_none");
+        }
+        return Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.trap_bait_consumed_chance",
+                formatChance(baitConsumeChance));
+    }
+
+    private static String formatChance(double chance) {
+        if (chance == Math.floor(chance)) {
+            return String.format("%d", (long) chance);
+        }
+        return String.format("%.2f", chance);
     }
 
     private static String biomeLabel(ResourceLocation id) {

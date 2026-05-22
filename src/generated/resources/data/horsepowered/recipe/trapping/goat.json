@@ -3,6 +3,8 @@
   "bait": {
     "item": "minecraft:apple"
   },
+  "baitConsumeChance": 10.0,
+  "baitConsumed": true,
   "entity": "minecraft:goat",
   "time": 1500
 }

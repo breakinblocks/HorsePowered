@@ -3,5 +3,7 @@
   "bait": {
     "item": "minecraft:wheat"
   },
+  "baitConsumeChance": 10.0,
+  "baitConsumed": true,
   "entity": "minecraft:cow"
 }

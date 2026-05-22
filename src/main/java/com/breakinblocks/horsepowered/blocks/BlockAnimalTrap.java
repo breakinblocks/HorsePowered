@@ -87,7 +87,6 @@ public class BlockAnimalTrap extends Block implements EntityBlock, SimpleWaterlo
         }
 
         if (!stack.isEmpty()
-                && !trap.hasCapturedEntity()
                 && trap.getInventory().getStackInSlot(AnimalTrapBlockEntity.BAIT_SLOT).isEmpty()) {
             if (level.isClientSide) return ItemInteractionResult.sidedSuccess(true);
             if (trap.tryInsertBait(stack)) {

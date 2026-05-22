@@ -39,6 +39,8 @@
   "gui.horsepowered.jei.trap_chance": "5%% Chance/sec",
   "gui.horsepowered.jei.trap_biome": "Biome: %s",
   "gui.horsepowered.jei.trap_waterlogged": "Requires water",
+  "gui.horsepowered.jei.trap_bait_consumed_none": "Bait consumed: No",
+  "gui.horsepowered.jei.trap_bait_consumed_chance": "Bait consumed: %s%% Chance",
 
   "emi.category.horsepowered.grinding": "Horse Grinding",
   "emi.category.horsepowered.manual_grinding": "Manual Grinding",

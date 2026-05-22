@@ -3,6 +3,8 @@
   "bait": {
     "item": "minecraft:red_mushroom"
   },
+  "baitConsumeChance": 10.0,
+  "baitConsumed": true,
   "entity": "minecraft:mooshroom",
   "time": 1800
 }

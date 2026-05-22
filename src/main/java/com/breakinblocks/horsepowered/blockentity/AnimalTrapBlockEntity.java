@@ -111,12 +111,36 @@ public class AnimalTrapBlockEntity extends BlockEntity {
         if (level.isClientSide) return;
 
         if (be.capturedEntityTag != null) {
-            be.dropTimer++;
             if (be.dropTimer >= DROP_INTERVAL_TICKS) {
-                be.rollLootTable();
+                ItemStack heldBait = be.inventory.getStackInSlot(BAIT_SLOT);
+                if (!heldBait.isEmpty()) {
+                    Optional<RecipeHolder<TrappingRecipe>> feeding = be.findFeedingRecipe(heldBait);
+                    if (feeding.isPresent() && feeding.get().value().isBaitConsumed()) {
+                        be.rollLootTable();
+                        double chance = feeding.get().value().getBaitConsumeChance();
+                        if (chance >= 100.0D || level.getRandom().nextDouble() * 100.0D < chance) {
+                            ItemStack consumed = heldBait.copy();
+                            consumed.shrink(1);
+                            be.inventory.setStackInSlot(BAIT_SLOT, consumed);
+                        }
+                    } else {
+                        be.rollLootTable();
+                    }
+                } else if (be.capturedEntityRequiresBait()) {
+                    if (be.dropTimer != DROP_INTERVAL_TICKS) {
+                        be.dropTimer = DROP_INTERVAL_TICKS;
+                        be.markDirtyAndSync();
+                    }
+                    return;
+                } else {
+                    be.rollLootTable();
+                }
                 be.dropTimer = 0;
                 be.markDirtyAndSync();
+                return;
             }
+            be.dropTimer++;
+            if (be.dropTimer % 20 == 0) be.markDirtyAndSync();
             return;
         }
 
@@ -320,10 +344,14 @@ public class AnimalTrapBlockEntity extends BlockEntity {
 
     public boolean tryInsertBait(ItemStack handStack) {
         if (level == null || level.isClientSide) return false;
-        if (capturedEntityTag != null) return false;
         if (!inventory.getStackInSlot(BAIT_SLOT).isEmpty()) return false;
         if (handStack.isEmpty()) return false;
-        if (findRecipe(handStack).isEmpty()) return false;
+        if (capturedEntityTag != null) {
+            Optional<RecipeHolder<TrappingRecipe>> feeding = findFeedingRecipe(handStack);
+            if (feeding.isEmpty() || !feeding.get().value().isBaitConsumed()) return false;
+        } else if (findRecipe(handStack).isEmpty()) {
+            return false;
+        }
         ItemStack copy = handStack.copyWithCount(1);
         inventory.setStackInSlot(BAIT_SLOT, copy);
         markDirtyAndSync();
@@ -334,6 +362,36 @@ public class AnimalTrapBlockEntity extends BlockEntity {
         if (level == null || stack.isEmpty()) return Optional.empty();
         return level.getRecipeManager().getRecipeFor(HPRecipes.TRAPPING_TYPE.get(),
                 new HPRecipeInput(stack), level);
+    }
+
+    private Optional<RecipeHolder<TrappingRecipe>> findFeedingRecipe(ItemStack stack) {
+        ResourceLocation typeId = getCapturedEntityTypeId();
+        if (typeId == null) return Optional.empty();
+        Optional<RecipeHolder<TrappingRecipe>> recipe = findRecipe(stack);
+        if (recipe.isPresent() && typeId.equals(recipe.get().value().getEntityId())) {
+            return recipe;
+        }
+        return Optional.empty();
+    }
+
+    private boolean capturedEntityRequiresBait() {
+        if (level == null) return false;
+        ResourceLocation typeId = getCapturedEntityTypeId();
+        if (typeId == null) return false;
+        try {
+            return level.getRecipeManager().getAllRecipesFor(HPRecipes.TRAPPING_TYPE.get()).stream()
+                    .anyMatch(h -> typeId.equals(h.value().getEntityId())
+                            && h.value().isBaitConsumed());
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    @Nullable
+    private ResourceLocation getCapturedEntityTypeId() {
+        return capturedEntityType == null
+                ? null
+                : BuiltInRegistries.ENTITY_TYPE.getKey(capturedEntityType);
     }
 
     public CompoundTag writeBlockEntityComponent(HolderLookup.Provider registries) {
@@ -421,17 +479,24 @@ public class AnimalTrapBlockEntity extends BlockEntity {
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
             if (slot != BAIT_SLOT) return false;
-            if (capturedEntityTag != null) return false;
             if (level == null) return true;
+            if (capturedEntityTag != null) {
+                Optional<RecipeHolder<TrappingRecipe>> feeding = findFeedingRecipe(stack);
+                return feeding.isPresent() && feeding.get().value().isBaitConsumed();
+            }
             return findRecipe(stack).isPresent();
         }
 
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
             if (slot != BAIT_SLOT) return stack;
-            if (capturedEntityTag != null) return stack;
             if (!getStackInSlot(BAIT_SLOT).isEmpty()) return stack;
-            if (findRecipe(stack).isEmpty()) return stack;
+            if (capturedEntityTag != null) {
+                Optional<RecipeHolder<TrappingRecipe>> feeding = findFeedingRecipe(stack);
+                if (feeding.isEmpty() || !feeding.get().value().isBaitConsumed()) return stack;
+            } else if (findRecipe(stack).isEmpty()) {
+                return stack;
+            }
             ItemStack toInsert = stack.copyWithCount(1);
             ItemStack remainder = stack.copy();
             remainder.shrink(1);

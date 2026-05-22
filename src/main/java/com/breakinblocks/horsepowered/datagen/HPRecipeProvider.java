@@ -57,18 +57,26 @@ public class HPRecipeProvider extends RecipeProvider {
         TrappingRecipeBuilder.trap(Ingredient.of(Items.NETHER_WART), EntityType.STRIDER)
                 .time(1800)
                 .biome(BiomeTags.IS_NETHER)
+                .baitConsumed(true)
+                .baitConsumeChance(10.0D)
                 .save(output, "strider");
 
         TrappingRecipeBuilder.trap(Ingredient.of(Items.KELP), EntityType.SALMON)
                 .time(1500)
                 .biome(FISH_HABITAT)
                 .waterlogged()
+                .baitConsumed(true)
+                .baitConsumeChance(10.0D)
                 .save(output, "salmon");
     }
 
     private static void trap(RecipeOutput output, Ingredient bait,
                              EntityType<?> entity, int time, String name) {
-        TrappingRecipeBuilder.trap(bait, entity).time(time).save(output, name);
+        TrappingRecipeBuilder.trap(bait, entity)
+                .time(time)
+                .baitConsumed(true)
+                .baitConsumeChance(10.0D)
+                .save(output, name);
     }
 
     // ==================== CRAFTING ====================
