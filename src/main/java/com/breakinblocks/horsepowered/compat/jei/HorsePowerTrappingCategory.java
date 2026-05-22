@@ -27,7 +27,7 @@ import java.util.Optional;
 public class HorsePowerTrappingCategory extends BaseHPCategory<TrappingRecipe> {
 
     private static final int WIDTH = 160;
-    private static final int HEIGHT = 84;
+    private static final int HEIGHT = 94;
 
     public HorsePowerTrappingCategory(IGuiHelper guiHelper) {
         super(guiHelper, ModBlocks.ANIMAL_TRAP.get(), "trapping");
@@ -86,6 +86,10 @@ public class HorsePowerTrappingCategory extends BaseHPCategory<TrappingRecipe> {
         guiGraphics.text(font, chanceText, (WIDTH - font.width(chanceText)) / 2, y, 0xFF808080, false);
         y += 10;
 
+        Component baitText = baitConsumedLabel(recipe);
+        guiGraphics.text(font, baitText, (WIDTH - font.width(baitText)) / 2, y, 0xFF808080, false);
+        y += 10;
+
         if (recipe.getBiome().isPresent()) {
             Component biomeText = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.trap_biome",
                     biomeLabel(recipe.getBiome().get().location()));
@@ -97,6 +101,21 @@ public class HorsePowerTrappingCategory extends BaseHPCategory<TrappingRecipe> {
             Component waterText = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.trap_waterlogged");
             guiGraphics.text(font, waterText, (WIDTH - font.width(waterText)) / 2, y, 0xFF6688AA, false);
         }
+    }
+
+    private static Component baitConsumedLabel(TrappingRecipe recipe) {
+        if (!recipe.isBaitConsumed()) {
+            return Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.trap_bait_consumed_none");
+        }
+        return Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.trap_bait_consumed_chance",
+                formatChance(recipe.getBaitConsumeChance()));
+    }
+
+    private static String formatChance(double chance) {
+        if (chance == Math.floor(chance)) {
+            return String.format("%d", (long) chance);
+        }
+        return String.format("%.2f", chance);
     }
 
     private static String biomeLabel(Identifier id) {
