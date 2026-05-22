@@ -8,7 +8,7 @@ item_ids:
 
 # Horse Chopper
 
-The Horse Chopper is an automated chopping machine powered by a horse or other creature. It can continuously chop logs and other items without manual intervention.
+The Horse Chopper is an automated chopping machine powered by a horse or other creature. It continuously chops logs and other items without manual intervention.
 
 <Row>
 <ItemImage id="horsepowered:chopper" scale="4" />
@@ -16,22 +16,20 @@ The Horse Chopper is an automated chopping machine powered by a horse or other c
 
 ## Setup
 
-1. Place the Horse Chopper in an area with at least a 7x7 clear space around it
-2. Lead a horse (or other valid creature) with a lead
-3. Right-click the chopper while holding the lead to attach the creature
-4. The creature will automatically walk in circles, powering the chopper
+1. Place the Horse Chopper in an area with at least a 7x7 clear space around it.
+2. Lead a horse (or other valid creature) with a lead.
+3. Right-click the chopper while holding the lead to attach the creature.
+4. The creature walks in circles, powering the chopper.
 
 ## Checking the Working Area
 
-**Shift+Right-click** the chopper with an empty hand to visualize the required working area:
-- **Green blocks**: Clear - the area is suitable for the horse to walk
-- **Red blocks**: Obstructed - remove these blocks for the chopper to function
+**Shift+Right-click** the chopper with an empty hand to visualize the required working area. Green = clear, Red = obstructed.
 
 ## Usage
 
-1. Right-click with logs or other choppable items to insert them
-2. The attached creature will chop items automatically
-3. Right-click to extract output items
+1. Right-click with logs or other choppable items to insert them.
+2. The attached creature chops items automatically.
+3. Right-click to extract output items.
 
 ## Recipe
 
@@ -39,17 +37,8 @@ The Horse Chopper is an automated chopping machine powered by a horse or other c
 
 ## Notes
 
-- The chopper is two blocks tall
-- Unlike the manual Chopping Block, no axe is required
-- The creature requires a clear path around the chopper; the floor blocks under that path scale how fast it works. See [Horse Path & Speed](horse_path.md)
-- Right-click with an empty hand to release the attached creature
-
-## Automation
-
-The Horse Chopper can be automated with hoppers:
-- Insert items from the top or sides — both halves of the 2-block model accept inserts
-- Extract output items from the bottom
-
-Because the upper half is a fully solid block (with its own hitbox), you can place hoppers and other blocks directly adjacent to it instead of building scaffold-and-break workarounds.
-
-This makes it ideal for automated wood processing farms.
+- The chopper is two blocks tall.
+- Unlike the manual Chopping Block, no axe is required.
+- Hoppers can insert from the top or sides and pull finished items out the bottom.
+- Right-click with an empty hand to release the attached creature.
+- The floor under the path scales work speed. See [Horse Path & Speed](horse_path.md).

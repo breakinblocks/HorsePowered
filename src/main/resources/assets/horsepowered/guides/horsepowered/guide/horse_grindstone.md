@@ -16,22 +16,20 @@ The Horse Grindstone is an automated grinding machine powered by a horse or othe
 
 ## Setup
 
-1. Place the Horse Grindstone in an area with at least a 7x7 clear space around it
-2. Lead a horse (or other valid creature) with a lead
-3. Right-click the grindstone while holding the lead to attach the creature
-4. The creature will automatically walk in circles, powering the grindstone
+1. Place the Horse Grindstone in an area with at least a 7x7 clear space around it.
+2. Lead a horse (or other valid creature) with a lead.
+3. Right-click the grindstone while holding the lead to attach the creature.
+4. The creature walks in circles, powering the grindstone.
 
 ## Checking the Working Area
 
-**Shift+Right-click** the grindstone with an empty hand to visualize the required working area:
-- **Green blocks**: Clear - the area is suitable for the horse to walk
-- **Red blocks**: Obstructed - remove these blocks for the grindstone to function
+**Shift+Right-click** the grindstone with an empty hand to visualize the required working area. Green = clear, Red = obstructed.
 
 ## Usage
 
-1. Right-click with items to insert them into the grindstone
-2. The attached creature will grind items automatically
-3. Right-click to extract output items
+1. Right-click with items to insert them into the grindstone.
+2. The attached creature grinds items automatically.
+3. Right-click to extract output items.
 
 ## Recipe
 
@@ -39,17 +37,7 @@ The Horse Grindstone is an automated grinding machine powered by a horse or othe
 
 ## Notes
 
-- The creature requires a clear path to walk around the grindstone
-- A few non-replaceable blocks (chests, hoppers, etc.) are tolerated inside the ring; the floor under the path also affects work speed. See [Horse Path & Speed](horse_path.md)
-- Right-click with an empty hand to release the attached creature back to a lead
-- If the creature dies or escapes, a lead will be dropped
-
-## Valid Creatures
-
-By default, the following creatures can power horse-powered machinery:
-- Horses
-- Donkeys
-- Mules
-- Llamas
-
-Additional creatures can be configured in the mod settings.
+- Right-click with an empty hand to release the attached creature back to a lead.
+- If the creature dies or escapes, a lead is dropped.
+- The floor under the path scales work speed, and a small number of obstructions (chests, hoppers, etc.) are tolerated. See [Horse Path & Speed](horse_path.md).
+- Valid workers by default: horses, donkeys, mules, and llamas. Additional creatures can be added via config.

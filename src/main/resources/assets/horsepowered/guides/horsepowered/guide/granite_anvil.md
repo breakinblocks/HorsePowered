@@ -16,26 +16,22 @@ The Granite Anvil is a manual crushing station for breaking harder materials int
 
 ## Usage
 
-1. Place the Granite Anvil
-2. Right-click with a stone block or other crushable item to place it on the anvil
-3. Right-click with a stone-tier (or better) pickaxe to crush the item — multiple strikes are needed per item
-4. The finished output either drops at the anvil or stays in the internal slot (configurable)
+1. Place the Granite Anvil.
+2. Right-click with a stone block or other crushable item to place it on the anvil.
+3. Right-click with a stone-tier (or better) pickaxe to crush the item. Multiple strikes are needed per item.
+4. The finished output either drops at the anvil or stays in the internal slot (configurable).
 
 ## Recipe
 
 <RecipeFor id="horsepowered:granite_anvil" />
 
-## Tool Requirement
-
-A wooden pickaxe is not strong enough — you need at least a **stone** pickaxe to operate the anvil. Iron, gold, diamond, and netherite pickaxes also work.
-
 ## Hunger Cost
 
-Every strike consumes a small baseline amount of hunger (configurable). Individual crushing recipes can also declare a `hungerCost` in their JSON, which is added on top of the baseline. When a recipe has a hunger cost, JEI shows a "Hunger" line on the crushing category.
+Every strike costs a small baseline amount of hunger (configurable). Some recipes also add their own extra hunger cost on top of the baseline. JEI shows a "Hunger" line on recipes that have one, so you can spot the expensive ones at a glance.
 
 ## Notes
 
-- Pickaxes take durability damage on every strike (configurable, respects Unbreaking)
-- Each strike contributes one tick toward the recipe; the number of strikes shown in JEI is `time × crushingMultiplier` (default 4)
-- Jade displays the remaining strikes while crushing is in progress
-- Hover over the anvil with JEI to see all available crushing recipes
+- A wooden pickaxe is not strong enough. Iron, gold, diamond, and netherite pickaxes also work.
+- Pickaxes take durability damage on every strike (configurable, respects Unbreaking).
+- Jade displays the remaining strikes while crushing is in progress.
+- Available crushing recipes can be found in JEI/EMI.

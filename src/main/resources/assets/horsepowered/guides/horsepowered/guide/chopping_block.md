@@ -16,10 +16,10 @@ The Chopping Block is a manual processing station for chopping logs and other it
 
 ## Usage
 
-1. Place the Chopping Block
-2. Right-click with a log or other choppable item to place it on the block
-3. Right-click with an axe to chop the item
-4. Right-click to collect the output
+1. Place the Chopping Block.
+2. Right-click with a log or other choppable item to place it on the block.
+3. Right-click with an axe to chop the item.
+4. Right-click to collect the output.
 
 ## Recipe
 
@@ -27,24 +27,11 @@ The Chopping Block is a manual processing station for chopping logs and other it
 
 ## Hunger Cost
 
-Every axe strike consumes a small baseline amount of hunger (configurable). Individual chopping recipes can also declare a `hungerCost` in their JSON, which is **added on top** of the baseline only on the Chopping Block — the Horse Chopper ignores it. When a recipe has a hunger cost, JEI shows a "Hunger" line on the manual-chopping category.
+Every axe strike costs a small baseline amount of hunger (configurable). Some recipes also add their own extra hunger cost on top of the baseline, and only the Chopping Block pays that cost. The Horse Chopper ignores it. JEI shows a "Hunger" line on recipes that have one, so you can spot the expensive ones at a glance.
 
 ## Notes
 
-- Axes may take durability damage when chopping (configurable)
-- Works with the same recipes as the Horse Chopper (unless the recipe is restricted with a `tier` of `"horse"`)
-- Different logs can produce different amounts of planks
-- Manual chopping takes more strikes per recipe than horse chopping by a configurable multiplier; JEI displays the actual chop count
-
-## Example Recipes
-
-Common items you can chop:
-- Oak Log to Oak Planks (4)
-- Birch Log to Birch Planks (4)
-- Other wood types follow the same pattern
-
-## Tips
-
-- Keep a spare axe handy for extended chopping sessions
-- The chopping block is great for early game wood processing
-- Upgrade to the Horse Chopper for automated processing
+- Axes may take durability damage when chopping (configurable).
+- Works with the same recipes as the Horse Chopper unless the recipe is tagged horse-only.
+- Manual chopping takes more strikes per recipe than horse chopping by a configurable multiplier; JEI displays the actual chop count.
+- Available chopping recipes can be found in JEI/EMI.

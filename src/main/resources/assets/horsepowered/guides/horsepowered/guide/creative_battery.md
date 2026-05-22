@@ -14,20 +14,13 @@ The Creative Battery is a creative-mode test block for prototyping energy setups
 <ItemImage id="horsepowered:creative_battery" scale="4" />
 </Row>
 
-## Specifications
-
-- **Capacity**: `Integer.MAX_VALUE` FE (about 2.1 billion)
-- **Receive rate**: `Integer.MAX_VALUE` FE/tick
-- **Extract rate**: `Integer.MAX_VALUE` FE/tick
-- **Auto-push**: every tick, any stored energy is pushed to adjacent FE consumers
-
 ## Usage
 
-- As a **source**: insert it into the build, fill it once from a Generator (or `/setblock`), and it will keep pushing power until something consumes it. Once drained it stops pushing — wire a generator in if you want a perpetual supply.
+- As a **source**: drop it into the build, fill it once, and it pushes power until something consumes it. Once drained it stops pushing, wire a generator in for a perpetual supply.
 - As a **sink**: connect the output of a machine and watch the buffer fill. The battery accepts as much as anything offers.
 
-## Restrictions
+## Notes
 
 - Creative-only: not craftable, only available in the creative inventory.
-- Unbreakable in survival (bedrock-grade hardness) and drops nothing when broken in creative.
+- Unbreakable in survival and drops nothing when broken in creative.
 - Cannot be pushed by pistons.
