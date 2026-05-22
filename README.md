@@ -72,6 +72,7 @@ Horse Powered uses data-driven JSON recipes that can be added or modified via da
 - `horsepowered:chopping` - Chopping block recipes
 - `horsepowered:pressing` - Press recipes (supports item and fluid outputs)
 - `horsepowered:drying` - Drying rack recipes (1 input -> 1 output over time)
+- `horsepowered:trapping` - Animal trap recipes (bait + entity, with optional biome/waterlog gates and per-recipe bait consumption)
 
 Example grinding recipe (`data/yourpack/recipes/grinding/custom_recipe.json`):
 ```json
@@ -85,6 +86,31 @@ Example grinding recipe (`data/yourpack/recipes/grinding/custom_recipe.json`):
   "hungerCost": 0.1
 }
 ```
+
+Example trapping recipe (`data/yourpack/recipes/trapping/custom_recipe.json`):
+```json
+{
+  "type": "horsepowered:trapping",
+  "bait": { "item": "minecraft:kelp" },
+  "entity": "minecraft:salmon",
+  "time": 1500,
+  "priority": 0,
+  "biome": "#horsepowered:fish_habitat",
+  "waterlogged": true,
+  "baitConsumed": true,
+  "baitConsumeChance": 10.0
+}
+```
+- `bait` - Ingredient. The item that triggers the recipe.
+- `entity` - ResourceLocation of the entity to capture. Any mob can be specified.
+- `time` - Optional minimum wait in ticks before the catch dice roll begins (default `1200`).
+- `priority` - Optional integer; lower values display first in JEI/EMI (default `0`).
+- `biome` - Optional biome tag the trap must sit inside before the dice roll counts.
+- `waterlogged` - Optional boolean; when `true` the trap must be waterlogged before the dice roll counts.
+- `baitConsumed` - Optional boolean (default `false`). When `true` the trap requires bait to generate each drop cycle after capture. When the bait slot is empty the drop timer pauses until matching bait is supplied. Hoppers may continue feeding bait into a captured trap.
+- `baitConsumeChance` - Optional percent (`0.01`-`100.00`, default `100.0`). Only applies when `baitConsumed` is `true`. Rolled each time drops are generated; on success one bait is consumed. All built-in trapping recipes ship with `baitConsumed: true` and `baitConsumeChance: 10.0`.
+
+The trap's drops come from the captured entity's vanilla loot table, so no drop list is declared on the trap recipe itself.
 
 #### Optional Recipe Fields
 

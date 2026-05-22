@@ -20,8 +20,9 @@ The Animal Trap is a passive wooden cage that lures and captures passive animals
 2. Right-click the trap with a valid bait item (wheat for a cow, kelp for salmon, and so on). The bait drops into the trap's bait slot and begins spinning inside the cage.
 3. Wait. Every recipe has a minimum trapping time. Jade shows the countdown.
 4. Once the minimum time has elapsed the trap rolls a 5% chance per second to capture the target animal. Average extra wait is around 20 seconds.
-5. On a successful capture the bait is consumed and the animal appears spinning inside the cage. From this point on the trap produces drops every 2.5 minutes.
-6. Pull the drops out with a hopper below the trap, or break the trap and take everything with you.
+5. On a successful capture the bait is consumed and the animal appears spinning inside the cage.
+6. Keep matching bait in the trap. The trap produces drops every 2.5 minutes, and each cycle has a small chance to consume one bait (built-in recipes consume around one bait per ten drops). When the bait slot is empty the drop timer pauses until matching bait is supplied, so a hopper feed keeps things running unattended.
+7. Pull the drops out with a hopper below the trap, or break the trap and take everything with you.
 
 ## Bait Recipes
 
@@ -68,7 +69,7 @@ The damage source used is generic, so drops are always in their raw form. Cooked
 
 ## Hopper Automation
 
-* Hoppers feeding into the trap can only insert valid bait into the bait slot. Random items are rejected by the slot's validity check, so an upstream hopper containing junk will not pollute the trap.
+* Hoppers feeding into the trap can only insert valid bait into the bait slot. Random items are rejected by the slot's validity check. Captured traps keep accepting matching bait so a hopper can sustain the drop cycles unattended.
 * Hoppers below the trap pull only from the five drop slots. The bait slot is extraction-locked even while empty, so an automated bait-pulling setup is not possible.
 * The block is fully waterloggable, so a hopper or pipe can sit in flowing water under a fish trap without breaking the water column.
 
@@ -94,6 +95,8 @@ Modpack makers can add their own trap recipes at `data/<namespace>/recipe/trappi
 * `priority`: optional, sort order in JEI and EMI. Lower numbers display first.
 * `biome`: optional, biome tag. The trap must be inside a biome in that tag for the dice roll to count.
 * `waterlogged`: optional boolean. When true the trap must be waterlogged for the dice roll to count.
+* `baitConsumed`: optional boolean (default `false`). When `true` the trap requires bait to generate each drop after capture; the drop timer pauses on an empty bait slot.
+* `baitConsumeChance`: optional percent `0.01`-`100.00` (default `100.0`). Only applies when `baitConsumed` is `true`. Rolled each time drops are generated; on success one bait is consumed.
 
 Example for capturing a sniffer with a torchflower seed in a flower forest:
 

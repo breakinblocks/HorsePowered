@@ -25,7 +25,7 @@ import net.minecraft.world.item.SpawnEggItem;
 public class HorsePowerTrappingCategory implements IRecipeCategory<TrappingRecipe> {
 
     private static final int WIDTH = 160;
-    private static final int HEIGHT = 84;
+    private static final int HEIGHT = 94;
 
     private final IDrawable background;
     private final IDrawable icon;
@@ -92,6 +92,10 @@ public class HorsePowerTrappingCategory implements IRecipeCategory<TrappingRecip
         guiGraphics.drawString(font, chanceText, (WIDTH - font.width(chanceText)) / 2, y, 0x808080, false);
         y += 10;
 
+        Component baitText = baitConsumedLabel(recipe);
+        guiGraphics.drawString(font, baitText, (WIDTH - font.width(baitText)) / 2, y, 0x808080, false);
+        y += 10;
+
         if (recipe.getBiome().isPresent()) {
             Component biomeText = Component.translatable("gui.horsepowered.jei.trap_biome",
                     biomeLabel(recipe.getBiome().get().location()));
@@ -103,6 +107,21 @@ public class HorsePowerTrappingCategory implements IRecipeCategory<TrappingRecip
             Component waterText = Component.translatable("gui.horsepowered.jei.trap_waterlogged");
             guiGraphics.drawString(font, waterText, (WIDTH - font.width(waterText)) / 2, y, 0x6688AA, false);
         }
+    }
+
+    private static Component baitConsumedLabel(TrappingRecipe recipe) {
+        if (!recipe.isBaitConsumed()) {
+            return Component.translatable("gui.horsepowered.jei.trap_bait_consumed_none");
+        }
+        return Component.translatable("gui.horsepowered.jei.trap_bait_consumed_chance",
+                formatChance(recipe.getBaitConsumeChance()));
+    }
+
+    private static String formatChance(double chance) {
+        if (chance == Math.floor(chance)) {
+            return String.format("%d", (long) chance);
+        }
+        return String.format("%.2f", chance);
     }
 
     private static String biomeLabel(ResourceLocation id) {

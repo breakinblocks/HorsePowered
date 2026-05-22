@@ -2,5 +2,7 @@
   "type": "horsepowered:trapping",
   "bait": { "item": "minecraft:apple" },
   "entity": "minecraft:goat",
-  "time": 1500
+  "time": 1500,
+  "baitConsumed": true,
+  "baitConsumeChance": 10.0
 }

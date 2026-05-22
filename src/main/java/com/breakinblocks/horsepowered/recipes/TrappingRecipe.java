@@ -28,9 +28,12 @@ public class TrappingRecipe implements Recipe<Container> {
     private final int priority;
     private final Optional<TagKey<Biome>> biome;
     private final boolean waterlogged;
+    private final boolean baitConsumed;
+    private final double baitConsumeChance;
 
     public TrappingRecipe(ResourceLocation id, Ingredient bait, ResourceLocation entityId,
-                          int time, int priority, Optional<TagKey<Biome>> biome, boolean waterlogged) {
+                          int time, int priority, Optional<TagKey<Biome>> biome, boolean waterlogged,
+                          boolean baitConsumed, double baitConsumeChance) {
         this.id = id;
         this.bait = bait;
         this.entityId = entityId;
@@ -38,6 +41,8 @@ public class TrappingRecipe implements Recipe<Container> {
         this.priority = priority;
         this.biome = biome;
         this.waterlogged = waterlogged;
+        this.baitConsumed = baitConsumed;
+        this.baitConsumeChance = Math.max(0.01D, Math.min(100.0D, baitConsumeChance));
     }
 
     @Override
@@ -88,6 +93,8 @@ public class TrappingRecipe implements Recipe<Container> {
     public int getPriority() { return priority; }
     public Optional<TagKey<Biome>> getBiome() { return biome; }
     public boolean isWaterlogged() { return waterlogged; }
+    public boolean isBaitConsumed() { return baitConsumed; }
+    public double getBaitConsumeChance() { return baitConsumeChance; }
 
     public static class Serializer implements RecipeSerializer<TrappingRecipe> {
 
@@ -104,7 +111,10 @@ public class TrappingRecipe implements Recipe<Container> {
                 biome = Optional.of(TagKey.create(Registries.BIOME, new ResourceLocation(biomeStr)));
             }
             boolean waterlogged = GsonHelper.getAsBoolean(json, "waterlogged", false);
-            return new TrappingRecipe(recipeId, bait, entityId, time, priority, biome, waterlogged);
+            boolean baitConsumed = GsonHelper.getAsBoolean(json, "baitConsumed", false);
+            double baitConsumeChance = GsonHelper.getAsDouble(json, "baitConsumeChance", 100.0D);
+            return new TrappingRecipe(recipeId, bait, entityId, time, priority, biome, waterlogged,
+                    baitConsumed, baitConsumeChance);
         }
 
         @Override
@@ -117,7 +127,10 @@ public class TrappingRecipe implements Recipe<Container> {
                     ? Optional.of(TagKey.create(Registries.BIOME, buffer.readResourceLocation()))
                     : Optional.empty();
             boolean waterlogged = buffer.readBoolean();
-            return new TrappingRecipe(recipeId, bait, entityId, time, priority, biome, waterlogged);
+            boolean baitConsumed = buffer.readBoolean();
+            double baitConsumeChance = buffer.readDouble();
+            return new TrappingRecipe(recipeId, bait, entityId, time, priority, biome, waterlogged,
+                    baitConsumed, baitConsumeChance);
         }
 
         @Override
@@ -129,6 +142,8 @@ public class TrappingRecipe implements Recipe<Container> {
             buffer.writeBoolean(recipe.biome.isPresent());
             recipe.biome.ifPresent(tag -> buffer.writeResourceLocation(tag.location()));
             buffer.writeBoolean(recipe.waterlogged);
+            buffer.writeBoolean(recipe.baitConsumed);
+            buffer.writeDouble(recipe.baitConsumeChance);
         }
     }
 }

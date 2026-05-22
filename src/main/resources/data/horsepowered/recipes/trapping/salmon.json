@@ -4,5 +4,7 @@
   "entity": "minecraft:salmon",
   "time": 1500,
   "biome": "#horsepowered:fish_habitat",
-  "waterlogged": true
+  "waterlogged": true,
+  "baitConsumed": true,
+  "baitConsumeChance": 10.0
 }

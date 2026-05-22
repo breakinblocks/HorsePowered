@@ -2,5 +2,7 @@
   "type": "horsepowered:trapping",
   "bait": { "item": "minecraft:grass" },
   "entity": "minecraft:sheep",
-  "time": 1200
+  "time": 1200,
+  "baitConsumed": true,
+  "baitConsumeChance": 10.0
 }

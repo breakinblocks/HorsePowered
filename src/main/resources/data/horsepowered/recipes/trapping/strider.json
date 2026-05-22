@@ -3,5 +3,7 @@
   "bait": { "item": "minecraft:nether_wart" },
   "entity": "minecraft:strider",
   "time": 1800,
-  "biome": "#minecraft:is_nether"
+  "biome": "#minecraft:is_nether",
+  "baitConsumed": true,
+  "baitConsumeChance": 10.0
 }

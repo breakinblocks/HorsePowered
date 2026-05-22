@@ -82,9 +82,12 @@ public class AnimalTrapBlockEntity extends HPBlockEntityBase {
     @Override
     public boolean isItemValidForSlot(int index, ItemStack stack) {
         if (index != BAIT_SLOT) return false;
-        if (capturedEntityTag != null) return false;
         if (!getItem(BAIT_SLOT).isEmpty()) return false;
         if (level == null) return true;
+        if (capturedEntityTag != null) {
+            Optional<TrappingRecipe> feeding = findFeedingRecipe(stack);
+            return feeding.isPresent() && feeding.get().isBaitConsumed();
+        }
         return findTrappingRecipe(stack).isPresent();
     }
 
@@ -112,18 +115,59 @@ public class AnimalTrapBlockEntity extends HPBlockEntityBase {
                 .findFirst();
     }
 
+    private Optional<TrappingRecipe> findFeedingRecipe(ItemStack stack) {
+        if (capturedEntityTypeId == null) return Optional.empty();
+        Optional<TrappingRecipe> recipe = findTrappingRecipe(stack);
+        if (recipe.isPresent() && capturedEntityTypeId.equals(recipe.get().getEntityId())) {
+            return recipe;
+        }
+        return Optional.empty();
+    }
+
+    private boolean capturedEntityRequiresBait() {
+        if (level == null || capturedEntityTypeId == null) return false;
+        try {
+            return level.getRecipeManager()
+                    .getAllRecipesFor(HPRecipes.TRAPPING_TYPE.get()).stream()
+                    .anyMatch(r -> capturedEntityTypeId.equals(r.getEntityId()) && r.isBaitConsumed());
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public static void serverTick(Level level, BlockPos pos, BlockState state, AnimalTrapBlockEntity be) {
         if (level.isClientSide) return;
 
         if (be.capturedEntityTag != null) {
-            be.dropTimer++;
             if (be.dropTimer >= DROP_INTERVAL_TICKS) {
-                be.rollLootTable();
+                ItemStack heldBait = be.getItem(BAIT_SLOT);
+                if (!heldBait.isEmpty()) {
+                    Optional<TrappingRecipe> feeding = be.findFeedingRecipe(heldBait);
+                    if (feeding.isPresent() && feeding.get().isBaitConsumed()) {
+                        be.rollLootTable();
+                        double chance = feeding.get().getBaitConsumeChance();
+                        if (chance >= 100.0D || level.getRandom().nextDouble() * 100.0D < chance) {
+                            heldBait.shrink(1);
+                            if (heldBait.isEmpty()) be.setItem(BAIT_SLOT, ItemStack.EMPTY);
+                        }
+                    } else {
+                        be.rollLootTable();
+                    }
+                } else if (be.capturedEntityRequiresBait()) {
+                    if (be.dropTimer != DROP_INTERVAL_TICKS) {
+                        be.dropTimer = DROP_INTERVAL_TICKS;
+                        be.setChanged();
+                    }
+                    return;
+                } else {
+                    be.rollLootTable();
+                }
                 be.dropTimer = 0;
                 be.setChanged();
-            } else if (be.dropTimer % 20 == 0) {
-                be.setChanged();
+                return;
             }
+            be.dropTimer++;
+            if (be.dropTimer % 20 == 0) be.setChanged();
             return;
         }
 
@@ -320,10 +364,14 @@ public class AnimalTrapBlockEntity extends HPBlockEntityBase {
 
     public boolean tryInsertBait(ItemStack handStack) {
         if (level == null || level.isClientSide) return false;
-        if (capturedEntityTag != null) return false;
         if (!getItem(BAIT_SLOT).isEmpty()) return false;
         if (handStack.isEmpty()) return false;
-        if (findTrappingRecipe(handStack).isEmpty()) return false;
+        if (capturedEntityTag != null) {
+            Optional<TrappingRecipe> feeding = findFeedingRecipe(handStack);
+            if (feeding.isEmpty() || !feeding.get().isBaitConsumed()) return false;
+        } else if (findTrappingRecipe(handStack).isEmpty()) {
+            return false;
+        }
         ItemStack copy = handStack.copy();
         copy.setCount(1);
         setItem(BAIT_SLOT, copy);

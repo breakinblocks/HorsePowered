@@ -2,5 +2,7 @@
   "type": "horsepowered:trapping",
   "bait": { "item": "minecraft:wheat_seeds" },
   "entity": "minecraft:chicken",
-  "time": 900
+  "time": 900,
+  "baitConsumed": true,
+  "baitConsumeChance": 10.0
 }
