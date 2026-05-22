@@ -1,5 +1,7 @@
 {
   "type": "horsepowered:trapping",
   "bait": "minecraft:carrot",
+  "baitConsumeChance": 10.0,
+  "baitConsumed": true,
   "entity": "minecraft:pig"
 }

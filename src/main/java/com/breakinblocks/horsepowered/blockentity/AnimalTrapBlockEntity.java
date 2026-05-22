@@ -1,6 +1,5 @@
 package com.breakinblocks.horsepowered.blockentity;
 
-import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
 import com.breakinblocks.horsepowered.recipes.TrappingRecipe;
 import net.minecraft.core.BlockPos;
@@ -18,6 +17,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -89,8 +89,8 @@ public class AnimalTrapBlockEntity extends HPBlockEntityBase {
         if (!getItem(BAIT_SLOT).isEmpty()) return false;
         if (level != null && level.isClientSide()) return true;
         if (capturedEntityTag != null) {
-            if (!HorsePowerConfig.animalTrapBaitConsumed.get()) return false;
-            return findFeedingRecipe(stack).isPresent();
+            Optional<RecipeHolder<TrappingRecipe>> recipe = findFeedingRecipe(stack);
+            return recipe.isPresent() && recipe.get().value().isBaitConsumed();
         }
         return findRecipe(HPRecipes.TRAPPING_TYPE.get(), stack).isPresent();
     }
@@ -123,26 +123,42 @@ public class AnimalTrapBlockEntity extends HPBlockEntityBase {
         return Optional.empty();
     }
 
+    private boolean capturedEntityRequiresBait() {
+        if (!(level instanceof ServerLevel sl) || capturedEntityTypeId == null) return false;
+        try {
+            return ((RecipeManager) sl.recipeAccess()).recipeMap()
+                    .byType(HPRecipes.TRAPPING_TYPE.get()).stream()
+                    .anyMatch(h -> capturedEntityTypeId.equals(h.value().getEntityId())
+                            && h.value().isBaitConsumed());
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public static void serverTick(net.minecraft.world.level.Level level, BlockPos pos, BlockState state, AnimalTrapBlockEntity be) {
         if (level.isClientSide()) return;
 
         if (be.capturedEntityTag != null) {
             if (be.dropTimer >= DROP_INTERVAL_TICKS) {
-                if (HorsePowerConfig.animalTrapBaitConsumed.get()) {
-                    ItemStack bait = be.getItem(BAIT_SLOT);
-                    if (bait.isEmpty()) {
-                        if (be.dropTimer != DROP_INTERVAL_TICKS) {
-                            be.dropTimer = DROP_INTERVAL_TICKS;
-                            be.setChanged();
+                ItemStack bait = be.getItem(BAIT_SLOT);
+                if (!bait.isEmpty()) {
+                    Optional<RecipeHolder<TrappingRecipe>> feeding = be.findFeedingRecipe(bait);
+                    if (feeding.isPresent() && feeding.get().value().isBaitConsumed()) {
+                        be.rollLootTable();
+                        double chance = feeding.get().value().getBaitConsumeChance();
+                        if (chance >= 100.0D || level.getRandom().nextDouble() * 100.0D < chance) {
+                            bait.shrink(1);
+                            if (bait.isEmpty()) be.setItem(BAIT_SLOT, ItemStack.EMPTY);
                         }
-                        return;
+                    } else {
+                        be.rollLootTable();
                     }
-                    be.rollLootTable();
-                    double chance = HorsePowerConfig.animalTrapBaitConsumeChance.get();
-                    if (chance >= 100.0D || level.getRandom().nextDouble() * 100.0D < chance) {
-                        bait.shrink(1);
-                        if (bait.isEmpty()) be.setItem(BAIT_SLOT, ItemStack.EMPTY);
+                } else if (be.capturedEntityRequiresBait()) {
+                    if (be.dropTimer != DROP_INTERVAL_TICKS) {
+                        be.dropTimer = DROP_INTERVAL_TICKS;
+                        be.setChanged();
                     }
+                    return;
                 } else {
                     be.rollLootTable();
                 }
@@ -379,8 +395,8 @@ public class AnimalTrapBlockEntity extends HPBlockEntityBase {
         if (!getItem(BAIT_SLOT).isEmpty()) return false;
         if (handStack.isEmpty()) return false;
         if (capturedEntityTag != null) {
-            if (!HorsePowerConfig.animalTrapBaitConsumed.get()) return false;
-            if (findFeedingRecipe(handStack).isEmpty()) return false;
+            Optional<RecipeHolder<TrappingRecipe>> feeding = findFeedingRecipe(handStack);
+            if (feeding.isEmpty() || !feeding.get().value().isBaitConsumed()) return false;
         } else if (findTrappingRecipe(handStack).isEmpty()) {
             return false;
         }

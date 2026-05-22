@@ -23,6 +23,8 @@ public class TrappingRecipeBuilder {
     private int priority = 0;
     private Optional<TagKey<Biome>> biome = Optional.empty();
     private boolean waterlogged = false;
+    private boolean baitConsumed = false;
+    private double baitConsumeChance = 100.0D;
 
     private TrappingRecipeBuilder(Ingredient bait, Identifier entityId) {
         this.bait = bait;
@@ -53,9 +55,19 @@ public class TrappingRecipeBuilder {
         return this;
     }
 
+    public TrappingRecipeBuilder baitConsumed(boolean consumed) {
+        this.baitConsumed = consumed;
+        return this;
+    }
+
+    public TrappingRecipeBuilder baitConsumeChance(double chance) {
+        this.baitConsumeChance = chance;
+        return this;
+    }
+
     public void save(RecipeOutput output, String name) {
         ResourceKey<Recipe<?>> key = ResourceKey.create(Registries.RECIPE,
                 HorsePowerMod.id("trapping/" + name));
-        output.accept(key, new TrappingRecipe(bait, entityId, time, priority, biome, waterlogged), null);
+        output.accept(key, new TrappingRecipe(bait, entityId, time, priority, biome, waterlogged, baitConsumed, baitConsumeChance), null);
     }
 }

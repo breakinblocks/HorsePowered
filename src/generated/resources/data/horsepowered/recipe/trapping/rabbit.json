@@ -1,6 +1,8 @@
 {
   "type": "horsepowered:trapping",
   "bait": "minecraft:dandelion",
+  "baitConsumeChance": 10.0,
+  "baitConsumed": true,
   "entity": "minecraft:rabbit",
   "time": 1500
 }

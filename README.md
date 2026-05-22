@@ -132,6 +132,7 @@ Horse Powered uses data-driven JSON recipes that can be added or modified via da
 - `horsepowered:chopping` — Chopping recipes
 - `horsepowered:pressing` — Press recipes (supports item OR fluid output)
 - `horsepowered:drying` — Drying Rack recipes (item-in, item-out, with a time in ticks)
+- `horsepowered:trapping` — Animal Trap recipes (bait + entity, with optional biome/waterlog gates and per-recipe bait consumption)
 
 **Optional fields available on every grinding and chopping recipe:**
 - `tier` — restricts which station can run the recipe. `"any"` (default) runs on both manual and horse-powered stations, `"hand"` is manual-only, `"horse"` is horse-powered-only.
@@ -216,6 +217,31 @@ Horse Powered uses data-driven JSON recipes that can be added or modified via da
   "time": 1000
 }
 ```
+
+#### Trapping Recipe
+```json
+{
+  "type": "horsepowered:trapping",
+  "bait": "minecraft:kelp",
+  "entity": "minecraft:salmon",
+  "time": 1500,
+  "priority": 0,
+  "biome": "horsepowered:fish_habitat",
+  "waterlogged": true,
+  "baitConsumed": true,
+  "baitConsumeChance": 10.0
+}
+```
+- `bait` — Ingredient. The item that triggers the recipe.
+- `entity` — ResourceLocation of the entity to capture. Any mob can be specified.
+- `time` — Optional minimum wait in ticks before the catch dice roll begins (default `1200`).
+- `priority` — Optional integer; lower values display first in JEI/EMI (default `0`).
+- `biome` — Optional biome tag the trap must sit inside before the dice roll counts.
+- `waterlogged` — Optional boolean; when `true` the trap must be waterlogged before the dice roll counts.
+- `baitConsumed` — Optional boolean (default `false`). When `true` the trap requires bait to generate each drop cycle after capture. When the bait slot is empty the drop timer pauses at the threshold until matching bait is supplied. Hoppers may continue feeding bait into a captured trap.
+- `baitConsumeChance` — Optional percent (`0.01`-`100.00`, default `100.0`). Only applies when `baitConsumed` is `true`. Rolled each time drops are generated; on success one bait is consumed. Lower values let one bait fuel multiple drop cycles on average. All built-in trapping recipes ship with `baitConsumed: true` and `baitConsumeChance: 10.0`.
+
+The trap's drops come from the captured entity's vanilla loot table, so no drop list is declared on the trap recipe itself.
 
 ### Conditional Recipes (Mod Compat)
 

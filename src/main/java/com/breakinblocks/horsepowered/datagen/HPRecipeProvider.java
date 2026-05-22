@@ -77,17 +77,25 @@ public class HPRecipeProvider extends RecipeProvider.Runner {
             TrappingRecipeBuilder.trap(Ingredient.of(Items.NETHER_WART), EntityType.STRIDER)
                     .time(1800)
                     .biome(BiomeTags.IS_NETHER)
+                    .baitConsumed(true)
+                    .baitConsumeChance(10.0D)
                     .save(this.output, "strider");
 
             TrappingRecipeBuilder.trap(Ingredient.of(Items.KELP), EntityType.SALMON)
                     .time(1500)
                     .biome(FISH_HABITAT)
                     .waterlogged()
+                    .baitConsumed(true)
+                    .baitConsumeChance(10.0D)
                     .save(this.output, "salmon");
         }
 
         private void trap(Ingredient bait, EntityType<?> entity, int time, String name) {
-            TrappingRecipeBuilder.trap(bait, entity).time(time).save(this.output, name);
+            TrappingRecipeBuilder.trap(bait, entity)
+                    .time(time)
+                    .baitConsumed(true)
+                    .baitConsumeChance(10.0D)
+                    .save(this.output, name);
         }
 
         private void buildCraftingRecipes() {

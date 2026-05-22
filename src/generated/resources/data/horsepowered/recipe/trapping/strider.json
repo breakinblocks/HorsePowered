@@ -1,6 +1,8 @@
 {
   "type": "horsepowered:trapping",
   "bait": "minecraft:nether_wart",
+  "baitConsumeChance": 10.0,
+  "baitConsumed": true,
   "biome": "minecraft:is_nether",
   "entity": "minecraft:strider",
   "time": 1800

@@ -36,9 +36,6 @@ public class HorsePowerConfig {
     public static ModConfigSpec.DoubleValue pathSpeedDefault;
     public static ModConfigSpec.ConfigValue<List<? extends String>> pathSpeedEntries;
 
-    public static ModConfigSpec.BooleanValue animalTrapBaitConsumed;
-    public static ModConfigSpec.DoubleValue animalTrapBaitConsumeChance;
-
     private static volatile Map<Identifier, Double> cachedPathSpeedMap;
 
     static {
@@ -119,18 +116,6 @@ public class HorsePowerConfig {
             graniteAnvilExhaustion = commonBuilder
                     .comment("The exhaustion amount added to the player when using the granite anvil (0 to disable)")
                     .defineInRange("graniteAnvilExhaustion", 0.15D, 0.0D, 40.0D);
-        }
-        commonBuilder.pop();
-
-        commonBuilder.comment("Animal trap settings").push("animal_trap");
-        {
-            animalTrapBaitConsumed = commonBuilder
-                    .comment("If true the animal trap requires bait to generate each drop cycle. When the bait slot is empty the drop timer pauses at the threshold until new matching bait is supplied.")
-                    .define("baitConsumed", false);
-
-            animalTrapBaitConsumeChance = commonBuilder
-                    .comment("Percent chance (0.01-100.00) that one bait is consumed each time the trap generates drops. Only applies when baitConsumed is true. 100.00 means the bait is always consumed.")
-                    .defineInRange("baitConsumeChance", 100.0D, 0.01D, 100.0D);
         }
         commonBuilder.pop();
 

@@ -24,15 +24,20 @@ public class TrappingRecipe extends BaseHPRecipe {
     private final int priority;
     private final Optional<TagKey<Biome>> biome;
     private final boolean waterlogged;
+    private final boolean baitConsumed;
+    private final double baitConsumeChance;
 
     public TrappingRecipe(Ingredient bait, Identifier entityId, int time, int priority,
-                          Optional<TagKey<Biome>> biome, boolean waterlogged) {
+                          Optional<TagKey<Biome>> biome, boolean waterlogged,
+                          boolean baitConsumed, double baitConsumeChance) {
         super(bait, null);
         this.entityId = entityId;
         this.time = Math.max(1, time);
         this.priority = priority;
         this.biome = biome;
         this.waterlogged = waterlogged;
+        this.baitConsumed = baitConsumed;
+        this.baitConsumeChance = Math.max(0.01D, Math.min(100.0D, baitConsumeChance));
     }
 
     @Override
@@ -74,6 +79,14 @@ public class TrappingRecipe extends BaseHPRecipe {
         return waterlogged;
     }
 
+    public boolean isBaitConsumed() {
+        return baitConsumed;
+    }
+
+    public double getBaitConsumeChance() {
+        return baitConsumeChance;
+    }
+
     public static final MapCodec<TrappingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance ->
             instance.group(
                     Ingredient.CODEC.fieldOf("bait").forGetter(TrappingRecipe::getBait),
@@ -81,7 +94,9 @@ public class TrappingRecipe extends BaseHPRecipe {
                     Codec.INT.optionalFieldOf("time", 1200).forGetter(TrappingRecipe::getTime),
                     Codec.INT.optionalFieldOf("priority", 0).forGetter(TrappingRecipe::getPriority),
                     TagKey.codec(Registries.BIOME).optionalFieldOf("biome").forGetter(TrappingRecipe::getBiome),
-                    Codec.BOOL.optionalFieldOf("waterlogged", false).forGetter(TrappingRecipe::isWaterlogged)
+                    Codec.BOOL.optionalFieldOf("waterlogged", false).forGetter(TrappingRecipe::isWaterlogged),
+                    Codec.BOOL.optionalFieldOf("baitConsumed", false).forGetter(TrappingRecipe::isBaitConsumed),
+                    Codec.doubleRange(0.01D, 100.0D).optionalFieldOf("baitConsumeChance", 100.0D).forGetter(TrappingRecipe::getBaitConsumeChance)
             ).apply(instance, TrappingRecipe::new)
     );
 
@@ -96,7 +111,9 @@ public class TrappingRecipe extends BaseHPRecipe {
                     ? Optional.of(TagKey.create(Registries.BIOME, Identifier.STREAM_CODEC.decode(buf)))
                     : Optional.empty();
             boolean waterlogged = ByteBufCodecs.BOOL.decode(buf);
-            return new TrappingRecipe(bait, entityId, time, priority, biome, waterlogged);
+            boolean baitConsumed = ByteBufCodecs.BOOL.decode(buf);
+            double baitConsumeChance = ByteBufCodecs.DOUBLE.decode(buf);
+            return new TrappingRecipe(bait, entityId, time, priority, biome, waterlogged, baitConsumed, baitConsumeChance);
         }
 
         @Override
@@ -108,6 +125,8 @@ public class TrappingRecipe extends BaseHPRecipe {
             buf.writeBoolean(recipe.biome.isPresent());
             recipe.biome.ifPresent(tag -> Identifier.STREAM_CODEC.encode(buf, tag.location()));
             ByteBufCodecs.BOOL.encode(buf, recipe.waterlogged);
+            ByteBufCodecs.BOOL.encode(buf, recipe.baitConsumed);
+            ByteBufCodecs.DOUBLE.encode(buf, recipe.baitConsumeChance);
         }
     };
 }
