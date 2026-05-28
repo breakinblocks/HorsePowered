@@ -68,8 +68,8 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
     }
 
     private boolean matchesAnyRecipeOutput(FluidStack fluid) {
-        if (level == null || fluid.isEmpty()) return false;
-        return ((RecipeManager) level.recipeAccess())
+        if (fluid.isEmpty() || !(level instanceof ServerLevel serverLevel)) return false;
+        return ((RecipeManager) serverLevel.recipeAccess())
                 .recipeMap().byType(HPRecipes.PRESSING_TYPE.get())
                 .stream()
                 .anyMatch(r -> {

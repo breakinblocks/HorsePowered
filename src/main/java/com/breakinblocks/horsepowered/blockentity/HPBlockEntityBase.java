@@ -300,12 +300,8 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
     protected <T extends Recipe<HPRecipeInput>> Optional<RecipeHolder<T>> findRecipe(RecipeType<T> type, ItemStack input) {
         if (!(level instanceof ServerLevel serverLevel)) return Optional.empty();
         try {
-            Optional<RecipeHolder<T>> result = ((RecipeManager) serverLevel.recipeAccess())
+            return ((RecipeManager) serverLevel.recipeAccess())
                     .getRecipeFor(type, new HPRecipeInput(input), serverLevel);
-            if (result.isEmpty()) {
-                LOGGER.debug("[HorsePowered] No recipe found for type {} with input {}", type, input);
-            }
-            return result;
         } catch (Exception e) {
             LOGGER.error("[HorsePowered] Recipe lookup failed for type {} with input {}", type, input, e);
             return Optional.empty();

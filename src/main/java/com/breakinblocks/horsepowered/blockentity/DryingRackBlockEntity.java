@@ -37,6 +37,7 @@ public class DryingRackBlockEntity extends BlockEntity implements WorldlyContain
     private static final int[] ALL_SLOTS = { 0, 1, 2, 3, 4, 5, 6, 7 };
 
     private final NonNullList<ItemStack> items = NonNullList.withSize(SLOT_COUNT, ItemStack.EMPTY);
+    private final NonNullList<ItemStack> outputs = NonNullList.withSize(SLOT_COUNT, ItemStack.EMPTY);
     private final int[] progress = new int[SLOT_COUNT];
     private final int[] recipeTime = new int[SLOT_COUNT];
 
@@ -71,13 +72,10 @@ public class DryingRackBlockEntity extends BlockEntity implements WorldlyContain
     }
 
     public ItemStack getOutputPreview(int slot) {
-        if (slot < 0 || slot >= SLOT_COUNT || level == null) return ItemStack.EMPTY;
+        if (slot < 0 || slot >= SLOT_COUNT) return ItemStack.EMPTY;
         if (progress[slot] == FINISHED) return ItemStack.EMPTY;
-        ItemStack input = items.get(slot);
-        if (input.isEmpty()) return ItemStack.EMPTY;
-        Optional<RecipeHolder<DryingRackRecipe>> recipe = ((RecipeManager) level.recipeAccess())
-                .getRecipeFor(HPRecipes.DRYING_TYPE.get(), new HPRecipeInput(input), level);
-        return recipe.map(holder -> holder.value().createResult()).orElse(ItemStack.EMPTY);
+        if (items.get(slot).isEmpty()) return ItemStack.EMPTY;
+        return outputs.get(slot);
     }
 
     public static void clientTick(Level level, BlockPos pos, BlockState state, DryingRackBlockEntity be) {
@@ -105,6 +103,7 @@ public class DryingRackBlockEntity extends BlockEntity implements WorldlyContain
             items.set(slot, inserted);
             progress[slot] = 0;
             recipeTime[slot] = recipe.get().value().getTime();
+            outputs.set(slot, recipe.get().value().createResult());
             handStack.shrink(1);
             markDirtyAndSync();
             return true;
@@ -114,6 +113,7 @@ public class DryingRackBlockEntity extends BlockEntity implements WorldlyContain
         items.set(slot, ItemStack.EMPTY);
         progress[slot] = 0;
         recipeTime[slot] = 0;
+        outputs.set(slot, ItemStack.EMPTY);
         markDirtyAndSync();
         return true;
     }
@@ -125,15 +125,18 @@ public class DryingRackBlockEntity extends BlockEntity implements WorldlyContain
             if (be.progress[slot] == FINISHED) continue;
 
             int time = be.recipeTime[slot];
-            if (time <= 0) {
+            if (time <= 0 || be.outputs.get(slot).isEmpty()) {
                 Optional<RecipeHolder<DryingRackRecipe>> recipe = be.findRecipe(be.items.get(slot));
                 if (recipe.isEmpty()) {
                     be.progress[slot] = 0;
                     be.recipeTime[slot] = 0;
+                    be.outputs.set(slot, ItemStack.EMPTY);
                     continue;
                 }
                 be.recipeTime[slot] = recipe.get().value().getTime();
+                be.outputs.set(slot, recipe.get().value().createResult());
                 time = be.recipeTime[slot];
+                dirty = true;
             }
 
             be.progress[slot]++;
@@ -143,10 +146,12 @@ public class DryingRackBlockEntity extends BlockEntity implements WorldlyContain
                     be.items.set(slot, recipe.get().value().createResult());
                     be.progress[slot] = FINISHED;
                     be.recipeTime[slot] = 0;
+                    be.outputs.set(slot, ItemStack.EMPTY);
                     dirty = true;
                 } else {
                     be.progress[slot] = 0;
                     be.recipeTime[slot] = 0;
+                    be.outputs.set(slot, ItemStack.EMPTY);
                 }
             }
         }
@@ -182,6 +187,7 @@ public class DryingRackBlockEntity extends BlockEntity implements WorldlyContain
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
         ContainerHelper.saveAllItems(output, items);
+        ContainerHelper.saveAllItems(output.child("outputs"), outputs);
         output.putIntArray("progress", progress);
         output.putIntArray("recipeTime", recipeTime);
     }
@@ -191,8 +197,10 @@ public class DryingRackBlockEntity extends BlockEntity implements WorldlyContain
         super.loadAdditional(input);
         for (int i = 0; i < SLOT_COUNT; i++) {
             items.set(i, ItemStack.EMPTY);
+            outputs.set(i, ItemStack.EMPTY);
         }
         ContainerHelper.loadAllItems(input, items);
+        input.child("outputs").ifPresent(child -> ContainerHelper.loadAllItems(child, outputs));
 
         int[] loadedProgress = input.getIntArray("progress").orElse(new int[0]);
         int[] loadedTime = input.getIntArray("recipeTime").orElse(new int[0]);
@@ -226,6 +234,7 @@ public class DryingRackBlockEntity extends BlockEntity implements WorldlyContain
             if (items.get(slot).isEmpty()) {
                 progress[slot] = 0;
                 recipeTime[slot] = 0;
+                outputs.set(slot, ItemStack.EMPTY);
             }
             markDirtyAndSync();
         }
@@ -238,6 +247,7 @@ public class DryingRackBlockEntity extends BlockEntity implements WorldlyContain
         ItemStack out = ContainerHelper.takeItem(items, slot);
         progress[slot] = 0;
         recipeTime[slot] = 0;
+        outputs.set(slot, ItemStack.EMPTY);
         return out;
     }
 
@@ -248,8 +258,12 @@ public class DryingRackBlockEntity extends BlockEntity implements WorldlyContain
         if (stack.isEmpty()) {
             progress[slot] = 0;
             recipeTime[slot] = 0;
+            outputs.set(slot, ItemStack.EMPTY);
         } else if (recipeTime[slot] <= 0) {
-            findRecipe(stack).ifPresent(r -> recipeTime[slot] = r.value().getTime());
+            findRecipe(stack).ifPresent(r -> {
+                recipeTime[slot] = r.value().getTime();
+                outputs.set(slot, r.value().createResult());
+            });
         }
         markDirtyAndSync();
     }
@@ -264,6 +278,7 @@ public class DryingRackBlockEntity extends BlockEntity implements WorldlyContain
     public void clearContent() {
         for (int i = 0; i < SLOT_COUNT; i++) {
             items.set(i, ItemStack.EMPTY);
+            outputs.set(i, ItemStack.EMPTY);
             progress[i] = 0;
             recipeTime[i] = 0;
         }
