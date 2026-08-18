@@ -219,8 +219,8 @@ public class AnimalTrapBlockEntity extends BlockEntity {
 
     private void capture(TrappingRecipe recipe) {
         if (!(level instanceof ServerLevel sl)) return;
+        if (!BuiltInRegistries.ENTITY_TYPE.containsKey(recipe.getEntityId())) return;
         EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.get(recipe.getEntityId());
-        if (type == null) return;
         Entity proto = type.create(sl);
         if (proto == null) return;
 
@@ -444,7 +444,9 @@ public class AnimalTrapBlockEntity extends BlockEntity {
         if (tag.contains("CapturedEntity")) {
             capturedEntityTag = tag.getCompound("CapturedEntity").copy();
             ResourceLocation typeId = ResourceLocation.tryParse(capturedEntityTag.getString("id"));
-            capturedEntityType = typeId == null ? null : BuiltInRegistries.ENTITY_TYPE.get(typeId);
+            capturedEntityType = typeId != null && BuiltInRegistries.ENTITY_TYPE.containsKey(typeId)
+                    ? BuiltInRegistries.ENTITY_TYPE.get(typeId)
+                    : null;
             displayEntity = null;
             displayEntitySourceTag = null;
         } else {

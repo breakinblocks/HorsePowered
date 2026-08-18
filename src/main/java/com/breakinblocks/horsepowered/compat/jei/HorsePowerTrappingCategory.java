@@ -14,20 +14,16 @@ import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.SpawnEggItem;
 
 public class HorsePowerTrappingCategory implements IRecipeCategory<TrappingRecipe> {
 
     public static final ResourceLocation UID = ResourceLocation.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "trapping");
 
     private static final int WIDTH = 160;
-    private static final int HEIGHT = 94;
+    private static final int HEIGHT = 104;
 
     private final IDrawable icon;
     private final IDrawable slot;
@@ -77,15 +73,8 @@ public class HorsePowerTrappingCategory implements IRecipeCategory<TrappingRecip
                 .setBackground(slot, -1, -1);
 
         builder.addSlot(RecipeIngredientRole.OUTPUT, 95, 22)
-                .addItemStack(outputDisplayStack(recipe))
+                .addItemStack(recipe.getDisplayIcon())
                 .setBackground(slot, -1, -1);
-    }
-
-    private static ItemStack outputDisplayStack(TrappingRecipe recipe) {
-        EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.get(recipe.getEntityId());
-        SpawnEggItem egg = type == null ? null : SpawnEggItem.byId(type);
-        if (egg != null) return new ItemStack(egg);
-        return new ItemStack(Items.EGG);
     }
 
     @Override
@@ -93,6 +82,10 @@ public class HorsePowerTrappingCategory implements IRecipeCategory<TrappingRecip
         arrow.draw(guiGraphics, 24, 22);
         var font = Minecraft.getInstance().font;
         int y = 42;
+
+        Component nameText = recipe.getDisplayName();
+        guiGraphics.drawString(font, nameText, (WIDTH - font.width(nameText)) / 2, y, 0xFF404040, false);
+        y += 12;
 
         int seconds = Math.max(1, recipe.getTime() / 20);
         Component timeText = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.trap_time", seconds + "s");
@@ -135,7 +128,7 @@ public class HorsePowerTrappingCategory implements IRecipeCategory<TrappingRecip
         return String.format("%.2f", chance);
     }
 
-    private static String biomeLabel(net.minecraft.resources.ResourceLocation id) {
+    private static String biomeLabel(ResourceLocation id) {
         String key = "biome." + id.getNamespace() + "." + id.getPath();
         Component translated = Component.translatable(key);
         String resolved = translated.getString();

@@ -25,7 +25,7 @@ A Minecraft NeoForge mod that adds horse-powered machinery for grinding, choppin
 
 - **Horse Grindstone** — An automated grindstone powered by a horse walking in circles. Continuously grinds items without manual intervention.
 - **Horse Chopper** — An automated chopping machine. Attach a horse to chop logs into planks automatically.
-- **Horse Press** — Press items to extract fluids or produce other outputs. Squeeze flowers for dye, press seeds for oil, and more.
+- **Horse Press** — Press items to extract fluids or produce other outputs. Squeeze flowers for dye, press seeds for oil, and more. Fluids come out by bucket, by pipe, or by bottle where a bottling recipe covers them.
 - **Horse Powered Generator** — Converts horse labor into Forge Energy (FE). Generates 80 FE/tick while a worker walks, stores up to 100,000 FE, and pushes power to any adjacent energy handler. Requires a redstone signal to run.
 
 ### Tools
@@ -93,6 +93,12 @@ The Drying Rack is passive — slower than other machines because no worker driv
 
 Jade tooltip shows per-slot progress and remaining time when you look at a specific slot.
 
+### Bottling (1 recipe)
+Bottling recipes let a container that has no fluid-handler capability of its own move fluid in and out of the Horse Press.
+- **Glass Bottle** + 250 mB Water → **Water Bottle** (and the reverse, emptying a water bottle back into the press)
+
+Press ice, snow, snowballs, or pointed dripstone for the water first. Packs and mods add their own entries for fluids that only exist in bottled form.
+
 ### Farmer's Delight Compat (11 recipes)
 When Farmer's Delight is installed, the chopper gains meat-cutting recipes:
 - Beef, porkchop, chicken, cod, salmon, mutton (raw and cooked variants)
@@ -100,6 +106,8 @@ When Farmer's Delight is installed, the chopper gains meat-cutting recipes:
 ## Automation
 
 All Horse Powered machines support item automation via hoppers, pipes, and other modded item transport systems. Insert items into the input slot from the top or sides, and extract finished products from the bottom.
+
+The Horse Press exposes a fluid handler to adjacent blocks, so pipes and tanks can fill its input tank and drain its output tank. By hand, fluids move with a bucket, or with a bottle where a bottling recipe covers that fluid.
 
 ## Mod Integrations
 
@@ -133,7 +141,8 @@ Horse Powered uses data-driven JSON recipes that can be added or modified via da
 - `horsepowered:chopping` — Chopping recipes
 - `horsepowered:pressing` — Press recipes (supports item OR fluid output)
 - `horsepowered:drying` — Drying Rack recipes (item-in, item-out, with a time in ticks)
-- `horsepowered:trapping` — Animal Trap recipes (bait + entity, with optional biome/waterlog gates and per-recipe bait consumption)
+- `horsepowered:bottling` — Press bottle-filling recipes (fluid to item, and the reverse)
+- `horsepowered:trapping` — Animal Trap recipes (bait + entity, with optional biome/waterlog gates, per-recipe bait consumption, and an overridable display name and icon)
 
 **Optional fields available on every grinding and chopping recipe:**
 - `tier` — restricts which station can run the recipe. `"any"` (default) runs on both manual and horse-powered stations, `"hand"` is manual-only, `"horse"` is horse-powered-only.
@@ -198,6 +207,25 @@ Horse Powered uses data-driven JSON recipes that can be added or modified via da
 }
 ```
 
+#### Bottling Recipe
+```json
+{
+  "type": "horsepowered:bottling",
+  "container": {"item": "minecraft:glass_bottle"},
+  "fluid": {"id": "minecraft:water", "amount": 250},
+  "result": {"id": "minecraft:potion", "count": 1, "components": {"minecraft:potion_contents": {"potion": "minecraft:water"}}},
+  "priority": 0
+}
+```
+- `container` — Ingredient. The empty container the player holds. Usually a glass bottle, but any item works.
+- `fluid` — The fluid and amount in mB moved per click.
+- `result` — The filled item handed back. Components are respected, so potions, juices, and other data-carrying items all work.
+- `priority` — Optional integer; lower values display first in JEI/EMI (default `0`).
+
+Right-clicking the Press with the `container` item drains `fluid` from the output tank and gives the `result`. Right-clicking with the `result` item does the reverse: it fills the input tank and returns the empty `container`. Both directions only fire when the tank has room or holds enough of the matching fluid.
+
+This exists because glass bottles carry no fluid-handler capability in NeoForge, so bottles cannot interact with a tank the way buckets do. Mods whose fluids only have a bottled form (juices, for example) should ship a bottling recipe so their fluid can be taken out of the Press by hand.
+
 #### Trapping Recipe
 ```json
 {
@@ -209,7 +237,9 @@ Horse Powered uses data-driven JSON recipes that can be added or modified via da
   "biome": "#horsepowered:fish_habitat",
   "waterlogged": true,
   "baitConsumed": true,
-  "baitConsumeChance": 10.0
+  "baitConsumeChance": 10.0,
+  "title": "River Salmon",
+  "icon": "minecraft:salmon_bucket"
 }
 ```
 - `bait` — Ingredient. The item that triggers the recipe.
@@ -220,6 +250,8 @@ Horse Powered uses data-driven JSON recipes that can be added or modified via da
 - `waterlogged` — Optional boolean; when `true` the trap must be waterlogged before the dice roll counts.
 - `baitConsumed` — Optional boolean (default `false`). When `true` the trap requires bait to generate each drop cycle after capture. When the bait slot is empty the drop timer pauses at the threshold until matching bait is supplied. Hoppers may continue feeding bait into a captured trap.
 - `baitConsumeChance` — Optional percent (`0.01`-`100.00`, default `100.0`). Only applies when `baitConsumed` is `true`. Rolled each time drops are generated; on success one bait is consumed. Lower values let one bait fuel multiple drop cycles on average. All built-in trapping recipes ship with `baitConsumed: true` and `baitConsumeChance: 10.0`.
+- `title` — Optional string naming the catch in the JEI and EMI recipe panels. Accepts a translation key (resolved against the active language) or a plain string (shown as-is). When omitted the entity's own name is used, so the panel identifies the animal even in packs that hide spawn eggs.
+- `icon` — Optional item ID shown in the recipe panel's output slot. Use it for mobs that have no spawn egg, or whose mod registers one the game cannot resolve. When omitted the icon is resolved in order: the entity's registered spawn egg, then an item named `<namespace>:<entity_path>_spawn_egg`, then `minecraft:egg` as a last resort.
 
 The trap's drops come from the captured entity's vanilla loot table, so no drop list is declared on the trap recipe itself.
 

@@ -20,6 +20,8 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.material.Fluids;
 
@@ -40,6 +42,14 @@ public class HPRecipeProvider extends RecipeProvider {
         buildDryingRecipes(output);
         buildCrushingRecipes(output);
         buildTrappingRecipes(output);
+        buildBottlingRecipes(output);
+    }
+
+    private void buildBottlingRecipes(RecipeOutput output) {
+        BottlingRecipeBuilder.bottling(Ingredient.of(Items.GLASS_BOTTLE))
+                .fluid(Fluids.WATER, 250)
+                .result(PotionContents.createItemStack(Items.POTION, Potions.WATER))
+                .save(output, "water_bottle");
     }
 
     private static final TagKey<Biome> FISH_HABITAT =
@@ -118,9 +128,10 @@ public class HPRecipeProvider extends RecipeProvider {
 
         ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ModBlocks.PRESS.get())
                 .pattern("PPP")
-                .pattern("P P")
+                .pattern("PSP")
                 .pattern("PPP")
                 .define('P', ItemTags.PLANKS)
+                .define('S', Items.SMOOTH_STONE)
                 .unlockedBy("has_planks", has(ItemTags.PLANKS))
                 .save(output, HorsePowerMod.id("crafting/press"));
 

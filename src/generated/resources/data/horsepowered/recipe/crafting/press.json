@@ -4,11 +4,14 @@
   "key": {
     "P": {
       "tag": "minecraft:planks"
+    },
+    "S": {
+      "item": "minecraft:smooth_stone"
     }
   },
   "pattern": [
     "PPP",
-    "P P",
+    "PSP",
     "PPP"
   ],
   "result": {

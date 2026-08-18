@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.biome.Biome;
 
 import java.util.Optional;
@@ -22,6 +23,8 @@ public class TrappingRecipeBuilder {
     private boolean waterlogged = false;
     private boolean baitConsumed = false;
     private double baitConsumeChance = 100.0D;
+    private Optional<String> title = Optional.empty();
+    private Optional<ResourceLocation> icon = Optional.empty();
 
     private TrappingRecipeBuilder(Ingredient bait, ResourceLocation entityId) {
         this.bait = bait;
@@ -62,8 +65,18 @@ public class TrappingRecipeBuilder {
         return this;
     }
 
+    public TrappingRecipeBuilder title(String title) {
+        this.title = Optional.of(title);
+        return this;
+    }
+
+    public TrappingRecipeBuilder icon(ItemLike item) {
+        this.icon = Optional.of(BuiltInRegistries.ITEM.getKey(item.asItem()));
+        return this;
+    }
+
     public void save(RecipeOutput output, String name) {
         ResourceLocation id = HorsePowerMod.id("trapping/" + name);
-        output.accept(id, new TrappingRecipe(bait, entityId, time, priority, biome, waterlogged, baitConsumed, baitConsumeChance), null);
+        output.accept(id, new TrappingRecipe(bait, entityId, time, priority, biome, waterlogged, baitConsumed, baitConsumeChance, title, icon), null);
     }
 }

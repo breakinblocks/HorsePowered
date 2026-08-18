@@ -2,6 +2,7 @@ package com.breakinblocks.horsepowered.compat.jei;
 
 import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
+import com.breakinblocks.horsepowered.recipes.BottlingRecipe;
 import com.breakinblocks.horsepowered.recipes.ChoppingRecipe;
 import com.breakinblocks.horsepowered.recipes.CrushingRecipe;
 import com.breakinblocks.horsepowered.recipes.DryingRackRecipe;
@@ -54,6 +55,9 @@ public class HorsePowerPlugin implements IModPlugin {
     public static final RecipeType<TrappingRecipe> TRAPPING_TYPE =
             RecipeType.create(HorsePowerMod.MOD_ID, "trapping", TrappingRecipe.class);
 
+    public static final RecipeType<BottlingRecipe> BOTTLING_TYPE =
+            RecipeType.create(HorsePowerMod.MOD_ID, "bottling", BottlingRecipe.class);
+
     @Override
     public ResourceLocation getPluginUid() {
         return UID;
@@ -71,7 +75,8 @@ public class HorsePowerPlugin implements IModPlugin {
                 new HorsePowerPressCategory(guiHelper),
                 new HorsePowerDryingCategory(guiHelper),
                 new HorsePowerCrushingCategory(guiHelper),
-                new HorsePowerTrappingCategory(guiHelper)
+                new HorsePowerTrappingCategory(guiHelper),
+                new HorsePowerBottlingCategory(guiHelper)
         );
     }
 
@@ -114,6 +119,12 @@ public class HorsePowerPlugin implements IModPlugin {
         registration.addRecipes(TRAPPING_TYPE,
                 recipeManager.getAllRecipesFor(HPRecipes.TRAPPING_TYPE.get()).stream()
                         .map(RecipeHolder::value).sorted(trappingOrder).toList());
+
+        Comparator<BottlingRecipe> bottlingOrder = Comparator.comparingInt(BottlingRecipe::getPriority);
+        registration.addRecipes(BOTTLING_TYPE,
+                recipeManager.getAllRecipesFor(HPRecipes.BOTTLING_TYPE.get()).stream()
+                        .map(RecipeHolder::value).filter(BottlingRecipe::isValid)
+                        .sorted(bottlingOrder).toList());
     }
 
     @Override
@@ -125,6 +136,7 @@ public class HorsePowerPlugin implements IModPlugin {
         registration.addRecipeCatalyst(new ItemStack(ModBlocks.CHOPPER.get()), CHOPPING_TYPE);
 
         registration.addRecipeCatalyst(new ItemStack(ModBlocks.PRESS.get()), PRESSING_TYPE);
+        registration.addRecipeCatalyst(new ItemStack(ModBlocks.PRESS.get()), BOTTLING_TYPE);
 
         registration.addRecipeCatalyst(new ItemStack(ModBlocks.DRYING_RACK.get()), DRYING_TYPE);
 

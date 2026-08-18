@@ -2,6 +2,7 @@ package com.breakinblocks.horsepowered.compat.emi;
 
 import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
+import com.breakinblocks.horsepowered.recipes.BottlingRecipe;
 import com.breakinblocks.horsepowered.recipes.ChoppingRecipe;
 import com.breakinblocks.horsepowered.recipes.CrushingRecipe;
 import com.breakinblocks.horsepowered.recipes.DryingRackRecipe;
@@ -48,6 +49,9 @@ public class HorsePoweredEmiPlugin implements EmiPlugin {
     public static final EmiRecipeCategory TRAPPING = new EmiRecipeCategory(
             ResourceLocation.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "trapping"),
             EmiStack.of(ModBlocks.ANIMAL_TRAP.get()));
+    public static final EmiRecipeCategory BOTTLING = new EmiRecipeCategory(
+            ResourceLocation.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "bottling"),
+            EmiStack.of(ModBlocks.PRESS.get()));
 
     @Override
     public void register(EmiRegistry registry) {
@@ -59,6 +63,7 @@ public class HorsePoweredEmiPlugin implements EmiPlugin {
         registry.addCategory(DRYING);
         registry.addCategory(CRUSHING);
         registry.addCategory(TRAPPING);
+        registry.addCategory(BOTTLING);
 
         registry.addWorkstation(GRINDING, EmiStack.of(ModBlocks.GRINDSTONE.get()));
         registry.addWorkstation(MANUAL_GRINDING, EmiStack.of(ModBlocks.HAND_GRINDSTONE.get()));
@@ -68,6 +73,7 @@ public class HorsePoweredEmiPlugin implements EmiPlugin {
         registry.addWorkstation(DRYING, EmiStack.of(ModBlocks.DRYING_RACK.get()));
         registry.addWorkstation(CRUSHING, EmiStack.of(ModBlocks.GRANITE_ANVIL.get()));
         registry.addWorkstation(TRAPPING, EmiStack.of(ModBlocks.ANIMAL_TRAP.get()));
+        registry.addWorkstation(BOTTLING, EmiStack.of(ModBlocks.PRESS.get()));
 
         RecipeManager rm = registry.getRecipeManager();
 
@@ -106,5 +112,10 @@ public class HorsePoweredEmiPlugin implements EmiPlugin {
         rm.getAllRecipesFor(HPRecipes.TRAPPING_TYPE.get()).stream()
                 .map(RecipeHolder::value).sorted(trapOrder)
                 .forEach(r -> registry.addRecipe(new EmiTrappingRecipe(TRAPPING, r)));
+
+        Comparator<BottlingRecipe> bottleOrder = Comparator.comparingInt(BottlingRecipe::getPriority);
+        rm.getAllRecipesFor(HPRecipes.BOTTLING_TYPE.get()).stream()
+                .map(RecipeHolder::value).filter(BottlingRecipe::isValid).sorted(bottleOrder)
+                .forEach(r -> registry.addRecipe(new EmiBottlingRecipe(BOTTLING, r)));
     }
 }
