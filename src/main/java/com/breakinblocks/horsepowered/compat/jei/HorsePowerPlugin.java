@@ -3,6 +3,7 @@ package com.breakinblocks.horsepowered.compat.jei;
 import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.events.HPDatapackSync;
+import com.breakinblocks.horsepowered.recipes.BottlingRecipe;
 import com.breakinblocks.horsepowered.recipes.ChoppingRecipe;
 import com.breakinblocks.horsepowered.recipes.CrushingRecipe;
 import com.breakinblocks.horsepowered.recipes.DryingRackRecipe;
@@ -54,6 +55,9 @@ public class HorsePowerPlugin implements IModPlugin {
     public static final IRecipeType<TrappingRecipe> TRAPPING_TYPE =
             IRecipeType.create(HorsePowerMod.MOD_ID, "trapping", TrappingRecipe.class);
 
+    public static final IRecipeType<BottlingRecipe> BOTTLING_TYPE =
+            IRecipeType.create(HorsePowerMod.MOD_ID, "bottling", BottlingRecipe.class);
+
     @Override
     public Identifier getPluginUid() {
         return UID;
@@ -71,7 +75,8 @@ public class HorsePowerPlugin implements IModPlugin {
                 new HorsePowerPressCategory(guiHelper),
                 new HorsePowerDryingCategory(guiHelper),
                 new HorsePowerCrushingCategory(guiHelper),
-                new HorsePowerTrappingCategory(guiHelper)
+                new HorsePowerTrappingCategory(guiHelper),
+                new HorsePowerBottlingCategory(guiHelper)
         );
     }
 
@@ -111,6 +116,11 @@ public class HorsePowerPlugin implements IModPlugin {
         Comparator<TrappingRecipe> trapOrder = Comparator.comparingInt(TrappingRecipe::getPriority);
         registration.addRecipes(TRAPPING_TYPE, recipeMap.byType(HPRecipes.TRAPPING_TYPE.get())
                 .stream().map(RecipeHolder::value).sorted(trapOrder).toList());
+
+        Comparator<BottlingRecipe> bottleOrder = Comparator.comparingInt(BottlingRecipe::getPriority);
+        registration.addRecipes(BOTTLING_TYPE, recipeMap.byType(HPRecipes.BOTTLING_TYPE.get())
+                .stream().map(RecipeHolder::value).filter(BottlingRecipe::isValid)
+                .sorted(bottleOrder).toList());
     }
 
     @Override
@@ -128,5 +138,7 @@ public class HorsePowerPlugin implements IModPlugin {
         registration.addCraftingStation(CRUSHING_TYPE, new ItemStack(ModBlocks.GRANITE_ANVIL.get()));
 
         registration.addCraftingStation(TRAPPING_TYPE, new ItemStack(ModBlocks.ANIMAL_TRAP.get()));
+
+        registration.addCraftingStation(BOTTLING_TYPE, new ItemStack(ModBlocks.PRESS.get()));
     }
 }

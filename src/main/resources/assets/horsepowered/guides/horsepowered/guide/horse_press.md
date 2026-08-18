@@ -44,6 +44,35 @@ The Horse Press has an internal fluid tank used for both producing and consuming
 - Right-click with a filled bucket to fill, or an empty bucket to drain.
 - Connect a fluid pipe or tank for automated fluid transfer.
 
+## Bottling
+
+Buckets work because the game gives them a fluid-handler capability. Glass bottles have none, so they cannot take fluid out of a tank on their own. The press covers that with a bottling recipe list.
+
+Right-click the press with a bottle (or whatever container a recipe names) and it drains that recipe's fluid from the output tank and hands back the filled item. Right-click with the filled item and the reverse happens: the fluid goes into the input tank and you get the empty container back.
+
+One bottling recipe ships by default: a glass bottle takes 250 mB of water out of the press and becomes a water bottle. Press ice, snow, or dripstone for the water first.
+
+Modpack makers can add more at `data/<namespace>/recipe/bottling/<recipe>.json`:
+
+```json
+{
+  "type": "horsepowered:bottling",
+  "container": "minecraft:glass_bottle",
+  "fluid": { "id": "minecraft:water", "amount": 250 },
+  "result": {
+    "id": "minecraft:potion",
+    "components": { "minecraft:potion_contents": { "potion": "minecraft:water" } }
+  }
+}
+```
+
+* `container`: Ingredient. The empty container the player holds.
+* `fluid`: the fluid and the amount in mB moved per click.
+* `result`: the filled item handed back. Components are respected, so potions and other data-carrying items work.
+* `priority`: optional, sort order in JEI. Lower numbers display first.
+
+This is the way to make a fluid that only exists in bottled form (fruit juices and the like) removable from the press by hand. JEI lists every bottling recipe under a Bottling category.
+
 ## Notes
 
 - The press is two blocks tall.

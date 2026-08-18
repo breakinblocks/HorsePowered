@@ -35,6 +35,7 @@
   "gui.horsepowered.jei.crushing": "Crushing",
   "gui.horsepowered.jei.strikes": "Strikes: %s",
   "gui.horsepowered.jei.trapping": "Trapping",
+  "gui.horsepowered.jei.bottling": "Bottling",
   "gui.horsepowered.jei.trap_time": "Min wait: %s",
   "gui.horsepowered.jei.trap_chance": "5%% Chance/sec",
   "gui.horsepowered.jei.trap_biome": "Biome: %s",

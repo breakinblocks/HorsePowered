@@ -12,22 +12,14 @@ import mezz.jei.api.recipe.types.IRecipeType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import net.minecraft.core.Holder;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.SpawnEggItem;
-
-import java.util.Optional;
 
 public class HorsePowerTrappingCategory extends BaseHPCategory<TrappingRecipe> {
 
     private static final int WIDTH = 160;
-    private static final int HEIGHT = 94;
+    private static final int HEIGHT = 104;
 
     public HorsePowerTrappingCategory(IGuiHelper guiHelper) {
         super(guiHelper, ModBlocks.ANIMAL_TRAP.get(), "trapping");
@@ -51,7 +43,7 @@ public class HorsePowerTrappingCategory extends BaseHPCategory<TrappingRecipe> {
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, TrappingRecipe recipe, IFocusGroup focuses) {
         builder.addSlot(RecipeIngredientRole.CRAFTING_STATION, 72, 1)
-                .addItemStack(new ItemStack(ModBlocks.ANIMAL_TRAP.get()))
+                .add(new ItemStack(ModBlocks.ANIMAL_TRAP.get()))
                 .setBackground(slot, -1, -1);
 
         builder.addSlot(RecipeIngredientRole.INPUT, 20, 22)
@@ -59,15 +51,8 @@ public class HorsePowerTrappingCategory extends BaseHPCategory<TrappingRecipe> {
                 .setBackground(slot, -1, -1);
 
         builder.addSlot(RecipeIngredientRole.OUTPUT, 124, 22)
-                .addItemStack(outputDisplayStack(recipe))
+                .add(recipe.getDisplayIcon())
                 .setBackground(slot, -1, -1);
-    }
-
-    private static ItemStack outputDisplayStack(TrappingRecipe recipe) {
-        EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.getValue(recipe.getEntityId());
-        if (type == null) return new ItemStack(Items.EGG);
-        Optional<Holder<Item>> egg = SpawnEggItem.byId(type);
-        return egg.map(h -> new ItemStack(h.value())).orElse(new ItemStack(Items.EGG));
     }
 
     @Override
@@ -76,6 +61,10 @@ public class HorsePowerTrappingCategory extends BaseHPCategory<TrappingRecipe> {
 
         Font font = Minecraft.getInstance().font;
         int y = 42;
+
+        Component nameText = recipe.getDisplayName();
+        guiGraphics.text(font, nameText, (WIDTH - font.width(nameText)) / 2, y, 0xFF404040, false);
+        y += 12;
 
         int seconds = Math.max(1, recipe.getTime() / 20);
         Component timeText = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.trap_time", seconds + "s");

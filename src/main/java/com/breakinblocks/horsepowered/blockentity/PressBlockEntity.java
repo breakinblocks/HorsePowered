@@ -252,6 +252,34 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
         return fluidHandler;
     }
 
+    /**
+     * Moves the exact amount out of the output tank, or nothing at all.
+     */
+    public boolean drainOutput(FluidStack fluid) {
+        try (Transaction tx = Transaction.openRoot()) {
+            int moved = tanks.extract(DualTankFluidHandler.OUTPUT_INDEX,
+                    FluidResource.of(fluid), fluid.getAmount(), tx);
+            if (moved != fluid.getAmount()) return false;
+            tx.commit();
+        }
+        setChanged();
+        return true;
+    }
+
+    /**
+     * Moves the exact amount into the input tank, or nothing at all.
+     */
+    public boolean fillInput(FluidStack fluid) {
+        try (Transaction tx = Transaction.openRoot()) {
+            int moved = tanks.insert(DualTankFluidHandler.INPUT_INDEX,
+                    FluidResource.of(fluid), fluid.getAmount(), tx);
+            if (moved != fluid.getAmount()) return false;
+            tx.commit();
+        }
+        setChanged();
+        return true;
+    }
+
     public int getCurrentPressStatus() {
         return currentPressStatus;
     }

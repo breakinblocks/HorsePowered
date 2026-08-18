@@ -24,6 +24,11 @@ import net.minecraft.world.item.crafting.CookingBookCategory;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.ItemStackTemplate;
+import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.common.NeoForgeMod;
 
@@ -60,6 +65,17 @@ public class HPRecipeProvider extends RecipeProvider.Runner {
             buildDryingRecipes();
             buildCrushingRecipes();
             buildTrappingRecipes();
+            buildBottlingRecipes();
+        }
+
+        private void buildBottlingRecipes() {
+            BottlingRecipeBuilder.bottling(Ingredient.of(Items.GLASS_BOTTLE))
+                    .fluid(Fluids.WATER, 250)
+                    .result(new ItemStackTemplate(Items.POTION,
+                            DataComponentPatch.builder()
+                                    .set(DataComponents.POTION_CONTENTS, new PotionContents(Potions.WATER))
+                                    .build()))
+                    .save(this.output, "water_bottle");
         }
 
         private static final TagKey<Biome> FISH_HABITAT =

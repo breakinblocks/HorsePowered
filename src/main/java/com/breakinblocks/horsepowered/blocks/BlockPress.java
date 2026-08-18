@@ -3,6 +3,8 @@ package com.breakinblocks.horsepowered.blocks;
 import com.breakinblocks.horsepowered.blockentity.HPBlockEntityHorseBase;
 import com.breakinblocks.horsepowered.blockentity.ModBlockEntities;
 import com.breakinblocks.horsepowered.blockentity.PressBlockEntity;
+import com.breakinblocks.horsepowered.recipes.BottlingRecipe;
+import com.breakinblocks.horsepowered.recipes.HPRecipes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -20,8 +22,13 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.transfer.access.ItemAccess;
 import net.neoforged.neoforge.capabilities.Capabilities;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.transfer.fluid.FluidUtil;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class BlockPress extends BlockHPBase {
 
@@ -42,18 +49,96 @@ public class BlockPress extends BlockHPBase {
 
     @Override
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if (level.getBlockEntity(pos) instanceof PressBlockEntity press
-                && ItemAccess.forPlayerInteraction(player, hand).getCapability(Capabilities.Fluid.ITEM) != null) {
-            if (level.isClientSide()) {
+        if (level.getBlockEntity(pos) instanceof PressBlockEntity press) {
+            if (ItemAccess.forPlayerInteraction(player, hand).getCapability(Capabilities.Fluid.ITEM) != null) {
+                if (level.isClientSide()) {
+                    return InteractionResult.SUCCESS;
+                }
+                if (FluidUtil.interactWithFluidHandler(player, hand, pos, press.getFluidHandler())) {
+                    press.setChanged();
+                    return InteractionResult.SUCCESS;
+                }
+                return InteractionResult.CONSUME;
+            }
+
+            if (level instanceof ServerLevel serverLevel) {
+                BottlingRecipe bottling = findBottlingRecipe(serverLevel, press, stack);
+                if (bottling != null) {
+                    return applyBottling(press, bottling, stack, player, hand)
+                            ? InteractionResult.SUCCESS
+                            : InteractionResult.CONSUME;
+                }
+            } else if (hasAnyBottlingRecipe(level, stack)) {
                 return InteractionResult.SUCCESS;
             }
-            if (FluidUtil.interactWithFluidHandler(player, hand, pos, press.getFluidHandler())) {
-                press.setChanged();
-                return InteractionResult.SUCCESS;
-            }
-            return InteractionResult.CONSUME;
         }
         return super.useItemOn(stack, state, level, pos, player, hand, hit);
+    }
+
+    private static boolean hasAnyBottlingRecipe(Level level, ItemStack stack) {
+        if (stack.isEmpty()) return false;
+        return ((RecipeManager) level.recipeAccess()).recipeMap().byType(HPRecipes.BOTTLING_TYPE.get())
+                .stream()
+                .map(holder -> holder.value())
+                .filter(BottlingRecipe::isValid)
+                .anyMatch(recipe -> recipe.matchesResult(stack) || recipe.matchesContainer(stack));
+    }
+
+    @Nullable
+    private static BottlingRecipe findBottlingRecipe(ServerLevel level, PressBlockEntity press, ItemStack stack) {
+        if (stack.isEmpty()) return null;
+        List<BottlingRecipe> recipes = ((RecipeManager) level.recipeAccess())
+                .recipeMap().byType(HPRecipes.BOTTLING_TYPE.get())
+                .stream()
+                .map(holder -> holder.value())
+                .filter(BottlingRecipe::isValid)
+                .toList();
+
+        for (BottlingRecipe recipe : recipes) {
+            if (recipe.matchesResult(stack) && canEmpty(press, recipe.getFluid())) {
+                return recipe;
+            }
+        }
+        for (BottlingRecipe recipe : recipes) {
+            if (recipe.matchesContainer(stack) && canFill(press, recipe.getFluid())) {
+                return recipe;
+            }
+        }
+        return null;
+    }
+
+    private static boolean canFill(PressBlockEntity press, FluidStack fluid) {
+        FluidStack held = press.getOutputFluid();
+        return FluidStack.isSameFluidSameComponents(held, fluid) && held.getAmount() >= fluid.getAmount();
+    }
+
+    private static boolean canEmpty(PressBlockEntity press, FluidStack fluid) {
+        FluidStack held = press.getInputFluid();
+        if (!held.isEmpty() && !FluidStack.isSameFluidSameComponents(held, fluid)) return false;
+        return press.getTankCapacity() - held.getAmount() >= fluid.getAmount();
+    }
+
+    private static boolean applyBottling(PressBlockEntity press, BottlingRecipe recipe, ItemStack stack,
+                                         Player player, InteractionHand hand) {
+        boolean emptying = recipe.matchesResult(stack);
+        ItemStack given;
+        if (emptying) {
+            if (!press.fillInput(recipe.getFluid())) return false;
+            given = recipe.getEmptyContainer();
+        } else {
+            if (!press.drainOutput(recipe.getFluid())) return false;
+            given = recipe.createResult();
+        }
+
+        if (player.getAbilities().instabuild) return true;
+
+        stack.shrink(1);
+        if (stack.isEmpty()) {
+            player.setItemInHand(hand, given);
+        } else if (!player.getInventory().add(given)) {
+            player.drop(given, false);
+        }
+        return true;
     }
 
     @Nullable

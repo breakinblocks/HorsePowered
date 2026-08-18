@@ -72,4 +72,4 @@ Jade displays in red as `Wrong biome` or `Needs water` when bait is loaded but t
 * The captured animal renders inside the cage like a vanilla mob spawner mob, spinning slowly. The same renderer is used for the bait item before capture.
 * Mining preserves the captured entity
 * Jade shows live progress, the captured animal's name, and a countdown until the next drop. It also lists the contents of the trap's inventory.
-* JEI and EMI both have a Trapping category showing every registered recipe along with its bait, time, conditions, and the expected animal (rendered as the matching spawn egg).
+* JEI has a Trapping category showing every registered recipe along with its bait, time, conditions, and the expected animal, named in text and rendered as the matching spawn egg. Recipes can override both with the optional `title` and `icon` fields, which is useful in packs that hide spawn eggs from the item list.

@@ -239,8 +239,8 @@ public class AnimalTrapBlockEntity extends HPBlockEntityBase {
 
     private void capture(TrappingRecipe recipe) {
         if (!(level instanceof ServerLevel sl)) return;
+        if (!BuiltInRegistries.ENTITY_TYPE.containsKey(recipe.getEntityId())) return;
         EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.getValue(recipe.getEntityId());
-        if (type == null) return;
         Entity proto = type.create(sl, EntitySpawnReason.LOAD);
         if (proto == null) return;
 
@@ -438,7 +438,9 @@ public class AnimalTrapBlockEntity extends HPBlockEntityBase {
             if (!idStr.isEmpty()) {
                 Identifier id = Identifier.tryParse(idStr);
                 capturedEntityTypeId = id;
-                capturedEntityType = id == null ? null : BuiltInRegistries.ENTITY_TYPE.getValue(id);
+                capturedEntityType = id != null && BuiltInRegistries.ENTITY_TYPE.containsKey(id)
+                        ? BuiltInRegistries.ENTITY_TYPE.getValue(id)
+                        : null;
             }
         } else {
             capturedEntityTag = null;

@@ -1,0 +1,16 @@
+{
+  "type": "horsepowered:bottling",
+  "container": "minecraft:glass_bottle",
+  "fluid": {
+    "amount": 250,
+    "id": "minecraft:water"
+  },
+  "result": {
+    "components": {
+      "minecraft:potion_contents": {
+        "potion": "minecraft:water"
+      }
+    },
+    "id": "minecraft:potion"
+  }
+}
