@@ -128,11 +128,11 @@ public class HPRecipeProvider extends RecipeProvider {
 
         ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ModBlocks.PRESS.get())
                 .pattern("PPP")
-                .pattern("PSP")
+                .pattern("PIP")
                 .pattern("PPP")
                 .define('P', ItemTags.PLANKS)
-                .define('S', Items.SMOOTH_STONE)
-                .unlockedBy("has_planks", has(ItemTags.PLANKS))
+                .define('I', Items.PISTON)
+                .unlockedBy("has_piston", has(Items.PISTON))
                 .save(output, HorsePowerMod.id("crafting/press"));
 
         ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, ModBlocks.GENERATOR.get())

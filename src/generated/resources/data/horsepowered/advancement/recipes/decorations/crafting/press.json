@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_planks": {
+    "has_piston": {
       "conditions": {
         "items": [
           {
-            "items": "#minecraft:planks"
+            "items": "minecraft:piston"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_planks"
+      "has_piston"
     ]
   ],
   "rewards": {

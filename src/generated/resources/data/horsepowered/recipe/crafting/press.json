@@ -2,16 +2,16 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
+    "I": {
+      "item": "minecraft:piston"
+    },
     "P": {
       "tag": "minecraft:planks"
-    },
-    "S": {
-      "item": "minecraft:smooth_stone"
     }
   },
   "pattern": [
     "PPP",
-    "PSP",
+    "PIP",
     "PPP"
   ],
   "result": {
