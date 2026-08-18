@@ -97,6 +97,8 @@ Modpack makers can add their own trap recipes at `data/<namespace>/recipe/trappi
 * `waterlogged`: optional boolean. When true the trap must be waterlogged for the dice roll to count.
 * `baitConsumed`: optional boolean (default `false`). When `true` the trap requires bait to generate each drop after capture; the drop timer pauses on an empty bait slot.
 * `baitConsumeChance`: optional percent `0.01`-`100.00` (default `100.0`). Only applies when `baitConsumed` is `true`. Rolled each time drops are generated; on success one bait is consumed.
+* `title`: optional string naming the catch in the JEI and EMI recipe panels. Accepts a translation key or a plain string. When omitted the entity's own name is used, so the panel always identifies the animal even if its spawn egg is hidden.
+* `icon`: optional item ID for the recipe panel's output slot. Useful for mobs that have no spawn egg at all. When omitted the trap uses the entity's registered spawn egg, then an item named `<namespace>:<entity_path>_spawn_egg`, then a plain egg.
 
 Example for capturing a sniffer with a torchflower seed in a flower forest:
 
@@ -117,4 +119,4 @@ The recipe's drops still come from the captured entity's loot table, so you do n
 * The captured animal renders inside the cage like a vanilla mob spawner mob, spinning slowly. The same renderer is used for the bait item before capture.
 * Mining preserves the captured entity through `DataComponents.BLOCK_ENTITY_DATA`, the same component vanilla containers use for inventory persistence.
 * Jade shows live progress, the captured animal's name, and a countdown until the next drop. It also lists the contents of the trap's inventory.
-* JEI and EMI both have a Trapping category showing every registered recipe along with its bait, time, conditions, and the expected animal (rendered as the matching spawn egg).
+* JEI and EMI both have a Trapping category showing every registered recipe along with its bait, time, conditions, and the expected animal (named in text and rendered as the matching spawn egg, or whatever the recipe's `icon` field points at).

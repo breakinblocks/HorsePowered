@@ -6,14 +6,9 @@ import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.biome.Biome;
 
 import java.util.Optional;
@@ -25,6 +20,7 @@ public class EmiTrappingRecipe extends BasicEmiRecipe {
     private final boolean waterlogged;
     private final boolean baitConsumed;
     private final double baitConsumeChance;
+    private final Component displayName;
 
     public EmiTrappingRecipe(EmiRecipeCategory category, TrappingRecipe recipe) {
         super(category, recipe.getId(), 160, heightFor(recipe));
@@ -33,22 +29,18 @@ public class EmiTrappingRecipe extends BasicEmiRecipe {
         this.waterlogged = recipe.isWaterlogged();
         this.baitConsumed = recipe.isBaitConsumed();
         this.baitConsumeChance = recipe.getBaitConsumeChance();
+        this.displayName = recipe.getDisplayName();
         this.inputs.add(EmiIngredient.of(recipe.getBait()));
-        this.outputs.add(EmiStack.of(outputDisplayStack(recipe)));
+        this.outputs.add(EmiStack.of(recipe.getDisplayIcon()));
     }
 
     private static int heightFor(TrappingRecipe recipe) {
-        int lines = 3;
+        int lines = 4;
         if (recipe.getBiome().isPresent()) lines++;
         if (recipe.isWaterlogged()) lines++;
         return 26 + lines * 10;
     }
 
-    private static ItemStack outputDisplayStack(TrappingRecipe recipe) {
-        EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.get(recipe.getEntityId());
-        SpawnEggItem egg = type == null ? null : SpawnEggItem.byId(type);
-        return egg != null ? new ItemStack(egg) : new ItemStack(Items.EGG);
-    }
 
     @Override
     public void addWidgets(WidgetHolder widgets) {
@@ -58,6 +50,8 @@ public class EmiTrappingRecipe extends BasicEmiRecipe {
 
         int seconds = Math.max(1, time / 20);
         int y = 26;
+        widgets.addText(displayName, 0, y, 0x404040, false);
+        y += 10;
         widgets.addText(
                 Component.translatable("gui.horsepowered.jei.trap_time", seconds + "s"),
                 0, y, 0x808080, false);

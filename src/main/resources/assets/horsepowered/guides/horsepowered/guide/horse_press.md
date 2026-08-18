@@ -43,7 +43,33 @@ The Horse Press is a horse-powered machine that can press items to extract fluid
 The Horse Press can produce fluids from certain recipes:
 - Fluids are stored in an internal tank
 - Connect a fluid pipe or tank to extract fluids
-- Place a bucket and right-click to manually extract fluids
+- Hold a bucket and right-click to manually extract fluids
+
+## Bottling
+
+Buckets work because the game gives them a fluid-handler capability. Glass bottles have none, so they cannot take fluid out of a tank on their own. The press covers that with a bottling recipe list.
+
+Right-click the press with a bottle (or whatever container a recipe names) and it drains that recipe's fluid from the output tank and hands back the filled item. Right-click with the filled item and the reverse happens: the fluid goes into the input tank and you get the empty container back.
+
+One bottling recipe ships by default: a glass bottle takes 250 mB of water out of the press and becomes a water bottle. Press ice, snow, or dripstone for the water first.
+
+Modpack makers can add more at `data/<namespace>/recipes/bottling/<recipe>.json`:
+
+```json
+{
+  "type": "horsepowered:bottling",
+  "container": { "item": "minecraft:glass_bottle" },
+  "fluid": { "id": "minecraft:water", "amount": 250 },
+  "result": { "item": "minecraft:potion", "count": 1, "nbt": { "Potion": "minecraft:water" } }
+}
+```
+
+* `container`: Ingredient. The empty container the player holds.
+* `fluid`: the fluid and the amount in mB moved per click.
+* `result`: the filled item handed back. NBT is respected, so potions and other data-carrying items work.
+* `priority`: optional, sort order in JEI and EMI. Lower numbers display first.
+
+This is the way to make a fluid that only exists in bottled form (fruit juices and the like) removable from the press by hand. JEI and EMI both list every bottling recipe under a Bottling category.
 
 ## Notes
 

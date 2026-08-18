@@ -19,7 +19,7 @@ A Minecraft Forge mod that adds horse-powered machinery for grinding, chopping, 
 
 - **Horse Grindstone** - An automated grindstone powered by a horse walking in circles. Continuously grinds items without manual intervention.
 - **Horse Chopper** - An automated chopping machine. Attach a horse to chop logs into planks automatically.
-- **Horse Press** - Press items to extract fluids or produce other outputs. Perfect for making oils, juices, and other liquids.
+- **Horse Press** - Press items to extract fluids or produce other outputs. Perfect for making oils, juices, and other liquids. Fluids come out by bucket, by pipe, or by bottle where a bottling recipe covers them.
 - **Horse Powered Generator** - Converts horse labor directly into Forge Energy. Generates 80 FE/tick while a worker walks, buffers 100,000 FE, and pushes power to any adjacent FE consumer. Requires a redstone signal to run (toggle with a lever inside the working ring).
 
 ### Passive Machines
@@ -72,7 +72,8 @@ Horse Powered uses data-driven JSON recipes that can be added or modified via da
 - `horsepowered:chopping` - Chopping block recipes
 - `horsepowered:pressing` - Press recipes (supports item and fluid outputs)
 - `horsepowered:drying` - Drying rack recipes (1 input -> 1 output over time)
-- `horsepowered:trapping` - Animal trap recipes (bait + entity, with optional biome/waterlog gates and per-recipe bait consumption)
+- `horsepowered:trapping` - Animal trap recipes (bait + entity, with optional biome/waterlog gates, per-recipe bait consumption, and an overridable display name and icon)
+- `horsepowered:bottling` - Press bottle-filling recipes (fluid to item, and the reverse)
 
 Example grinding recipe (`data/yourpack/recipes/grinding/custom_recipe.json`):
 ```json
@@ -98,7 +99,9 @@ Example trapping recipe (`data/yourpack/recipes/trapping/custom_recipe.json`):
   "biome": "#horsepowered:fish_habitat",
   "waterlogged": true,
   "baitConsumed": true,
-  "baitConsumeChance": 10.0
+  "baitConsumeChance": 10.0,
+  "title": "River Salmon",
+  "icon": "minecraft:salmon_bucket"
 }
 ```
 - `bait` - Ingredient. The item that triggers the recipe.
@@ -109,8 +112,29 @@ Example trapping recipe (`data/yourpack/recipes/trapping/custom_recipe.json`):
 - `waterlogged` - Optional boolean; when `true` the trap must be waterlogged before the dice roll counts.
 - `baitConsumed` - Optional boolean (default `false`). When `true` the trap requires bait to generate each drop cycle after capture. When the bait slot is empty the drop timer pauses until matching bait is supplied. Hoppers may continue feeding bait into a captured trap.
 - `baitConsumeChance` - Optional percent (`0.01`-`100.00`, default `100.0`). Only applies when `baitConsumed` is `true`. Rolled each time drops are generated; on success one bait is consumed. All built-in trapping recipes ship with `baitConsumed: true` and `baitConsumeChance: 10.0`.
+- `title` - Optional string naming the catch in the JEI and EMI recipe panels. Accepts a translation key (resolved against the active language) or a plain string (shown as-is). When omitted the entity's own name is used, so the panel identifies the animal even in packs that hide spawn eggs.
+- `icon` - Optional item ID shown in the recipe panel's output slot. Use it for mobs that have no spawn egg, or whose mod registers one the game cannot resolve. When omitted the icon is resolved in order: the entity's registered spawn egg, then an item named `<namespace>:<entity_path>_spawn_egg`, then `minecraft:egg` as a last resort.
 
 The trap's drops come from the captured entity's vanilla loot table, so no drop list is declared on the trap recipe itself.
+
+Example bottling recipe (`data/yourpack/recipes/bottling/custom_recipe.json`):
+```json
+{
+  "type": "horsepowered:bottling",
+  "container": { "item": "minecraft:glass_bottle" },
+  "fluid": { "id": "minecraft:water", "amount": 250 },
+  "result": { "item": "minecraft:potion", "count": 1, "nbt": { "Potion": "minecraft:water" } },
+  "priority": 0
+}
+```
+- `container` - Ingredient. The empty container the player holds. Usually a glass bottle, but any item works.
+- `fluid` - The fluid and amount in mB moved per click.
+- `result` - The filled item handed back. NBT is respected, so potions, juices, and other data-carrying items all work.
+- `priority` - Optional integer; lower values display first in JEI/EMI (default `0`).
+
+Right-clicking the Press with the `container` item drains `fluid` from the output tank and gives the `result`. Right-clicking with the `result` item does the reverse: it fills the input tank and returns the empty `container`. Both directions only fire when the tank has room or holds enough of the matching fluid.
+
+This exists because glass bottles carry no fluid-handler capability in Forge, so bottles cannot interact with a tank the way buckets do. Mods whose fluids only have a bottled form (juices, for example) should ship a bottling recipe so their fluid can be taken out of the Press by hand. One recipe ships by default: a glass bottle takes 250 mB of water out of the press and becomes a water bottle.
 
 #### Optional Recipe Fields
 
