@@ -133,7 +133,9 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 // Mod publishing to CurseForge and Modrinth (GitHub releases handled by CI)
+// Pass -PdryRun=true to test publishing without actually uploading.
 publishMods {
+    dryRun = project.hasProperty("dryRun") && project.property("dryRun") == "true"
     file = jar.archiveFile
     def changelogFile = file("metadata/changelogs/${mod_version}.md")
     changelog = changelogFile.exists() ? changelogFile.text : "Release ${version}"
@@ -161,7 +163,8 @@ publishMods {
 // Include Maven publish when running publishMods
 tasks.named('publishMods') {
     def mavenUser = providers.environmentVariable("MAVEN_USER")
-    if (mavenUser.isPresent()) {
+    def isDryRun = project.hasProperty("dryRun") && project.property("dryRun") == "true"
+    if (mavenUser.isPresent() && !isDryRun) {
         dependsOn 'publishMavenJavaPublicationToBreakInBlocksRepository'
     }
 }
