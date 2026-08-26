@@ -132,15 +132,23 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
             ItemStack inputSlot = te.getItem(0);
 
             if (inputSlot.isEmpty()) {
-                te.setItem(0, stack.copy());
-                stack.setCount(stack.getCount() - te.getMaxStackSize(stack));
+                if (!level.isClientSide) {
+                    int inserted = Math.min(stack.getCount(), te.getMaxStackSize(stack));
+                    ItemStack placed = stack.copy();
+                    placed.setCount(inserted);
+                    te.setItem(0, placed);
+                    stack.shrink(inserted);
+                }
                 return InteractionResult.sidedSuccess(level.isClientSide);
             } else if (HPBlockEntityBase.canCombine(inputSlot, stack)) {
                 int maxTransfer = Math.min(te.getMaxStackSize(stack), stack.getMaxStackSize()) - inputSlot.getCount();
                 int transferAmount = Math.min(stack.getCount(), maxTransfer);
                 if (transferAmount > 0) {
-                    stack.shrink(transferAmount);
-                    inputSlot.grow(transferAmount);
+                    if (!level.isClientSide) {
+                        stack.shrink(transferAmount);
+                        inputSlot.grow(transferAmount);
+                        te.setChanged();
+                    }
                     return InteractionResult.sidedSuccess(level.isClientSide);
                 }
             }
@@ -150,6 +158,23 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
         int slot = getSlot(state, (float) hit.getLocation().x - pos.getX(),
                 (float) hit.getLocation().y - pos.getY(),
                 (float) hit.getLocation().z - pos.getZ());
+
+        // The client mirrors the outcome without touching anything; the server is authoritative.
+        if (level.isClientSide) {
+            boolean extracts;
+            if (slot > -1) {
+                extracts = !te.getItem(slot).isEmpty();
+            } else if (slot > -2) {
+                extracts = !te.getItem(1).isEmpty() || !te.getItem(2).isEmpty()
+                        || (stack.isEmpty() && hand != InteractionHand.OFF_HAND && !te.getItem(0).isEmpty());
+            } else {
+                extracts = false;
+            }
+            if (!extracts && !stack.isEmpty()) {
+                return InteractionResult.PASS;
+            }
+            return InteractionResult.sidedSuccess(true);
+        }
 
         ItemStack result = ItemStack.EMPTY;
         if (slot > -1) {
