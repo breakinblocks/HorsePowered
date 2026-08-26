@@ -11,6 +11,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -113,16 +114,21 @@ public final class RenderUtils {
         poseStack.mulPose(Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation());
 
         // Scale down for text
-        poseStack.scale(0.02F, -0.02F, 0.02F);
+        poseStack.scale(0.025F, -0.025F, 0.025F);
 
-        String text = String.valueOf(count);
+        Component text = Component.literal(Integer.toString(count));
         float textX = -font.width(text) / 2.0F;
 
         Matrix4f matrix = poseStack.last().pose();
 
-        // Draw text with background for visibility
-        font.drawInBatch(text, textX, 0, 0xFFFFFF, true, matrix, bufferSource,
-                Font.DisplayMode.NORMAL, 0x40000000, packedLight);
+        // Matches how vanilla draws name tags: a translucent see-through pass carrying the
+        // background, then an opaque pass in front, with the background alpha taken from the
+        // Text Background accessibility option instead of a fixed value.
+        int background = (int) (Minecraft.getInstance().options.getBackgroundOpacity(0.25F) * 255.0F) << 24;
+        font.drawInBatch(text, textX, 0, 553648127, false, matrix, bufferSource,
+                Font.DisplayMode.SEE_THROUGH, background, packedLight);
+        font.drawInBatch(text, textX, 0, -1, false, matrix, bufferSource,
+                Font.DisplayMode.NORMAL, 0, packedLight);
 
         poseStack.popPose();
     }

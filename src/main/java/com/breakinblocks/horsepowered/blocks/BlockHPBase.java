@@ -124,15 +124,21 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
             ItemStack inputSlot = te.getItem(0);
 
             if (inputSlot.isEmpty()) {
-                te.setItem(0, stack.copy());
-                stack.setCount(stack.getCount() - te.getMaxStackSize(stack));
+                if (!level.isClientSide) {
+                    int inserted = Math.min(stack.getCount(), te.getMaxStackSize(stack));
+                    te.setItem(0, stack.copyWithCount(inserted));
+                    stack.shrink(inserted);
+                }
                 return ItemInteractionResult.sidedSuccess(level.isClientSide);
             } else if (HPBlockEntityBase.canCombine(inputSlot, stack)) {
                 int maxTransfer = Math.min(te.getMaxStackSize(stack), stack.getMaxStackSize()) - inputSlot.getCount();
                 int transferAmount = Math.min(stack.getCount(), maxTransfer);
                 if (transferAmount > 0) {
-                    stack.shrink(transferAmount);
-                    inputSlot.grow(transferAmount);
+                    if (!level.isClientSide) {
+                        stack.shrink(transferAmount);
+                        inputSlot.grow(transferAmount);
+                        te.setChanged();
+                    }
                     return ItemInteractionResult.sidedSuccess(level.isClientSide);
                 }
             }
@@ -157,6 +163,10 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
                 horseTE.showWorkingAreaHighlight();
             }
             return InteractionResult.sidedSuccess(level.isClientSide);
+        }
+
+        if (level.isClientSide) {
+            return InteractionResult.sidedSuccess(true);
         }
 
         // Handle extracting items

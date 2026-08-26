@@ -29,8 +29,14 @@ public class ModFluids {
                     .density(920)       // Lighter than water
                     .viscosity(3000)    // 3x more viscous than water
                     .temperature(300)
+                    .fallDistanceModifier(0F)
+                    .canExtinguish(false)
+                    .canConvertToSource(false)
+                    .canHydrate(false)
+                    .supportsBoating(true)
                     .sound(SoundActions.BUCKET_FILL, SoundEvents.BUCKET_FILL)
                     .sound(SoundActions.BUCKET_EMPTY, SoundEvents.BUCKET_EMPTY)
+                    .sound(SoundActions.FLUID_VAPORIZE, SoundEvents.FIRE_EXTINGUISH)
             ));
 
     public static final DeferredHolder<Fluid, FlowingFluid> SEED_OIL_SOURCE = FLUIDS.register("seed_oil",
