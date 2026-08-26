@@ -111,9 +111,6 @@ public class HandGrindstoneBlockEntity extends HPBlockEntityBase {
     @Override
     public boolean isItemValidForSlot(int index, ItemStack stack) {
         if (index != 0) return false;
-        // Recipe lookup is server-only; on the client, allow insertion so the
-        // interaction isn't blocked (server will do the authoritative check)
-        if (level != null && level.isClientSide()) return true;
         return findRecipe(HPRecipes.GRINDING_TYPE.get(), stack, r -> r.getTier().allowsHand()).isPresent();
     }
 

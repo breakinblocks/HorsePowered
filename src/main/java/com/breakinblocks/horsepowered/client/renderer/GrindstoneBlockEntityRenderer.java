@@ -33,6 +33,12 @@ public class GrindstoneBlockEntityRenderer implements BlockEntityRenderer<Grinds
         RenderUtils.extractItemState(state.inputItem, blockEntity.getItem(0), blockEntity.getLevel());
         RenderUtils.extractItemState(state.outputItem, blockEntity.getItem(1), blockEntity.getLevel());
         RenderUtils.extractItemState(state.secondaryItem, blockEntity.getItem(2), blockEntity.getLevel());
+
+        state.showCounts = RenderUtils.shouldShowItemCounts(blockEntity.getBlockPos());
+        state.distanceToCameraSq = RenderUtils.distanceToCameraSq(blockEntity.getBlockPos(), cameraPos);
+        state.inputCount = blockEntity.getItem(0).getCount();
+        state.outputCount = blockEntity.getItem(1).getCount();
+        state.secondaryCount = blockEntity.getItem(2).getCount();
     }
 
     @Override
@@ -42,6 +48,15 @@ public class GrindstoneBlockEntityRenderer implements BlockEntityRenderer<Grinds
         RenderUtils.renderFlatItem(state.inputItem, poseStack, collector, state.lightCoords, 0.5D, 0.55D, 0.5D, 0.4F);
         RenderUtils.renderFlatItem(state.outputItem, poseStack, collector, state.lightCoords, 0.5D, 0.2D, 0.18D, 0.3F);
         RenderUtils.renderFlatItem(state.secondaryItem, poseStack, collector, state.lightCoords, 0.5D, 0.2D, 0.82D, 0.3F);
+
+        if (state.showCounts) {
+            RenderUtils.submitItemCount(state.inputCount, poseStack, collector, state.lightCoords,
+                    state.distanceToCameraSq, camera, 0.5D, 0.95D, 0.5D);
+            RenderUtils.submitItemCount(state.outputCount, poseStack, collector, state.lightCoords,
+                    state.distanceToCameraSq, camera, 0.5D, 0.5D, 0.18D);
+            RenderUtils.submitItemCount(state.secondaryCount, poseStack, collector, state.lightCoords,
+                    state.distanceToCameraSq, camera, 0.5D, 0.5D, 0.82D);
+        }
     }
 
     @Override
@@ -60,5 +75,8 @@ public class GrindstoneBlockEntityRenderer implements BlockEntityRenderer<Grinds
         public final ItemStackRenderState inputItem = new ItemStackRenderState();
         public final ItemStackRenderState outputItem = new ItemStackRenderState();
         public final ItemStackRenderState secondaryItem = new ItemStackRenderState();
+        public int inputCount;
+        public int outputCount;
+        public int secondaryCount;
     }
 }

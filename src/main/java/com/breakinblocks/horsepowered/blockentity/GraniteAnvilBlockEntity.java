@@ -53,7 +53,6 @@ public class GraniteAnvilBlockEntity extends HPBlockEntityBase {
             if (!ItemStack.isSameItemSameComponents(inputSlot, stack)) return false;
             if (inputSlot.getCount() >= getInventoryStackLimit()) return false;
         }
-        if (level != null && level.isClientSide()) return true;
         return findRecipe(HPRecipes.CRUSHING_TYPE.get(), stack).isPresent();
     }
 

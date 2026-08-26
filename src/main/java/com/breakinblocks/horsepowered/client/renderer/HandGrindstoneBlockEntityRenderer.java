@@ -44,6 +44,12 @@ public class HandGrindstoneBlockEntityRenderer implements BlockEntityRenderer<Ha
         RenderUtils.extractItemState(state.inputSideItem, blockEntity.getItem(0), blockEntity.getLevel());
         RenderUtils.extractItemState(state.outputItem, blockEntity.getItem(1), blockEntity.getLevel());
         RenderUtils.extractItemState(state.secondaryItem, blockEntity.getItem(2), blockEntity.getLevel());
+
+        state.showCounts = RenderUtils.shouldShowItemCounts(blockEntity.getBlockPos());
+        state.distanceToCameraSq = RenderUtils.distanceToCameraSq(blockEntity.getBlockPos(), cameraPos);
+        state.inputCount = blockEntity.getItem(0).getCount();
+        state.outputCount = blockEntity.getItem(1).getCount();
+        state.secondaryCount = blockEntity.getItem(2).getCount();
     }
 
     @Override
@@ -53,6 +59,21 @@ public class HandGrindstoneBlockEntityRenderer implements BlockEntityRenderer<Ha
         submitSide(state.inputSideItem, state.inputSide, poseStack, collector, state.lightCoords);
         submitSide(state.outputItem, state.outputSide, poseStack, collector, state.lightCoords);
         submitSide(state.secondaryItem, state.secondarySide, poseStack, collector, state.lightCoords);
+
+        if (state.showCounts) {
+            RenderUtils.submitItemCount(state.inputCount, poseStack, collector, state.lightCoords,
+                    state.distanceToCameraSq, camera, 0.5D, 1.2D, 0.5D);
+            submitSideCount(state.outputCount, state.outputSide, poseStack, collector, state, camera);
+            submitSideCount(state.secondaryCount, state.secondarySide, poseStack, collector, state, camera);
+        }
+    }
+
+    private void submitSideCount(int count, Direction side, PoseStack poseStack, SubmitNodeCollector collector,
+                                 HandGrindstoneRenderState state, CameraRenderState camera) {
+        double x = 0.5 + side.getStepX() * 0.25;
+        double z = 0.5 + side.getStepZ() * 0.25;
+        RenderUtils.submitItemCount(count, poseStack, collector, state.lightCoords,
+                state.distanceToCameraSq, camera, x, SIDE_Y + 0.3D, z);
     }
 
     private void submitSide(ItemStackRenderState item, Direction side, PoseStack poseStack, SubmitNodeCollector collector, int light) {
@@ -70,5 +91,10 @@ public class HandGrindstoneBlockEntityRenderer implements BlockEntityRenderer<Ha
         public final ItemStackRenderState inputSideItem = new ItemStackRenderState();
         public final ItemStackRenderState outputItem = new ItemStackRenderState();
         public final ItemStackRenderState secondaryItem = new ItemStackRenderState();
+        public boolean showCounts;
+        public double distanceToCameraSq;
+        public int inputCount;
+        public int outputCount;
+        public int secondaryCount;
     }
 }

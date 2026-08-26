@@ -25,7 +25,8 @@ public class HPDatapackSync {
                 HPRecipes.PRESSING_TYPE.get(),
                 HPRecipes.DRYING_TYPE.get(),
                 HPRecipes.CRUSHING_TYPE.get(),
-                HPRecipes.TRAPPING_TYPE.get());
+                HPRecipes.TRAPPING_TYPE.get(),
+                HPRecipes.BOTTLING_TYPE.get());
     }
 
     @SubscribeEvent

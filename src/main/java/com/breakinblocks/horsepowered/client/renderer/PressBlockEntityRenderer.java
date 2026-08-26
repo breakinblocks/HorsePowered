@@ -42,6 +42,11 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
         // Extract item states for rendering
         RenderUtils.extractItemState(state.inputItem, blockEntity.getItem(0), blockEntity.getLevel());
         RenderUtils.extractItemState(state.outputItem, blockEntity.getItem(1), blockEntity.getLevel());
+
+        state.showCounts = RenderUtils.shouldShowItemCounts(blockEntity.getBlockPos());
+        state.distanceToCameraSq = RenderUtils.distanceToCameraSq(blockEntity.getBlockPos(), cameraPos);
+        state.inputCount = blockEntity.getItem(0).getCount();
+        state.outputCount = blockEntity.getItem(1).getCount();
     }
 
     @Override
@@ -57,6 +62,13 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
         // Render input fluid in the left half of the tank, output fluid in the right half.
         FluidRenderer.renderFluidHalf(poseStack, collector, state.inputFluid, state.tankCapacity, state.lightCoords, true);
         FluidRenderer.renderFluidHalf(poseStack, collector, state.outputFluid, state.tankCapacity, state.lightCoords, false);
+
+        if (state.showCounts) {
+            RenderUtils.submitItemCount(state.inputCount, poseStack, collector, state.lightCoords,
+                    state.distanceToCameraSq, camera, 0.35D, 1.25D, 0.5D);
+            RenderUtils.submitItemCount(state.outputCount, poseStack, collector, state.lightCoords,
+                    state.distanceToCameraSq, camera, 0.7D, 1.25D, 0.5D);
+        }
     }
 
     @Override
@@ -78,5 +90,7 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
         public int tankCapacity;
         public final ItemStackRenderState inputItem = new ItemStackRenderState();
         public final ItemStackRenderState outputItem = new ItemStackRenderState();
+        public int inputCount;
+        public int outputCount;
     }
 }

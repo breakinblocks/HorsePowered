@@ -8,6 +8,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.RecipeMap;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -226,10 +227,10 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
     public boolean isItemValidForSlot(int index, ItemStack stack) {
         if (index != 0) return false;
         if (currentPressStatus != 0) return false;
-        if (!(level instanceof ServerLevel serverLevel)) return level != null && level.isClientSide();
 
-        return ((RecipeManager) serverLevel.recipeAccess())
-                .recipeMap().byType(HPRecipes.PRESSING_TYPE.get())
+        RecipeMap recipes = recipeMap();
+        if (recipes == null) return false;
+        return recipes.byType(HPRecipes.PRESSING_TYPE.get())
                 .stream()
                 .anyMatch(recipe -> recipe.value().getIngredient().test(stack));
     }

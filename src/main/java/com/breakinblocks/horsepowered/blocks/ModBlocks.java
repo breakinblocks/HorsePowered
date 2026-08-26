@@ -91,7 +91,8 @@ public class ModBlocks {
                     .strength(100.0F)
                     .pushReaction(PushReaction.DESTROY)
                     .noLootTable()
-                    .liquid(),
+                    .liquid()
+                    .sound(SoundType.EMPTY),
                     300, 300));
 
     public static final DeferredBlock<Block> FILLER = BLOCKS.register("filler",

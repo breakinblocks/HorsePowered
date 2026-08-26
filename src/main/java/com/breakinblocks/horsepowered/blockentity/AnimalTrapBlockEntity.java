@@ -87,7 +87,6 @@ public class AnimalTrapBlockEntity extends HPBlockEntityBase {
     public boolean isItemValidForSlot(int index, ItemStack stack) {
         if (index != BAIT_SLOT) return false;
         if (!getItem(BAIT_SLOT).isEmpty()) return false;
-        if (level != null && level.isClientSide()) return true;
         if (capturedEntityTag != null) {
             Optional<RecipeHolder<TrappingRecipe>> recipe = findFeedingRecipe(stack);
             return recipe.isPresent() && recipe.get().value().isBaitConsumed();

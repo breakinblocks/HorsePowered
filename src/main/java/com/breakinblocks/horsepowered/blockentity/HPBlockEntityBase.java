@@ -1,5 +1,6 @@
 package com.breakinblocks.horsepowered.blockentity;
 
+import com.breakinblocks.horsepowered.events.HPDatapackSync;
 import com.breakinblocks.horsepowered.recipes.HPRecipeInput;
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;
@@ -19,6 +20,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.RecipeMap;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -298,10 +300,10 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
      * Centralizes the common recipe lookup pattern used across all block entities.
      */
     protected <T extends Recipe<HPRecipeInput>> Optional<RecipeHolder<T>> findRecipe(RecipeType<T> type, ItemStack input) {
-        if (!(level instanceof ServerLevel serverLevel)) return Optional.empty();
+        RecipeMap recipes = recipeMap();
+        if (recipes == null) return Optional.empty();
         try {
-            return ((RecipeManager) serverLevel.recipeAccess())
-                    .getRecipeFor(type, new HPRecipeInput(input), serverLevel);
+            return recipes.<HPRecipeInput, T>getRecipesFor(type, new HPRecipeInput(input), level).findFirst();
         } catch (Exception e) {
             LOGGER.error("[HorsePowered] Recipe lookup failed for type {} with input {}", type, input, e);
             return Optional.empty();
@@ -309,11 +311,11 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
     }
 
     protected <T extends Recipe<HPRecipeInput>> Optional<RecipeHolder<T>> findRecipe(RecipeType<T> type, ItemStack input, Predicate<T> filter) {
-        if (!(level instanceof ServerLevel serverLevel)) return Optional.empty();
+        RecipeMap recipes = recipeMap();
+        if (recipes == null) return Optional.empty();
         try {
             HPRecipeInput recipeInput = new HPRecipeInput(input);
-            return ((RecipeManager) serverLevel.recipeAccess()).recipeMap()
-                    .byType(type).stream()
+            return recipes.<HPRecipeInput, T>byType(type).stream()
                     .filter(h -> filter.test(h.value()))
                     .filter(h -> h.value().matches(recipeInput, level))
                     .findFirst();
@@ -321,6 +323,18 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
             LOGGER.error("[HorsePowered] Recipe lookup failed for type {} with input {}", type, input, e);
             return Optional.empty();
         }
+    }
+
+    /**
+     * Recipes for the current side. The server reads its own manager; the client uses the
+     * copy pushed by HPDatapackSync, so interaction predictions match what the server will do.
+     */
+    @Nullable
+    protected RecipeMap recipeMap() {
+        if (level instanceof ServerLevel serverLevel) {
+            return ((RecipeManager) serverLevel.recipeAccess()).recipeMap();
+        }
+        return level == null ? null : HPDatapackSync.getClientRecipes();
     }
 
     public boolean canBeRotated() {

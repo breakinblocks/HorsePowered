@@ -1,5 +1,6 @@
 package com.breakinblocks.horsepowered.client.renderer;
 
+import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
@@ -7,10 +8,16 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 
 public final class RenderUtils {
@@ -45,6 +52,29 @@ public final class RenderUtils {
         poseStack.scale(scale, scale, scale);
         itemState.submit(poseStack, collector, lightCoords, OverlayTexture.NO_OVERLAY, 0);
         poseStack.popPose();
+    }
+
+    public static boolean shouldShowItemCounts(BlockPos pos) {
+        if (!HorsePowerConfig.renderItemAmount.get()) return false;
+        if (!HorsePowerConfig.mustLookAtBlock.get()) return true;
+        HitResult hit = Minecraft.getInstance().hitResult;
+        return hit instanceof BlockHitResult blockHit && blockHit.getBlockPos().equals(pos);
+    }
+
+    public static double distanceToCameraSq(BlockPos pos, Vec3 cameraPos) {
+        return cameraPos.distanceToSqr(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D);
+    }
+
+    /**
+     * Draws a stack size above a slot. Routed through submitNameTag so it billboards, draws a
+     * see-through pass behind geometry, and picks up the accessibility text background setting.
+     */
+    public static void submitItemCount(int count, PoseStack poseStack, SubmitNodeCollector collector, int lightCoords,
+                                       double distanceToCameraSq, CameraRenderState camera,
+                                       double x, double y, double z) {
+        if (count <= 1) return;
+        collector.submitNameTag(poseStack, new Vec3(x, y - 0.5D, z), 0,
+                Component.literal(Integer.toString(count)), true, lightCoords, distanceToCameraSq, camera);
     }
 
     public static void extractItemState(ItemStackRenderState itemState, ItemStack stack, Level level) {

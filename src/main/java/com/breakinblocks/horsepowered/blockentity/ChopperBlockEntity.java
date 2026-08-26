@@ -60,9 +60,6 @@ public class ChopperBlockEntity extends HPBlockEntityHorseBase {
             if (!ItemStack.isSameItemSameComponents(inputSlot, stack)) return false;
             if (inputSlot.getCount() >= getInventoryStackLimit()) return false;
         }
-        // Recipe lookup is server-only; on the client, allow insertion so the
-        // interaction isn't blocked (server will do the authoritative check)
-        if (level != null && level.isClientSide()) return true;
         return findRecipe(HPRecipes.CHOPPING_TYPE.get(), stack, r -> r.getTier().allowsHorse()).isPresent();
     }
 

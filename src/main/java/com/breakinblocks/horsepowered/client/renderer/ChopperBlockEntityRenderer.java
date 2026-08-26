@@ -39,6 +39,7 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
             state.inputItem.clear();
             state.outputItem.clear();
             state.hasWorker = false;
+            state.showCounts = false;
             return;
         }
         HorseBlockRenderState.extractWorkerState(blockEntity, state, partialTick);
@@ -52,6 +53,11 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
 
         RenderUtils.extractItemState(state.inputItem, blockEntity.getItem(0), blockEntity.getLevel());
         RenderUtils.extractItemState(state.outputItem, blockEntity.getItem(1), blockEntity.getLevel());
+
+        state.showCounts = RenderUtils.shouldShowItemCounts(blockEntity.getBlockPos());
+        state.distanceToCameraSq = RenderUtils.distanceToCameraSq(blockEntity.getBlockPos(), cameraPos);
+        state.inputCount = blockEntity.getItem(0).getCount();
+        state.outputCount = blockEntity.getItem(1).getCount();
     }
 
     private static float rotationFor(Direction facing) {
@@ -83,6 +89,13 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
 
         RenderUtils.renderFlatItem(state.outputItem, poseStack, collector, state.lightCoords,
                 0.5D, 0.2D, 0.9D, 0.3F);
+
+        if (state.showCounts) {
+            RenderUtils.submitItemCount(state.inputCount, poseStack, collector, state.lightCoords,
+                    state.distanceToCameraSq, camera, 0.5D, 1.15D, 0.5D);
+            RenderUtils.submitItemCount(state.outputCount, poseStack, collector, state.lightCoords,
+                    state.distanceToCameraSq, camera, 0.5D, 0.5D, 0.9D);
+        }
     }
 
     @Override
@@ -103,5 +116,7 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
         public float facingRotation;
         public final ItemStackRenderState inputItem = new ItemStackRenderState();
         public final ItemStackRenderState outputItem = new ItemStackRenderState();
+        public int inputCount;
+        public int outputCount;
     }
 }

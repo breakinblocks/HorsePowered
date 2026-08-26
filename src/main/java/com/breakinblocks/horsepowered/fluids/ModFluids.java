@@ -29,8 +29,15 @@ public class ModFluids {
                     .density(920)       // Slightly less dense than water
                     .viscosity(3000)    // 3x more viscous than water — flows slow
                     .temperature(300)
+                    .fallDistanceModifier(0F)
+                    .canExtinguish(false)
+                    .canConvertToSource(false)
+                    .canHydrate(false)
+                    .supportsBoating(true)
+                    .isWaterLike(true)
                     .sound(SoundActions.BUCKET_FILL, SoundEvents.BUCKET_FILL)
                     .sound(SoundActions.BUCKET_EMPTY, SoundEvents.BUCKET_EMPTY)
+                    .sound(SoundActions.FLUID_VAPORIZE, SoundEvents.FIRE_EXTINGUISH)
             ));
 
     // Fluids must be declared before the properties supplier can reference them,

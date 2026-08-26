@@ -19,6 +19,9 @@ public class HorseBlockRenderState extends BlockEntityRenderState {
     public boolean showHighlight;
     public List<Map.Entry<BlockPos, Boolean>> workingAreaPositions;
 
+    public boolean showCounts;
+    public double distanceToCameraSq;
+
     public Vec3 workerOffset;
 
     public Entity renderEntity;

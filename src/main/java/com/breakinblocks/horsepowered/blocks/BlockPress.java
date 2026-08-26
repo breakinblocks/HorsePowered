@@ -3,6 +3,7 @@ package com.breakinblocks.horsepowered.blocks;
 import com.breakinblocks.horsepowered.blockentity.HPBlockEntityHorseBase;
 import com.breakinblocks.horsepowered.blockentity.ModBlockEntities;
 import com.breakinblocks.horsepowered.blockentity.PressBlockEntity;
+import com.breakinblocks.horsepowered.events.HPDatapackSync;
 import com.breakinblocks.horsepowered.recipes.BottlingRecipe;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
 import net.minecraft.core.BlockPos;
@@ -24,6 +25,7 @@ import net.neoforged.neoforge.transfer.access.ItemAccess;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.RecipeMap;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.transfer.fluid.FluidUtil;
 import org.jetbrains.annotations.Nullable;
@@ -68,16 +70,18 @@ public class BlockPress extends BlockHPBase {
                             ? InteractionResult.SUCCESS
                             : InteractionResult.CONSUME;
                 }
-            } else if (hasAnyBottlingRecipe(level, stack)) {
+            } else if (hasAnyBottlingRecipe(stack)) {
                 return InteractionResult.SUCCESS;
             }
         }
         return super.useItemOn(stack, state, level, pos, player, hand, hit);
     }
 
-    private static boolean hasAnyBottlingRecipe(Level level, ItemStack stack) {
+    private static boolean hasAnyBottlingRecipe(ItemStack stack) {
         if (stack.isEmpty()) return false;
-        return ((RecipeManager) level.recipeAccess()).recipeMap().byType(HPRecipes.BOTTLING_TYPE.get())
+        RecipeMap recipes = HPDatapackSync.getClientRecipes();
+        if (recipes == null) return false;
+        return recipes.byType(HPRecipes.BOTTLING_TYPE.get())
                 .stream()
                 .map(holder -> holder.value())
                 .filter(BottlingRecipe::isValid)
