@@ -100,8 +100,7 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
         }
 
         // Check for leashed creatures nearby (for horse-powered blocks)
-        PathfinderMob creature = null;
-        if (horseTE != null) {
+        if (horseTE != null && !horseTE.hasWorker()) {
             int x = pos.getX();
             int y = pos.getY();
             int z = pos.getZ();
@@ -111,23 +110,18 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
 
             for (PathfinderMob mob : creatures) {
                 if (mob.isLeashed() && mob.getLeashHolder() == player) {
-                    creature = mob;
-                    break;
+                    if (!level.isClientSide) {
+                        mob.dropLeash(true, false);
+                        horseTE.setWorker(mob);
+                        onWorkerAttached(player, mob);
+                    }
+                    return InteractionResult.sidedSuccess(level.isClientSide);
                 }
             }
         }
 
-        if (horseTE != null && creature != null) {
-            if (!horseTE.hasWorker()) {
-                creature.dropLeash(true, false);
-                horseTE.setWorker(creature);
-                onWorkerAttached(player, creature);
-                return InteractionResult.sidedSuccess(level.isClientSide);
-            }
-            return InteractionResult.FAIL;
-        }
-
         // Handle inserting items
+        boolean inputFull = false;
         if (!stack.isEmpty() && te.isItemValidForSlot(0, stack)) {
             ItemStack inputSlot = te.getItem(0);
 
@@ -140,7 +134,9 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
                     stack.shrink(inserted);
                 }
                 return InteractionResult.sidedSuccess(level.isClientSide);
-            } else if (HPBlockEntityBase.canCombine(inputSlot, stack)) {
+            }
+
+            if (HPBlockEntityBase.canCombine(inputSlot, stack)) {
                 int maxTransfer = Math.min(te.getMaxStackSize(stack), stack.getMaxStackSize()) - inputSlot.getCount();
                 int transferAmount = Math.min(stack.getCount(), maxTransfer);
                 if (transferAmount > 0) {
@@ -152,6 +148,8 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
                     return InteractionResult.sidedSuccess(level.isClientSide);
                 }
             }
+
+            inputFull = true;
         }
 
         // Handle extracting items
@@ -170,8 +168,13 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
             } else {
                 extracts = false;
             }
-            if (!extracts && !stack.isEmpty()) {
-                return InteractionResult.PASS;
+            if (!extracts) {
+                if (inputFull) {
+                    return InteractionResult.CONSUME;
+                }
+                if (!stack.isEmpty()) {
+                    return InteractionResult.PASS;
+                }
             }
             return InteractionResult.sidedSuccess(true);
         }
@@ -194,6 +197,9 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
         }
 
         if (result.isEmpty()) {
+            if (inputFull) {
+                return InteractionResult.CONSUME;
+            }
             if (!stack.isEmpty()) {
                 return InteractionResult.PASS;
             }

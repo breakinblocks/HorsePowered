@@ -217,11 +217,6 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
     }
 
     @Override
-    public ItemStack removeItemNoUpdate(int slot) {
-        return currentPressStatus == 0 ? super.removeItemNoUpdate(slot) : ItemStack.EMPTY;
-    }
-
-    @Override
     public int getInventoryStackLimit() {
         return getRecipe().map(PressRecipe::getInputCount).orElse(64);
     }
@@ -229,7 +224,7 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
     @Override
     public boolean isItemValidForSlot(int index, ItemStack stack) {
         if (index != 0) return false;
-        if (currentPressStatus != 0) return false;
+        if (currentPressStatus != 0 && !getItem(0).isEmpty()) return false;
         if (level == null) return false;
 
         return level.getRecipeManager()
