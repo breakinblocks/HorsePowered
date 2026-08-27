@@ -132,6 +132,7 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
     @Override
     public void clearContent() {
         itemStacks.clear();
+        onInputChanged();
     }
 
     @Override

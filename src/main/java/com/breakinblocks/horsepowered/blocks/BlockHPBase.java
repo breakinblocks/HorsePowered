@@ -10,8 +10,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.LeadItem;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -79,8 +77,7 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
         HPBlockEntityHorseBase horseTE = te instanceof HPBlockEntityHorseBase ? (HPBlockEntityHorseBase) te : null;
 
         // Check for leashed creatures nearby (for horse-powered blocks)
-        PathfinderMob creature = null;
-        if (horseTE != null) {
+        if (horseTE != null && !horseTE.hasWorker()) {
             int x = pos.getX();
             int y = pos.getY();
             int z = pos.getZ();
@@ -90,24 +87,14 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
 
             for (PathfinderMob mob : creatures) {
                 if (mob.isLeashed() && mob.getLeashHolder() == player) {
-                    creature = mob;
-                    break;
+                    if (!level.isClientSide()) {
+                        mob.removeLeash();
+                        horseTE.setWorker(mob);
+                        onWorkerAttached(player, mob);
+                    }
+                    return InteractionResult.SUCCESS;
                 }
             }
-        }
-
-        // Handle attaching a leashed creature (server-side only to prevent sync issues)
-        if (horseTE != null && creature != null && !level.isClientSide()) {
-            if (!horseTE.hasWorker()) {
-                creature.removeLeash();
-                horseTE.setWorker(creature);
-                onWorkerAttached(player, creature);
-                return InteractionResult.SUCCESS;
-            }
-            return InteractionResult.FAIL;
-        } else if (horseTE != null && creature != null && level.isClientSide()) {
-            // Client-side: just return success to show animation, server handles the logic
-            return InteractionResult.SUCCESS;
         }
 
         // Handle inserting items
@@ -122,7 +109,9 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
                 te.setItem(0, stack.copyWithCount(inserted));
                 stack.shrink(inserted);
                 return InteractionResult.SUCCESS;
-            } else if (HPBlockEntityBase.canCombine(inputSlot, stack)) {
+            }
+
+            if (HPBlockEntityBase.canCombine(inputSlot, stack)) {
                 int maxTransfer = Math.min(te.getMaxStackSize(stack), stack.getMaxStackSize()) - inputSlot.getCount();
                 int transferAmount = Math.min(stack.getCount(), maxTransfer);
                 if (transferAmount > 0) {
@@ -135,6 +124,20 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
                     return InteractionResult.SUCCESS;
                 }
             }
+
+            int outputSlot = !te.getItem(1).isEmpty() ? 1 : (!te.getItem(2).isEmpty() ? 2 : -1);
+            if (outputSlot < 0) {
+                return InteractionResult.CONSUME;
+            }
+            if (level.isClientSide()) {
+                return InteractionResult.SUCCESS;
+            }
+            ItemStack taken = te.removeItem(outputSlot, te.getItem(outputSlot).getCount());
+            if (!taken.isEmpty()) {
+                emptiedOutput(level, pos);
+                player.getInventory().placeItemBackInInventory(taken);
+            }
+            return InteractionResult.SUCCESS;
         }
 
         // Only try empty-hand interaction if the player's hand is actually empty
