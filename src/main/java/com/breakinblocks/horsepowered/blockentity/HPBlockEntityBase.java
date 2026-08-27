@@ -70,6 +70,9 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
     public ItemStack removeItem(int slot, int amount) {
         ItemStack stack = ContainerHelper.removeItem(itemStacks, slot, amount);
         if (!stack.isEmpty()) {
+            if (slot == 0 && itemStacks.get(0).isEmpty()) {
+                resetInput();
+            }
             setChanged();
         }
         return stack;
@@ -77,7 +80,11 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
 
     @Override
     public ItemStack removeItemNoUpdate(int slot) {
-        return ContainerHelper.takeItem(itemStacks, slot);
+        ItemStack stack = ContainerHelper.takeItem(itemStacks, slot);
+        if (slot == 0 && !stack.isEmpty()) {
+            resetInput();
+        }
+        return stack;
     }
 
     @Override
@@ -108,6 +115,15 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
         // Default: no-op. Subclasses override to reset progress.
     }
 
+    /**
+     * Called when the input slot is emptied by something other than a completed craft,
+     * so partial progress is not carried over to whatever goes in next.
+     */
+    protected void resetInput() {
+        lastInputType = ItemStack.EMPTY;
+        onInputChanged();
+    }
+
     public int getMaxStackSize(ItemStack stack) {
         return Math.min(getInventoryStackLimit(stack), stack.getMaxStackSize());
     }
@@ -123,6 +139,7 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
     @Override
     public void clearContent() {
         itemStacks.clear();
+        resetInput();
     }
 
     @Override

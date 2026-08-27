@@ -11,7 +11,6 @@ import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.LeadItem;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -91,8 +90,7 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
         HPBlockEntityHorseBase horseTE = te instanceof HPBlockEntityHorseBase ? (HPBlockEntityHorseBase) te : null;
 
         // Check for leashed creatures nearby (for horse-powered blocks)
-        PathfinderMob creature = null;
-        if (horseTE != null) {
+        if (horseTE != null && !horseTE.hasWorker()) {
             int x = pos.getX();
             int y = pos.getY();
             int z = pos.getZ();
@@ -102,21 +100,14 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
 
             for (PathfinderMob mob : creatures) {
                 if (mob.isLeashed() && mob.getLeashHolder() == player) {
-                    creature = mob;
-                    break;
+                    if (!level.isClientSide) {
+                        mob.dropLeash(true, false);
+                        horseTE.setWorker(mob);
+                        onWorkerAttached(player, mob);
+                    }
+                    return ItemInteractionResult.sidedSuccess(level.isClientSide);
                 }
             }
-        }
-
-        // Handle attaching a leashed creature
-        if (horseTE != null && ((stack.getItem() instanceof LeadItem && creature != null) || creature != null)) {
-            if (!horseTE.hasWorker()) {
-                creature.dropLeash(true, false);
-                horseTE.setWorker(creature);
-                onWorkerAttached(player, creature);
-                return ItemInteractionResult.sidedSuccess(level.isClientSide);
-            }
-            return ItemInteractionResult.FAIL;
         }
 
         // Handle inserting items
@@ -130,7 +121,9 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
                     stack.shrink(inserted);
                 }
                 return ItemInteractionResult.sidedSuccess(level.isClientSide);
-            } else if (HPBlockEntityBase.canCombine(inputSlot, stack)) {
+            }
+
+            if (HPBlockEntityBase.canCombine(inputSlot, stack)) {
                 int maxTransfer = Math.min(te.getMaxStackSize(stack), stack.getMaxStackSize()) - inputSlot.getCount();
                 int transferAmount = Math.min(stack.getCount(), maxTransfer);
                 if (transferAmount > 0) {
@@ -142,6 +135,15 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
                     return ItemInteractionResult.sidedSuccess(level.isClientSide);
                 }
             }
+
+            int outputSlot = findTakeSlot(te, -1, false);
+            if (outputSlot < 0) {
+                return ItemInteractionResult.CONSUME;
+            }
+            if (!level.isClientSide) {
+                takeFromSlot(te, outputSlot, level, pos, player);
+            }
+            return ItemInteractionResult.sidedSuccess(level.isClientSide);
         }
 
         return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
@@ -165,42 +167,52 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
             return InteractionResult.sidedSuccess(level.isClientSide);
         }
 
+        boolean emptyHanded = player.getMainHandItem().isEmpty();
+
+        int slot = getSlot(state, (float) hit.getLocation().x - pos.getX(),
+                (float) hit.getLocation().y - pos.getY(),
+                (float) hit.getLocation().z - pos.getZ());
+        int takeSlot = findTakeSlot(te, slot, emptyHanded);
+        boolean releaseWorker = takeSlot < 0 && horseTE != null && horseTE.hasWorker() && emptyHanded;
+
+        if (takeSlot < 0 && !releaseWorker) {
+            return InteractionResult.PASS;
+        }
+
         if (level.isClientSide) {
             return InteractionResult.sidedSuccess(true);
         }
 
-        // Handle extracting items
-        int slot = getSlot(state, (float) hit.getLocation().x - pos.getX(),
-                (float) hit.getLocation().y - pos.getY(),
-                (float) hit.getLocation().z - pos.getZ());
-
-        ItemStack result = ItemStack.EMPTY;
-        if (slot > -1) {
-            result = te.removeItem(slot, te.getItem(slot).getCount());
-        } else if (slot > -2) {
-            // Try output slot first, then secondary, then input
-            result = te.removeItem(1, te.getItem(1).getCount());
-            if (result.isEmpty()) {
-                result = te.removeItem(2, te.getItem(2).getCount());
-                if (result.isEmpty()) {
-                    result = te.removeItem(0, te.getItem(0).getCount());
-                }
-            }
-            if (!result.isEmpty()) {
-                emptiedOutput(level, pos);
-            }
-        }
-
-        if (result.isEmpty()) {
-            // Release worker if no other action
-            if (horseTE != null) {
-                horseTE.setWorkerToPlayer(player);
-            }
+        if (takeSlot >= 0) {
+            takeFromSlot(te, takeSlot, level, pos, player);
         } else {
-            ItemHandlerHelper.giveItemToPlayer(player, result);
+            horseTE.setWorkerToPlayer(player);
         }
 
         te.setChanged();
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return InteractionResult.SUCCESS;
+    }
+
+    private static int findTakeSlot(HPBlockEntityBase te, int slot, boolean emptyHanded) {
+        if (slot >= 0) {
+            if (slot == 0 && !emptyHanded) return -1;
+            return te.getItem(slot).isEmpty() ? -1 : slot;
+        }
+
+        if (slot < -1) return -1;
+
+        if (!te.getItem(1).isEmpty()) return 1;
+        if (!te.getItem(2).isEmpty()) return 2;
+        return emptyHanded && !te.getItem(0).isEmpty() ? 0 : -1;
+    }
+
+    private void takeFromSlot(HPBlockEntityBase te, int slot, Level level, BlockPos pos, Player player) {
+        ItemStack result = te.removeItem(slot, te.getItem(slot).getCount());
+        if (result.isEmpty()) return;
+
+        if (slot > 0) {
+            emptiedOutput(level, pos);
+        }
+        ItemHandlerHelper.giveItemToPlayer(player, result);
     }
 }
