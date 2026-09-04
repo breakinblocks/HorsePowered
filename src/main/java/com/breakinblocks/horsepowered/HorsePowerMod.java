@@ -2,6 +2,7 @@ package com.breakinblocks.horsepowered;
 
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.items.ModItems;
+import com.breakinblocks.horsepowered.compat.create.CreateCompat;
 import com.breakinblocks.horsepowered.lib.Reference;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
 import com.mojang.logging.LogUtils;
@@ -10,6 +11,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -24,6 +26,7 @@ import org.slf4j.Logger;
 public class HorsePowerMod {
 
     public static final Logger LOGGER = LogUtils.getLogger();
+    public static final boolean CREATE_LOADED = ModList.get().isLoaded("create");
 
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS =
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, Reference.MODID);
@@ -48,6 +51,9 @@ public class HorsePowerMod {
                         output.accept(ModBlocks.GRANITE_ANVIL.get());
                         output.accept(ModBlocks.ANIMAL_TRAP.get());
                         output.accept(ModBlocks.CREATIVE_BATTERY.get());
+                        if (CREATE_LOADED) {
+                            CreateCompat.addToCreativeTab(output);
+                        }
                     })
                     .build()
     );
@@ -66,6 +72,10 @@ public class HorsePowerMod {
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener((ModConfigEvent.Loading e) -> Configs.invalidatePathSpeedCache());
         modEventBus.addListener((ModConfigEvent.Reloading e) -> Configs.invalidatePathSpeedCache());
+
+        if (CREATE_LOADED) {
+            CreateCompat.init(modEventBus);
+        }
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {

@@ -36,6 +36,10 @@ public class Configs {
     public static ForgeConfigSpec.DoubleValue pathSpeedDefault;
     public static ForgeConfigSpec.ConfigValue<List<? extends String>> pathSpeedEntries;
 
+    public static ForgeConfigSpec.IntValue horseEngineRpm;
+    public static ForgeConfigSpec.DoubleValue horseEngineStressPerJumpPoint;
+    public static ForgeConfigSpec.DoubleValue horseEngineDefaultJumpStrength;
+
     private static volatile Map<ResourceLocation, Double> cachedPathSpeedMap;
 
     static {
@@ -140,6 +144,23 @@ public class Configs {
                                     "minecraft:dirt_path=1.0",
                                     "minecraft:packed_ice=2.0"),
                             Configs::isValidSpeedEntry);
+        }
+        builder.pop();
+
+        builder.comment("Horse engine settings (only used when Create is installed)").push("horse_engine");
+        {
+            horseEngineRpm = builder
+                    .comment("Rotation speed in RPM produced by a horse engine while its worker walks.")
+                    .defineInRange("horseEngineRpm", 16, 1, 256);
+
+            horseEngineStressPerJumpPoint = builder
+                    .comment("Stress units provided at the configured RPM for every 0.1 of the worker's jump strength.")
+                    .defineInRange("horseEngineStressPerJumpPoint", 40.0D, 0.0D, 4096.0D);
+
+            horseEngineDefaultJumpStrength = builder
+                    .comment("Jump strength used for workers that have no jump strength attribute.",
+                            "Per-mob values can be set with datapack files in data/<namespace>/horse_engine_jump_strength/.")
+                    .defineInRange("horseEngineDefaultJumpStrength", 0.4D, 0.0D, 32.0D);
         }
         builder.pop();
 

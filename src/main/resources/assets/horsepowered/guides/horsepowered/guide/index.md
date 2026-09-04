@@ -29,6 +29,7 @@ Start by crafting a [Hand Grindstone](hand_grindstone.md) for manual grinding, o
 - [Horse Chopper](horse_chopper.md) - Automated chopping powered by a horse
 - [Horse Press](horse_press.md) - Press items into fluids or other products
 - [Horse Powered Generator](horse_generator.md) - Convert horsepower into Forge Energy
+- [Horse Engine](horse_engine.md) - Convert horsepower into Create stress units (needs Create)
 - [Horse Path & Speed](horse_path.md) - Working area, obstruction tolerance, and per-block speed multipliers
 
 ### Passive Machines
