@@ -2,7 +2,6 @@ package com.breakinblocks.horsepowered.blocks;
 
 import com.breakinblocks.horsepowered.blockentity.HPBlockEntityBase;
 import com.breakinblocks.horsepowered.blockentity.HPBlockEntityHorseBase;
-import com.breakinblocks.horsepowered.util.Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
@@ -19,12 +18,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 public abstract class BlockHPBase extends Block implements EntityBlock {
 
@@ -89,25 +85,8 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
 
         HPBlockEntityHorseBase horseTE = te instanceof HPBlockEntityHorseBase ? (HPBlockEntityHorseBase) te : null;
 
-        // Check for leashed creatures nearby (for horse-powered blocks)
-        if (horseTE != null && !horseTE.hasWorker()) {
-            int x = pos.getX();
-            int y = pos.getY();
-            int z = pos.getZ();
-
-            List<PathfinderMob> creatures = Utils.getValidCreatures(level,
-                    new AABB(x - 7.0D, y - 7.0D, z - 7.0D, x + 7.0D, y + 7.0D, z + 7.0D));
-
-            for (PathfinderMob mob : creatures) {
-                if (mob.isLeashed() && mob.getLeashHolder() == player) {
-                    if (!level.isClientSide) {
-                        mob.dropLeash(true, false);
-                        horseTE.setWorker(mob);
-                        onWorkerAttached(player, mob);
-                    }
-                    return ItemInteractionResult.sidedSuccess(level.isClientSide);
-                }
-            }
+        if (horseTE != null && WorkerInteraction.tryAttachLeashed(level, pos, player, horseTE.getVirtualWorker(), this::onWorkerAttached)) {
+            return ItemInteractionResult.sidedSuccess(level.isClientSide);
         }
 
         // Handle inserting items
@@ -161,9 +140,7 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
 
         // Show working area highlight on shift+right-click with empty hand
         if (horseTE != null && player.isShiftKeyDown()) {
-            if (level.isClientSide) {
-                horseTE.showWorkingAreaHighlight();
-            }
+            WorkerInteraction.showHighlight(level, horseTE.getVirtualWorker());
             return InteractionResult.sidedSuccess(level.isClientSide);
         }
 
@@ -186,7 +163,7 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
         if (takeSlot >= 0) {
             takeFromSlot(te, takeSlot, level, pos, player);
         } else {
-            horseTE.setWorkerToPlayer(player);
+            WorkerInteraction.tryRelease(level, player, horseTE.getVirtualWorker());
         }
 
         te.setChanged();

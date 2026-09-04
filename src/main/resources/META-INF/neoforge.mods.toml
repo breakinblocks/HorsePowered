@@ -45,3 +45,10 @@ type = "optional"
 versionRange = "[1.1,)"
 ordering = "AFTER"
 side = "CLIENT"
+
+[[dependencies.${mod_id}]]
+modId = "create"
+type = "optional"
+versionRange = "[6.0.0,)"
+ordering = "AFTER"
+side = "BOTH"

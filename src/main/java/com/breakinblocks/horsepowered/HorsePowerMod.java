@@ -5,6 +5,7 @@ import com.breakinblocks.horsepowered.blockentity.PressBlockEntity;
 import com.breakinblocks.horsepowered.blocks.BlockDryingRack;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.client.ClientExtensions;
+import com.breakinblocks.horsepowered.compat.create.CreateCompat;
 import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import com.breakinblocks.horsepowered.fluids.ModFluids;
 import com.breakinblocks.horsepowered.items.ModItems;
@@ -19,6 +20,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -38,6 +40,7 @@ public class HorsePowerMod {
 
     public static final String MOD_ID = "horsepowered";
     public static final Logger LOGGER = LogUtils.getLogger();
+    public static final boolean CREATE_LOADED = ModList.get().isLoaded("create");
 
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS =
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MOD_ID);
@@ -98,6 +101,10 @@ public class HorsePowerMod {
         // Client-only setup - registration is handled by @EventBusSubscriber in HorsePowerClient
         if (dist.isClient()) {
             registerClientExtensions(container);
+        }
+
+        if (CREATE_LOADED) {
+            CreateCompat.init(modEventBus, dist);
         }
     }
 

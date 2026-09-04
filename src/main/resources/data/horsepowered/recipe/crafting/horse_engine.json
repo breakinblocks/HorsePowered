@@ -1,0 +1,33 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "create"
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " S ",
+    "AGA",
+    "ACA"
+  ],
+  "key": {
+    "S": {
+      "item": "create:shaft"
+    },
+    "A": {
+      "item": "create:andesite_alloy"
+    },
+    "G": {
+      "item": "horsepowered:grindstone"
+    },
+    "C": {
+      "item": "create:cogwheel"
+    }
+  },
+  "result": {
+    "id": "horsepowered:horse_engine",
+    "count": 1
+  }
+}

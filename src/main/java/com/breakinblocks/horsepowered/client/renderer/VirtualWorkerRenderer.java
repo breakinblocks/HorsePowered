@@ -1,6 +1,7 @@
 package com.breakinblocks.horsepowered.client.renderer;
 
-import com.breakinblocks.horsepowered.blockentity.HPBlockEntityHorseBase;
+import com.breakinblocks.horsepowered.blockentity.VirtualWorker;
+import com.breakinblocks.horsepowered.blockentity.WorkerHost;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -21,25 +22,26 @@ public class VirtualWorkerRenderer {
      * Does nothing if no worker is attached.
      * Call this from the block entity renderer's render() method.
      */
-    public static void renderWorker(HPBlockEntityHorseBase blockEntity, float partialTick,
+    public static void renderWorker(WorkerHost blockEntity, float partialTick,
                                      PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
-        if (!blockEntity.hasWorker()) return;
+        VirtualWorker worker = blockEntity.getVirtualWorker();
+        if (!worker.hasWorker()) return;
 
-        Entity entity = blockEntity.getCachedRenderEntity();
+        Entity entity = worker.getCachedRenderEntity();
         if (entity == null) return;
 
         // Interpolated virtual position relative to block origin
         BlockPos blockPos = blockEntity.getBlockPos();
-        double workerX = Mth.lerp(partialTick, blockEntity.getPrevVirtualX(), blockEntity.getVirtualX());
-        double workerZ = Mth.lerp(partialTick, blockEntity.getPrevVirtualZ(), blockEntity.getVirtualZ());
+        double workerX = Mth.lerp(partialTick, worker.getPrevVirtualX(), worker.getVirtualX());
+        double workerZ = Mth.lerp(partialTick, worker.getPrevVirtualZ(), worker.getVirtualZ());
 
         double offsetX = workerX - blockPos.getX();
-        double offsetY = blockEntity.getVirtualY() - blockPos.getY();
+        double offsetY = worker.getVirtualY() - blockPos.getY();
         double offsetZ = workerZ - blockPos.getZ();
 
         // Interpolated rotation with angle wrapping
-        float prevYRot = blockEntity.getPrevVirtualYRot();
-        float yRot = blockEntity.getVirtualYRot();
+        float prevYRot = worker.getPrevVirtualYRot();
+        float yRot = worker.getVirtualYRot();
         float diff = yRot - prevYRot;
         while (diff < -180) diff += 360;
         while (diff > 180) diff -= 360;

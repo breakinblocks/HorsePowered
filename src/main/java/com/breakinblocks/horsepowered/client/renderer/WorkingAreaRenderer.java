@@ -1,6 +1,6 @@
 package com.breakinblocks.horsepowered.client.renderer;
 
-import com.breakinblocks.horsepowered.blockentity.HPBlockEntityHorseBase;
+import com.breakinblocks.horsepowered.blockentity.WorkerHost;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.BufferUploader;
@@ -35,8 +35,8 @@ public class WorkingAreaRenderer {
      * @param poseStack The pose stack for rendering
      * @param bufferSource The buffer source for rendering
      */
-    public static void renderIfActive(HPBlockEntityHorseBase blockEntity, PoseStack poseStack, MultiBufferSource bufferSource) {
-        if (blockEntity.shouldShowHighlight()) {
+    public static void renderIfActive(WorkerHost blockEntity, PoseStack poseStack, MultiBufferSource bufferSource) {
+        if (blockEntity.getVirtualWorker().shouldShowHighlight()) {
             render(blockEntity, poseStack, bufferSource);
         }
     }
@@ -48,9 +48,9 @@ public class WorkingAreaRenderer {
      * @param poseStack The pose stack for rendering
      * @param bufferSource The buffer source for rendering
      */
-    public static void render(HPBlockEntityHorseBase blockEntity, PoseStack poseStack, MultiBufferSource bufferSource) {
+    public static void render(WorkerHost blockEntity, PoseStack poseStack, MultiBufferSource bufferSource) {
         BlockPos blockPos = blockEntity.getBlockPos();
-        List<Map.Entry<BlockPos, Boolean>> positions = blockEntity.getWorkingAreaPositions();
+        List<Map.Entry<BlockPos, Boolean>> positions = blockEntity.getVirtualWorker().getWorkingAreaPositions();
 
         if (positions.isEmpty()) {
             return;

@@ -20,6 +20,7 @@ import com.breakinblocks.horsepowered.blocks.BlockGraniteAnvil;
 import com.breakinblocks.horsepowered.blocks.BlockGrindstone;
 import com.breakinblocks.horsepowered.blocks.BlockHandGrindstone;
 import com.breakinblocks.horsepowered.blocks.BlockPress;
+import com.breakinblocks.horsepowered.compat.create.jade.HorseEngineJadeSupport;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -71,9 +72,9 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
     // NBT keys for server data
     private static final String KEY_CURRENT = "hp_current";
     private static final String KEY_TOTAL = "hp_total";
-    private static final String KEY_HAS_WORKER = "hp_has_worker";
-    private static final String KEY_WORKER_NAME = "hp_worker_name";
-    private static final String KEY_IS_VALID = "hp_is_valid";
+    public static final String KEY_HAS_WORKER = "hp_has_worker";
+    public static final String KEY_WORKER_NAME = "hp_worker_name";
+    public static final String KEY_IS_VALID = "hp_is_valid";
     private static final String KEY_FLUID_NAME = "hp_fluid_name";
     private static final String KEY_FLUID_AMOUNT = "hp_fluid_amount";
     private static final String KEY_FLUID_CAPACITY = "hp_fluid_capacity";
@@ -86,6 +87,9 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
 
     @Override
     public void register(IWailaCommonRegistration registration) {
+        if (HorsePowerMod.CREATE_LOADED) {
+            HorseEngineJadeSupport.register(registration);
+        }
         // Register server data providers to sync progress from server
         registration.registerBlockDataProvider(new IServerDataProvider<BlockAccessor>() {
             @Override
@@ -250,6 +254,9 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
 
     @Override
     public void registerClient(IWailaClientRegistration registration) {
+        if (HorsePowerMod.CREATE_LOADED) {
+            HorseEngineJadeSupport.registerClient(registration);
+        }
         // Horse-powered grindstone
         registration.registerBlockComponent(new IBlockComponentProvider() {
             @Override
@@ -573,7 +580,7 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
         }
     }
 
-    private static void appendWorkerInfoFromData(ITooltip tooltip, CompoundTag data) {
+    public static void appendWorkerInfoFromData(ITooltip tooltip, CompoundTag data) {
         if (data.contains(KEY_HAS_WORKER)) {
             if (data.getBoolean(KEY_HAS_WORKER)) {
                 if (data.contains(KEY_WORKER_NAME)) {

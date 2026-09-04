@@ -78,6 +78,27 @@ repositories {
         name = "Terraformers"
         url = "https://maven.terraformersmc.com/releases/"
     }
+    maven {
+        name = "CreateMod"
+        url = "https://maven.createmod.net"
+        content {
+            includeGroup "com.simibubi.create"
+            includeGroup "net.createmod.catnip"
+            includeGroup "net.createmod.ponder"
+            includeGroup "dev.engine-room.flywheel"
+            includeGroup "com.tterrag.registrate"
+        }
+    }
+    maven {
+        name = "Ithundxr"
+        url = "https://maven.ithundxr.dev/snapshots"
+        content { includeGroup "com.tterrag.registrate" }
+    }
+    maven {
+        name = "tterrag"
+        url = "https://maven.tterrag.com/"
+        content { includeGroup "com.tterrag.registrate" }
+    }
 }
 
 dependencies {
@@ -97,6 +118,14 @@ dependencies {
     // GuideMe (in-game guidebook)
     compileOnly "org.appliedenergistics:guideme:${guideme_version}"
     runtimeOnly "org.appliedenergistics:guideme:${guideme_version}"
+
+    compileOnly("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false }
+    compileOnly("net.createmod.ponder:ponder-neoforge:${ponder_version}") { transitive = false }
+    compileOnly("dev.engine-room.flywheel:flywheel-neoforge-${minecraft_version}:${flywheel_version}") { transitive = false }
+    runtimeOnly("com.simibubi.create:create-${minecraft_version}:${create_version}") { transitive = false }
+    runtimeOnly("com.tterrag.registrate:Registrate:${registrate_version}") { transitive = false }
+    runtimeOnly("net.createmod.ponder:ponder-neoforge:${ponder_version}") { transitive = false }
+    runtimeOnly("dev.engine-room.flywheel:flywheel-neoforge-${minecraft_version}:${flywheel_version}") { transitive = false }
 }
 
 tasks.named('processResources', ProcessResources).configure {
@@ -161,14 +190,14 @@ publishMods {
         minecraftVersions.add(minecraft_version)
         clientRequired = true
         serverRequired = true
-        optional("jei", "jade", "guideme", "emi")
+        optional("jei", "jade", "guideme", "emi", "create")
     }
 
     modrinth {
         projectId = "cZml36tg"
         accessToken = providers.environmentVariable("MODRINTH_TOKEN")
         minecraftVersions.add(minecraft_version)
-        optional("jei", "jade", "guideme", "emi")
+        optional("jei", "jade", "guideme", "emi", "create")
     }
 }
 

@@ -27,6 +27,7 @@ A Minecraft NeoForge mod that adds horse-powered machinery for grinding, choppin
 - **Horse Chopper** — An automated chopping machine. Attach a horse to chop logs into planks automatically.
 - **Horse Press** — Press items to extract fluids or produce other outputs. Squeeze flowers for dye, press seeds for oil, and more. Fluids come out by bucket, by pipe, or by bottle where a bottling recipe covers them.
 - **Horse Powered Generator** — Converts horse labor into Forge Energy (FE). Generates 80 FE/tick while a worker walks, stores up to 100,000 FE, and pushes power to any adjacent energy handler. Requires a redstone signal to run.
+- **Horse Engine** (needs Create): converts horse labor into Create rotational force. Spins at 16 RPM while a worker walks and provides 40 SU for every 0.1 of the worker's jump strength (a 0.7 horse gives 280 SU). Connect a shaft below it or cogwheels beside it. Speed, SU per jump point and the fallback jump strength are configurable, and the `horsepowered:horse_engine_jump_strength` entity type data map sets a fixed value per mob.
 
 ### Tools
 

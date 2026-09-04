@@ -36,6 +36,10 @@ public class HorsePowerConfig {
     public static ModConfigSpec.DoubleValue pathSpeedDefault;
     public static ModConfigSpec.ConfigValue<List<? extends String>> pathSpeedEntries;
 
+    public static ModConfigSpec.IntValue horseEngineRpm;
+    public static ModConfigSpec.DoubleValue horseEngineStressPerJumpPoint;
+    public static ModConfigSpec.DoubleValue horseEngineDefaultJumpStrength;
+
     private static volatile Map<ResourceLocation, Double> cachedPathSpeedMap;
 
     static {
@@ -141,6 +145,23 @@ public class HorsePowerConfig {
                                     "minecraft:packed_ice=2.0"),
                             () -> "minecraft:stone=1.0",
                             HorsePowerConfig::isValidSpeedEntry);
+        }
+        builder.pop();
+
+        builder.comment("Horse engine settings (only used when Create is installed)").push("horse_engine");
+        {
+            horseEngineRpm = builder
+                    .comment("Rotation speed in RPM produced by a horse engine while its worker walks.")
+                    .defineInRange("horseEngineRpm", 16, 1, 256);
+
+            horseEngineStressPerJumpPoint = builder
+                    .comment("Stress units provided at the configured RPM for every 0.1 of the worker's jump strength.")
+                    .defineInRange("horseEngineStressPerJumpPoint", 40.0D, 0.0D, 4096.0D);
+
+            horseEngineDefaultJumpStrength = builder
+                    .comment("Jump strength used for workers that have no jump strength attribute.",
+                            "Per-mob values can be set with the horsepowered:horse_engine_jump_strength entity type data map.")
+                    .defineInRange("horseEngineDefaultJumpStrength", 0.4D, 0.0D, 32.0D);
         }
         builder.pop();
 

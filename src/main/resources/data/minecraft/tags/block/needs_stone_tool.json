@@ -5,6 +5,10 @@
     "horsepowered:hand_grindstone",
     "horsepowered:granite_anvil",
     "horsepowered:animal_trap",
-    "horsepowered:generator"
+    "horsepowered:generator",
+    {
+      "id": "horsepowered:horse_engine",
+      "required": false
+    }
   ]
 }
