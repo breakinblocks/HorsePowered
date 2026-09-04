@@ -6,7 +6,10 @@ import com.breakinblocks.horsepowered.blockentity.DryingRackBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.GraniteAnvilBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.GrindstoneBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.HandGrindstoneBlockEntity;
+import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.blockentity.HPBlockEntityHorseBase;
+import com.breakinblocks.horsepowered.blockentity.VirtualWorker;
+import com.breakinblocks.horsepowered.blockentity.WorkerHost;
 import com.breakinblocks.horsepowered.blockentity.ManualChopperBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.PressBlockEntity;
 import com.breakinblocks.horsepowered.blocks.BlockAnimalTrap;
@@ -17,6 +20,7 @@ import com.breakinblocks.horsepowered.blocks.BlockGraniteAnvil;
 import com.breakinblocks.horsepowered.blocks.BlockGrindstone;
 import com.breakinblocks.horsepowered.blocks.BlockHandGrindstone;
 import com.breakinblocks.horsepowered.blocks.BlockPress;
+import com.breakinblocks.horsepowered.compat.create.jade.HorseEngineJadeSupport;
 import com.breakinblocks.horsepowered.lib.Reference;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -64,6 +68,9 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
 
     @Override
     public void register(IWailaCommonRegistration registration) {
+        if (HorsePowerMod.CREATE_LOADED) {
+            HorseEngineJadeSupport.register(registration);
+        }
         registration.registerBlockDataProvider(new IServerDataProvider<BlockAccessor>() {
             @Override
             public void appendServerData(CompoundTag data, BlockAccessor accessor) {
@@ -124,6 +131,9 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
 
     @Override
     public void registerClient(IWailaClientRegistration registration) {
+        if (HorsePowerMod.CREATE_LOADED) {
+            HorseEngineJadeSupport.registerClient(registration);
+        }
         registration.registerBlockComponent(new IBlockComponentProvider() {
             @Override
             public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
@@ -367,8 +377,9 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
         }
     }
 
-    private static void appendWorkerInfo(ITooltip tooltip, HPBlockEntityHorseBase te) {
-        if (te.hasWorkerForDisplay()) {
+    public static void appendWorkerInfo(ITooltip tooltip, WorkerHost host) {
+        VirtualWorker te = host.getVirtualWorker();
+        if (te.hasWorker()) {
             String name = te.getWorkerDisplayName();
             if (name != null && !name.isEmpty()) {
                 tooltip.add(Component.translatable("jade." + Reference.MODID + ".worker",

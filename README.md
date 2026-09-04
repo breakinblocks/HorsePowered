@@ -21,6 +21,7 @@ A Minecraft Forge mod that adds horse-powered machinery for grinding, chopping, 
 - **Horse Chopper** - An automated chopping machine. Attach a horse to chop logs into planks automatically.
 - **Horse Press** - Press items to extract fluids or produce other outputs. Perfect for making oils, juices, and other liquids. Fluids come out by bucket, by pipe, or by bottle where a bottling recipe covers them.
 - **Horse Powered Generator** - Converts horse labor directly into Forge Energy. Generates 80 FE/tick while a worker walks, buffers 100,000 FE, and pushes power to any adjacent FE consumer. Requires a redstone signal to run (toggle with a lever inside the working ring).
+- **Horse Engine** (needs Create): converts horse labor into Create rotational force. Spins at 16 RPM while a worker walks and provides 40 SU for every 0.1 of the worker's jump strength (a 0.7 horse gives 280 SU). Connect a shaft below it or cogwheels beside it. Speed, SU per jump point and the fallback jump strength are configurable, and a datapack can set a fixed value per mob.
 
 ### Passive Machines
 

@@ -1,6 +1,7 @@
 package com.breakinblocks.horsepowered.client.renderer;
 
-import com.breakinblocks.horsepowered.blockentity.HPBlockEntityHorseBase;
+import com.breakinblocks.horsepowered.blockentity.VirtualWorker;
+import com.breakinblocks.horsepowered.blockentity.WorkerHost;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.LightTexture;
@@ -26,9 +27,10 @@ public class LeadRenderer {
      * @param poseStack     The pose stack
      * @param bufferSource  The buffer source
      */
-    public static void renderLead(HPBlockEntityHorseBase blockEntity, float partialTick,
+    public static void renderLead(WorkerHost blockEntity, float partialTick,
                                    PoseStack poseStack, MultiBufferSource bufferSource) {
-        if (!blockEntity.hasWorkerForDisplay()) {
+        VirtualWorker worker = blockEntity.getVirtualWorker();
+        if (!worker.hasWorker()) {
             return;
         }
         Level level = blockEntity.getLevel();
@@ -39,9 +41,9 @@ public class LeadRenderer {
         double blockY = 1.0;
         double blockZ = 0.5;
 
-        double workerX = Mth.lerp(partialTick, blockEntity.getPrevVirtualX(), blockEntity.getVirtualX());
-        double workerZ = Mth.lerp(partialTick, blockEntity.getPrevVirtualZ(), blockEntity.getVirtualZ());
-        double workerY = blockEntity.getVirtualY() + blockEntity.getWorkerEntityHeight() * 0.7;
+        double workerX = Mth.lerp(partialTick, worker.getPrevVirtualX(), worker.getVirtualX());
+        double workerZ = Mth.lerp(partialTick, worker.getPrevVirtualZ(), worker.getVirtualZ());
+        double workerY = worker.getVirtualY() + worker.getWorkerEntityHeight() * 0.7;
 
         double dx = workerX - blockPos.getX() - blockX;
         double dy = workerY - blockPos.getY() - blockY;

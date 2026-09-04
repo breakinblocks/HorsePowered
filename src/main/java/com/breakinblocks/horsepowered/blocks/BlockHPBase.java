@@ -93,31 +93,12 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
 
         // Show working area highlight on shift+right-click with empty hand
         if (horseTE != null && player.isShiftKeyDown() && stack.isEmpty() && hand == InteractionHand.MAIN_HAND) {
-            if (level.isClientSide) {
-                horseTE.showWorkingAreaHighlight();
-            }
+            WorkerInteraction.showHighlight(level, horseTE.getVirtualWorker());
             return InteractionResult.sidedSuccess(level.isClientSide);
         }
 
-        // Check for leashed creatures nearby (for horse-powered blocks)
-        if (horseTE != null && !horseTE.hasWorker()) {
-            int x = pos.getX();
-            int y = pos.getY();
-            int z = pos.getZ();
-
-            List<PathfinderMob> creatures = Utils.getValidCreatures(level,
-                    new AABB(x - 7.0D, y - 7.0D, z - 7.0D, x + 7.0D, y + 7.0D, z + 7.0D));
-
-            for (PathfinderMob mob : creatures) {
-                if (mob.isLeashed() && mob.getLeashHolder() == player) {
-                    if (!level.isClientSide) {
-                        mob.dropLeash(true, false);
-                        horseTE.setWorker(mob);
-                        onWorkerAttached(player, mob);
-                    }
-                    return InteractionResult.sidedSuccess(level.isClientSide);
-                }
-            }
+        if (horseTE != null && WorkerInteraction.tryAttachLeashed(level, pos, player, horseTE.getVirtualWorker(), this::onWorkerAttached)) {
+            return InteractionResult.sidedSuccess(level.isClientSide);
         }
 
         // Handle inserting items
@@ -205,7 +186,7 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
             }
             // Release worker if no other action
             if (horseTE != null) {
-                horseTE.setWorkerToPlayer(player);
+                WorkerInteraction.tryRelease(level, player, horseTE.getVirtualWorker());
             }
         } else {
             ItemHandlerHelper.giveItemToPlayer(player, result);

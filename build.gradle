@@ -75,6 +75,22 @@ repositories {
         name = "Terraformers"
         url = "https://maven.terraformersmc.com/releases/"
     }
+    maven {
+        name = "CreateMod"
+        url = "https://maven.createmod.net"
+        content {
+            includeGroup "com.simibubi.create"
+            includeGroup "net.createmod.catnip"
+            includeGroup "net.createmod.ponder"
+            includeGroup "dev.engine-room.flywheel"
+            includeGroup "com.tterrag.registrate"
+        }
+    }
+    maven {
+        name = "tterrag"
+        url = "https://maven.tterrag.com/"
+        content { includeGroup "com.tterrag.registrate" }
+    }
 }
 
 dependencies {
@@ -95,6 +111,10 @@ dependencies {
     // EMI (via Terraformers Maven)
     compileOnly fg.deobf("dev.emi:emi-forge:${emi_version}:api")
     runtimeOnly fg.deobf("dev.emi:emi-forge:${emi_version}")
+    compileOnly fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_version}:slim")
+    compileOnly fg.deobf("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}")
+    compileOnly fg.deobf("dev.engine-room.flywheel:flywheel-forge-${minecraft_version}:${flywheel_version}")
+    runtimeOnly fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_version}:all")
 }
 
 tasks.named('processResources', ProcessResources).configure {
@@ -175,14 +195,14 @@ publishMods {
         minecraftVersions.add(minecraft_version)
         clientRequired = true
         serverRequired = true
-        optional("jei", "jade", "guideme", "emi")
+        optional("jei", "jade", "guideme", "emi", "create")
     }
 
     modrinth {
         projectId = "cZml36tg"
         accessToken = providers.environmentVariable("MODRINTH_TOKEN")
         minecraftVersions.add(minecraft_version)
-        optional("jei", "jade", "guideme", "emi")
+        optional("jei", "jade", "guideme", "emi", "create")
     }
 
     def githubToken = providers.environmentVariable("GITHUB_TOKEN")

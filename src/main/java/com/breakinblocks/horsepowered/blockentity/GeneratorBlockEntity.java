@@ -36,7 +36,7 @@ public class GeneratorBlockEntity extends HPBlockEntityHorseBase {
     protected void tickServer() {
         super.tickServer();
 
-        boolean working = running && valid && hasWorker();
+        boolean working = worker.isWorking();
 
         if (working) {
             int stored = energy.getEnergyStored();
