@@ -56,7 +56,7 @@ public class BlockPress extends BlockHPBase {
                 if (level.isClientSide()) {
                     return InteractionResult.SUCCESS;
                 }
-                if (FluidUtil.interactWithFluidHandler(player, hand, pos, press.getFluidHandler())) {
+                if (FluidUtil.interactWithFluidHandler(player, hand, pos, press.getFluidHandler(), null)) {
                     press.setChanged();
                     return InteractionResult.SUCCESS;
                 }
