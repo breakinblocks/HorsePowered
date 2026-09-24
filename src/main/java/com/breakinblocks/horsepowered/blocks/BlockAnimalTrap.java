@@ -110,7 +110,7 @@ public class BlockAnimalTrap extends Block implements EntityBlock, SimpleWaterlo
             }
         }
 
-        return InteractionResult.PASS;
+        return stack.isEmpty() ? InteractionResult.TRY_WITH_EMPTY_HAND : InteractionResult.PASS;
     }
 
     @Override

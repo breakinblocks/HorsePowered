@@ -131,13 +131,18 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
             }
         }
         for (BlockPos pos : floorPos) {
-            BlockState state = level.getBlockState(pos);
-            if (!state.isFaceSturdy(level, pos, Direction.UP)) {
+            if (!isValidFloor(pos)) {
                 return false;
             }
         }
         pathSpeedMultiplier = computePathSpeedMultiplier();
         return true;
+    }
+
+    private boolean isValidFloor(BlockPos pos) {
+        BlockState state = level.getBlockState(pos);
+        return state.isFaceSturdy(level, pos, Direction.UP)
+                || HorsePowerConfig.hasPathSpeedEntry(BuiltInRegistries.BLOCK.getKey(state.getBlock()));
     }
 
     private double computePathSpeedMultiplier() {
@@ -425,8 +430,7 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
         }
         if (floorPos != null) {
             for (BlockPos pos : floorPos) {
-                BlockState state = level.getBlockState(pos);
-                if (!state.isFaceSturdy(level, pos, Direction.UP)) {
+                if (!isValidFloor(pos)) {
                     positions.add(Map.entry(pos, false));
                 }
             }

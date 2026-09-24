@@ -133,7 +133,8 @@ public class HorsePowerConfig {
                     .comment(
                             "Per-block speed multipliers for the floor blocks under the horse's circular path.",
                             "Format: \"namespace:block_id=multiplier\". Multipliers below 1.0 slow the worker, above 1.0 speed it up.",
-                            "The final path speed is the average of the multipliers of every unique floor block the path crosses.")
+                            "The final path speed is the average of the multipliers of every unique floor block the path crosses.",
+                            "Any block listed here also counts as valid floor, even if its top is not a full block (such as dirt paths).")
                     .defineListAllowEmpty("pathSpeedEntries",
                             List.of(
                                     "minecraft:grass_block=0.5",
@@ -164,13 +165,21 @@ public class HorsePowerConfig {
     }
 
     public static double getPathSpeedMultiplier(Identifier blockId) {
+        Double value = getPathSpeedMap().get(blockId);
+        return value != null ? value : pathSpeedDefault.get();
+    }
+
+    public static boolean hasPathSpeedEntry(Identifier blockId) {
+        return getPathSpeedMap().containsKey(blockId);
+    }
+
+    private static Map<Identifier, Double> getPathSpeedMap() {
         Map<Identifier, Double> map = cachedPathSpeedMap;
         if (map == null) {
             map = parseSpeedMap();
             cachedPathSpeedMap = map;
         }
-        Double value = map.get(blockId);
-        return value != null ? value : pathSpeedDefault.get();
+        return map;
     }
 
     public static void invalidatePathSpeedCache() {

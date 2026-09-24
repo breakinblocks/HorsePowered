@@ -4,6 +4,7 @@ import com.breakinblocks.horsepowered.blockentity.DryingRackBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.ModBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -12,8 +13,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -154,21 +159,30 @@ public class BlockDryingRack extends Block implements EntityBlock {
     }
 
     @Override
-    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+    protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos pos,
+                                     Direction direction, BlockPos neighborPos, BlockState neighborState,
+                                     RandomSource random) {
+        BlockPos mainPos = getMainPos(state, pos);
         Direction facing = state.getValue(FACING);
-        if (state.getValue(PART) == DryingRackPart.MAIN) {
-            for (DryingRackPart fillerPart : DryingRackPart.FILLERS) {
-                BlockPos fillerPos = fillerPart.offsetFromMain(pos, facing);
-                BlockState fillerState = level.getBlockState(fillerPos);
-                if (fillerState.is(this) && fillerState.getValue(PART) == fillerPart) {
-                    level.destroyBlock(fillerPos, false);
-                }
+        for (DryingRackPart part : DryingRackPart.values()) {
+            if (part.offsetFromMain(mainPos, facing).equals(neighborPos)) {
+                boolean intact = neighborState.is(this)
+                        && neighborState.getValue(FACING) == facing
+                        && neighborState.getValue(PART) == part;
+                return intact ? state : Blocks.AIR.defaultBlockState();
             }
-        } else {
+        }
+        return super.updateShape(state, level, ticks, pos, direction, neighborPos, neighborState, random);
+    }
+
+    @Override
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+        if (!level.isClientSide() && player.preventsBlockDrops() && state.getValue(PART) != DryingRackPart.MAIN) {
             BlockPos mainPos = getMainPos(state, pos);
             BlockState mainState = level.getBlockState(mainPos);
             if (mainState.is(this) && mainState.getValue(PART) == DryingRackPart.MAIN) {
-                level.destroyBlock(mainPos, true);
+                level.setBlock(mainPos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL | Block.UPDATE_SUPPRESS_DROPS);
+                level.levelEvent(player, LevelEvent.PARTICLES_DESTROY_BLOCK, mainPos, Block.getId(mainState));
             }
         }
         return super.playerWillDestroy(level, pos, state, player);
