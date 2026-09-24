@@ -129,13 +129,18 @@ public class VirtualWorker {
             }
         }
         for (BlockPos pos : floorPos) {
-            BlockState state = level.getBlockState(pos);
-            if (!state.isFaceSturdy(level, pos, Direction.UP)) {
+            if (!isValidFloor(level, pos)) {
                 return false;
             }
         }
         pathSpeedMultiplier = computePathSpeedMultiplier();
         return true;
+    }
+
+    private static boolean isValidFloor(Level level, BlockPos pos) {
+        BlockState state = level.getBlockState(pos);
+        return state.isFaceSturdy(level, pos, Direction.UP)
+                || HorsePowerConfig.hasPathSpeedEntry(BuiltInRegistries.BLOCK.getKey(state.getBlock()));
     }
 
     private double computePathSpeedMultiplier() {
@@ -415,8 +420,7 @@ public class VirtualWorker {
         }
         if (floorPos != null) {
             for (BlockPos pos : floorPos) {
-                BlockState state = level.getBlockState(pos);
-                if (!state.isFaceSturdy(level, pos, Direction.UP)) {
+                if (!isValidFloor(level, pos)) {
                     positions.add(Map.entry(pos, false));
                 }
             }
