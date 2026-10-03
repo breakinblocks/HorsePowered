@@ -218,14 +218,22 @@ Horse Powered uses data-driven JSON recipes that can be added or modified via da
 - A recipe can combine `fluidInput` with either `result`, `fluidResult`, or both
 
 #### Drying Recipe
+Save as `data/<namespace>/recipe/<name>.json` in a datapack, for example `data/mypack/recipe/drying/beef_jerky.json`:
 ```json
 {
   "type": "horsepowered:drying",
-  "ingredient": { "item": "minecraft:kelp" },
-  "result": { "id": "minecraft:dried_kelp", "count": 1 },
-  "time": 1000
+  "ingredient": "minecraft:beef",
+  "result": { "id": "minecraft:cooked_beef", "count": 1 },
+  "time": 1200
 }
 ```
+- `ingredient`: an item ID (`"minecraft:beef"`), a tag (`"#minecraft:saplings"`), or a list of item IDs (`["minecraft:beef", "minecraft:porkchop"]`)
+- `result`: the item each slot turns into, with an optional `count` and `components`
+- `time`: ticks to dry one item (20 ticks = 1 second). Required
+
+Each of the rack's 8 slots holds one input item and dries it on its own timer. A finished slot keeps its result until a player or a hopper takes it out.
+
+To replace a built-in recipe, put a file with the same path in your datapack, e.g. `data/horsepowered/recipe/drying/kelp_to_dried_kelp.json`. The built-in drying recipes are `clay_to_terracotta`, `kelp_to_dried_kelp`, `mud_to_dirt`, `rotten_flesh_to_leather`, `saplings_to_dead_bush` and `wet_sponge_to_sponge`.
 
 #### Bottling Recipe
 ```json
@@ -289,6 +297,23 @@ Use NeoForge conditions to add recipes that only load when a specific mod is pre
   "time": 1
 }
 ```
+
+### KubeJS
+
+Every recipe type can be added through KubeJS with `event.custom`, using the same JSON as the datapack examples above. Put this in `kubejs/server_scripts/`:
+```js
+ServerEvents.recipes(event => {
+  event.custom({
+    type: 'horsepowered:drying',
+    ingredient: 'minecraft:beef',
+    result: { id: 'minecraft:cooked_beef', count: 1 },
+    time: 1200
+  }).id('mypack:drying/beef_jerky')
+
+  event.remove({ id: 'horsepowered:drying/clay_to_terracotta' })
+})
+```
+The `remove` line drops one built-in recipe by its ID. To clear every drying recipe and add your own set instead, use `event.remove({ type: 'horsepowered:drying' })`. Run `/reload` after editing the script.
 
 ### Custom Worker Mobs
 
