@@ -55,10 +55,8 @@ public class GeneratorBlockEntity extends HPBlockEntityHorseBase {
             int stored = energy.getAmountAsInt();
             if (stored <= 0) return;
 
-            EnergyHandler neighbor = level.getCapability(
-                    Capabilities.Energy.BLOCK,
-                    worldPosition.relative(dir),
-                    dir.getOpposite());
+            EnergyHandler neighbor =
+                    level.getCapability(Capabilities.Energy.BLOCK, worldPosition.relative(dir), dir.getOpposite());
             if (neighbor == null) continue;
 
             try (Transaction tx = Transaction.openRoot()) {

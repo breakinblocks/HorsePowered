@@ -35,8 +35,7 @@ public class DryingRecipeBuilder {
     }
 
     public void save(RecipeOutput output, String name) {
-        ResourceKey<Recipe<?>> key = ResourceKey.create(Registries.RECIPE,
-                HorsePowerMod.id("drying/" + name));
+        ResourceKey<Recipe<?>> key = ResourceKey.create(Registries.RECIPE, HorsePowerMod.id("drying/" + name));
         output.accept(key, new DryingRackRecipe(ingredient, result, time), null);
     }
 }

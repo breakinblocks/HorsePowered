@@ -2,6 +2,9 @@ package com.breakinblocks.horsepowered.client.renderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.serialization.MapCodec;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -20,10 +23,6 @@ import net.minecraft.world.item.component.TypedEntityData;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.jspecify.annotations.Nullable;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.function.Consumer;
 
 public class WorkSaddleSpecialRenderer implements SpecialModelRenderer<Entity> {
 
@@ -74,8 +73,14 @@ public class WorkSaddleSpecialRenderer implements SpecialModelRenderer<Entity> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public void submit(@Nullable Entity entity, PoseStack poseStack, SubmitNodeCollector collector,
-                       int lightCoords, int overlayCoords, boolean hasFoil, int outlineColor) {
+    public void submit(
+            @Nullable Entity entity,
+            PoseStack poseStack,
+            SubmitNodeCollector collector,
+            int lightCoords,
+            int overlayCoords,
+            boolean hasFoil,
+            int outlineColor) {
         if (entity == null) return;
         EntityRenderDispatcher dispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
         EntityRenderer<Entity, EntityRenderState> renderer =

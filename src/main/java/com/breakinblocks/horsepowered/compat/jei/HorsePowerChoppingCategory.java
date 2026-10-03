@@ -49,7 +49,12 @@ public class HorsePowerChoppingCategory extends BaseHPCategory<ChoppingRecipe> {
     }
 
     @Override
-    public void draw(ChoppingRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
+    public void draw(
+            ChoppingRecipe recipe,
+            IRecipeSlotsView recipeSlotsView,
+            GuiGraphicsExtractor guiGraphics,
+            double mouseX,
+            double mouseY) {
         arrow.draw(guiGraphics, 26, 1);
 
         Component timeText = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.chops", recipe.getTime());

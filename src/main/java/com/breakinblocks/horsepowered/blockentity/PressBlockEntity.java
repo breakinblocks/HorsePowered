@@ -3,6 +3,7 @@ package com.breakinblocks.horsepowered.blockentity;
 import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
 import com.breakinblocks.horsepowered.recipes.PressRecipe;
+import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
@@ -16,8 +17,6 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.fluid.FluidStacksResourceHandler;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
-
-import java.util.Optional;
 
 public class PressBlockEntity extends HPBlockEntityHorseBase {
 
@@ -71,9 +70,7 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
     private boolean matchesAnyRecipeOutput(FluidStack fluid) {
         if (fluid.isEmpty() || !(level instanceof ServerLevel serverLevel)) return false;
         return ((RecipeManager) serverLevel.recipeAccess())
-                .recipeMap().byType(HPRecipes.PRESSING_TYPE.get())
-                .stream()
-                .anyMatch(r -> {
+                .recipeMap().byType(HPRecipes.PRESSING_TYPE.get()).stream().anyMatch(r -> {
                     PressRecipe rec = r.value();
                     return rec.hasFluidOutput() && FluidStack.isSameFluidSameComponents(rec.getFluidResult(), fluid);
                 });
@@ -131,15 +128,14 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
                 recipe.getFluidInput().ifPresent(fluidIn -> {
                     FluidStack inputFluid = getInputFluid();
                     if (!inputFluid.isEmpty()) {
-                        tanks.extract(DualTankFluidHandler.INPUT_INDEX,
-                                FluidResource.of(inputFluid), fluidIn.amount(), tx);
+                        tanks.extract(
+                                DualTankFluidHandler.INPUT_INDEX, FluidResource.of(inputFluid), fluidIn.amount(), tx);
                     }
                 });
 
                 if (recipe.hasFluidOutput()) {
                     FluidStack result = recipe.getFluidResult();
-                    tanks.insert(DualTankFluidHandler.OUTPUT_INDEX,
-                            FluidResource.of(result), result.getAmount(), tx);
+                    tanks.insert(DualTankFluidHandler.OUTPUT_INDEX, FluidResource.of(result), result.getAmount(), tx);
                 }
                 tx.commit();
             }
@@ -225,8 +221,7 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
 
         RecipeMap recipes = recipeMap();
         if (recipes == null) return false;
-        return recipes.byType(HPRecipes.PRESSING_TYPE.get())
-                .stream()
+        return recipes.byType(HPRecipes.PRESSING_TYPE.get()).stream()
                 .anyMatch(recipe -> recipe.value().getIngredient().test(stack));
     }
 
@@ -253,8 +248,8 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
      */
     public boolean drainOutput(FluidStack fluid) {
         try (Transaction tx = Transaction.openRoot()) {
-            int moved = tanks.extract(DualTankFluidHandler.OUTPUT_INDEX,
-                    FluidResource.of(fluid), fluid.getAmount(), tx);
+            int moved =
+                    tanks.extract(DualTankFluidHandler.OUTPUT_INDEX, FluidResource.of(fluid), fluid.getAmount(), tx);
             if (moved != fluid.getAmount()) return false;
             tx.commit();
         }
@@ -267,8 +262,7 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
      */
     public boolean fillInput(FluidStack fluid) {
         try (Transaction tx = Transaction.openRoot()) {
-            int moved = tanks.insert(DualTankFluidHandler.INPUT_INDEX,
-                    FluidResource.of(fluid), fluid.getAmount(), tx);
+            int moved = tanks.insert(DualTankFluidHandler.INPUT_INDEX, FluidResource.of(fluid), fluid.getAmount(), tx);
             if (moved != fluid.getAmount()) return false;
             tx.commit();
         }

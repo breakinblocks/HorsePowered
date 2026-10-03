@@ -76,14 +76,26 @@ public class FlintAndTinderItem extends Item {
         BlockState modified = state.getToolModifiedState(fakeContext, ItemAbilities.FIRESTARTER_LIGHT, false);
 
         if (modified != null) {
-            level.playSound(player, hitPos, SoundEvents.FLINTANDSTEEL_USE, SoundSource.BLOCKS, 1.0F, level.getRandom().nextFloat() * 0.4F + 0.8F);
+            level.playSound(
+                    player,
+                    hitPos,
+                    SoundEvents.FLINTANDSTEEL_USE,
+                    SoundSource.BLOCKS,
+                    1.0F,
+                    level.getRandom().nextFloat() * 0.4F + 0.8F);
             level.setBlock(hitPos, modified, 11);
             level.gameEvent(player, GameEvent.BLOCK_CHANGE, hitPos);
             stack.hurtAndBreak(1, player, hand);
         } else {
             BlockPos firePos = hitPos.relative(hit.getDirection());
             if (BaseFireBlock.canBePlacedAt(level, firePos, player.getDirection())) {
-                level.playSound(player, firePos, SoundEvents.FLINTANDSTEEL_USE, SoundSource.BLOCKS, 1.0F, level.getRandom().nextFloat() * 0.4F + 0.8F);
+                level.playSound(
+                        player,
+                        firePos,
+                        SoundEvents.FLINTANDSTEEL_USE,
+                        SoundSource.BLOCKS,
+                        1.0F,
+                        level.getRandom().nextFloat() * 0.4F + 0.8F);
                 BlockState fireState = BaseFireBlock.getState(level, firePos);
                 level.setBlock(firePos, fireState, 11);
                 level.gameEvent(player, GameEvent.BLOCK_PLACE, firePos);

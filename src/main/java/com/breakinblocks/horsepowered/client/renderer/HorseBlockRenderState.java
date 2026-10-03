@@ -2,15 +2,14 @@ package com.breakinblocks.horsepowered.client.renderer;
 
 import com.breakinblocks.horsepowered.blockentity.HPBlockEntityHorseBase;
 import com.mojang.blaze3d.vertex.PoseStack;
+import java.util.List;
+import java.util.Map;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
-
-import java.util.List;
-import java.util.Map;
 
 public class HorseBlockRenderState extends BlockEntityRenderState {
     public float partialTick;
@@ -28,7 +27,8 @@ public class HorseBlockRenderState extends BlockEntityRenderState {
     public double entityOffsetX, entityOffsetY, entityOffsetZ;
     public float entityYRot;
 
-    public static void extractWorkerState(HPBlockEntityHorseBase blockEntity, HorseBlockRenderState state, float partialTick) {
+    public static void extractWorkerState(
+            HPBlockEntityHorseBase blockEntity, HorseBlockRenderState state, float partialTick) {
         state.partialTick = partialTick;
         state.blockPos = blockEntity.getBlockPos();
 
@@ -50,8 +50,7 @@ public class HorseBlockRenderState extends BlockEntityRenderState {
             state.workerOffset = new Vec3(
                     interpX - blockCenterX,
                     interpY + entityHeight * 0.7 - blockCenterY, // rope attaches ~70% up the entity
-                    interpZ - blockCenterZ
-            );
+                    interpZ - blockCenterZ);
 
             // Entity rendering offset from block origin
             state.entityOffsetX = interpX - blockEntity.getBlockPos().getX();
@@ -71,15 +70,21 @@ public class HorseBlockRenderState extends BlockEntityRenderState {
         state.workingAreaPositions = blockEntity.getWorkingAreaPositions();
     }
 
-    public static void submitWorkerAndArea(HorseBlockRenderState state, PoseStack poseStack,
-                                            SubmitNodeCollector collector, CameraRenderState camera) {
+    public static void submitWorkerAndArea(
+            HorseBlockRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
         if (state.hasWorker) {
             if (state.renderEntity != null) {
                 VirtualWorkerRenderer.renderEntity(
                         state.renderEntity,
-                        state.entityOffsetX, state.entityOffsetY, state.entityOffsetZ,
-                        state.entityYRot, state.partialTick,
-                        poseStack, collector, camera, state.lightCoords);
+                        state.entityOffsetX,
+                        state.entityOffsetY,
+                        state.entityOffsetZ,
+                        state.entityYRot,
+                        state.partialTick,
+                        poseStack,
+                        collector,
+                        camera,
+                        state.lightCoords);
             }
 
             if (state.workerOffset != null) {
@@ -89,8 +94,8 @@ public class HorseBlockRenderState extends BlockEntityRenderState {
             }
         }
 
-        WorkingAreaRenderer.render(state.showHighlight, state.workingAreaPositions,
-                state.blockPos, poseStack, collector);
+        WorkingAreaRenderer.render(
+                state.showHighlight, state.workingAreaPositions, state.blockPos, poseStack, collector);
     }
 
     private static double lerp(float t, double a, double b) {

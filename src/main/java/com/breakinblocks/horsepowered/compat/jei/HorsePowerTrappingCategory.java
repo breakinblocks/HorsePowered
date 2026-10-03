@@ -56,7 +56,12 @@ public class HorsePowerTrappingCategory extends BaseHPCategory<TrappingRecipe> {
     }
 
     @Override
-    public void draw(TrappingRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
+    public void draw(
+            TrappingRecipe recipe,
+            IRecipeSlotsView recipeSlotsView,
+            GuiGraphicsExtractor guiGraphics,
+            double mouseX,
+            double mouseY) {
         arrow.draw(guiGraphics, 50, 22);
 
         Font font = Minecraft.getInstance().font;
@@ -80,7 +85,8 @@ public class HorsePowerTrappingCategory extends BaseHPCategory<TrappingRecipe> {
         y += 10;
 
         if (recipe.getBiome().isPresent()) {
-            Component biomeText = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.trap_biome",
+            Component biomeText = Component.translatable(
+                    "gui." + HorsePowerMod.MOD_ID + ".jei.trap_biome",
                     biomeLabel(recipe.getBiome().get().location()));
             guiGraphics.text(font, biomeText, (WIDTH - font.width(biomeText)) / 2, y, 0xFF6688AA, false);
             y += 10;
@@ -96,7 +102,8 @@ public class HorsePowerTrappingCategory extends BaseHPCategory<TrappingRecipe> {
         if (!recipe.isBaitConsumed()) {
             return Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.trap_bait_consumed_none");
         }
-        return Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.trap_bait_consumed_chance",
+        return Component.translatable(
+                "gui." + HorsePowerMod.MOD_ID + ".jei.trap_bait_consumed_chance",
                 formatChance(recipe.getBaitConsumeChance()));
     }
 

@@ -3,14 +3,13 @@ package com.breakinblocks.horsepowered.blockentity;
 import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import com.breakinblocks.horsepowered.recipes.ChoppingRecipe;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
+import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-
-import java.util.Optional;
 
 public class ChopperBlockEntity extends HPBlockEntityHorseBase {
 
@@ -60,7 +59,8 @@ public class ChopperBlockEntity extends HPBlockEntityHorseBase {
             if (!ItemStack.isSameItemSameComponents(inputSlot, stack)) return false;
             if (inputSlot.getCount() >= getInventoryStackLimit()) return false;
         }
-        return findRecipe(HPRecipes.CHOPPING_TYPE.get(), stack, r -> r.getTier().allowsHorse()).isPresent();
+        return findRecipe(HPRecipes.CHOPPING_TYPE.get(), stack, r -> r.getTier().allowsHorse())
+                .isPresent();
     }
 
     @Override
@@ -127,7 +127,8 @@ public class ChopperBlockEntity extends HPBlockEntityHorseBase {
     }
 
     public Optional<RecipeHolder<ChoppingRecipe>> getRecipe() {
-        return findRecipe(HPRecipes.CHOPPING_TYPE.get(), getItem(0), r -> r.getTier().allowsHorse());
+        return findRecipe(
+                HPRecipes.CHOPPING_TYPE.get(), getItem(0), r -> r.getTier().allowsHorse());
     }
 
     @Override

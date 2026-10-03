@@ -41,9 +41,8 @@ public class BlockDryingRack extends Block implements EntityBlock {
 
     public BlockDryingRack(Properties properties) {
         super(properties);
-        registerDefaultState(stateDefinition.any()
-                .setValue(FACING, Direction.NORTH)
-                .setValue(PART, DryingRackPart.MAIN));
+        registerDefaultState(
+                stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(PART, DryingRackPart.MAIN));
     }
 
     @Override
@@ -65,11 +64,13 @@ public class BlockDryingRack extends Block implements EntityBlock {
     }
 
     @Override
-    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+    public void setPlacedBy(
+            Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
         Direction facing = state.getValue(FACING);
         for (DryingRackPart fillerPart : DryingRackPart.FILLERS) {
             BlockPos fillerPos = fillerPart.offsetFromMain(pos, facing);
-            level.setBlock(fillerPos, defaultBlockState().setValue(FACING, facing).setValue(PART, fillerPart), 3);
+            level.setBlock(
+                    fillerPos, defaultBlockState().setValue(FACING, facing).setValue(PART, fillerPart), 3);
         }
     }
 
@@ -90,13 +91,20 @@ public class BlockDryingRack extends Block implements EntityBlock {
     }
 
     @Override
-    protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+    protected VoxelShape getCollisionShape(
+            BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return SHAPE;
     }
 
     @Override
-    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
-                                          Player player, InteractionHand hand, BlockHitResult hit) {
+    protected InteractionResult useItemOn(
+            ItemStack stack,
+            BlockState state,
+            Level level,
+            BlockPos pos,
+            Player player,
+            InteractionHand hand,
+            BlockHitResult hit) {
         if (hand != InteractionHand.MAIN_HAND) return InteractionResult.TRY_WITH_EMPTY_HAND;
         DryingRackBlockEntity rack = getMainBlockEntity(level, state, pos);
         if (rack == null) return InteractionResult.TRY_WITH_EMPTY_HAND;
@@ -115,7 +123,8 @@ public class BlockDryingRack extends Block implements EntityBlock {
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+    protected InteractionResult useWithoutItem(
+            BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         DryingRackBlockEntity rack = getMainBlockEntity(level, state, pos);
         if (rack == null) return InteractionResult.PASS;
 
@@ -159,9 +168,15 @@ public class BlockDryingRack extends Block implements EntityBlock {
     }
 
     @Override
-    protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos pos,
-                                     Direction direction, BlockPos neighborPos, BlockState neighborState,
-                                     RandomSource random) {
+    protected BlockState updateShape(
+            BlockState state,
+            LevelReader level,
+            ScheduledTickAccess ticks,
+            BlockPos pos,
+            Direction direction,
+            BlockPos neighborPos,
+            BlockState neighborState,
+            RandomSource random) {
         BlockPos mainPos = getMainPos(state, pos);
         Direction facing = state.getValue(FACING);
         for (DryingRackPart part : DryingRackPart.values()) {
@@ -196,7 +211,8 @@ public class BlockDryingRack extends Block implements EntityBlock {
 
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(
+            Level level, BlockState state, BlockEntityType<T> type) {
         if (state.getValue(PART) != DryingRackPart.MAIN) return null;
         if (type != ModBlockEntities.DRYING_RACK.get()) return null;
         @SuppressWarnings("unchecked")

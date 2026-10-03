@@ -3,14 +3,15 @@ package com.breakinblocks.horsepowered.blocks;
 import com.breakinblocks.horsepowered.blockentity.HPBlockEntityBase;
 import com.breakinblocks.horsepowered.blockentity.HPBlockEntityHorseBase;
 import com.breakinblocks.horsepowered.util.Utils;
+import java.util.List;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -22,8 +23,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 public abstract class BlockHPBase extends Block implements EntityBlock {
 
@@ -41,33 +40,43 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
         return -1;
     }
 
-    public void onWorkerAttached(Player player, PathfinderMob creature) {
-    }
+    public void onWorkerAttached(Player player, PathfinderMob creature) {}
 
     @Nullable
-    protected abstract <T extends BlockEntity> BlockEntityTicker<T> createTicker(Level level, BlockState state, BlockEntityType<T> type);
+    protected abstract <T extends BlockEntity> BlockEntityTicker<T> createTicker(
+            Level level, BlockState state, BlockEntityType<T> type);
 
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(
+            Level level, BlockState state, BlockEntityType<T> type) {
         return createTicker(level, state, type);
     }
 
     @SuppressWarnings("unchecked")
     @Nullable
-    protected static <E extends BlockEntity, A extends BlockEntity> BlockEntityTicker<A> checkType(BlockEntityType<A> actual, BlockEntityType<E> expected, BlockEntityTicker<? super E> ticker) {
+    protected static <E extends BlockEntity, A extends BlockEntity> BlockEntityTicker<A> checkType(
+            BlockEntityType<A> actual, BlockEntityType<E> expected, BlockEntityTicker<? super E> ticker) {
         return expected == actual ? (BlockEntityTicker<A>) ticker : null;
     }
 
     @Override
-    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
+    protected void affectNeighborsAfterRemoval(
+            BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
         // Container dropping and lead dropping is now handled in BlockEntity.preRemoveSideEffects
         // This method only needs to update neighbors
         Containers.updateNeighboursAfterDestroy(state, level, pos);
     }
 
     @Override
-    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    protected InteractionResult useItemOn(
+            ItemStack stack,
+            BlockState state,
+            Level level,
+            BlockPos pos,
+            Player player,
+            InteractionHand hand,
+            BlockHitResult hit) {
         BlockEntity blockEntity = level.getBlockEntity(pos);
 
         if (!(blockEntity instanceof HPBlockEntityBase te)) {
@@ -82,8 +91,8 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
             int y = pos.getY();
             int z = pos.getZ();
 
-            List<PathfinderMob> creatures = Utils.getValidCreatures(level,
-                    new AABB(x - 7.0D, y - 7.0D, z - 7.0D, x + 7.0D, y + 7.0D, z + 7.0D));
+            List<PathfinderMob> creatures = Utils.getValidCreatures(
+                    level, new AABB(x - 7.0D, y - 7.0D, z - 7.0D, x + 7.0D, y + 7.0D, z + 7.0D));
 
             for (PathfinderMob mob : creatures) {
                 if (mob.isLeashed() && mob.getLeashHolder() == player) {
@@ -149,7 +158,8 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+    protected InteractionResult useWithoutItem(
+            BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         BlockEntity blockEntity = level.getBlockEntity(pos);
 
         if (!(blockEntity instanceof HPBlockEntityBase te)) {
@@ -171,7 +181,9 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
         }
 
         // Handle extracting items
-        int slot = getSlot(state, (float) hit.getLocation().x - pos.getX(),
+        int slot = getSlot(
+                state,
+                (float) hit.getLocation().x - pos.getX(),
                 (float) hit.getLocation().y - pos.getY(),
                 (float) hit.getLocation().z - pos.getZ());
 

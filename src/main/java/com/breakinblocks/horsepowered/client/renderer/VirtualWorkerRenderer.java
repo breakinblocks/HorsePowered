@@ -15,10 +15,17 @@ public class VirtualWorkerRenderer {
     // entity must be a detached/cached instance — the EntityRenderDispatcher is invoked directly
     // from inside a BE renderer so it never enters the world render pipeline.
     @SuppressWarnings("unchecked")
-    public static void renderEntity(Entity entity, double offsetX, double offsetY, double offsetZ,
-                                     float yRot, float partialTick,
-                                     PoseStack poseStack, SubmitNodeCollector collector,
-                                     CameraRenderState camera, int packedLight) {
+    public static void renderEntity(
+            Entity entity,
+            double offsetX,
+            double offsetY,
+            double offsetZ,
+            float yRot,
+            float partialTick,
+            PoseStack poseStack,
+            SubmitNodeCollector collector,
+            CameraRenderState camera,
+            int packedLight) {
         if (entity == null) return;
 
         EntityRenderDispatcher dispatcher = Minecraft.getInstance().getEntityRenderDispatcher();

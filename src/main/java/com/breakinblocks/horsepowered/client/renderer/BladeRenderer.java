@@ -24,23 +24,33 @@ public class BladeRenderer {
     private static final float BLADE_TRAVEL = 0.5f;
 
     // visualWindup range: -0.74 (wound down / struck) .. 0 (raised).
-    public static void renderBlade(PoseStack poseStack, SubmitNodeCollector collector, float visualWindup, int packedLight) {
+    public static void renderBlade(
+            PoseStack poseStack, SubmitNodeCollector collector, float visualWindup, int packedLight) {
         poseStack.pushPose();
 
         float yOffset = visualWindup * BLADE_TRAVEL / 0.74f;
         poseStack.translate(0, yOffset, 0);
 
-        TextureAtlasSprite sprite = Minecraft.getInstance().getModelManager()
-                .getBlockStateModelSet().getParticleMaterial(Blocks.IRON_BLOCK.defaultBlockState()).sprite();
+        TextureAtlasSprite sprite = Minecraft.getInstance()
+                .getModelManager()
+                .getBlockStateModelSet()
+                .getParticleMaterial(Blocks.IRON_BLOCK.defaultBlockState())
+                .sprite();
 
         collector.submitCustomGeometry(
                 poseStack,
                 Sheets.cutoutBlockSheet(),
-                (pose, consumer) -> RenderUtils.renderTexturedBox(consumer, pose, sprite,
-                        BLADE_MIN_X, BLADE_MIN_Y, BLADE_MIN_Z,
-                        BLADE_MAX_X, BLADE_MAX_Y, BLADE_MAX_Z,
-                        packedLight)
-        );
+                (pose, consumer) -> RenderUtils.renderTexturedBox(
+                        consumer,
+                        pose,
+                        sprite,
+                        BLADE_MIN_X,
+                        BLADE_MIN_Y,
+                        BLADE_MIN_Z,
+                        BLADE_MAX_X,
+                        BLADE_MAX_Y,
+                        BLADE_MAX_Z,
+                        packedLight));
 
         poseStack.popPose();
     }

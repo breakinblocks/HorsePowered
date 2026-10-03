@@ -56,7 +56,8 @@ public class BlockFiller extends Block implements EntityBlock {
     }
 
     @Override
-    protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+    protected VoxelShape getCollisionShape(
+            BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return Shapes.block();
     }
 
@@ -82,7 +83,15 @@ public class BlockFiller extends Block implements EntityBlock {
     }
 
     @Override
-    protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess scheduledTickAccess, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
+    protected BlockState updateShape(
+            BlockState state,
+            LevelReader level,
+            ScheduledTickAccess scheduledTickAccess,
+            BlockPos pos,
+            Direction direction,
+            BlockPos neighborPos,
+            BlockState neighborState,
+            RandomSource random) {
         Direction facing = state.getValue(FACING);
         if (direction == facing && !(neighborState.getBlock() instanceof BlockHPBase)) {
             return Blocks.AIR.defaultBlockState();
@@ -91,7 +100,14 @@ public class BlockFiller extends Block implements EntityBlock {
     }
 
     @Override
-    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    protected InteractionResult useItemOn(
+            ItemStack stack,
+            BlockState state,
+            Level level,
+            BlockPos pos,
+            Player player,
+            InteractionHand hand,
+            BlockHitResult hit) {
         BlockPos filledPos = pos.relative(state.getValue(FACING));
         BlockState filledState = level.getBlockState(filledPos);
         if (validateFilled(level, pos, state)) {
@@ -101,7 +117,8 @@ public class BlockFiller extends Block implements EntityBlock {
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+    protected InteractionResult useWithoutItem(
+            BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         BlockPos filledPos = pos.relative(state.getValue(FACING));
         BlockState filledState = level.getBlockState(filledPos);
         if (validateFilled(level, pos, state)) {
@@ -121,7 +138,8 @@ public class BlockFiller extends Block implements EntityBlock {
     }
 
     @Override
-    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData, Player player) {
+    public ItemStack getCloneItemStack(
+            LevelReader level, BlockPos pos, BlockState state, boolean includeData, Player player) {
         BlockPos filledPos = pos.relative(state.getValue(FACING));
         BlockState filledState = level.getBlockState(filledPos);
         if (filledState.getBlock() instanceof BlockHPBase) {

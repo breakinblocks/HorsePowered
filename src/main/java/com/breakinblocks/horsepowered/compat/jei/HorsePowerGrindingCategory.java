@@ -52,14 +52,19 @@ public class HorsePowerGrindingCategory extends BaseHPCategory<GrindstoneRecipe>
                     .add(recipe.createSecondary())
                     .setBackground(slot, -1, -1)
                     .addRichTooltipCallback((slotView, tooltip) -> {
-                        tooltip.add(Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.chance",
-                                recipe.getSecondaryChance()));
+                        tooltip.add(Component.translatable(
+                                "gui." + HorsePowerMod.MOD_ID + ".jei.chance", recipe.getSecondaryChance()));
                     });
         }
     }
 
     @Override
-    public void draw(GrindstoneRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
+    public void draw(
+            GrindstoneRecipe recipe,
+            IRecipeSlotsView recipeSlotsView,
+            GuiGraphicsExtractor guiGraphics,
+            double mouseX,
+            double mouseY) {
         arrow.draw(guiGraphics, 26, 1);
 
         Component timeText = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.time", recipe.getTime());

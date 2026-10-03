@@ -3,6 +3,7 @@ package com.breakinblocks.horsepowered.blockentity;
 import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import com.breakinblocks.horsepowered.recipes.GrindstoneRecipe;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
+import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -10,8 +11,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-
-import java.util.Optional;
 
 public class HandGrindstoneBlockEntity extends HPBlockEntityBase {
 
@@ -71,7 +70,8 @@ public class HandGrindstoneBlockEntity extends HPBlockEntityBase {
     }
 
     public Optional<RecipeHolder<GrindstoneRecipe>> getRecipe() {
-        return findRecipe(HPRecipes.GRINDING_TYPE.get(), getItem(0), r -> r.getTier().allowsHand());
+        return findRecipe(
+                HPRecipes.GRINDING_TYPE.get(), getItem(0), r -> r.getTier().allowsHand());
     }
 
     private void millItem() {
@@ -111,7 +111,8 @@ public class HandGrindstoneBlockEntity extends HPBlockEntityBase {
     @Override
     public boolean isItemValidForSlot(int index, ItemStack stack) {
         if (index != 0) return false;
-        return findRecipe(HPRecipes.GRINDING_TYPE.get(), stack, r -> r.getTier().allowsHand()).isPresent();
+        return findRecipe(HPRecipes.GRINDING_TYPE.get(), stack, r -> r.getTier().allowsHand())
+                .isPresent();
     }
 
     @Override

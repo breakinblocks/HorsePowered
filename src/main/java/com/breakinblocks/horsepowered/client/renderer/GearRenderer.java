@@ -23,18 +23,28 @@ public class GearRenderer {
 
     private static final int TEETH = 8;
 
-    public static void renderGear(PoseStack poseStack, SubmitNodeCollector collector, float yRotDegrees, int packedLight) {
-        TextureAtlasSprite sprite = Minecraft.getInstance().getModelManager()
-                .getBlockStateModelSet().getParticleMaterial(Blocks.POLISHED_DEEPSLATE.defaultBlockState()).sprite();
+    public static void renderGear(
+            PoseStack poseStack, SubmitNodeCollector collector, float yRotDegrees, int packedLight) {
+        TextureAtlasSprite sprite = Minecraft.getInstance()
+                .getModelManager()
+                .getBlockStateModelSet()
+                .getParticleMaterial(Blocks.POLISHED_DEEPSLATE.defaultBlockState())
+                .sprite();
 
         collector.submitCustomGeometry(
                 poseStack,
                 Sheets.cutoutBlockSheet(),
-                (pose, consumer) -> aabbBox(consumer, pose, sprite,
-                        HUB_MIN, GEAR_BOTTOM, HUB_MIN,
-                        HUB_MAX, GEAR_TOP, HUB_MAX,
-                        packedLight)
-        );
+                (pose, consumer) -> aabbBox(
+                        consumer,
+                        pose,
+                        sprite,
+                        HUB_MIN,
+                        GEAR_BOTTOM,
+                        HUB_MIN,
+                        HUB_MAX,
+                        GEAR_TOP,
+                        HUB_MAX,
+                        packedLight));
 
         for (int i = 0; i < TEETH; i++) {
             float toothAngle = yRotDegrees + i * (360f / TEETH);
@@ -46,20 +56,33 @@ public class GearRenderer {
             collector.submitCustomGeometry(
                     poseStack,
                     Sheets.cutoutBlockSheet(),
-                    (pose, consumer) -> aabbBox(consumer, pose, sprite,
-                            TOOTH_INNER, GEAR_BOTTOM, -TOOTH_HALF_THICK,
-                            TOOTH_OUTER, GEAR_TOP,   TOOTH_HALF_THICK,
-                            packedLight)
-            );
+                    (pose, consumer) -> aabbBox(
+                            consumer,
+                            pose,
+                            sprite,
+                            TOOTH_INNER,
+                            GEAR_BOTTOM,
+                            -TOOTH_HALF_THICK,
+                            TOOTH_OUTER,
+                            GEAR_TOP,
+                            TOOTH_HALF_THICK,
+                            packedLight));
 
             poseStack.popPose();
         }
     }
 
-    private static void aabbBox(VertexConsumer consumer, PoseStack.Pose pose, TextureAtlasSprite sprite,
-                                float minX, float minY, float minZ,
-                                float maxX, float maxY, float maxZ,
-                                int packedLight) {
+    private static void aabbBox(
+            VertexConsumer consumer,
+            PoseStack.Pose pose,
+            TextureAtlasSprite sprite,
+            float minX,
+            float minY,
+            float minZ,
+            float maxX,
+            float maxY,
+            float maxZ,
+            int packedLight) {
         float u0 = sprite.getU0();
         float u1 = sprite.getU1();
         float v0 = sprite.getV0();
@@ -97,9 +120,19 @@ public class GearRenderer {
         vx(consumer, pose, maxX, minY, maxZ, u1, v1, 1, 0, 0, packedLight, overlay);
     }
 
-    private static void vx(VertexConsumer buf, PoseStack.Pose pose,
-                           float x, float y, float z, float u, float v,
-                           float nx, float ny, float nz, int light, int overlay) {
+    private static void vx(
+            VertexConsumer buf,
+            PoseStack.Pose pose,
+            float x,
+            float y,
+            float z,
+            float u,
+            float v,
+            float nx,
+            float ny,
+            float nz,
+            int light,
+            int overlay) {
         buf.addVertex(pose, x, y, z)
                 .setColor(255, 255, 255, 255)
                 .setUv(u, v)

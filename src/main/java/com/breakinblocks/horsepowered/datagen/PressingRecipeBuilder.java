@@ -2,6 +2,7 @@ package com.breakinblocks.horsepowered.datagen;
 
 import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.recipes.PressRecipe;
+import java.util.Optional;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeOutput;
@@ -15,8 +16,6 @@ import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
 import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 import org.jspecify.annotations.Nullable;
-
-import java.util.Optional;
 
 public class PressingRecipeBuilder {
     private final Ingredient ingredient;
@@ -55,8 +54,7 @@ public class PressingRecipeBuilder {
     }
 
     public PressingRecipeBuilder fluidResult(Fluid fluid, int amount) {
-        this.fluidRef = new PressRecipe.FluidRef(
-                BuiltInRegistries.FLUID.getKey(fluid), amount);
+        this.fluidRef = new PressRecipe.FluidRef(BuiltInRegistries.FLUID.getKey(fluid), amount);
         return this;
     }
 
@@ -71,10 +69,16 @@ public class PressingRecipeBuilder {
     }
 
     public void save(RecipeOutput output, String name) {
-        ResourceKey<Recipe<?>> key = ResourceKey.create(Registries.RECIPE,
-                HorsePowerMod.id("pressing/" + name));
-        output.accept(key, new PressRecipe(ingredient, inputCount,
-                Optional.ofNullable(fluidInput),
-                Optional.ofNullable(result), Optional.ofNullable(fluidRef), priority), null);
+        ResourceKey<Recipe<?>> key = ResourceKey.create(Registries.RECIPE, HorsePowerMod.id("pressing/" + name));
+        output.accept(
+                key,
+                new PressRecipe(
+                        ingredient,
+                        inputCount,
+                        Optional.ofNullable(fluidInput),
+                        Optional.ofNullable(result),
+                        Optional.ofNullable(fluidRef),
+                        priority),
+                null);
     }
 }

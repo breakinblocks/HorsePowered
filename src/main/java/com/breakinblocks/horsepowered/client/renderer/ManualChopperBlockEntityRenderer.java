@@ -12,10 +12,11 @@ import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
-public class ManualChopperBlockEntityRenderer implements BlockEntityRenderer<ManualChopperBlockEntity, ManualChopperBlockEntityRenderer.ManualChopperRenderState> {
+public class ManualChopperBlockEntityRenderer
+        implements BlockEntityRenderer<
+                ManualChopperBlockEntity, ManualChopperBlockEntityRenderer.ManualChopperRenderState> {
 
-    public ManualChopperBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
-    }
+    public ManualChopperBlockEntityRenderer(BlockEntityRendererProvider.Context context) {}
 
     @Override
     public ManualChopperRenderState createRenderState() {
@@ -23,17 +24,25 @@ public class ManualChopperBlockEntityRenderer implements BlockEntityRenderer<Man
     }
 
     @Override
-    public void extractRenderState(ManualChopperBlockEntity blockEntity, ManualChopperRenderState state, float partialTick,
-                                   Vec3 cameraPos, @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
+    public void extractRenderState(
+            ManualChopperBlockEntity blockEntity,
+            ManualChopperRenderState state,
+            float partialTick,
+            Vec3 cameraPos,
+            @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
         BlockEntityRenderState.extractBase(blockEntity, state, crumblingOverlay);
         RenderUtils.extractItemState(state.inputItem, blockEntity.getItem(0), blockEntity.getLevel());
     }
 
     @Override
-    public void submit(ManualChopperRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
+    public void submit(
+            ManualChopperRenderState state,
+            PoseStack poseStack,
+            SubmitNodeCollector collector,
+            CameraRenderState camera) {
         // Log stands upright on the chopping surface so the axe cleaves it like a real chop.
-        RenderUtils.renderStandingItem(state.inputItem, poseStack, collector, state.lightCoords,
-                0.5D, 0.71D, 0.5D, 0.6F);
+        RenderUtils.renderStandingItem(
+                state.inputItem, poseStack, collector, state.lightCoords, 0.5D, 0.71D, 0.5D, 0.6F);
     }
 
     public static class ManualChopperRenderState extends BlockEntityRenderState {

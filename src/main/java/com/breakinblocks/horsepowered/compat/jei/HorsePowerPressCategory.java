@@ -53,12 +53,14 @@ public class HorsePowerPressCategory extends BaseHPCategory<PressRecipe> {
                         .toList())
                 .setBackground(slot, -1, -1);
 
-        recipe.getFluidInput().ifPresent(fluidIn ->
-                builder.addSlot(RecipeIngredientRole.INPUT, 1, 22)
+        recipe.getFluidInput()
+                .ifPresent(fluidIn -> builder.addSlot(RecipeIngredientRole.INPUT, 1, 22)
                         .setFluidRenderer(fluidIn.amount(), false, 16, 16)
-                        .addIngredients(NeoForgeTypes.FLUID_STACK, fluidIn.ingredient().fluids().stream()
-                                .map(h -> new FluidStack(h.value(), fluidIn.amount()))
-                                .toList()));
+                        .addIngredients(
+                                NeoForgeTypes.FLUID_STACK,
+                                fluidIn.ingredient().fluids().stream()
+                                        .map(h -> new FluidStack(h.value(), fluidIn.amount()))
+                                        .toList()));
 
         if (recipe.hasFluidOutput()) {
             builder.addSlot(RecipeIngredientRole.OUTPUT, 61, 1)
@@ -72,7 +74,12 @@ public class HorsePowerPressCategory extends BaseHPCategory<PressRecipe> {
     }
 
     @Override
-    public void draw(PressRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
+    public void draw(
+            PressRecipe recipe,
+            IRecipeSlotsView recipeSlotsView,
+            GuiGraphicsExtractor guiGraphics,
+            double mouseX,
+            double mouseY) {
         arrow.draw(guiGraphics, 26, 1);
 
         if (recipe.hasFluidOutput()) {

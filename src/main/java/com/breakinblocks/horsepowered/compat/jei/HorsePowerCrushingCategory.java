@@ -4,6 +4,7 @@ import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import com.breakinblocks.horsepowered.recipes.CrushingRecipe;
+import java.util.List;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
@@ -17,8 +18,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
-
-import java.util.List;
 
 public class HorsePowerCrushingCategory extends BaseHPCategory<CrushingRecipe> {
 
@@ -68,7 +67,12 @@ public class HorsePowerCrushingCategory extends BaseHPCategory<CrushingRecipe> {
     }
 
     @Override
-    public void draw(CrushingRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
+    public void draw(
+            CrushingRecipe recipe,
+            IRecipeSlotsView recipeSlotsView,
+            GuiGraphicsExtractor guiGraphics,
+            double mouseX,
+            double mouseY) {
         arrow.draw(guiGraphics, 38, 26);
 
         int strikes = recipe.getTime() * HorsePowerConfig.crushingMultiplier.get();
@@ -77,10 +81,11 @@ public class HorsePowerCrushingCategory extends BaseHPCategory<CrushingRecipe> {
         guiGraphics.text(Minecraft.getInstance().font, strikeText, (WIDTH - strikeWidth) / 2, 48, 0xFF808080, false);
 
         if (recipe.getHungerCost() > 0.0F) {
-            Component hungerText = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.hunger",
-                    String.format("%.2f", recipe.getHungerCost()));
+            Component hungerText = Component.translatable(
+                    "gui." + HorsePowerMod.MOD_ID + ".jei.hunger", String.format("%.2f", recipe.getHungerCost()));
             int hungerWidth = Minecraft.getInstance().font.width(hungerText);
-            guiGraphics.text(Minecraft.getInstance().font, hungerText, (WIDTH - hungerWidth) / 2, 58, 0xFF808080, false);
+            guiGraphics.text(
+                    Minecraft.getInstance().font, hungerText, (WIDTH - hungerWidth) / 2, 58, 0xFF808080, false);
         }
     }
 }

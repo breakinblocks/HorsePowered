@@ -1,11 +1,10 @@
 package com.breakinblocks.horsepowered.config;
 
-import net.minecraft.resources.Identifier;
-import net.neoforged.neoforge.common.ModConfigSpec;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.minecraft.resources.Identifier;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class HorsePowerConfig {
 
@@ -70,11 +69,13 @@ public class HorsePowerConfig {
                     .define("shouldDamageAxe", true);
 
             choppingBlockDrop = commonBuilder
-                    .comment("If true the manual chopping block will drop the result items. If false it will put them in internal inventory.")
+                    .comment(
+                            "If true the manual chopping block will drop the result items. If false it will put them in internal inventory.")
                     .define("choppingBlockDrop", true);
 
             pointsForWindup = commonBuilder
-                    .comment("The amount of points for the chopper to do windup and do a chop. One lap around the chopping block is 8 points.")
+                    .comment(
+                            "The amount of points for the chopper to do windup and do a chop. One lap around the chopping block is 8 points.")
                     .defineInRange("pointsForWindup", 8, 1, Integer.MAX_VALUE);
 
             pointsPerRotation = commonBuilder
@@ -106,7 +107,8 @@ public class HorsePowerConfig {
                     .define("shouldDamageGraniteAnvilPickaxe", true);
 
             graniteAnvilDrop = commonBuilder
-                    .comment("If true the granite anvil will drop the result items. If false it will put them in internal inventory.")
+                    .comment(
+                            "If true the granite anvil will drop the result items. If false it will put them in internal inventory.")
                     .define("graniteAnvilDrop", true);
 
             crushingMultiplier = commonBuilder
@@ -122,7 +124,8 @@ public class HorsePowerConfig {
         commonBuilder.comment("Horse path settings").push("horse_path");
         {
             pathObstructionTolerance = commonBuilder
-                    .comment("How many non-replaceable blocks (chests, hoppers, gears, etc.) are tolerated in the horse's 7x7 working ring before validation fails. Levers are always allowed.")
+                    .comment(
+                            "How many non-replaceable blocks (chests, hoppers, gears, etc.) are tolerated in the horse's 7x7 working ring before validation fails. Levers are always allowed.")
                     .defineInRange("pathObstructionTolerance", 2, 0, 40);
 
             pathSpeedDefault = commonBuilder
@@ -135,7 +138,8 @@ public class HorsePowerConfig {
                             "Format: \"namespace:block_id=multiplier\". Multipliers below 1.0 slow the worker, above 1.0 speed it up.",
                             "The final path speed is the average of the multipliers of every unique floor block the path crosses.",
                             "Any block listed here also counts as valid floor, even if its top is not a full block (such as dirt paths).")
-                    .defineListAllowEmpty("pathSpeedEntries",
+                    .defineListAllowEmpty(
+                            "pathSpeedEntries",
                             List.of(
                                     "minecraft:grass_block=0.5",
                                     "minecraft:dirt=0.5",

@@ -20,10 +20,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
-public class AnimalTrapBlockEntityRenderer implements BlockEntityRenderer<AnimalTrapBlockEntity, AnimalTrapBlockEntityRenderer.AnimalTrapRenderState> {
+public class AnimalTrapBlockEntityRenderer
+        implements BlockEntityRenderer<AnimalTrapBlockEntity, AnimalTrapBlockEntityRenderer.AnimalTrapRenderState> {
 
-    public AnimalTrapBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
-    }
+    public AnimalTrapBlockEntityRenderer(BlockEntityRendererProvider.Context context) {}
 
     @Override
     public AnimalTrapRenderState createRenderState() {
@@ -31,8 +31,12 @@ public class AnimalTrapBlockEntityRenderer implements BlockEntityRenderer<Animal
     }
 
     @Override
-    public void extractRenderState(AnimalTrapBlockEntity be, AnimalTrapRenderState state, float partialTick,
-                                   Vec3 cameraPos, ModelFeatureRenderer.@Nullable CrumblingOverlay crumblingOverlay) {
+    public void extractRenderState(
+            AnimalTrapBlockEntity be,
+            AnimalTrapRenderState state,
+            float partialTick,
+            Vec3 cameraPos,
+            ModelFeatureRenderer.@Nullable CrumblingOverlay crumblingOverlay) {
         BlockEntityRenderState.extractBase(be, state, crumblingOverlay);
         state.spin = Mth.lerp(partialTick, (float) be.getOSpin(), (float) be.getSpin());
 
@@ -74,7 +78,8 @@ public class AnimalTrapBlockEntityRenderer implements BlockEntityRenderer<Animal
     }
 
     @Override
-    public void submit(AnimalTrapRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
+    public void submit(
+            AnimalTrapRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
         if (state.entityRenderer != null && state.entityState != null) {
             poseStack.pushPose();
             poseStack.translate(0.5F, 0.0F, 0.5F);
@@ -101,15 +106,25 @@ public class AnimalTrapBlockEntityRenderer implements BlockEntityRenderer<Animal
             poseStack.translate(0.5F, 0.45F, 0.5F);
             poseStack.mulPose(Axis.YP.rotationDegrees(state.spin * 10.0F));
             poseStack.scale(0.6F, 0.6F, 0.6F);
-            state.baitItem.submit(poseStack, collector, state.lightCoords, net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY, 0);
+            state.baitItem.submit(
+                    poseStack,
+                    collector,
+                    state.lightCoords,
+                    net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY,
+                    0);
             poseStack.popPose();
         }
     }
 
     public static class AnimalTrapRenderState extends BlockEntityRenderState {
         public float spin;
-        @Nullable public EntityRenderer<Entity, EntityRenderState> entityRenderer;
-        @Nullable public EntityRenderState entityState;
+
+        @Nullable
+        public EntityRenderer<Entity, EntityRenderState> entityRenderer;
+
+        @Nullable
+        public EntityRenderState entityState;
+
         public float entityWidth;
         public float entityHeight;
         public final ItemStackRenderState baitItem = new ItemStackRenderState();

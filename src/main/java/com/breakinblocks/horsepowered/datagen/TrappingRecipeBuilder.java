@@ -2,6 +2,7 @@ package com.breakinblocks.horsepowered.datagen;
 
 import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.recipes.TrappingRecipe;
+import java.util.Optional;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeOutput;
@@ -13,8 +14,6 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.biome.Biome;
-
-import java.util.Optional;
 
 public class TrappingRecipeBuilder {
 
@@ -79,8 +78,20 @@ public class TrappingRecipeBuilder {
     }
 
     public void save(RecipeOutput output, String name) {
-        ResourceKey<Recipe<?>> key = ResourceKey.create(Registries.RECIPE,
-                HorsePowerMod.id("trapping/" + name));
-        output.accept(key, new TrappingRecipe(bait, entityId, time, priority, biome, waterlogged, baitConsumed, baitConsumeChance, title, icon), null);
+        ResourceKey<Recipe<?>> key = ResourceKey.create(Registries.RECIPE, HorsePowerMod.id("trapping/" + name));
+        output.accept(
+                key,
+                new TrappingRecipe(
+                        bait,
+                        entityId,
+                        time,
+                        priority,
+                        biome,
+                        waterlogged,
+                        baitConsumed,
+                        baitConsumeChance,
+                        title,
+                        icon),
+                null);
     }
 }

@@ -43,8 +43,7 @@ public class BottlingRecipeBuilder {
     }
 
     public void save(RecipeOutput output, String name) {
-        ResourceKey<Recipe<?>> key = ResourceKey.create(Registries.RECIPE,
-                HorsePowerMod.id("bottling/" + name));
+        ResourceKey<Recipe<?>> key = ResourceKey.create(Registries.RECIPE, HorsePowerMod.id("bottling/" + name));
         output.accept(key, new BottlingRecipe(container, fluid, result, priority), null);
     }
 }

@@ -3,13 +3,14 @@ package com.breakinblocks.horsepowered.recipes;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import java.util.Optional;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
@@ -23,8 +24,6 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.biome.Biome;
 
-import java.util.Optional;
-
 public class TrappingRecipe extends BaseHPRecipe {
 
     private final Identifier entityId;
@@ -37,10 +36,17 @@ public class TrappingRecipe extends BaseHPRecipe {
     private final Optional<String> title;
     private final Optional<Identifier> icon;
 
-    public TrappingRecipe(Ingredient bait, Identifier entityId, int time, int priority,
-                          Optional<TagKey<Biome>> biome, boolean waterlogged,
-                          boolean baitConsumed, double baitConsumeChance,
-                          Optional<String> title, Optional<Identifier> icon) {
+    public TrappingRecipe(
+            Ingredient bait,
+            Identifier entityId,
+            int time,
+            int priority,
+            Optional<TagKey<Biome>> biome,
+            boolean waterlogged,
+            boolean baitConsumed,
+            double baitConsumeChance,
+            Optional<String> title,
+            Optional<Identifier> icon) {
         super(bait, null);
         this.entityId = entityId;
         this.time = Math.max(1, time);
@@ -117,8 +123,8 @@ public class TrappingRecipe extends BaseHPRecipe {
             Optional<Holder<Item>> egg = SpawnEggItem.byId(type);
             if (egg.isPresent()) return new ItemStack(egg.get().value());
         }
-        Identifier conventional = Identifier.fromNamespaceAndPath(
-                entityId.getNamespace(), entityId.getPath() + "_spawn_egg");
+        Identifier conventional =
+                Identifier.fromNamespaceAndPath(entityId.getNamespace(), entityId.getPath() + "_spawn_egg");
         if (BuiltInRegistries.ITEM.containsKey(conventional)) {
             return new ItemStack(BuiltInRegistries.ITEM.getValue(conventional));
         }
@@ -136,8 +142,7 @@ public class TrappingRecipe extends BaseHPRecipe {
         return Component.literal(entityId.toString());
     }
 
-    public static final MapCodec<TrappingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance ->
-            instance.group(
+    public static final MapCodec<TrappingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
                     Ingredient.CODEC.fieldOf("bait").forGetter(TrappingRecipe::getBait),
                     Identifier.CODEC.fieldOf("entity").forGetter(TrappingRecipe::getEntityId),
                     Codec.INT.optionalFieldOf("time", 1200).forGetter(TrappingRecipe::getTime),
@@ -145,11 +150,12 @@ public class TrappingRecipe extends BaseHPRecipe {
                     TagKey.codec(Registries.BIOME).optionalFieldOf("biome").forGetter(TrappingRecipe::getBiome),
                     Codec.BOOL.optionalFieldOf("waterlogged", false).forGetter(TrappingRecipe::isWaterlogged),
                     Codec.BOOL.optionalFieldOf("baitConsumed", false).forGetter(TrappingRecipe::isBaitConsumed),
-                    Codec.doubleRange(0.01D, 100.0D).optionalFieldOf("baitConsumeChance", 100.0D).forGetter(TrappingRecipe::getBaitConsumeChance),
+                    Codec.doubleRange(0.01D, 100.0D)
+                            .optionalFieldOf("baitConsumeChance", 100.0D)
+                            .forGetter(TrappingRecipe::getBaitConsumeChance),
                     Codec.STRING.optionalFieldOf("title").forGetter(TrappingRecipe::getTitle),
-                    Identifier.CODEC.optionalFieldOf("icon").forGetter(TrappingRecipe::getIcon)
-            ).apply(instance, TrappingRecipe::new)
-    );
+                    Identifier.CODEC.optionalFieldOf("icon").forGetter(TrappingRecipe::getIcon))
+            .apply(instance, TrappingRecipe::new));
 
     private static final StreamCodec<RegistryFriendlyByteBuf, Optional<String>> OPTIONAL_STRING =
             ByteBufCodecs.optional(ByteBufCodecs.STRING_UTF8).cast();
@@ -172,7 +178,8 @@ public class TrappingRecipe extends BaseHPRecipe {
             double baitConsumeChance = ByteBufCodecs.DOUBLE.decode(buf);
             Optional<String> title = OPTIONAL_STRING.decode(buf);
             Optional<Identifier> icon = OPTIONAL_ID.decode(buf);
-            return new TrappingRecipe(bait, entityId, time, priority, biome, waterlogged, baitConsumed, baitConsumeChance, title, icon);
+            return new TrappingRecipe(
+                    bait, entityId, time, priority, biome, waterlogged, baitConsumed, baitConsumeChance, title, icon);
         }
 
         @Override

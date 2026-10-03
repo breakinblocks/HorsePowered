@@ -18,10 +18,10 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
-public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBlockEntity, ChopperBlockEntityRenderer.ChopperRenderState> {
+public class ChopperBlockEntityRenderer
+        implements BlockEntityRenderer<ChopperBlockEntity, ChopperBlockEntityRenderer.ChopperRenderState> {
 
-    public ChopperBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
-    }
+    public ChopperBlockEntityRenderer(BlockEntityRendererProvider.Context context) {}
 
     @Override
     public ChopperRenderState createRenderState() {
@@ -29,8 +29,12 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
     }
 
     @Override
-    public void extractRenderState(ChopperBlockEntity blockEntity, ChopperRenderState state, float partialTick,
-                                   Vec3 cameraPos, @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
+    public void extractRenderState(
+            ChopperBlockEntity blockEntity,
+            ChopperRenderState state,
+            float partialTick,
+            Vec3 cameraPos,
+            @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
         BlockEntityRenderState.extractBase(blockEntity, state, crumblingOverlay);
         // Skip the remaining state extraction when the BE is being destroyed — otherwise
         // item-model/texture lookups in the final frame can produce a purple/black flash.
@@ -47,9 +51,8 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
         state.visualWindup = blockEntity.getVisualWindup();
 
         BlockState blockState = blockEntity.getBlockState();
-        state.facingRotation = blockState.hasProperty(BlockChopper.FACING)
-                ? rotationFor(blockState.getValue(BlockChopper.FACING))
-                : 0;
+        state.facingRotation =
+                blockState.hasProperty(BlockChopper.FACING) ? rotationFor(blockState.getValue(BlockChopper.FACING)) : 0;
 
         RenderUtils.extractItemState(state.inputItem, blockEntity.getItem(0), blockEntity.getLevel());
         RenderUtils.extractItemState(state.outputItem, blockEntity.getItem(1), blockEntity.getLevel());
@@ -70,7 +73,8 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
     }
 
     @Override
-    public void submit(ChopperRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
+    public void submit(
+            ChopperRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
         if (state.skipSubmit) return;
 
         HorseBlockRenderState.submitWorkerAndArea(state, poseStack, collector, camera);
@@ -84,17 +88,32 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
         BladeRenderer.renderBlade(poseStack, collector, state.visualWindup, state.lightCoords);
         poseStack.popPose();
 
-        RenderUtils.renderStandingItem(state.inputItem, poseStack, collector, state.lightCoords,
-                0.5D, 0.6D, 0.5D, 0.6F);
+        RenderUtils.renderStandingItem(
+                state.inputItem, poseStack, collector, state.lightCoords, 0.5D, 0.6D, 0.5D, 0.6F);
 
-        RenderUtils.renderFlatItem(state.outputItem, poseStack, collector, state.lightCoords,
-                0.5D, 0.2D, 0.9D, 0.3F);
+        RenderUtils.renderFlatItem(state.outputItem, poseStack, collector, state.lightCoords, 0.5D, 0.2D, 0.9D, 0.3F);
 
         if (state.showCounts) {
-            RenderUtils.submitItemCount(state.inputCount, poseStack, collector, state.lightCoords,
-                    state.distanceToCameraSq, camera, 0.5D, 1.15D, 0.5D);
-            RenderUtils.submitItemCount(state.outputCount, poseStack, collector, state.lightCoords,
-                    state.distanceToCameraSq, camera, 0.5D, 0.5D, 0.9D);
+            RenderUtils.submitItemCount(
+                    state.inputCount,
+                    poseStack,
+                    collector,
+                    state.lightCoords,
+                    state.distanceToCameraSq,
+                    camera,
+                    0.5D,
+                    1.15D,
+                    0.5D);
+            RenderUtils.submitItemCount(
+                    state.outputCount,
+                    poseStack,
+                    collector,
+                    state.lightCoords,
+                    state.distanceToCameraSq,
+                    camera,
+                    0.5D,
+                    0.5D,
+                    0.9D);
         }
     }
 
@@ -106,8 +125,7 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
     @Override
     public AABB getRenderBoundingBox(ChopperBlockEntity blockEntity) {
         BlockPos pos = blockEntity.getBlockPos();
-        return new AABB(pos.getX() - 3, pos.getY(), pos.getZ() - 3,
-                        pos.getX() + 4, pos.getY() + 4, pos.getZ() + 4);
+        return new AABB(pos.getX() - 3, pos.getY(), pos.getZ() - 3, pos.getX() + 4, pos.getY() + 4, pos.getZ() + 4);
     }
 
     public static class ChopperRenderState extends HorseBlockRenderState {

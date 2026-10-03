@@ -19,7 +19,13 @@ public class ChoppingRecipe extends BaseHPRecipe {
     private final int priority;
     private final float hungerCost;
 
-    public ChoppingRecipe(Ingredient ingredient, ItemStackTemplate result, int time, RecipeTier tier, int priority, float hungerCost) {
+    public ChoppingRecipe(
+            Ingredient ingredient,
+            ItemStackTemplate result,
+            int time,
+            RecipeTier tier,
+            int priority,
+            float hungerCost) {
         super(ingredient, result);
         this.time = time;
         this.tier = tier;
@@ -58,16 +64,14 @@ public class ChoppingRecipe extends BaseHPRecipe {
         return hungerCost;
     }
 
-    public static final MapCodec<ChoppingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance ->
-            instance.group(
+    public static final MapCodec<ChoppingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
                     Ingredient.CODEC.fieldOf("ingredient").forGetter(ChoppingRecipe::getIngredient),
                     ItemStackTemplate.CODEC.fieldOf("result").forGetter(ChoppingRecipe::getResult),
                     Codec.INT.fieldOf("time").forGetter(ChoppingRecipe::getTime),
                     RecipeTier.CODEC.optionalFieldOf("tier", RecipeTier.ANY).forGetter(ChoppingRecipe::getTier),
                     Codec.INT.optionalFieldOf("priority", 0).forGetter(ChoppingRecipe::getPriority),
-                    Codec.FLOAT.optionalFieldOf("hungerCost", 0.0F).forGetter(ChoppingRecipe::getHungerCost)
-            ).apply(instance, ChoppingRecipe::new)
-    );
+                    Codec.FLOAT.optionalFieldOf("hungerCost", 0.0F).forGetter(ChoppingRecipe::getHungerCost))
+            .apply(instance, ChoppingRecipe::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, ChoppingRecipe> STREAM_CODEC = new StreamCodec<>() {
         @Override

@@ -2,8 +2,8 @@ package com.breakinblocks.horsepowered.client.renderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.world.phys.Vec3;
 
 public class LeadRenderer {
@@ -18,8 +18,8 @@ public class LeadRenderer {
     private static final float ROPE_HALF_WIDTH = 0.025f;
 
     // Both positions are expected in block-local coordinates (block origin = 0,0,0).
-    public static void renderLead(Vec3 blockAttachment, Vec3 entityPos,
-                                   PoseStack poseStack, SubmitNodeCollector collector) {
+    public static void renderLead(
+            Vec3 blockAttachment, Vec3 entityPos, PoseStack poseStack, SubmitNodeCollector collector) {
         if (entityPos == null || blockAttachment == null) return;
 
         double dx = entityPos.x - blockAttachment.x;
@@ -30,13 +30,9 @@ public class LeadRenderer {
         poseStack.translate(blockAttachment.x, blockAttachment.y, blockAttachment.z);
 
         // Submit custom geometry for the leash using quads for proper thickness
-        collector.submitCustomGeometry(
-                poseStack,
-                RenderTypes.debugQuads(),
-                (pose, consumer) -> {
-                    renderLeashRibbon(consumer, pose, dx, dy, dz);
-                }
-        );
+        collector.submitCustomGeometry(poseStack, RenderTypes.debugQuads(), (pose, consumer) -> {
+            renderLeashRibbon(consumer, pose, dx, dy, dz);
+        });
 
         poseStack.popPose();
     }
@@ -45,8 +41,7 @@ public class LeadRenderer {
      * Renders the leash as a ribbon of quads with proper thickness.
      * Creates two perpendicular ribbons (cross shape) for visibility from any angle.
      */
-    private static void renderLeashRibbon(VertexConsumer buffer, PoseStack.Pose pose,
-                                           double dx, double dy, double dz) {
+    private static void renderLeashRibbon(VertexConsumer buffer, PoseStack.Pose pose, double dx, double dy, double dz) {
         // Number of segments in the leash
         int segments = 24;
 

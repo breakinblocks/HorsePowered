@@ -6,7 +6,6 @@ import com.breakinblocks.horsepowered.recipes.RecipeTier;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
@@ -54,8 +53,7 @@ public class ChoppingRecipeBuilder {
     }
 
     public void save(RecipeOutput output, String name) {
-        ResourceKey<Recipe<?>> key = ResourceKey.create(Registries.RECIPE,
-                HorsePowerMod.id("chopping/" + name));
+        ResourceKey<Recipe<?>> key = ResourceKey.create(Registries.RECIPE, HorsePowerMod.id("chopping/" + name));
         output.accept(key, new ChoppingRecipe(ingredient, result, time, tier, priority, hungerCost), null);
     }
 }

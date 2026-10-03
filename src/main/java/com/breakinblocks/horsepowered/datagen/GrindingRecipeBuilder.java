@@ -3,6 +3,7 @@ package com.breakinblocks.horsepowered.datagen;
 import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.recipes.GrindstoneRecipe;
 import com.breakinblocks.horsepowered.recipes.RecipeTier;
+import java.util.Optional;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceKey;
@@ -11,8 +12,6 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.ItemLike;
 import org.jspecify.annotations.Nullable;
-
-import java.util.Optional;
 
 public class GrindingRecipeBuilder {
     private final Ingredient ingredient;
@@ -64,9 +63,18 @@ public class GrindingRecipeBuilder {
     }
 
     public void save(RecipeOutput output, String name) {
-        ResourceKey<Recipe<?>> key = ResourceKey.create(Registries.RECIPE,
-                HorsePowerMod.id("grinding/" + name));
-        output.accept(key, new GrindstoneRecipe(ingredient, result,
-                Optional.ofNullable(secondary), secondaryChance, time, tier, priority, hungerCost), null);
+        ResourceKey<Recipe<?>> key = ResourceKey.create(Registries.RECIPE, HorsePowerMod.id("grinding/" + name));
+        output.accept(
+                key,
+                new GrindstoneRecipe(
+                        ingredient,
+                        result,
+                        Optional.ofNullable(secondary),
+                        secondaryChance,
+                        time,
+                        tier,
+                        priority,
+                        hungerCost),
+                null);
     }
 }

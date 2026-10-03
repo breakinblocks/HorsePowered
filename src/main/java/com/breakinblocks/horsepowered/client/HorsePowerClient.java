@@ -2,10 +2,10 @@ package com.breakinblocks.horsepowered.client;
 
 import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.blockentity.ModBlockEntities;
+import com.breakinblocks.horsepowered.client.renderer.AnimalTrapBlockEntityRenderer;
 import com.breakinblocks.horsepowered.client.renderer.ChopperBlockEntityRenderer;
 import com.breakinblocks.horsepowered.client.renderer.DryingRackBlockEntityRenderer;
 import com.breakinblocks.horsepowered.client.renderer.GeneratorBlockEntityRenderer;
-import com.breakinblocks.horsepowered.client.renderer.AnimalTrapBlockEntityRenderer;
 import com.breakinblocks.horsepowered.client.renderer.GraniteAnvilBlockEntityRenderer;
 import com.breakinblocks.horsepowered.client.renderer.GrindstoneBlockEntityRenderer;
 import com.breakinblocks.horsepowered.client.renderer.HandGrindstoneBlockEntityRenderer;
@@ -21,14 +21,14 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterFluidModelsEvent;
 import net.neoforged.neoforge.client.event.RegisterSpecialModelRendererEvent;
-import net.neoforged.neoforge.client.fluid.FluidTintSources;
 
 @EventBusSubscriber(modid = HorsePowerMod.MOD_ID, value = Dist.CLIENT)
 public class HorsePowerClient {
 
     @SubscribeEvent
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
-        event.registerBlockEntityRenderer(ModBlockEntities.HAND_GRINDSTONE.get(), HandGrindstoneBlockEntityRenderer::new);
+        event.registerBlockEntityRenderer(
+                ModBlockEntities.HAND_GRINDSTONE.get(), HandGrindstoneBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.GRINDSTONE.get(), GrindstoneBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.CHOPPING_BLOCK.get(), ManualChopperBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.CHOPPER.get(), ChopperBlockEntityRenderer::new);
@@ -52,9 +52,7 @@ public class HorsePowerClient {
                 new Material(HorsePowerMod.id("block/seed_oil_flow")),
                 new Material(HorsePowerMod.id("block/seed_oil_still")),
                 null // no tint — color is baked into the texture
-        );
-        event.register(seedOilModel,
-                ModFluids.SEED_OIL_SOURCE.get(),
-                ModFluids.SEED_OIL_FLOWING.get());
+                );
+        event.register(seedOilModel, ModFluids.SEED_OIL_SOURCE.get(), ModFluids.SEED_OIL_FLOWING.get());
     }
 }

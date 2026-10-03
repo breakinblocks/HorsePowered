@@ -14,10 +14,10 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
-public class GrindstoneBlockEntityRenderer implements BlockEntityRenderer<GrindstoneBlockEntity, GrindstoneBlockEntityRenderer.GrindstoneRenderState> {
+public class GrindstoneBlockEntityRenderer
+        implements BlockEntityRenderer<GrindstoneBlockEntity, GrindstoneBlockEntityRenderer.GrindstoneRenderState> {
 
-    public GrindstoneBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
-    }
+    public GrindstoneBlockEntityRenderer(BlockEntityRendererProvider.Context context) {}
 
     @Override
     public GrindstoneRenderState createRenderState() {
@@ -25,8 +25,12 @@ public class GrindstoneBlockEntityRenderer implements BlockEntityRenderer<Grinds
     }
 
     @Override
-    public void extractRenderState(GrindstoneBlockEntity blockEntity, GrindstoneRenderState state, float partialTick,
-                                   Vec3 cameraPos, @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
+    public void extractRenderState(
+            GrindstoneBlockEntity blockEntity,
+            GrindstoneRenderState state,
+            float partialTick,
+            Vec3 cameraPos,
+            @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
         BlockEntityRenderState.extractBase(blockEntity, state, crumblingOverlay);
         HorseBlockRenderState.extractWorkerState(blockEntity, state, partialTick);
 
@@ -42,20 +46,46 @@ public class GrindstoneBlockEntityRenderer implements BlockEntityRenderer<Grinds
     }
 
     @Override
-    public void submit(GrindstoneRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
+    public void submit(
+            GrindstoneRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
         HorseBlockRenderState.submitWorkerAndArea(state, poseStack, collector, camera);
 
         RenderUtils.renderFlatItem(state.inputItem, poseStack, collector, state.lightCoords, 0.5D, 0.55D, 0.5D, 0.4F);
         RenderUtils.renderFlatItem(state.outputItem, poseStack, collector, state.lightCoords, 0.5D, 0.2D, 0.18D, 0.3F);
-        RenderUtils.renderFlatItem(state.secondaryItem, poseStack, collector, state.lightCoords, 0.5D, 0.2D, 0.82D, 0.3F);
+        RenderUtils.renderFlatItem(
+                state.secondaryItem, poseStack, collector, state.lightCoords, 0.5D, 0.2D, 0.82D, 0.3F);
 
         if (state.showCounts) {
-            RenderUtils.submitItemCount(state.inputCount, poseStack, collector, state.lightCoords,
-                    state.distanceToCameraSq, camera, 0.5D, 0.95D, 0.5D);
-            RenderUtils.submitItemCount(state.outputCount, poseStack, collector, state.lightCoords,
-                    state.distanceToCameraSq, camera, 0.5D, 0.5D, 0.18D);
-            RenderUtils.submitItemCount(state.secondaryCount, poseStack, collector, state.lightCoords,
-                    state.distanceToCameraSq, camera, 0.5D, 0.5D, 0.82D);
+            RenderUtils.submitItemCount(
+                    state.inputCount,
+                    poseStack,
+                    collector,
+                    state.lightCoords,
+                    state.distanceToCameraSq,
+                    camera,
+                    0.5D,
+                    0.95D,
+                    0.5D);
+            RenderUtils.submitItemCount(
+                    state.outputCount,
+                    poseStack,
+                    collector,
+                    state.lightCoords,
+                    state.distanceToCameraSq,
+                    camera,
+                    0.5D,
+                    0.5D,
+                    0.18D);
+            RenderUtils.submitItemCount(
+                    state.secondaryCount,
+                    poseStack,
+                    collector,
+                    state.lightCoords,
+                    state.distanceToCameraSq,
+                    camera,
+                    0.5D,
+                    0.5D,
+                    0.82D);
         }
     }
 
@@ -67,8 +97,7 @@ public class GrindstoneBlockEntityRenderer implements BlockEntityRenderer<Grinds
     @Override
     public AABB getRenderBoundingBox(GrindstoneBlockEntity blockEntity) {
         BlockPos pos = blockEntity.getBlockPos();
-        return new AABB(pos.getX() - 3, pos.getY(), pos.getZ() - 3,
-                        pos.getX() + 4, pos.getY() + 4, pos.getZ() + 4);
+        return new AABB(pos.getX() - 3, pos.getY(), pos.getZ() - 3, pos.getX() + 4, pos.getY() + 4, pos.getZ() + 4);
     }
 
     public static class GrindstoneRenderState extends HorseBlockRenderState {

@@ -3,6 +3,8 @@ package com.breakinblocks.horsepowered.blockentity;
 import com.breakinblocks.horsepowered.events.HPDatapackSync;
 import com.breakinblocks.horsepowered.recipes.HPRecipeInput;
 import com.mojang.logging.LogUtils;
+import java.util.Optional;
+import java.util.function.Predicate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -28,9 +30,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Optional;
-import java.util.function.Predicate;
 import org.slf4j.Logger;
 
 public abstract class HPBlockEntityBase extends BlockEntity implements Container, WorldlyContainer {
@@ -114,8 +113,7 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
      * Called when slot 0 changes to a different item type.
      * Override in subclasses to reset progress counters.
      */
-    protected void onInputChanged() {
-    }
+    protected void onInputChanged() {}
 
     public int getMaxStackSize(ItemStack stack) {
         return Math.min(getInventoryStackLimit(stack), stack.getMaxStackSize());
@@ -126,7 +124,9 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
         if (level == null || level.getBlockEntity(worldPosition) != this) {
             return false;
         }
-        return player.distanceToSqr(worldPosition.getX() + 0.5D, worldPosition.getY() + 0.5D, worldPosition.getZ() + 0.5D) <= 64.0D;
+        return player.distanceToSqr(
+                        worldPosition.getX() + 0.5D, worldPosition.getY() + 0.5D, worldPosition.getZ() + 0.5D)
+                <= 64.0D;
     }
 
     @Override
@@ -300,18 +300,21 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
      * Looks up a recipe of the given type for the specified input item.
      * Centralizes the common recipe lookup pattern used across all block entities.
      */
-    protected <T extends Recipe<HPRecipeInput>> Optional<RecipeHolder<T>> findRecipe(RecipeType<T> type, ItemStack input) {
+    protected <T extends Recipe<HPRecipeInput>> Optional<RecipeHolder<T>> findRecipe(
+            RecipeType<T> type, ItemStack input) {
         RecipeMap recipes = recipeMap();
         if (recipes == null) return Optional.empty();
         try {
-            return recipes.<HPRecipeInput, T>getRecipesFor(type, new HPRecipeInput(input), level).findFirst();
+            return recipes.<HPRecipeInput, T>getRecipesFor(type, new HPRecipeInput(input), level)
+                    .findFirst();
         } catch (Exception e) {
             LOGGER.error("[HorsePowered] Recipe lookup failed for type {} with input {}", type, input, e);
             return Optional.empty();
         }
     }
 
-    protected <T extends Recipe<HPRecipeInput>> Optional<RecipeHolder<T>> findRecipe(RecipeType<T> type, ItemStack input, Predicate<T> filter) {
+    protected <T extends Recipe<HPRecipeInput>> Optional<RecipeHolder<T>> findRecipe(
+            RecipeType<T> type, ItemStack input, Predicate<T> filter) {
         RecipeMap recipes = recipeMap();
         if (recipes == null) return Optional.empty();
         try {

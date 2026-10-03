@@ -18,25 +18,38 @@ public class FluidRenderer {
     // Inset from tank walls to avoid z-fighting.
     private static final float INSET = 0.001f;
 
-    public static void renderFluid(PoseStack poseStack, SubmitNodeCollector collector,
-                                    FluidStack fluidStack, int tankCapacity, int packedLight) {
-        renderFluidBand(poseStack, collector, fluidStack, tankCapacity, packedLight,
-                TANK_MIN_X + INSET, TANK_MAX_X - INSET);
+    public static void renderFluid(
+            PoseStack poseStack,
+            SubmitNodeCollector collector,
+            FluidStack fluidStack,
+            int tankCapacity,
+            int packedLight) {
+        renderFluidBand(
+                poseStack, collector, fluidStack, tankCapacity, packedLight, TANK_MIN_X + INSET, TANK_MAX_X - INSET);
     }
 
     // Used by the press's split-tank layout — input on the left, output on the right.
-    public static void renderFluidHalf(PoseStack poseStack, SubmitNodeCollector collector,
-                                        FluidStack fluidStack, int tankCapacity, int packedLight,
-                                        boolean leftHalf) {
+    public static void renderFluidHalf(
+            PoseStack poseStack,
+            SubmitNodeCollector collector,
+            FluidStack fluidStack,
+            int tankCapacity,
+            int packedLight,
+            boolean leftHalf) {
         float mid = (TANK_MIN_X + TANK_MAX_X) / 2f;
         float minX = leftHalf ? TANK_MIN_X + INSET : mid + INSET;
         float maxX = leftHalf ? mid - INSET : TANK_MAX_X - INSET;
         renderFluidBand(poseStack, collector, fluidStack, tankCapacity, packedLight, minX, maxX);
     }
 
-    private static void renderFluidBand(PoseStack poseStack, SubmitNodeCollector collector,
-                                         FluidStack fluidStack, int tankCapacity, int packedLight,
-                                         float minX, float maxX) {
+    private static void renderFluidBand(
+            PoseStack poseStack,
+            SubmitNodeCollector collector,
+            FluidStack fluidStack,
+            int tankCapacity,
+            int packedLight,
+            float minX,
+            float maxX) {
         if (fluidStack.isEmpty() || tankCapacity <= 0) return;
 
         // Calculate fill level
@@ -67,29 +80,32 @@ public class FluidRenderer {
         final float finalFluidMaxY = fluidMaxY;
 
         // Submit custom geometry for the fluid
-        collector.submitCustomGeometry(
-                poseStack,
-                RenderTypes.debugQuads(),
-                (pose, consumer) -> {
-                    renderFluidBox(consumer, pose,
-                            minX, fluidMinY, minZ,
-                            maxX, finalFluidMaxY, maxZ,
-                            finalR, finalG, finalB, finalA);
-                }
-        );
+        collector.submitCustomGeometry(poseStack, RenderTypes.debugQuads(), (pose, consumer) -> {
+            renderFluidBox(
+                    consumer, pose, minX, fluidMinY, minZ, maxX, finalFluidMaxY, maxZ, finalR, finalG, finalB, finalA);
+        });
     }
 
     /**
      * Renders a box for the fluid using quads.
      */
-    private static void renderFluidBox(VertexConsumer buffer, PoseStack.Pose pose,
-                                        float minX, float minY, float minZ,
-                                        float maxX, float maxY, float maxZ,
-                                        int r, int g, int b, int a) {
+    private static void renderFluidBox(
+            VertexConsumer buffer,
+            PoseStack.Pose pose,
+            float minX,
+            float minY,
+            float minZ,
+            float maxX,
+            float maxY,
+            float maxZ,
+            int r,
+            int g,
+            int b,
+            int a) {
         // Slightly darker color for side faces
-        int rDark = (int)(r * 0.8f);
-        int gDark = (int)(g * 0.8f);
-        int bDark = (int)(b * 0.8f);
+        int rDark = (int) (r * 0.8f);
+        int gDark = (int) (g * 0.8f);
+        int bDark = (int) (b * 0.8f);
 
         // Top face (fluid surface) - brightest
         buffer.addVertex(pose, minX, maxY, maxZ).setColor(r, g, b, a);

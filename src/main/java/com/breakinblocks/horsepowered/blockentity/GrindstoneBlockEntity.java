@@ -2,14 +2,13 @@ package com.breakinblocks.horsepowered.blockentity;
 
 import com.breakinblocks.horsepowered.recipes.GrindstoneRecipe;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
+import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-
-import java.util.Optional;
 
 public class GrindstoneBlockEntity extends HPBlockEntityHorseBase {
 
@@ -83,7 +82,8 @@ public class GrindstoneBlockEntity extends HPBlockEntityHorseBase {
     }
 
     public Optional<RecipeHolder<GrindstoneRecipe>> getRecipe() {
-        return findRecipe(HPRecipes.GRINDING_TYPE.get(), getItem(0), r -> r.getTier().allowsHorse());
+        return findRecipe(
+                HPRecipes.GRINDING_TYPE.get(), getItem(0), r -> r.getTier().allowsHorse());
     }
 
     @Override
@@ -120,7 +120,8 @@ public class GrindstoneBlockEntity extends HPBlockEntityHorseBase {
     @Override
     public boolean isItemValidForSlot(int index, ItemStack stack) {
         if (index != 0) return false;
-        return findRecipe(HPRecipes.GRINDING_TYPE.get(), stack, r -> r.getTier().allowsHorse()).isPresent();
+        return findRecipe(HPRecipes.GRINDING_TYPE.get(), stack, r -> r.getTier().allowsHorse())
+                .isPresent();
     }
 
     @Override

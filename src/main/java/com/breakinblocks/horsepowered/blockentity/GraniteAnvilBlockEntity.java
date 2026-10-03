@@ -3,6 +3,7 @@ package com.breakinblocks.horsepowered.blockentity;
 import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import com.breakinblocks.horsepowered.recipes.CrushingRecipe;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
+import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -13,8 +14,6 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-
-import java.util.Optional;
 
 public class GraniteAnvilBlockEntity extends HPBlockEntityBase {
 
@@ -84,7 +83,8 @@ public class GraniteAnvilBlockEntity extends HPBlockEntityBase {
         if (!level.isClientSide()) {
             ItemStack result = getRecipeOutput();
             if (HorsePowerConfig.graniteAnvilDrop.get()) {
-                Containers.dropItemStack(level, worldPosition.getX(), worldPosition.getY() + 0.5, worldPosition.getZ(), result.copy());
+                Containers.dropItemStack(
+                        level, worldPosition.getX(), worldPosition.getY() + 0.5, worldPosition.getZ(), result.copy());
             } else {
                 mergeOutput(1, result);
             }

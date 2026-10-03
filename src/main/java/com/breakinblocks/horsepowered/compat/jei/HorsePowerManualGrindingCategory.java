@@ -53,14 +53,19 @@ public class HorsePowerManualGrindingCategory extends BaseHPCategory<GrindstoneR
                     .add(recipe.createSecondary())
                     .setBackground(slot, -1, -1)
                     .addRichTooltipCallback((slotView, tooltip) -> {
-                        tooltip.add(Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.chance",
-                                recipe.getSecondaryChance()));
+                        tooltip.add(Component.translatable(
+                                "gui." + HorsePowerMod.MOD_ID + ".jei.chance", recipe.getSecondaryChance()));
                     });
         }
     }
 
     @Override
-    public void draw(GrindstoneRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
+    public void draw(
+            GrindstoneRecipe recipe,
+            IRecipeSlotsView recipeSlotsView,
+            GuiGraphicsExtractor guiGraphics,
+            double mouseX,
+            double mouseY) {
         arrow.draw(guiGraphics, 26, 1);
 
         int pointsPerTurn = HorsePowerConfig.pointsPerRotation.get();
@@ -74,8 +79,8 @@ public class HorsePowerManualGrindingCategory extends BaseHPCategory<GrindstoneR
         }
 
         if (recipe.getHungerCost() > 0.0F) {
-            Component hungerText = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.hunger",
-                    String.format("%.2f", recipe.getHungerCost()));
+            Component hungerText = Component.translatable(
+                    "gui." + HorsePowerMod.MOD_ID + ".jei.hunger", String.format("%.2f", recipe.getHungerCost()));
             guiGraphics.text(Minecraft.getInstance().font, hungerText, 1, 34, 0xFF808080, false);
         }
     }

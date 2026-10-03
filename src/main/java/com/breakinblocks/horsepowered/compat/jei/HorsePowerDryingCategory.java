@@ -49,10 +49,16 @@ public class HorsePowerDryingCategory extends BaseHPCategory<DryingRackRecipe> {
     }
 
     @Override
-    public void draw(DryingRackRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
+    public void draw(
+            DryingRackRecipe recipe,
+            IRecipeSlotsView recipeSlotsView,
+            GuiGraphicsExtractor guiGraphics,
+            double mouseX,
+            double mouseY) {
         arrow.draw(guiGraphics, 26, 1);
 
-        Component timeText = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.time", formatTime(recipe.getTime()));
+        Component timeText =
+                Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.time", formatTime(recipe.getTime()));
         int textWidth = Minecraft.getInstance().font.width(timeText);
         guiGraphics.text(Minecraft.getInstance().font, timeText, (WIDTH - textWidth) / 2, 24, 0xFF808080, false);
     }

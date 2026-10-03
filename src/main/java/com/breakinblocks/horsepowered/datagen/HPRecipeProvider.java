@@ -3,7 +3,10 @@ package com.breakinblocks.horsepowered.datagen;
 import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.items.ModItems;
+import java.util.concurrent.CompletableFuture;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeCategory;
@@ -12,27 +15,22 @@ import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.data.recipes.SimpleCookingRecipeBuilder;
-import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.crafting.CookingBookCategory;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.core.component.DataComponentPatch;
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.world.item.ItemStackTemplate;
-import net.minecraft.world.item.alchemy.PotionContents;
-import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.common.NeoForgeMod;
-
-import java.util.concurrent.CompletableFuture;
 
 public class HPRecipeProvider extends RecipeProvider.Runner {
 
@@ -71,7 +69,8 @@ public class HPRecipeProvider extends RecipeProvider.Runner {
         private void buildBottlingRecipes() {
             BottlingRecipeBuilder.bottling(Ingredient.of(Items.GLASS_BOTTLE))
                     .fluid(Fluids.WATER, 250)
-                    .result(new ItemStackTemplate(Items.POTION,
+                    .result(new ItemStackTemplate(
+                            Items.POTION,
                             DataComponentPatch.builder()
                                     .set(DataComponents.POTION_CONTENTS, new PotionContents(Potions.WATER))
                                     .build()))
@@ -118,7 +117,10 @@ public class HPRecipeProvider extends RecipeProvider.Runner {
             // Guide book recipe is hand-authored in guide.json because it outputs
             // guideme:guide with a custom component that ShapedRecipeBuilder can't express.
 
-            ShapedRecipeBuilder.shaped(this.registries.lookupOrThrow(Registries.ITEM), RecipeCategory.DECORATIONS, ModBlocks.HAND_GRINDSTONE.get())
+            ShapedRecipeBuilder.shaped(
+                            this.registries.lookupOrThrow(Registries.ITEM),
+                            RecipeCategory.DECORATIONS,
+                            ModBlocks.HAND_GRINDSTONE.get())
                     .pattern("S S")
                     .pattern("SSS")
                     .pattern("P P")
@@ -127,7 +129,10 @@ public class HPRecipeProvider extends RecipeProvider.Runner {
                     .unlockedBy("has_stone", has(Items.STONE))
                     .save(this.output, recipeKey("crafting/hand_grindstone"));
 
-            ShapedRecipeBuilder.shaped(this.registries.lookupOrThrow(Registries.ITEM), RecipeCategory.DECORATIONS, ModBlocks.GRINDSTONE.get())
+            ShapedRecipeBuilder.shaped(
+                            this.registries.lookupOrThrow(Registries.ITEM),
+                            RecipeCategory.DECORATIONS,
+                            ModBlocks.GRINDSTONE.get())
                     .pattern("S S")
                     .pattern("SSS")
                     .pattern("LLL")
@@ -136,13 +141,19 @@ public class HPRecipeProvider extends RecipeProvider.Runner {
                     .unlockedBy("has_stone", has(Items.STONE))
                     .save(this.output, recipeKey("crafting/grindstone"));
 
-            ShapelessRecipeBuilder.shapeless(this.registries.lookupOrThrow(Registries.ITEM), RecipeCategory.DECORATIONS, ModBlocks.CHOPPING_BLOCK.get())
+            ShapelessRecipeBuilder.shapeless(
+                            this.registries.lookupOrThrow(Registries.ITEM),
+                            RecipeCategory.DECORATIONS,
+                            ModBlocks.CHOPPING_BLOCK.get())
                     .requires(tag(ItemTags.LOGS))
                     .requires(tag(ItemTags.WOODEN_SLABS))
                     .unlockedBy("has_log", has(ItemTags.LOGS))
                     .save(this.output, recipeKey("crafting/chopping_block"));
 
-            ShapedRecipeBuilder.shaped(this.registries.lookupOrThrow(Registries.ITEM), RecipeCategory.DECORATIONS, ModBlocks.CHOPPER.get())
+            ShapedRecipeBuilder.shaped(
+                            this.registries.lookupOrThrow(Registries.ITEM),
+                            RecipeCategory.DECORATIONS,
+                            ModBlocks.CHOPPER.get())
                     .pattern("I I")
                     .pattern("LLL")
                     .pattern("LLL")
@@ -151,7 +162,10 @@ public class HPRecipeProvider extends RecipeProvider.Runner {
                     .unlockedBy("has_iron", has(Items.IRON_INGOT))
                     .save(this.output, recipeKey("crafting/chopper"));
 
-            ShapedRecipeBuilder.shaped(this.registries.lookupOrThrow(Registries.ITEM), RecipeCategory.DECORATIONS, ModBlocks.PRESS.get())
+            ShapedRecipeBuilder.shaped(
+                            this.registries.lookupOrThrow(Registries.ITEM),
+                            RecipeCategory.DECORATIONS,
+                            ModBlocks.PRESS.get())
                     .pattern("PPP")
                     .pattern("PIP")
                     .pattern("PPP")
@@ -160,7 +174,10 @@ public class HPRecipeProvider extends RecipeProvider.Runner {
                     .unlockedBy("has_piston", has(Items.PISTON))
                     .save(this.output, recipeKey("crafting/press"));
 
-            ShapedRecipeBuilder.shaped(this.registries.lookupOrThrow(Registries.ITEM), RecipeCategory.REDSTONE, ModBlocks.GENERATOR.get())
+            ShapedRecipeBuilder.shaped(
+                            this.registries.lookupOrThrow(Registries.ITEM),
+                            RecipeCategory.REDSTONE,
+                            ModBlocks.GENERATOR.get())
                     .pattern("SRS")
                     .pattern("DGD")
                     .pattern("DDD")
@@ -171,19 +188,26 @@ public class HPRecipeProvider extends RecipeProvider.Runner {
                     .unlockedBy("has_grindstone", has(ModBlocks.GRINDSTONE.get()))
                     .save(this.output, recipeKey("crafting/generator"));
 
-            ShapelessRecipeBuilder.shapeless(this.registries.lookupOrThrow(Registries.ITEM), RecipeCategory.FOOD, ModItems.DOUGH.get())
+            ShapelessRecipeBuilder.shapeless(
+                            this.registries.lookupOrThrow(Registries.ITEM), RecipeCategory.FOOD, ModItems.DOUGH.get())
                     .requires(ModItems.FLOUR.get())
                     .requires(Items.WATER_BUCKET)
                     .unlockedBy("has_flour", has(ModItems.FLOUR.get()))
                     .save(this.output, recipeKey("crafting/dough"));
 
-            ShapelessRecipeBuilder.shapeless(this.registries.lookupOrThrow(Registries.ITEM), RecipeCategory.TOOLS, ModItems.WORK_SADDLE.get())
+            ShapelessRecipeBuilder.shapeless(
+                            this.registries.lookupOrThrow(Registries.ITEM),
+                            RecipeCategory.TOOLS,
+                            ModItems.WORK_SADDLE.get())
                     .requires(Items.SADDLE)
                     .requires(Items.LEAD)
                     .unlockedBy("has_saddle", has(Items.SADDLE))
                     .save(this.output, recipeKey("crafting/work_saddle"));
 
-            ShapedRecipeBuilder.shaped(this.registries.lookupOrThrow(Registries.ITEM), RecipeCategory.DECORATIONS, ModBlocks.DRYING_RACK.get())
+            ShapedRecipeBuilder.shaped(
+                            this.registries.lookupOrThrow(Registries.ITEM),
+                            RecipeCategory.DECORATIONS,
+                            ModBlocks.DRYING_RACK.get())
                     .pattern("SSS")
                     .pattern("P P")
                     .pattern("SSS")
@@ -192,7 +216,10 @@ public class HPRecipeProvider extends RecipeProvider.Runner {
                     .unlockedBy("has_planks", has(ItemTags.PLANKS))
                     .save(this.output, recipeKey("crafting/drying_rack"));
 
-            ShapedRecipeBuilder.shaped(this.registries.lookupOrThrow(Registries.ITEM), RecipeCategory.REDSTONE, ModBlocks.WOODEN_HOPPER.get())
+            ShapedRecipeBuilder.shaped(
+                            this.registries.lookupOrThrow(Registries.ITEM),
+                            RecipeCategory.REDSTONE,
+                            ModBlocks.WOODEN_HOPPER.get())
                     .pattern("S S")
                     .pattern("SCS")
                     .pattern(" S ")
@@ -201,7 +228,10 @@ public class HPRecipeProvider extends RecipeProvider.Runner {
                     .unlockedBy("has_chest", has(Items.CHEST))
                     .save(this.output, recipeKey("crafting/wooden_hopper"));
 
-            ShapedRecipeBuilder.shaped(this.registries.lookupOrThrow(Registries.ITEM), RecipeCategory.DECORATIONS, ModBlocks.GRANITE_ANVIL.get())
+            ShapedRecipeBuilder.shaped(
+                            this.registries.lookupOrThrow(Registries.ITEM),
+                            RecipeCategory.DECORATIONS,
+                            ModBlocks.GRANITE_ANVIL.get())
                     .pattern("GGG")
                     .pattern("DDD")
                     .define('G', Items.GRANITE)
@@ -209,7 +239,10 @@ public class HPRecipeProvider extends RecipeProvider.Runner {
                     .unlockedBy("has_granite", has(Items.GRANITE))
                     .save(this.output, recipeKey("crafting/granite_anvil"));
 
-            ShapedRecipeBuilder.shaped(this.registries.lookupOrThrow(Registries.ITEM), RecipeCategory.DECORATIONS, ModBlocks.ANIMAL_TRAP.get())
+            ShapedRecipeBuilder.shaped(
+                            this.registries.lookupOrThrow(Registries.ITEM),
+                            RecipeCategory.DECORATIONS,
+                            ModBlocks.ANIMAL_TRAP.get())
                     .pattern("WSW")
                     .pattern("CPC")
                     .pattern("WSW")
@@ -220,7 +253,10 @@ public class HPRecipeProvider extends RecipeProvider.Runner {
                     .unlockedBy("has_chain", has(Items.IRON_CHAIN))
                     .save(this.output, recipeKey("crafting/animal_trap"));
 
-            ShapedRecipeBuilder.shaped(this.registries.lookupOrThrow(Registries.ITEM), RecipeCategory.TOOLS, ModItems.FLINT_AND_TINDER.get())
+            ShapedRecipeBuilder.shaped(
+                            this.registries.lookupOrThrow(Registries.ITEM),
+                            RecipeCategory.TOOLS,
+                            ModItems.FLINT_AND_TINDER.get())
                     .pattern("BBB")
                     .pattern("BFB")
                     .pattern("BBB")
@@ -229,7 +265,13 @@ public class HPRecipeProvider extends RecipeProvider.Runner {
                     .unlockedBy("has_dead_bush", has(Items.DEAD_BUSH))
                     .save(this.output, recipeKey("crafting/flint_and_tinder"));
 
-            SimpleCookingRecipeBuilder.smelting(Ingredient.of(ModItems.DOUGH.get()), RecipeCategory.FOOD, CookingBookCategory.MISC, Items.BREAD, 0.35f, 200)
+            SimpleCookingRecipeBuilder.smelting(
+                            Ingredient.of(ModItems.DOUGH.get()),
+                            RecipeCategory.FOOD,
+                            CookingBookCategory.MISC,
+                            Items.BREAD,
+                            0.35f,
+                            200)
                     .unlockedBy("has_dough", has(ModItems.DOUGH.get()))
                     .save(this.output, recipeKey("smelting/dough_to_bread"));
         }
@@ -293,8 +335,23 @@ public class HPRecipeProvider extends RecipeProvider.Runner {
             grind(Ingredient.of(Items.COBBLED_DEEPSLATE), Items.GRAVEL, 1, 8, "cobbled_deepslate_to_gravel");
             grind(Ingredient.of(Items.NETHERRACK), Items.NETHER_BRICK, 1, 8, "netherrack_to_nether_brick");
 
-            grind(Ingredient.of(Items.SANDSTONE, Items.CHISELED_SANDSTONE, Items.CUT_SANDSTONE, Items.SMOOTH_SANDSTONE), Items.SAND, 2, 8, "sandstone_to_sand");
-            grind(Ingredient.of(Items.RED_SANDSTONE, Items.CHISELED_RED_SANDSTONE, Items.CUT_RED_SANDSTONE, Items.SMOOTH_RED_SANDSTONE), Items.RED_SAND, 2, 8, "red_sandstone_to_sand");
+            grind(
+                    Ingredient.of(
+                            Items.SANDSTONE, Items.CHISELED_SANDSTONE, Items.CUT_SANDSTONE, Items.SMOOTH_SANDSTONE),
+                    Items.SAND,
+                    2,
+                    8,
+                    "sandstone_to_sand");
+            grind(
+                    Ingredient.of(
+                            Items.RED_SANDSTONE,
+                            Items.CHISELED_RED_SANDSTONE,
+                            Items.CUT_RED_SANDSTONE,
+                            Items.SMOOTH_RED_SANDSTONE),
+                    Items.RED_SAND,
+                    2,
+                    8,
+                    "red_sandstone_to_sand");
 
             grind(tag(ItemTags.WOOL), Items.STRING, 4, 8, "wool_to_string");
 
@@ -454,21 +511,15 @@ public class HPRecipeProvider extends RecipeProvider.Runner {
         }
 
         private void chop(Ingredient input, Item result, int count, int time, String name) {
-            ChoppingRecipeBuilder.chopping(input, result, count)
-                    .time(time)
-                    .save(this.output, name);
+            ChoppingRecipeBuilder.chopping(input, result, count).time(time).save(this.output, name);
         }
 
         private void crush(Ingredient input, Item result, int count, int time, String name) {
-            CrushingRecipeBuilder.crushing(input, result, count)
-                    .time(time)
-                    .save(this.output, name);
+            CrushingRecipeBuilder.crushing(input, result, count).time(time).save(this.output, name);
         }
 
         private void grind(Ingredient input, Item result, int count, int time, String name) {
-            GrindingRecipeBuilder.grinding(input, result, count)
-                    .time(time)
-                    .save(this.output, name);
+            GrindingRecipeBuilder.grinding(input, result, count).time(time).save(this.output, name);
         }
 
         private void press(Item input, Item result, int count, String name) {

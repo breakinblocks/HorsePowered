@@ -20,8 +20,7 @@ public class BottlingRecipe extends BaseHPRecipe {
     private final PressRecipe.FluidRef fluidRef;
     private final int priority;
 
-    public BottlingRecipe(Ingredient container, PressRecipe.FluidRef fluidRef,
-                          ItemStackTemplate result, int priority) {
+    public BottlingRecipe(Ingredient container, PressRecipe.FluidRef fluidRef, ItemStackTemplate result, int priority) {
         super(container, result);
         this.fluidRef = fluidRef;
         this.priority = priority;
@@ -78,20 +77,21 @@ public class BottlingRecipe extends BaseHPRecipe {
                 .orElse(ItemStack.EMPTY);
     }
 
-    public static final MapCodec<BottlingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance ->
-            instance.group(
+    public static final MapCodec<BottlingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
                     Ingredient.CODEC.fieldOf("container").forGetter(BottlingRecipe::getContainer),
                     PressRecipe.FluidRef.CODEC.fieldOf("fluid").forGetter(BottlingRecipe::getFluidRef),
                     ItemStackTemplate.CODEC.fieldOf("result").forGetter(r -> r.result),
-                    Codec.INT.optionalFieldOf("priority", 0).forGetter(BottlingRecipe::getPriority)
-            ).apply(instance, BottlingRecipe::new)
-    );
+                    Codec.INT.optionalFieldOf("priority", 0).forGetter(BottlingRecipe::getPriority))
+            .apply(instance, BottlingRecipe::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, BottlingRecipe> STREAM_CODEC = StreamCodec.composite(
-            Ingredient.CONTENTS_STREAM_CODEC, BottlingRecipe::getContainer,
-            PressRecipe.FluidRef.STREAM_CODEC, BottlingRecipe::getFluidRef,
-            ItemStackTemplate.STREAM_CODEC, r -> r.result,
-            ByteBufCodecs.VAR_INT, BottlingRecipe::getPriority,
-            BottlingRecipe::new
-    );
+            Ingredient.CONTENTS_STREAM_CODEC,
+            BottlingRecipe::getContainer,
+            PressRecipe.FluidRef.STREAM_CODEC,
+            BottlingRecipe::getFluidRef,
+            ItemStackTemplate.STREAM_CODEC,
+            r -> r.result,
+            ByteBufCodecs.VAR_INT,
+            BottlingRecipe::getPriority,
+            BottlingRecipe::new);
 }

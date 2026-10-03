@@ -1,9 +1,10 @@
 package com.breakinblocks.horsepowered.items;
 
 import com.breakinblocks.horsepowered.HorsePowerMod;
+import java.util.function.Consumer;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -31,8 +32,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.TagValueOutput;
 
-import java.util.function.Consumer;
-
 public class WorkSaddleItem extends Item {
 
     public static final TagKey<EntityType<?>> VALID_WORKER =
@@ -42,7 +41,8 @@ public class WorkSaddleItem extends Item {
         super(properties);
     }
 
-    public static InteractionResult tryCapture(ItemStack stack, Player player, LivingEntity target, InteractionHand hand) {
+    public static InteractionResult tryCapture(
+            ItemStack stack, Player player, LivingEntity target, InteractionHand hand) {
         Level level = target.level();
         if (stack.has(DataComponents.ENTITY_DATA)) {
             return InteractionResult.PASS;
@@ -94,9 +94,8 @@ public class WorkSaddleItem extends Item {
         BlockPos clickedPos = context.getClickedPos();
         Direction face = context.getClickedFace();
         BlockState clickedState = level.getBlockState(clickedPos);
-        BlockPos spawnPos = clickedState.getCollisionShape(level, clickedPos).isEmpty()
-                ? clickedPos
-                : clickedPos.relative(face);
+        BlockPos spawnPos =
+                clickedState.getCollisionShape(level, clickedPos).isEmpty() ? clickedPos : clickedPos.relative(face);
 
         EntityType<?> type = data.type();
         Entity entity = type.create(serverLevel, EntitySpawnReason.LOAD);
@@ -105,7 +104,7 @@ public class WorkSaddleItem extends Item {
         }
 
         try (ProblemReporter.ScopedCollector reporter =
-                     new ProblemReporter.ScopedCollector(entity.problemPath(), HorsePowerMod.LOGGER)) {
+                new ProblemReporter.ScopedCollector(entity.problemPath(), HorsePowerMod.LOGGER)) {
             TagValueOutput baseOut = TagValueOutput.createWithContext(reporter, serverLevel.registryAccess());
             entity.saveWithoutId(baseOut);
             var merged = baseOut.buildResult();
@@ -148,12 +147,18 @@ public class WorkSaddleItem extends Item {
 
     @Override
     @SuppressWarnings("deprecation")
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, Consumer<Component> consumer, TooltipFlag flag) {
+    public void appendHoverText(
+            ItemStack stack,
+            Item.TooltipContext context,
+            TooltipDisplay display,
+            Consumer<Component> consumer,
+            TooltipFlag flag) {
         super.appendHoverText(stack, context, display, consumer, flag);
         TypedEntityData<EntityType<?>> data = stack.get(DataComponents.ENTITY_DATA);
         if (data != null) {
-            consumer.accept(Component.translatable("item.horsepowered.work_saddle.contains",
-                    Component.translatable(data.type().getDescriptionId()))
+            consumer.accept(Component.translatable(
+                            "item.horsepowered.work_saddle.contains",
+                            Component.translatable(data.type().getDescriptionId()))
                     .withStyle(ChatFormatting.GRAY));
         }
     }

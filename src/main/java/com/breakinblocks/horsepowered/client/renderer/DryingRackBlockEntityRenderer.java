@@ -17,14 +17,14 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
-public class DryingRackBlockEntityRenderer implements BlockEntityRenderer<DryingRackBlockEntity, DryingRackBlockEntityRenderer.DryingRackRenderState> {
+public class DryingRackBlockEntityRenderer
+        implements BlockEntityRenderer<DryingRackBlockEntity, DryingRackBlockEntityRenderer.DryingRackRenderState> {
 
     private static final float FADE_START = 0.7F;
     private static final float FADE_SPAN = 1.0F - FADE_START;
     private static final float BASE_SCALE = 0.45F;
 
-    public DryingRackBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
-    }
+    public DryingRackBlockEntityRenderer(BlockEntityRendererProvider.Context context) {}
 
     @Override
     public DryingRackRenderState createRenderState() {
@@ -32,8 +32,12 @@ public class DryingRackBlockEntityRenderer implements BlockEntityRenderer<Drying
     }
 
     @Override
-    public void extractRenderState(DryingRackBlockEntity be, DryingRackRenderState state, float partialTick,
-                                   Vec3 cameraPos, @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
+    public void extractRenderState(
+            DryingRackBlockEntity be,
+            DryingRackRenderState state,
+            float partialTick,
+            Vec3 cameraPos,
+            @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
         BlockEntityRenderState.extractBase(be, state, crumblingOverlay);
         BlockState blockState = be.getBlockState();
         state.facing = blockState.hasProperty(BlockDryingRack.FACING)
@@ -60,7 +64,8 @@ public class DryingRackBlockEntityRenderer implements BlockEntityRenderer<Drying
     }
 
     @Override
-    public void submit(DryingRackRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
+    public void submit(
+            DryingRackRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
         Direction rightDir = state.facing.getClockWise();
         double y = 14.5 / 16.0;
         for (int slot = 0; slot < DryingRackBlockEntity.SLOT_COUNT; slot++) {
@@ -68,8 +73,8 @@ public class DryingRackBlockEntityRenderer implements BlockEntityRenderer<Drying
             if (item.isEmpty()) continue;
             int row = slot / 2;
             int col = slot % 2;
-            double[] rowCenters = { 4.0, 12.0, 20.0, 28.0 };
-            double[] colCenters = { 10.0, 22.0 };
+            double[] rowCenters = {4.0, 12.0, 20.0, 28.0};
+            double[] colCenters = {10.0, 22.0};
             double rightPx = colCenters[col];
             double forwardPx = rowCenters[row];
             double rightOffset = (rightPx / 16.0) - 0.5;
@@ -112,8 +117,13 @@ public class DryingRackBlockEntityRenderer implements BlockEntityRenderer<Drying
         maxX = Math.max(maxX, rightDir.getStepX());
         minZ = Math.min(minZ, rightDir.getStepZ());
         maxZ = Math.max(maxZ, rightDir.getStepZ());
-        return new AABB(pos.getX() + minX, pos.getY(), pos.getZ() + minZ,
-                pos.getX() + maxX + 1, pos.getY() + 1, pos.getZ() + maxZ + 1);
+        return new AABB(
+                pos.getX() + minX,
+                pos.getY(),
+                pos.getZ() + minZ,
+                pos.getX() + maxX + 1,
+                pos.getY() + 1,
+                pos.getZ() + maxZ + 1);
     }
 
     public static class DryingRackRenderState extends BlockEntityRenderState {

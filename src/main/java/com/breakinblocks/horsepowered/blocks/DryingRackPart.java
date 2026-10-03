@@ -39,5 +39,5 @@ public enum DryingRackPart implements StringRepresentable {
         return pos;
     }
 
-    public static DryingRackPart[] FILLERS = { RIGHT, FORWARD, RIGHT_FORWARD };
+    public static DryingRackPart[] FILLERS = {RIGHT, FORWARD, RIGHT_FORWARD};
 }

@@ -11,6 +11,8 @@ import com.breakinblocks.horsepowered.recipes.GrindstoneRecipe;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
 import com.breakinblocks.horsepowered.recipes.PressRecipe;
 import com.breakinblocks.horsepowered.recipes.TrappingRecipe;
+import java.util.Comparator;
+import java.util.List;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.helpers.IGuiHelper;
@@ -22,9 +24,6 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeMap;
-
-import java.util.Comparator;
-import java.util.List;
 
 @JeiPlugin
 public class HorsePowerPlugin implements IModPlugin {
@@ -76,8 +75,7 @@ public class HorsePowerPlugin implements IModPlugin {
                 new HorsePowerDryingCategory(guiHelper),
                 new HorsePowerCrushingCategory(guiHelper),
                 new HorsePowerTrappingCategory(guiHelper),
-                new HorsePowerBottlingCategory(guiHelper)
-        );
+                new HorsePowerBottlingCategory(guiHelper));
     }
 
     @Override
@@ -89,38 +87,75 @@ public class HorsePowerPlugin implements IModPlugin {
         Comparator<ChoppingRecipe> chopOrder = Comparator.comparingInt(ChoppingRecipe::getPriority);
         Comparator<PressRecipe> pressOrder = Comparator.comparingInt(PressRecipe::getPriority);
 
-        List<GrindstoneRecipe> allGrinding = recipeMap.byType(HPRecipes.GRINDING_TYPE.get())
-                .stream().map(RecipeHolder::value).toList();
-        registration.addRecipes(GRINDING_TYPE, allGrinding.stream()
-                .filter(r -> r.getTier().allowsHorse()).sorted(grindOrder).toList());
-        registration.addRecipes(MANUAL_GRINDING_TYPE, allGrinding.stream()
-                .filter(r -> r.getTier().allowsHand()).sorted(grindOrder).toList());
+        List<GrindstoneRecipe> allGrinding = recipeMap.byType(HPRecipes.GRINDING_TYPE.get()).stream()
+                .map(RecipeHolder::value)
+                .toList();
+        registration.addRecipes(
+                GRINDING_TYPE,
+                allGrinding.stream()
+                        .filter(r -> r.getTier().allowsHorse())
+                        .sorted(grindOrder)
+                        .toList());
+        registration.addRecipes(
+                MANUAL_GRINDING_TYPE,
+                allGrinding.stream()
+                        .filter(r -> r.getTier().allowsHand())
+                        .sorted(grindOrder)
+                        .toList());
 
-        List<ChoppingRecipe> allChopping = recipeMap.byType(HPRecipes.CHOPPING_TYPE.get())
-                .stream().map(RecipeHolder::value).toList();
-        registration.addRecipes(CHOPPING_TYPE, allChopping.stream()
-                .filter(r -> r.getTier().allowsHorse()).sorted(chopOrder).toList());
-        registration.addRecipes(MANUAL_CHOPPING_TYPE, allChopping.stream()
-                .filter(r -> r.getTier().allowsHand()).sorted(chopOrder).toList());
+        List<ChoppingRecipe> allChopping = recipeMap.byType(HPRecipes.CHOPPING_TYPE.get()).stream()
+                .map(RecipeHolder::value)
+                .toList();
+        registration.addRecipes(
+                CHOPPING_TYPE,
+                allChopping.stream()
+                        .filter(r -> r.getTier().allowsHorse())
+                        .sorted(chopOrder)
+                        .toList());
+        registration.addRecipes(
+                MANUAL_CHOPPING_TYPE,
+                allChopping.stream()
+                        .filter(r -> r.getTier().allowsHand())
+                        .sorted(chopOrder)
+                        .toList());
 
-        registration.addRecipes(PRESSING_TYPE, recipeMap.byType(HPRecipes.PRESSING_TYPE.get())
-                .stream().map(RecipeHolder::value).sorted(pressOrder).toList());
+        registration.addRecipes(
+                PRESSING_TYPE,
+                recipeMap.byType(HPRecipes.PRESSING_TYPE.get()).stream()
+                        .map(RecipeHolder::value)
+                        .sorted(pressOrder)
+                        .toList());
 
-        registration.addRecipes(DRYING_TYPE, recipeMap.byType(HPRecipes.DRYING_TYPE.get())
-                .stream().map(RecipeHolder::value).toList());
+        registration.addRecipes(
+                DRYING_TYPE,
+                recipeMap.byType(HPRecipes.DRYING_TYPE.get()).stream()
+                        .map(RecipeHolder::value)
+                        .toList());
 
         Comparator<CrushingRecipe> crushOrder = Comparator.comparingInt(CrushingRecipe::getPriority);
-        registration.addRecipes(CRUSHING_TYPE, recipeMap.byType(HPRecipes.CRUSHING_TYPE.get())
-                .stream().map(RecipeHolder::value).sorted(crushOrder).toList());
+        registration.addRecipes(
+                CRUSHING_TYPE,
+                recipeMap.byType(HPRecipes.CRUSHING_TYPE.get()).stream()
+                        .map(RecipeHolder::value)
+                        .sorted(crushOrder)
+                        .toList());
 
         Comparator<TrappingRecipe> trapOrder = Comparator.comparingInt(TrappingRecipe::getPriority);
-        registration.addRecipes(TRAPPING_TYPE, recipeMap.byType(HPRecipes.TRAPPING_TYPE.get())
-                .stream().map(RecipeHolder::value).sorted(trapOrder).toList());
+        registration.addRecipes(
+                TRAPPING_TYPE,
+                recipeMap.byType(HPRecipes.TRAPPING_TYPE.get()).stream()
+                        .map(RecipeHolder::value)
+                        .sorted(trapOrder)
+                        .toList());
 
         Comparator<BottlingRecipe> bottleOrder = Comparator.comparingInt(BottlingRecipe::getPriority);
-        registration.addRecipes(BOTTLING_TYPE, recipeMap.byType(HPRecipes.BOTTLING_TYPE.get())
-                .stream().map(RecipeHolder::value).filter(BottlingRecipe::isValid)
-                .sorted(bottleOrder).toList());
+        registration.addRecipes(
+                BOTTLING_TYPE,
+                recipeMap.byType(HPRecipes.BOTTLING_TYPE.get()).stream()
+                        .map(RecipeHolder::value)
+                        .filter(BottlingRecipe::isValid)
+                        .sorted(bottleOrder)
+                        .toList());
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.breakinblocks.horsepowered.blockentity;
 import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import com.breakinblocks.horsepowered.recipes.ChoppingRecipe;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
+import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -13,8 +14,6 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-
-import java.util.Optional;
 
 public class ManualChopperBlockEntity extends HPBlockEntityBase {
 
@@ -55,7 +54,8 @@ public class ManualChopperBlockEntity extends HPBlockEntityBase {
             if (!ItemStack.isSameItemSameComponents(inputSlot, stack)) return false;
             if (inputSlot.getCount() >= getInventoryStackLimit()) return false;
         }
-        return findRecipe(HPRecipes.CHOPPING_TYPE.get(), stack, r -> r.getTier().allowsHand()).isPresent();
+        return findRecipe(HPRecipes.CHOPPING_TYPE.get(), stack, r -> r.getTier().allowsHand())
+                .isPresent();
     }
 
     // Returns true when the chop consumed the input (recipe completed).
@@ -88,7 +88,8 @@ public class ManualChopperBlockEntity extends HPBlockEntityBase {
             ItemStack result = getRecipeOutput();
 
             if (HorsePowerConfig.choppingBlockDrop.get()) {
-                Containers.dropItemStack(level, worldPosition.getX(), worldPosition.getY() + 0.5, worldPosition.getZ(), result.copy());
+                Containers.dropItemStack(
+                        level, worldPosition.getX(), worldPosition.getY() + 0.5, worldPosition.getZ(), result.copy());
             } else {
                 mergeOutput(1, result);
             }
@@ -110,7 +111,8 @@ public class ManualChopperBlockEntity extends HPBlockEntityBase {
     }
 
     public Optional<RecipeHolder<ChoppingRecipe>> getRecipe() {
-        return findRecipe(HPRecipes.CHOPPING_TYPE.get(), getItem(0), r -> r.getTier().allowsHand());
+        return findRecipe(
+                HPRecipes.CHOPPING_TYPE.get(), getItem(0), r -> r.getTier().allowsHand());
     }
 
     @Override

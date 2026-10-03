@@ -53,7 +53,12 @@ public class HorsePowerBottlingCategory extends BaseHPCategory<BottlingRecipe> {
     }
 
     @Override
-    public void draw(BottlingRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
+    public void draw(
+            BottlingRecipe recipe,
+            IRecipeSlotsView recipeSlotsView,
+            GuiGraphicsExtractor guiGraphics,
+            double mouseX,
+            double mouseY) {
         arrow.draw(guiGraphics, 66, 9);
 
         Font font = Minecraft.getInstance().font;

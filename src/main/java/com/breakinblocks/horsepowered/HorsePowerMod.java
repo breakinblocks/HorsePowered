@@ -44,8 +44,9 @@ public class HorsePowerMod {
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS =
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MOD_ID);
 
-    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> CREATIVE_TAB = CREATIVE_MODE_TABS.register("main", () ->
-            CreativeModeTab.builder()
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> CREATIVE_TAB = CREATIVE_MODE_TABS.register(
+            "main",
+            () -> CreativeModeTab.builder()
                     .title(Component.translatable("itemGroup." + MOD_ID))
                     .icon(() -> new ItemStack(ModBlocks.HAND_GRINDSTONE.get()))
                     .displayItems((parameters, output) -> {
@@ -69,8 +70,7 @@ public class HorsePowerMod {
                         output.accept(ModBlocks.WOODEN_HOPPER.get());
                         output.accept(ModBlocks.CREATIVE_BATTERY.get());
                     })
-                    .build()
-    );
+                    .build());
 
     public static Identifier id(String path) {
         return Identifier.fromNamespaceAndPath(MOD_ID, path);
@@ -95,8 +95,10 @@ public class HorsePowerMod {
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::buildCreativeContents);
         modEventBus.addListener(HorsePowerMod::registerCapabilities);
-        modEventBus.addListener((net.neoforged.fml.event.config.ModConfigEvent.Loading e) -> HorsePowerConfig.invalidatePathSpeedCache());
-        modEventBus.addListener((net.neoforged.fml.event.config.ModConfigEvent.Reloading e) -> HorsePowerConfig.invalidatePathSpeedCache());
+        modEventBus.addListener((net.neoforged.fml.event.config.ModConfigEvent.Loading e) ->
+                HorsePowerConfig.invalidatePathSpeedCache());
+        modEventBus.addListener((net.neoforged.fml.event.config.ModConfigEvent.Reloading e) ->
+                HorsePowerConfig.invalidatePathSpeedCache());
 
         if (dist.isClient()) {
             registerClientExtensions(container);
@@ -111,85 +113,84 @@ public class HorsePowerMod {
             var fire = Blocks.FIRE.defaultBlockState();
             var air = Blocks.AIR.defaultBlockState();
 
-            FluidInteractionRegistry.addInteraction(oilType,
-                    new FluidInteractionRegistry.InteractionInformation(
-                            lavaType,
-                            fluidState -> fire));
+            FluidInteractionRegistry.addInteraction(
+                    oilType, new FluidInteractionRegistry.InteractionInformation(lavaType, fluidState -> fire));
 
-            FluidInteractionRegistry.addInteraction(oilType,
+            FluidInteractionRegistry.addInteraction(
+                    oilType,
                     new FluidInteractionRegistry.InteractionInformation(
                             (level, currentPos, relativePos, currentState) ->
                                     level.getBlockState(relativePos).is(Blocks.FIRE),
                             fluidState -> fire));
 
-            FluidInteractionRegistry.addInteraction(lavaType,
-                    new FluidInteractionRegistry.InteractionInformation(
-                            oilType,
-                            fluidState -> fire));
+            FluidInteractionRegistry.addInteraction(
+                    lavaType, new FluidInteractionRegistry.InteractionInformation(oilType, fluidState -> fire));
 
             LOGGER.info("Registered seed oil fluid interactions");
         });
     }
 
     private static void registerCapabilities(RegisterCapabilitiesEvent event) {
-        event.registerBlockEntity(Capabilities.Item.BLOCK,
+        event.registerBlockEntity(
+                Capabilities.Item.BLOCK,
                 ModBlockEntities.CHOPPER.get(),
                 (be, side) -> new WorldlyContainerWrapper(be, side));
-        event.registerBlockEntity(Capabilities.Item.BLOCK,
+        event.registerBlockEntity(
+                Capabilities.Item.BLOCK,
                 ModBlockEntities.GRINDSTONE.get(),
                 (be, side) -> new WorldlyContainerWrapper(be, side));
-        event.registerBlockEntity(Capabilities.Item.BLOCK,
+        event.registerBlockEntity(
+                Capabilities.Item.BLOCK,
                 ModBlockEntities.PRESS.get(),
                 (be, side) -> new WorldlyContainerWrapper(be, side));
-        event.registerBlockEntity(Capabilities.Item.BLOCK,
+        event.registerBlockEntity(
+                Capabilities.Item.BLOCK,
                 ModBlockEntities.HAND_GRINDSTONE.get(),
                 (be, side) -> new WorldlyContainerWrapper(be, side));
-        event.registerBlockEntity(Capabilities.Item.BLOCK,
+        event.registerBlockEntity(
+                Capabilities.Item.BLOCK,
                 ModBlockEntities.CHOPPING_BLOCK.get(),
                 (be, side) -> new WorldlyContainerWrapper(be, side));
-        event.registerBlockEntity(Capabilities.Item.BLOCK,
+        event.registerBlockEntity(
+                Capabilities.Item.BLOCK,
                 ModBlockEntities.DRYING_RACK.get(),
                 (be, side) -> new WorldlyContainerWrapper(be, side));
-        event.registerBlockEntity(Capabilities.Item.BLOCK,
+        event.registerBlockEntity(
+                Capabilities.Item.BLOCK,
                 ModBlockEntities.GRANITE_ANVIL.get(),
                 (be, side) -> new WorldlyContainerWrapper(be, side));
-        event.registerBlockEntity(Capabilities.Energy.BLOCK,
-                ModBlockEntities.GENERATOR.get(),
-                (be, side) -> be.getEnergyHandler());
-        event.registerBlockEntity(Capabilities.Energy.BLOCK,
+        event.registerBlockEntity(
+                Capabilities.Energy.BLOCK, ModBlockEntities.GENERATOR.get(), (be, side) -> be.getEnergyHandler());
+        event.registerBlockEntity(
+                Capabilities.Energy.BLOCK,
                 ModBlockEntities.CREATIVE_BATTERY.get(),
                 (be, side) -> be.getEnergyHandler());
 
-        event.registerBlockEntity(Capabilities.Fluid.BLOCK,
-                ModBlockEntities.PRESS.get(),
-                (be, side) -> be.getFluidHandler());
+        event.registerBlockEntity(
+                Capabilities.Fluid.BLOCK, ModBlockEntities.PRESS.get(), (be, side) -> be.getFluidHandler());
 
-        event.registerBlockEntity(Capabilities.Item.BLOCK,
-                ModBlockEntities.FILLER.get(),
-                (be, side) -> {
-                    HPBlockEntityBase mainBe = be.getFilledTileEntity();
-                    if (mainBe != null) {
-                        return new WorldlyContainerWrapper(mainBe, side);
-                    }
-                    return null;
-                });
-        event.registerBlockEntity(Capabilities.Fluid.BLOCK,
-                ModBlockEntities.FILLER.get(),
-                (be, side) -> {
-                    HPBlockEntityBase mainBe = be.getFilledTileEntity();
-                    if (mainBe instanceof PressBlockEntity press) {
-                        return press.getFluidHandler();
-                    }
-                    return null;
-                });
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntities.FILLER.get(), (be, side) -> {
+            HPBlockEntityBase mainBe = be.getFilledTileEntity();
+            if (mainBe != null) {
+                return new WorldlyContainerWrapper(mainBe, side);
+            }
+            return null;
+        });
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntities.FILLER.get(), (be, side) -> {
+            HPBlockEntityBase mainBe = be.getFilledTileEntity();
+            if (mainBe instanceof PressBlockEntity press) {
+                return press.getFluidHandler();
+            }
+            return null;
+        });
 
-        event.registerBlockEntity(Capabilities.Item.BLOCK,
+        event.registerBlockEntity(
+                Capabilities.Item.BLOCK,
                 ModBlockEntities.WOODEN_HOPPER.get(),
                 (be, side) -> VanillaContainerWrapper.of(be));
     }
 
-    private void buildCreativeContents(final BuildCreativeModeTabContentsEvent event) {
-    }
+    private void buildCreativeContents(final BuildCreativeModeTabContentsEvent event) {}
 
     private static void registerClientExtensions(ModContainer container) {
         ClientExtensions.register(container);

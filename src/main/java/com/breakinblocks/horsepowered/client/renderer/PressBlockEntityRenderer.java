@@ -15,10 +15,10 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.fluids.FluidStack;
 import org.jetbrains.annotations.Nullable;
 
-public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockEntity, PressBlockEntityRenderer.PressRenderState> {
+public class PressBlockEntityRenderer
+        implements BlockEntityRenderer<PressBlockEntity, PressBlockEntityRenderer.PressRenderState> {
 
-    public PressBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
-    }
+    public PressBlockEntityRenderer(BlockEntityRendererProvider.Context context) {}
 
     @Override
     public PressRenderState createRenderState() {
@@ -26,8 +26,12 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
     }
 
     @Override
-    public void extractRenderState(PressBlockEntity blockEntity, PressRenderState state, float partialTick,
-                                   Vec3 cameraPos, @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
+    public void extractRenderState(
+            PressBlockEntity blockEntity,
+            PressRenderState state,
+            float partialTick,
+            Vec3 cameraPos,
+            @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
         BlockEntityRenderState.extractBase(blockEntity, state, crumblingOverlay);
         HorseBlockRenderState.extractWorkerState(blockEntity, state, partialTick);
 
@@ -50,7 +54,8 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
     }
 
     @Override
-    public void submit(PressRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
+    public void submit(
+            PressRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
         HorseBlockRenderState.submitWorkerAndArea(state, poseStack, collector, camera);
 
         // Render plunger
@@ -60,14 +65,32 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
         RenderUtils.renderFlatItem(state.outputItem, poseStack, collector, state.lightCoords, 0.7D, 0.95D, 0.5D, 0.3F);
 
         // Render input fluid in the left half of the tank, output fluid in the right half.
-        FluidRenderer.renderFluidHalf(poseStack, collector, state.inputFluid, state.tankCapacity, state.lightCoords, true);
-        FluidRenderer.renderFluidHalf(poseStack, collector, state.outputFluid, state.tankCapacity, state.lightCoords, false);
+        FluidRenderer.renderFluidHalf(
+                poseStack, collector, state.inputFluid, state.tankCapacity, state.lightCoords, true);
+        FluidRenderer.renderFluidHalf(
+                poseStack, collector, state.outputFluid, state.tankCapacity, state.lightCoords, false);
 
         if (state.showCounts) {
-            RenderUtils.submitItemCount(state.inputCount, poseStack, collector, state.lightCoords,
-                    state.distanceToCameraSq, camera, 0.35D, 1.25D, 0.5D);
-            RenderUtils.submitItemCount(state.outputCount, poseStack, collector, state.lightCoords,
-                    state.distanceToCameraSq, camera, 0.7D, 1.25D, 0.5D);
+            RenderUtils.submitItemCount(
+                    state.inputCount,
+                    poseStack,
+                    collector,
+                    state.lightCoords,
+                    state.distanceToCameraSq,
+                    camera,
+                    0.35D,
+                    1.25D,
+                    0.5D);
+            RenderUtils.submitItemCount(
+                    state.outputCount,
+                    poseStack,
+                    collector,
+                    state.lightCoords,
+                    state.distanceToCameraSq,
+                    camera,
+                    0.7D,
+                    1.25D,
+                    0.5D);
         }
     }
 
@@ -79,8 +102,7 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
     @Override
     public AABB getRenderBoundingBox(PressBlockEntity blockEntity) {
         BlockPos pos = blockEntity.getBlockPos();
-        return new AABB(pos.getX() - 3, pos.getY(), pos.getZ() - 3,
-                        pos.getX() + 4, pos.getY() + 4, pos.getZ() + 4);
+        return new AABB(pos.getX() - 3, pos.getY(), pos.getZ() - 3, pos.getX() + 4, pos.getY() + 4, pos.getZ() + 4);
     }
 
     public static class PressRenderState extends HorseBlockRenderState {

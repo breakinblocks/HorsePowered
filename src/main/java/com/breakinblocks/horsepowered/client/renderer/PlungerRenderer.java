@@ -19,23 +19,33 @@ public class PlungerRenderer {
     private static final float PLUNGER_TRAVEL = 0.5f;
 
     // visualProgress: 0.0 = raised, 1.0 = pressing down.
-    public static void renderPlunger(PoseStack poseStack, SubmitNodeCollector collector, float visualProgress, int packedLight) {
+    public static void renderPlunger(
+            PoseStack poseStack, SubmitNodeCollector collector, float visualProgress, int packedLight) {
         poseStack.pushPose();
 
         float yOffset = -visualProgress * PLUNGER_TRAVEL;
         poseStack.translate(0, yOffset, 0);
 
-        TextureAtlasSprite sprite = Minecraft.getInstance().getModelManager()
-                .getBlockStateModelSet().getParticleMaterial(Blocks.STONE.defaultBlockState()).sprite();
+        TextureAtlasSprite sprite = Minecraft.getInstance()
+                .getModelManager()
+                .getBlockStateModelSet()
+                .getParticleMaterial(Blocks.STONE.defaultBlockState())
+                .sprite();
 
         collector.submitCustomGeometry(
                 poseStack,
                 Sheets.cutoutBlockSheet(),
-                (pose, consumer) -> RenderUtils.renderTexturedBox(consumer, pose, sprite,
-                        PLUNGER_MIN_X, PLUNGER_MIN_Y, PLUNGER_MIN_Z,
-                        PLUNGER_MAX_X, PLUNGER_MAX_Y, PLUNGER_MAX_Z,
-                        packedLight)
-        );
+                (pose, consumer) -> RenderUtils.renderTexturedBox(
+                        consumer,
+                        pose,
+                        sprite,
+                        PLUNGER_MIN_X,
+                        PLUNGER_MIN_Y,
+                        PLUNGER_MIN_Z,
+                        PLUNGER_MAX_X,
+                        PLUNGER_MAX_Y,
+                        PLUNGER_MAX_Z,
+                        packedLight));
 
         poseStack.popPose();
     }

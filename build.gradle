@@ -5,6 +5,7 @@ plugins {
     id 'maven-publish'
     id 'net.neoforged.moddev' version '2.0.141'
     id 'me.modmuss50.mod-publish-plugin' version '1.1.0'
+    id 'com.diffplug.spotless' version '8.10.3'
 }
 
 version = "${minecraft_version}-${mod_version}"
@@ -166,5 +167,16 @@ tasks.named('publishMods') {
     def isDryRun = project.hasProperty("dryRun") && project.property("dryRun") == "true"
     if (mavenUser.isPresent() && !isDryRun) {
         dependsOn 'publishMavenJavaPublicationToBreakInBlocksRepository'
+    }
+}
+
+spotless {
+    java {
+        target 'src/*/java/**/*.java'
+        palantirJavaFormat()
+        importOrder()
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
     }
 }

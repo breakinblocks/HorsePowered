@@ -1,6 +1,12 @@
 package com.breakinblocks.horsepowered.blockentity;
 
 import com.breakinblocks.horsepowered.config.HorsePowerConfig;
+import com.google.common.collect.Lists;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -28,14 +34,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Lists;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
 
@@ -156,7 +154,8 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
             double pathZ = worldPosition.getZ() + 0.5 + PATH[i][1] * 2;
             BlockPos pos = new BlockPos((int) Math.floor(pathX), floorY, (int) Math.floor(pathZ));
             if (!seen.add(pos)) continue;
-            Identifier id = BuiltInRegistries.BLOCK.getKey(level.getBlockState(pos).getBlock());
+            Identifier id =
+                    BuiltInRegistries.BLOCK.getKey(level.getBlockState(pos).getBlock());
             sum += HorsePowerConfig.getPathSpeedMultiplier(id);
             count++;
         }
@@ -252,17 +251,18 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
     }
 
     public void setWorker(PathfinderMob newWorker) {
-        TagValueOutput output = TagValueOutput.createWithContext(
-                ProblemReporter.DISCARDING, level.registryAccess());
+        TagValueOutput output = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, level.registryAccess());
         newWorker.saveAsPassenger(output);
         workerEntityData = output.buildResult();
-        workerEntityTypeId = BuiltInRegistries.ENTITY_TYPE.getKey(newWorker.getType()).toString();
+        workerEntityTypeId =
+                BuiltInRegistries.ENTITY_TYPE.getKey(newWorker.getType()).toString();
         workerEntityHeight = newWorker.getBbHeight();
         hasVirtualWorker = true;
 
         String name = newWorker.getDisplayName().getString();
-        workerDisplayName = (name != null && !name.isEmpty()) ? name :
-                BuiltInRegistries.ENTITY_TYPE.getKey(newWorker.getType()).getPath();
+        workerDisplayName = (name != null && !name.isEmpty())
+                ? name
+                : BuiltInRegistries.ENTITY_TYPE.getKey(newWorker.getType()).getPath();
 
         virtualX = newWorker.getX();
         virtualZ = newWorker.getZ();
@@ -279,7 +279,8 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
 
         newWorker.discard();
 
-        LOGGER.info("[HorsePowered] setWorker at {}: Stored {} ({})", worldPosition, workerDisplayName, workerEntityTypeId);
+        LOGGER.info(
+                "[HorsePowered] setWorker at {}: Stored {} ({})", worldPosition, workerDisplayName, workerEntityTypeId);
         setChanged();
     }
 
@@ -291,7 +292,8 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
             mob.setPos(virtualX, worldPosition.getY() + getPositionOffset(), virtualZ);
             level.addFreshEntity(mob);
             mob.setLeashedTo(player, true);
-            LOGGER.info("[HorsePowered] setWorkerToPlayer at {}: Released {} to player", worldPosition, workerDisplayName);
+            LOGGER.info(
+                    "[HorsePowered] setWorkerToPlayer at {}: Released {} to player", worldPosition, workerDisplayName);
         }
 
         clearVirtualWorker();
@@ -305,7 +307,10 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
         if (mob != null) {
             mob.setPos(virtualX, worldPosition.getY() + getPositionOffset(), virtualZ);
             level.addFreshEntity(mob);
-            LOGGER.info("[HorsePowered] spawnStoredEntity at {}: Spawned {} back into world", worldPosition, workerDisplayName);
+            LOGGER.info(
+                    "[HorsePowered] spawnStoredEntity at {}: Spawned {} back into world",
+                    worldPosition,
+                    workerDisplayName);
         }
 
         clearVirtualWorker();
@@ -319,12 +324,13 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
             EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.getValue(typeId);
             Entity entity = type.create(level, EntitySpawnReason.LOAD);
             if (entity instanceof PathfinderMob mob) {
-                ValueInput input = TagValueInput.create(
-                        ProblemReporter.DISCARDING, level.registryAccess(), workerEntityData);
+                ValueInput input =
+                        TagValueInput.create(ProblemReporter.DISCARDING, level.registryAccess(), workerEntityData);
                 mob.load(input);
                 return mob;
             } else {
-                LOGGER.warn("[HorsePowered] recreateEntity: Created entity is not a PathfinderMob: {}", workerEntityTypeId);
+                LOGGER.warn(
+                        "[HorsePowered] recreateEntity: Created entity is not a PathfinderMob: {}", workerEntityTypeId);
                 if (entity != null) entity.discard();
             }
         } catch (Exception e) {
@@ -361,16 +367,45 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
         return valid;
     }
 
-    public double getVirtualX() { return virtualX; }
-    public double getVirtualZ() { return virtualZ; }
-    public float getVirtualYRot() { return virtualYRot; }
-    public double getPrevVirtualX() { return prevVirtualX; }
-    public double getPrevVirtualZ() { return prevVirtualZ; }
-    public float getPrevVirtualYRot() { return prevVirtualYRot; }
-    public double getVirtualY() { return worldPosition.getY() + getPositionOffset(); }
-    public float getWorkerEntityHeight() { return workerEntityHeight; }
-    public String getWorkerEntityTypeId() { return workerEntityTypeId; }
-    public CompoundTag getWorkerEntityData() { return workerEntityData; }
+    public double getVirtualX() {
+        return virtualX;
+    }
+
+    public double getVirtualZ() {
+        return virtualZ;
+    }
+
+    public float getVirtualYRot() {
+        return virtualYRot;
+    }
+
+    public double getPrevVirtualX() {
+        return prevVirtualX;
+    }
+
+    public double getPrevVirtualZ() {
+        return prevVirtualZ;
+    }
+
+    public float getPrevVirtualYRot() {
+        return prevVirtualYRot;
+    }
+
+    public double getVirtualY() {
+        return worldPosition.getY() + getPositionOffset();
+    }
+
+    public float getWorkerEntityHeight() {
+        return workerEntityHeight;
+    }
+
+    public String getWorkerEntityTypeId() {
+        return workerEntityTypeId;
+    }
+
+    public CompoundTag getWorkerEntityData() {
+        return workerEntityData;
+    }
 
     public Entity getCachedRenderEntity() {
         if (level == null || !level.isClientSide() || !hasVirtualWorker) return null;
@@ -386,8 +421,8 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
                 EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.getValue(typeId);
                 Entity entity = type.create(level, EntitySpawnReason.LOAD);
                 if (entity != null) {
-                    ValueInput input = TagValueInput.create(
-                            ProblemReporter.DISCARDING, level.registryAccess(), workerEntityData);
+                    ValueInput input =
+                            TagValueInput.create(ProblemReporter.DISCARDING, level.registryAccess(), workerEntityData);
                     entity.load(input);
                     entity.setNoGravity(true);
                     entity.setSilent(true);
@@ -465,11 +500,13 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
         return closest;
     }
 
-    public static <T extends HPBlockEntityHorseBase> void serverTick(Level level, BlockPos pos, BlockState state, T blockEntity) {
+    public static <T extends HPBlockEntityHorseBase> void serverTick(
+            Level level, BlockPos pos, BlockState state, T blockEntity) {
         blockEntity.tickServer();
     }
 
-    public static <T extends HPBlockEntityHorseBase> void clientTick(Level level, BlockPos pos, BlockState state, T blockEntity) {
+    public static <T extends HPBlockEntityHorseBase> void clientTick(
+            Level level, BlockPos pos, BlockState state, T blockEntity) {
         blockEntity.tickClient();
     }
 
@@ -554,9 +591,8 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
         Vec3 pathPos = getPathPosition(target);
         double y = worldPosition.getY() + getPositionOffset();
 
-        searchAreas[target] = new AABB(
-                pathPos.x - 0.5, y - 0.5, pathPos.z - 0.5,
-                pathPos.x + 0.5, y + 1.5, pathPos.z + 0.5);
+        searchAreas[target] =
+                new AABB(pathPos.x - 0.5, y - 0.5, pathPos.z - 0.5, pathPos.x + 0.5, y + 1.5, pathPos.z + 0.5);
 
         double dx = virtualX - pathPos.x;
         double dz = virtualZ - pathPos.z;

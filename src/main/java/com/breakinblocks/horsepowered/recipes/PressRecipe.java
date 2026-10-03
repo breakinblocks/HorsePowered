@@ -3,6 +3,7 @@ package com.breakinblocks.horsepowered.recipes;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import java.util.Optional;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -19,24 +20,17 @@ import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 
-import java.util.Optional;
-
 public class PressRecipe extends BaseHPRecipe {
 
     // FluidRef defers FluidStack construction until item components are bound at runtime.
     public record FluidRef(Identifier fluidId, int amount) {
-        public static final Codec<FluidRef> CODEC = RecordCodecBuilder.create(instance ->
-                instance.group(
+        public static final Codec<FluidRef> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                         Identifier.CODEC.fieldOf("id").forGetter(FluidRef::fluidId),
-                        ExtraCodecs.POSITIVE_INT.fieldOf("amount").forGetter(FluidRef::amount)
-                ).apply(instance, FluidRef::new)
-        );
+                        ExtraCodecs.POSITIVE_INT.fieldOf("amount").forGetter(FluidRef::amount))
+                .apply(instance, FluidRef::new));
 
         public static final StreamCodec<RegistryFriendlyByteBuf, FluidRef> STREAM_CODEC = StreamCodec.composite(
-                Identifier.STREAM_CODEC, FluidRef::fluidId,
-                ByteBufCodecs.VAR_INT, FluidRef::amount,
-                FluidRef::new
-        );
+                Identifier.STREAM_CODEC, FluidRef::fluidId, ByteBufCodecs.VAR_INT, FluidRef::amount, FluidRef::new);
 
         public FluidStack create() {
             return new FluidStack(BuiltInRegistries.FLUID.getValue(fluidId), amount);
@@ -52,10 +46,13 @@ public class PressRecipe extends BaseHPRecipe {
     private final Optional<FluidRef> fluidRef;
     private final int priority;
 
-    public PressRecipe(Ingredient ingredient, int inputCount,
-                       Optional<SizedFluidIngredient> fluidInput,
-                       Optional<ItemStackTemplate> result, Optional<FluidRef> fluidRef,
-                       int priority) {
+    public PressRecipe(
+            Ingredient ingredient,
+            int inputCount,
+            Optional<SizedFluidIngredient> fluidInput,
+            Optional<ItemStackTemplate> result,
+            Optional<FluidRef> fluidRef,
+            int priority) {
         super(ingredient, result.orElse(null));
         this.inputCount = inputCount;
         this.fluidInput = fluidInput;
@@ -108,24 +105,29 @@ public class PressRecipe extends BaseHPRecipe {
         return priority;
     }
 
-    public static final MapCodec<PressRecipe> CODEC = RecordCodecBuilder.mapCodec(instance ->
-            instance.group(
+    public static final MapCodec<PressRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
                     Ingredient.CODEC.fieldOf("ingredient").forGetter(PressRecipe::getIngredient),
                     Codec.INT.optionalFieldOf("inputCount", 1).forGetter(PressRecipe::getInputCount),
                     SizedFluidIngredient.CODEC.optionalFieldOf("fluidInput").forGetter(PressRecipe::getFluidInput),
-                    ItemStackTemplate.CODEC.optionalFieldOf("result").forGetter(r -> Optional.ofNullable(r.getResult())),
+                    ItemStackTemplate.CODEC
+                            .optionalFieldOf("result")
+                            .forGetter(r -> Optional.ofNullable(r.getResult())),
                     FluidRef.CODEC.optionalFieldOf("fluidResult").forGetter(r -> r.fluidRef),
-                    Codec.INT.optionalFieldOf("priority", 0).forGetter(PressRecipe::getPriority)
-            ).apply(instance, PressRecipe::new)
-    );
+                    Codec.INT.optionalFieldOf("priority", 0).forGetter(PressRecipe::getPriority))
+            .apply(instance, PressRecipe::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, PressRecipe> STREAM_CODEC = StreamCodec.composite(
-            Ingredient.CONTENTS_STREAM_CODEC, PressRecipe::getIngredient,
-            ByteBufCodecs.VAR_INT, PressRecipe::getInputCount,
-            ByteBufCodecs.optional(SizedFluidIngredient.STREAM_CODEC), PressRecipe::getFluidInput,
-            ByteBufCodecs.optional(ItemStackTemplate.STREAM_CODEC), r -> Optional.ofNullable(r.getResult()),
-            ByteBufCodecs.optional(FluidRef.STREAM_CODEC), r -> r.fluidRef,
-            ByteBufCodecs.VAR_INT, PressRecipe::getPriority,
-            PressRecipe::new
-    );
+            Ingredient.CONTENTS_STREAM_CODEC,
+            PressRecipe::getIngredient,
+            ByteBufCodecs.VAR_INT,
+            PressRecipe::getInputCount,
+            ByteBufCodecs.optional(SizedFluidIngredient.STREAM_CODEC),
+            PressRecipe::getFluidInput,
+            ByteBufCodecs.optional(ItemStackTemplate.STREAM_CODEC),
+            r -> Optional.ofNullable(r.getResult()),
+            ByteBufCodecs.optional(FluidRef.STREAM_CODEC),
+            r -> r.fluidRef,
+            ByteBufCodecs.VAR_INT,
+            PressRecipe::getPriority,
+            PressRecipe::new);
 }

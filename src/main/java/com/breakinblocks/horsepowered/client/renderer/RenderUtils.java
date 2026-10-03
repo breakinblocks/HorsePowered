@@ -7,8 +7,8 @@ import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -22,16 +22,30 @@ import org.joml.Matrix4f;
 
 public final class RenderUtils {
 
-    private RenderUtils() {
-    }
+    private RenderUtils() {}
 
-    public static void renderFlatItem(ItemStackRenderState itemState, PoseStack poseStack, SubmitNodeCollector collector,
-                                      int lightCoords, double x, double y, double z, float scale) {
+    public static void renderFlatItem(
+            ItemStackRenderState itemState,
+            PoseStack poseStack,
+            SubmitNodeCollector collector,
+            int lightCoords,
+            double x,
+            double y,
+            double z,
+            float scale) {
         renderFlatItem(itemState, poseStack, collector, lightCoords, x, y, z, scale, 0);
     }
 
-    public static void renderFlatItem(ItemStackRenderState itemState, PoseStack poseStack, SubmitNodeCollector collector,
-                                      int lightCoords, double x, double y, double z, float scale, float yRotation) {
+    public static void renderFlatItem(
+            ItemStackRenderState itemState,
+            PoseStack poseStack,
+            SubmitNodeCollector collector,
+            int lightCoords,
+            double x,
+            double y,
+            double z,
+            float scale,
+            float yRotation) {
         if (itemState.isEmpty()) return;
         poseStack.pushPose();
         poseStack.translate(x, y, z);
@@ -44,8 +58,15 @@ public final class RenderUtils {
         poseStack.popPose();
     }
 
-    public static void renderStandingItem(ItemStackRenderState itemState, PoseStack poseStack, SubmitNodeCollector collector,
-                                          int lightCoords, double x, double y, double z, float scale) {
+    public static void renderStandingItem(
+            ItemStackRenderState itemState,
+            PoseStack poseStack,
+            SubmitNodeCollector collector,
+            int lightCoords,
+            double x,
+            double y,
+            double z,
+            float scale) {
         if (itemState.isEmpty()) return;
         poseStack.pushPose();
         poseStack.translate(x, y, z);
@@ -69,26 +90,51 @@ public final class RenderUtils {
      * Draws a stack size above a slot. Routed through submitNameTag so it billboards, draws a
      * see-through pass behind geometry, and picks up the accessibility text background setting.
      */
-    public static void submitItemCount(int count, PoseStack poseStack, SubmitNodeCollector collector, int lightCoords,
-                                       double distanceToCameraSq, CameraRenderState camera,
-                                       double x, double y, double z) {
+    public static void submitItemCount(
+            int count,
+            PoseStack poseStack,
+            SubmitNodeCollector collector,
+            int lightCoords,
+            double distanceToCameraSq,
+            CameraRenderState camera,
+            double x,
+            double y,
+            double z) {
         if (count <= 1) return;
-        collector.submitNameTag(poseStack, new Vec3(x, y - 0.5D, z), 0,
-                Component.literal(Integer.toString(count)), true, lightCoords, distanceToCameraSq, camera);
+        collector.submitNameTag(
+                poseStack,
+                new Vec3(x, y - 0.5D, z),
+                0,
+                Component.literal(Integer.toString(count)),
+                true,
+                lightCoords,
+                distanceToCameraSq,
+                camera);
     }
 
     public static void extractItemState(ItemStackRenderState itemState, ItemStack stack, Level level) {
         if (!stack.isEmpty()) {
-            Minecraft.getInstance().getItemModelResolver()
+            Minecraft.getInstance()
+                    .getItemModelResolver()
                     .updateForTopItem(itemState, stack, ItemDisplayContext.FIXED, level, null, 0);
         } else {
             itemState.clear();
         }
     }
 
-    public static void addVertex(VertexConsumer builder, Matrix4f pose,
-                                 float x, float y, float z, float u, float v,
-                                 float nx, float ny, float nz, int packedLight, int packedOverlay) {
+    public static void addVertex(
+            VertexConsumer builder,
+            Matrix4f pose,
+            float x,
+            float y,
+            float z,
+            float u,
+            float v,
+            float nx,
+            float ny,
+            float nz,
+            int packedLight,
+            int packedOverlay) {
         builder.addVertex(pose, x, y, z)
                 .setColor(255, 255, 255, 255)
                 .setUv(u, v)
@@ -97,9 +143,19 @@ public final class RenderUtils {
                 .setNormal(nx, ny, nz);
     }
 
-    public static void addVertex(VertexConsumer buffer, PoseStack.Pose pose,
-                                 float x, float y, float z, float u, float v,
-                                 float nx, float ny, float nz, int packedLight, int packedOverlay) {
+    public static void addVertex(
+            VertexConsumer buffer,
+            PoseStack.Pose pose,
+            float x,
+            float y,
+            float z,
+            float u,
+            float v,
+            float nx,
+            float ny,
+            float nz,
+            int packedLight,
+            int packedOverlay) {
         buffer.addVertex(pose, x, y, z)
                 .setColor(255, 255, 255, 255)
                 .setUv(u, v)
@@ -108,10 +164,17 @@ public final class RenderUtils {
                 .setNormal(pose, nx, ny, nz);
     }
 
-    public static void renderTexturedBox(VertexConsumer buffer, PoseStack.Pose pose, TextureAtlasSprite sprite,
-                                         float minX, float minY, float minZ,
-                                         float maxX, float maxY, float maxZ,
-                                         int packedLight) {
+    public static void renderTexturedBox(
+            VertexConsumer buffer,
+            PoseStack.Pose pose,
+            TextureAtlasSprite sprite,
+            float minX,
+            float minY,
+            float minZ,
+            float maxX,
+            float maxY,
+            float maxZ,
+            int packedLight) {
         float u0 = sprite.getU0();
         float u1 = sprite.getU1();
         float v0 = sprite.getV0();

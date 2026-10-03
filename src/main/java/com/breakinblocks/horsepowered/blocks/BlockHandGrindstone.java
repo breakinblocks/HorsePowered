@@ -36,10 +36,8 @@ public class BlockHandGrindstone extends BlockHPBase {
 
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 
-    private static final VoxelShape SHAPE = Shapes.or(
-            Block.box(1, 0, 1, 15, 4, 15),
-            Block.box(6.5, 4, 6.5, 9.5, 10, 9.5)
-    );
+    private static final VoxelShape SHAPE =
+            Shapes.or(Block.box(1, 0, 1, 15, 4, 15), Block.box(6.5, 4, 6.5, 9.5, 10, 9.5));
     private static final VoxelShape COLLISION_SHAPE = SHAPE;
 
     private static final float STEM_MIN = 6.5F / 16F;
@@ -58,11 +56,13 @@ public class BlockHandGrindstone extends BlockHPBase {
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        return defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
+        return defaultBlockState()
+                .setValue(FACING, context.getHorizontalDirection().getOpposite());
     }
 
     @Override
-    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+    public void setPlacedBy(
+            Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
         if (placer != null) {
             BlockEntity be = level.getBlockEntity(pos);
             if (be instanceof HandGrindstoneBlockEntity grindstone) {
@@ -77,19 +77,25 @@ public class BlockHandGrindstone extends BlockHPBase {
     }
 
     @Override
-    protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+    protected VoxelShape getCollisionShape(
+            BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return COLLISION_SHAPE;
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+    protected InteractionResult useWithoutItem(
+            BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         BlockEntity be = level.getBlockEntity(pos);
         if (be instanceof HandGrindstoneBlockEntity grindstone) {
             if (grindstone.canWork() && !player.isShiftKeyDown() && isStemHit(pos, hit)) {
                 if (!level.isClientSide()) {
-                    float recipeHunger = grindstone.getRecipe().map(r -> r.value().getHungerCost()).orElse(0.0F);
+                    float recipeHunger = grindstone
+                            .getRecipe()
+                            .map(r -> r.value().getHungerCost())
+                            .orElse(0.0F);
                     if (grindstone.turn()) {
-                        player.causeFoodExhaustion(HorsePowerConfig.grindstoneExhaustion.get().floatValue() + recipeHunger);
+                        player.causeFoodExhaustion(
+                                HorsePowerConfig.grindstoneExhaustion.get().floatValue() + recipeHunger);
                         playTurnFeedback(level, pos);
                     }
                 }
@@ -112,8 +118,14 @@ public class BlockHandGrindstone extends BlockHPBase {
         if (level instanceof ServerLevel serverLevel) {
             serverLevel.sendParticles(
                     new BlockParticleOption(ParticleTypes.BLOCK, Blocks.STONE.defaultBlockState()),
-                    pos.getX() + 0.5, pos.getY() + 0.65, pos.getZ() + 0.5,
-                    4, 0.15, 0.05, 0.15, 0.0);
+                    pos.getX() + 0.5,
+                    pos.getY() + 0.65,
+                    pos.getZ() + 0.5,
+                    4,
+                    0.15,
+                    0.05,
+                    0.15,
+                    0.0);
         }
     }
 
@@ -152,7 +164,8 @@ public class BlockHandGrindstone extends BlockHPBase {
 
     @Nullable
     @Override
-    protected <T extends BlockEntity> BlockEntityTicker<T> createTicker(Level level, BlockState state, BlockEntityType<T> type) {
+    protected <T extends BlockEntity> BlockEntityTicker<T> createTicker(
+            Level level, BlockState state, BlockEntityType<T> type) {
         if (level.isClientSide()) {
             return checkType(type, ModBlockEntities.HAND_GRINDSTONE.get(), HandGrindstoneBlockEntity::clientTick);
         } else {

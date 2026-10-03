@@ -12,10 +12,11 @@ import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
-public class GraniteAnvilBlockEntityRenderer implements BlockEntityRenderer<GraniteAnvilBlockEntity, GraniteAnvilBlockEntityRenderer.GraniteAnvilRenderState> {
+public class GraniteAnvilBlockEntityRenderer
+        implements BlockEntityRenderer<
+                GraniteAnvilBlockEntity, GraniteAnvilBlockEntityRenderer.GraniteAnvilRenderState> {
 
-    public GraniteAnvilBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
-    }
+    public GraniteAnvilBlockEntityRenderer(BlockEntityRendererProvider.Context context) {}
 
     @Override
     public GraniteAnvilRenderState createRenderState() {
@@ -23,16 +24,23 @@ public class GraniteAnvilBlockEntityRenderer implements BlockEntityRenderer<Gran
     }
 
     @Override
-    public void extractRenderState(GraniteAnvilBlockEntity blockEntity, GraniteAnvilRenderState state, float partialTick,
-                                   Vec3 cameraPos, @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
+    public void extractRenderState(
+            GraniteAnvilBlockEntity blockEntity,
+            GraniteAnvilRenderState state,
+            float partialTick,
+            Vec3 cameraPos,
+            @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
         BlockEntityRenderState.extractBase(blockEntity, state, crumblingOverlay);
         RenderUtils.extractItemState(state.inputItem, blockEntity.getItem(0), blockEntity.getLevel());
     }
 
     @Override
-    public void submit(GraniteAnvilRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
-        RenderUtils.renderFlatItem(state.inputItem, poseStack, collector, state.lightCoords,
-                0.5D, 0.84D, 0.5D, 1.375F);
+    public void submit(
+            GraniteAnvilRenderState state,
+            PoseStack poseStack,
+            SubmitNodeCollector collector,
+            CameraRenderState camera) {
+        RenderUtils.renderFlatItem(state.inputItem, poseStack, collector, state.lightCoords, 0.5D, 0.84D, 0.5D, 1.375F);
     }
 
     public static class GraniteAnvilRenderState extends BlockEntityRenderState {

@@ -2,6 +2,7 @@ package com.breakinblocks.horsepowered.blockentity;
 
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
 import com.breakinblocks.horsepowered.recipes.TrappingRecipe;
+import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -32,16 +33,14 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
-import java.util.Optional;
-
 public class AnimalTrapBlockEntity extends HPBlockEntityBase {
 
     public static final int INVENTORY_SIZE = 6;
     public static final int BAIT_SLOT = 0;
     public static final int FIRST_DROP_SLOT = 1;
     public static final int LAST_DROP_SLOT = 5;
-    private static final int[] DROP_SLOTS = { 1, 2, 3, 4, 5 };
-    private static final int[] BAIT_ONLY = { 0 };
+    private static final int[] DROP_SLOTS = {1, 2, 3, 4, 5};
+    private static final int[] BAIT_ONLY = {0};
 
     public static final int DROP_INTERVAL_TICKS = 3000;
     public static final int CATCH_ROLL_INTERVAL_TICKS = 20;
@@ -53,15 +52,19 @@ public class AnimalTrapBlockEntity extends HPBlockEntityBase {
 
     @Nullable
     private CompoundTag capturedEntityTag;
+
     @Nullable
     private Identifier capturedEntityTypeId;
+
     @Nullable
     private EntityType<?> capturedEntityType;
 
     private double spin;
     private double oSpin;
+
     @Nullable
     private Entity displayEntity;
+
     @Nullable
     private CompoundTag displayEntitySourceTag;
 
@@ -69,19 +72,44 @@ public class AnimalTrapBlockEntity extends HPBlockEntityBase {
         super(ModBlockEntities.ANIMAL_TRAP.get(), pos, state, INVENTORY_SIZE);
     }
 
-    public int getTrapProgress() { return trapProgress; }
-    public int getTrapTime() { return trapTime; }
-    public int getDropTimer() { return dropTimer; }
-    public boolean hasCapturedEntity() { return capturedEntityTag != null; }
-    @Nullable public EntityType<?> getCapturedEntityType() { return capturedEntityType; }
-    public double getSpin() { return spin; }
-    public double getOSpin() { return oSpin; }
+    public int getTrapProgress() {
+        return trapProgress;
+    }
+
+    public int getTrapTime() {
+        return trapTime;
+    }
+
+    public int getDropTimer() {
+        return dropTimer;
+    }
+
+    public boolean hasCapturedEntity() {
+        return capturedEntityTag != null;
+    }
+
+    @Nullable
+    public EntityType<?> getCapturedEntityType() {
+        return capturedEntityType;
+    }
+
+    public double getSpin() {
+        return spin;
+    }
+
+    public double getOSpin() {
+        return oSpin;
+    }
 
     @Override
-    public int getInventoryStackLimit() { return 64; }
+    public int getInventoryStackLimit() {
+        return 64;
+    }
 
     @Override
-    public int getOutputSlot() { return 1; }
+    public int getOutputSlot() {
+        return 1;
+    }
 
     @Override
     public boolean isItemValidForSlot(int index, ItemStack stack) {
@@ -116,7 +144,8 @@ public class AnimalTrapBlockEntity extends HPBlockEntityBase {
     private Optional<RecipeHolder<TrappingRecipe>> findFeedingRecipe(ItemStack stack) {
         if (capturedEntityTypeId == null) return Optional.empty();
         Optional<RecipeHolder<TrappingRecipe>> recipe = findRecipe(HPRecipes.TRAPPING_TYPE.get(), stack);
-        if (recipe.isPresent() && capturedEntityTypeId.equals(recipe.get().value().getEntityId())) {
+        if (recipe.isPresent()
+                && capturedEntityTypeId.equals(recipe.get().value().getEntityId())) {
             return recipe;
         }
         return Optional.empty();
@@ -125,16 +154,17 @@ public class AnimalTrapBlockEntity extends HPBlockEntityBase {
     private boolean capturedEntityRequiresBait() {
         if (!(level instanceof ServerLevel sl) || capturedEntityTypeId == null) return false;
         try {
-            return ((RecipeManager) sl.recipeAccess()).recipeMap()
-                    .byType(HPRecipes.TRAPPING_TYPE.get()).stream()
-                    .anyMatch(h -> capturedEntityTypeId.equals(h.value().getEntityId())
-                            && h.value().isBaitConsumed());
+            return ((RecipeManager) sl.recipeAccess())
+                    .recipeMap().byType(HPRecipes.TRAPPING_TYPE.get()).stream()
+                            .anyMatch(h -> capturedEntityTypeId.equals(h.value().getEntityId())
+                                    && h.value().isBaitConsumed());
         } catch (Exception e) {
             return false;
         }
     }
 
-    public static void serverTick(net.minecraft.world.level.Level level, BlockPos pos, BlockState state, AnimalTrapBlockEntity be) {
+    public static void serverTick(
+            net.minecraft.world.level.Level level, BlockPos pos, BlockState state, AnimalTrapBlockEntity be) {
         if (level.isClientSide()) return;
 
         if (be.capturedEntityTag != null) {
@@ -210,15 +240,15 @@ public class AnimalTrapBlockEntity extends HPBlockEntityBase {
         }
     }
 
-    public static void clientTick(net.minecraft.world.level.Level level, BlockPos pos, BlockState state, AnimalTrapBlockEntity be) {
+    public static void clientTick(
+            net.minecraft.world.level.Level level, BlockPos pos, BlockState state, AnimalTrapBlockEntity be) {
         if (!level.isClientSide()) return;
         be.oSpin = be.spin;
-        boolean hasDisplay = be.capturedEntityTag != null || !be.getItem(BAIT_SLOT).isEmpty();
+        boolean hasDisplay =
+                be.capturedEntityTag != null || !be.getItem(BAIT_SLOT).isEmpty();
         if (!hasDisplay) return;
         double remaining = Math.max(0, be.trapTime - be.trapProgress);
-        double accel = be.capturedEntityTag != null
-                ? 1000.0 / 200.0
-                : 1000.0 / (200.0 + remaining);
+        double accel = be.capturedEntityTag != null ? 1000.0 / 200.0 : 1000.0 / (200.0 + remaining);
         be.spin = (be.spin + accel) % 360.0;
     }
 
@@ -243,8 +273,7 @@ public class AnimalTrapBlockEntity extends HPBlockEntityBase {
         Entity proto = type.create(sl, EntitySpawnReason.LOAD);
         if (proto == null) return;
 
-        TagValueOutput output = TagValueOutput.createWithContext(
-                ProblemReporter.DISCARDING, sl.registryAccess());
+        TagValueOutput output = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, sl.registryAccess());
         proto.saveAsPassenger(output);
         CompoundTag tag = output.buildResult();
         tag.remove("Pos");
@@ -274,8 +303,7 @@ public class AnimalTrapBlockEntity extends HPBlockEntityBase {
             return;
         }
         try {
-            ValueInput input = TagValueInput.create(
-                    ProblemReporter.DISCARDING, sl.registryAccess(), capturedEntityTag);
+            ValueInput input = TagValueInput.create(ProblemReporter.DISCARDING, sl.registryAccess(), capturedEntityTag);
             living.load(input);
         } catch (Exception ignored) {
             // Fall through with default-loaded entity.
@@ -291,7 +319,8 @@ public class AnimalTrapBlockEntity extends HPBlockEntityBase {
         LootParams params = new LootParams.Builder(sl)
                 .withParameter(LootContextParams.THIS_ENTITY, living)
                 .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(worldPosition))
-                .withParameter(LootContextParams.DAMAGE_SOURCE, sl.damageSources().generic())
+                .withParameter(
+                        LootContextParams.DAMAGE_SOURCE, sl.damageSources().generic())
                 .create(LootContextParamSets.ENTITY);
         table.getRandomItems(params, this::depositDrop);
         living.discard();
@@ -333,7 +362,8 @@ public class AnimalTrapBlockEntity extends HPBlockEntityBase {
         for (int slot = 0; slot < INVENTORY_SIZE; slot++) {
             ItemStack stack = getItem(slot);
             if (!stack.isEmpty()) {
-                Containers.dropItemStack(level,
+                Containers.dropItemStack(
+                        level,
                         worldPosition.getX() + 0.5,
                         worldPosition.getY() + 0.5,
                         worldPosition.getZ() + 0.5,
@@ -355,8 +385,8 @@ public class AnimalTrapBlockEntity extends HPBlockEntityBase {
             entity = capturedEntityType.create(sl, EntitySpawnReason.LOAD);
             if (entity != null) {
                 try {
-                    ValueInput input = TagValueInput.create(
-                            ProblemReporter.DISCARDING, sl.registryAccess(), capturedEntityTag);
+                    ValueInput input =
+                            TagValueInput.create(ProblemReporter.DISCARDING, sl.registryAccess(), capturedEntityTag);
                     entity.load(input);
                 } catch (Exception ignored) {
                     // proceed with default-loaded entity
@@ -374,11 +404,7 @@ public class AnimalTrapBlockEntity extends HPBlockEntityBase {
         }
 
         float yaw = sl.getRandom().nextFloat() * 360F;
-        entity.snapTo(
-                worldPosition.getX() + 0.5,
-                worldPosition.getY() + 1.0,
-                worldPosition.getZ() + 0.5,
-                yaw, 0F);
+        entity.snapTo(worldPosition.getX() + 0.5, worldPosition.getY() + 1.0, worldPosition.getZ() + 0.5, yaw, 0F);
         sl.addFreshEntity(entity);
 
         capturedEntityTag = null;
@@ -461,8 +487,8 @@ public class AnimalTrapBlockEntity extends HPBlockEntityBase {
             try {
                 Entity built = capturedEntityType.create(level, EntitySpawnReason.LOAD);
                 if (built != null) {
-                    ValueInput input = TagValueInput.create(
-                            ProblemReporter.DISCARDING, level.registryAccess(), capturedEntityTag);
+                    ValueInput input =
+                            TagValueInput.create(ProblemReporter.DISCARDING, level.registryAccess(), capturedEntityTag);
                     built.load(input);
                     displayEntity = built;
                     displayEntitySourceTag = capturedEntityTag;

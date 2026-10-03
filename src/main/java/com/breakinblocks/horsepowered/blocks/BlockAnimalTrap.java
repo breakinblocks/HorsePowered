@@ -4,6 +4,7 @@ import com.breakinblocks.horsepowered.blockentity.AnimalTrapBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.ModBlockEntities;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
@@ -38,12 +39,10 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-
 public class BlockAnimalTrap extends Block implements EntityBlock, SimpleWaterloggedBlock {
 
-    public static final MapCodec<BlockAnimalTrap> CODEC = RecordCodecBuilder.mapCodec(instance ->
-            instance.group(propertiesCodec()).apply(instance, BlockAnimalTrap::new));
+    public static final MapCodec<BlockAnimalTrap> CODEC = RecordCodecBuilder.mapCodec(
+            instance -> instance.group(propertiesCodec()).apply(instance, BlockAnimalTrap::new));
 
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
@@ -75,9 +74,15 @@ public class BlockAnimalTrap extends Block implements EntityBlock, SimpleWaterlo
     }
 
     @Override
-    protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess tickAccess,
-                                     BlockPos pos, Direction direction, BlockPos neighborPos,
-                                     BlockState neighborState, net.minecraft.util.RandomSource random) {
+    protected BlockState updateShape(
+            BlockState state,
+            LevelReader level,
+            ScheduledTickAccess tickAccess,
+            BlockPos pos,
+            Direction direction,
+            BlockPos neighborPos,
+            BlockState neighborState,
+            net.minecraft.util.RandomSource random) {
         if (state.getValue(WATERLOGGED)) {
             tickAccess.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
@@ -85,8 +90,14 @@ public class BlockAnimalTrap extends Block implements EntityBlock, SimpleWaterlo
     }
 
     @Override
-    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
-                                          Player player, InteractionHand hand, BlockHitResult hit) {
+    protected InteractionResult useItemOn(
+            ItemStack stack,
+            BlockState state,
+            Level level,
+            BlockPos pos,
+            Player player,
+            InteractionHand hand,
+            BlockHitResult hit) {
         if (!(level.getBlockEntity(pos) instanceof AnimalTrapBlockEntity trap)) {
             return InteractionResult.PASS;
         }
@@ -100,8 +111,7 @@ public class BlockAnimalTrap extends Block implements EntityBlock, SimpleWaterlo
             return InteractionResult.PASS;
         }
 
-        if (!stack.isEmpty()
-                && trap.getItem(AnimalTrapBlockEntity.BAIT_SLOT).isEmpty()) {
+        if (!stack.isEmpty() && trap.getItem(AnimalTrapBlockEntity.BAIT_SLOT).isEmpty()) {
             if (level.isClientSide()) return InteractionResult.SUCCESS;
             if (trap.tryInsertBait(stack)) {
                 if (!player.getAbilities().instabuild) stack.shrink(1);
@@ -114,8 +124,8 @@ public class BlockAnimalTrap extends Block implements EntityBlock, SimpleWaterlo
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos,
-                                               Player player, BlockHitResult hit) {
+    protected InteractionResult useWithoutItem(
+            BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!(level.getBlockEntity(pos) instanceof AnimalTrapBlockEntity trap)) {
             return InteractionResult.PASS;
         }
@@ -161,7 +171,8 @@ public class BlockAnimalTrap extends Block implements EntityBlock, SimpleWaterlo
 
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(
+            Level level, BlockState state, BlockEntityType<T> type) {
         if (type != ModBlockEntities.ANIMAL_TRAP.get()) return null;
         @SuppressWarnings("unchecked")
         BlockEntityTicker<T> ticker = level.isClientSide()

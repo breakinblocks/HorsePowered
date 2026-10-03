@@ -41,19 +41,30 @@ public class BlockChoppingBlock extends BlockHPBase {
     }
 
     @Override
-    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    protected InteractionResult useItemOn(
+            ItemStack stack,
+            BlockState state,
+            Level level,
+            BlockPos pos,
+            Player player,
+            InteractionHand hand,
+            BlockHitResult hit) {
         BlockEntity be = level.getBlockEntity(pos);
         if (be instanceof ManualChopperBlockEntity chopper) {
             // Axe strike: chop an already-placed log
             if (stack.is(ItemTags.AXES) && chopper.canWork()) {
                 if (!level.isClientSide()) {
-                    float recipeHunger = chopper.getRecipe().map(r -> r.value().getHungerCost()).orElse(0.0F);
+                    float recipeHunger = chopper.getRecipe()
+                            .map(r -> r.value().getHungerCost())
+                            .orElse(0.0F);
                     boolean finishedChop = chopper.chop(player, stack);
                     if (finishedChop && HorsePowerConfig.shouldDamageAxe.get()) {
-                        EquipmentSlot slot = hand == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
+                        EquipmentSlot slot =
+                                hand == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
                         stack.hurtAndBreak(1, player, slot);
                     }
-                    player.causeFoodExhaustion(HorsePowerConfig.choppingBlockExhaustion.get().floatValue() + recipeHunger);
+                    player.causeFoodExhaustion(
+                            HorsePowerConfig.choppingBlockExhaustion.get().floatValue() + recipeHunger);
                     playStrikeFeedback(level, pos, chopper.getItem(0));
                 }
                 return InteractionResult.SUCCESS;
@@ -82,8 +93,14 @@ public class BlockChoppingBlock extends BlockHPBase {
         if (level instanceof ServerLevel serverLevel) {
             serverLevel.sendParticles(
                     new BlockParticleOption(ParticleTypes.BLOCK, Blocks.OAK_LOG.defaultBlockState()),
-                    pos.getX() + 0.5, pos.getY() + 0.6, pos.getZ() + 0.5,
-                    6, 0.2, 0.05, 0.2, 0.0);
+                    pos.getX() + 0.5,
+                    pos.getY() + 0.6,
+                    pos.getZ() + 0.5,
+                    6,
+                    0.2,
+                    0.05,
+                    0.2,
+                    0.0);
         }
     }
 
@@ -93,8 +110,14 @@ public class BlockChoppingBlock extends BlockHPBase {
         if (level instanceof ServerLevel serverLevel && !target.isEmpty()) {
             serverLevel.sendParticles(
                     new BlockParticleOption(ParticleTypes.BLOCK, Blocks.OAK_LOG.defaultBlockState()),
-                    pos.getX() + 0.5, pos.getY() + 0.7, pos.getZ() + 0.5,
-                    8, 0.25, 0.1, 0.25, 0.0);
+                    pos.getX() + 0.5,
+                    pos.getY() + 0.7,
+                    pos.getZ() + 0.5,
+                    8,
+                    0.25,
+                    0.1,
+                    0.25,
+                    0.0);
         }
     }
 
@@ -111,7 +134,8 @@ public class BlockChoppingBlock extends BlockHPBase {
 
     @Nullable
     @Override
-    protected <T extends BlockEntity> BlockEntityTicker<T> createTicker(Level level, BlockState state, BlockEntityType<T> type) {
+    protected <T extends BlockEntity> BlockEntityTicker<T> createTicker(
+            Level level, BlockState state, BlockEntityType<T> type) {
         // Manual chopper doesn't need ticking
         return null;
     }

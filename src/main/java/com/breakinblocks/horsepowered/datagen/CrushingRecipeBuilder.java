@@ -46,8 +46,7 @@ public class CrushingRecipeBuilder {
     }
 
     public void save(RecipeOutput output, String name) {
-        ResourceKey<Recipe<?>> key = ResourceKey.create(Registries.RECIPE,
-                HorsePowerMod.id("crushing/" + name));
+        ResourceKey<Recipe<?>> key = ResourceKey.create(Registries.RECIPE, HorsePowerMod.id("crushing/" + name));
         output.accept(key, new CrushingRecipe(ingredient, result, time, priority, hungerCost), null);
     }
 }

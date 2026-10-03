@@ -78,25 +78,32 @@ public class HPRecipes {
 
     // Recipe Serializers - RecipeSerializer is now a record of MapCodec + StreamCodec in 26.1
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<GrindstoneRecipe>> GRINDING_SERIALIZER =
-            RECIPE_SERIALIZERS.register("grinding", () -> new RecipeSerializer<>(GrindstoneRecipe.CODEC, GrindstoneRecipe.STREAM_CODEC));
+            RECIPE_SERIALIZERS.register(
+                    "grinding", () -> new RecipeSerializer<>(GrindstoneRecipe.CODEC, GrindstoneRecipe.STREAM_CODEC));
 
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<ChoppingRecipe>> CHOPPING_SERIALIZER =
-            RECIPE_SERIALIZERS.register("chopping", () -> new RecipeSerializer<>(ChoppingRecipe.CODEC, ChoppingRecipe.STREAM_CODEC));
+            RECIPE_SERIALIZERS.register(
+                    "chopping", () -> new RecipeSerializer<>(ChoppingRecipe.CODEC, ChoppingRecipe.STREAM_CODEC));
 
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<PressRecipe>> PRESSING_SERIALIZER =
-            RECIPE_SERIALIZERS.register("pressing", () -> new RecipeSerializer<>(PressRecipe.CODEC, PressRecipe.STREAM_CODEC));
+            RECIPE_SERIALIZERS.register(
+                    "pressing", () -> new RecipeSerializer<>(PressRecipe.CODEC, PressRecipe.STREAM_CODEC));
 
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<DryingRackRecipe>> DRYING_SERIALIZER =
-            RECIPE_SERIALIZERS.register("drying", () -> new RecipeSerializer<>(DryingRackRecipe.CODEC, DryingRackRecipe.STREAM_CODEC));
+            RECIPE_SERIALIZERS.register(
+                    "drying", () -> new RecipeSerializer<>(DryingRackRecipe.CODEC, DryingRackRecipe.STREAM_CODEC));
 
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<CrushingRecipe>> CRUSHING_SERIALIZER =
-            RECIPE_SERIALIZERS.register("crushing", () -> new RecipeSerializer<>(CrushingRecipe.CODEC, CrushingRecipe.STREAM_CODEC));
+            RECIPE_SERIALIZERS.register(
+                    "crushing", () -> new RecipeSerializer<>(CrushingRecipe.CODEC, CrushingRecipe.STREAM_CODEC));
 
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<TrappingRecipe>> TRAPPING_SERIALIZER =
-            RECIPE_SERIALIZERS.register("trapping", () -> new RecipeSerializer<>(TrappingRecipe.CODEC, TrappingRecipe.STREAM_CODEC));
+            RECIPE_SERIALIZERS.register(
+                    "trapping", () -> new RecipeSerializer<>(TrappingRecipe.CODEC, TrappingRecipe.STREAM_CODEC));
 
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<BottlingRecipe>> BOTTLING_SERIALIZER =
-            RECIPE_SERIALIZERS.register("bottling", () -> new RecipeSerializer<>(BottlingRecipe.CODEC, BottlingRecipe.STREAM_CODEC));
+            RECIPE_SERIALIZERS.register(
+                    "bottling", () -> new RecipeSerializer<>(BottlingRecipe.CODEC, BottlingRecipe.STREAM_CODEC));
 
     // Recipe Book Categories
     public static final DeferredHolder<RecipeBookCategory, RecipeBookCategory> GRINDING_CATEGORY =

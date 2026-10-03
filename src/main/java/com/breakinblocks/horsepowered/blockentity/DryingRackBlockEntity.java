@@ -3,6 +3,8 @@ package com.breakinblocks.horsepowered.blockentity;
 import com.breakinblocks.horsepowered.recipes.DryingRackRecipe;
 import com.breakinblocks.horsepowered.recipes.HPRecipeInput;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
+import java.util.Optional;
+import java.util.function.Consumer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -26,15 +28,12 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Optional;
-import java.util.function.Consumer;
-
 public class DryingRackBlockEntity extends BlockEntity implements WorldlyContainer {
 
     public static final int SLOT_COUNT = 8;
     private static final int FINISHED = -1;
 
-    private static final int[] ALL_SLOTS = { 0, 1, 2, 3, 4, 5, 6, 7 };
+    private static final int[] ALL_SLOTS = {0, 1, 2, 3, 4, 5, 6, 7};
 
     private final NonNullList<ItemStack> items = NonNullList.withSize(SLOT_COUNT, ItemStack.EMPTY);
     private final NonNullList<ItemStack> outputs = NonNullList.withSize(SLOT_COUNT, ItemStack.EMPTY);
@@ -271,7 +270,8 @@ public class DryingRackBlockEntity extends BlockEntity implements WorldlyContain
     @Override
     public boolean stillValid(Player player) {
         if (level == null || level.getBlockEntity(worldPosition) != this) return false;
-        return player.distanceToSqr(worldPosition.getX() + 0.5, worldPosition.getY() + 0.5, worldPosition.getZ() + 0.5) <= 64.0;
+        return player.distanceToSqr(worldPosition.getX() + 0.5, worldPosition.getY() + 0.5, worldPosition.getZ() + 0.5)
+                <= 64.0;
     }
 
     @Override
