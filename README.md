@@ -89,6 +89,23 @@ Example grinding recipe (`data/yourpack/recipes/grinding/custom_recipe.json`):
 }
 ```
 
+Example drying recipe (`data/yourpack/recipes/drying/beef_jerky.json`):
+```json
+{
+  "type": "horsepowered:drying",
+  "ingredient": { "item": "minecraft:beef" },
+  "result": { "item": "minecraft:cooked_beef", "count": 1 },
+  "time": 1200
+}
+```
+- `ingredient` - `{ "item": "minecraft:beef" }` for one item, or `{ "tag": "minecraft:saplings" }` for a tag.
+- `result` - The item each slot turns into, with an optional `count` and `nbt`.
+- `time` - Ticks to dry one item (20 ticks = 1 second). Required.
+
+Each of the rack's 8 slots holds one input item and dries it on its own timer. A finished slot keeps its result until a player or a hopper takes it out.
+
+To replace a built-in recipe, put a file with the same path in your datapack, e.g. `data/horsepowered/recipes/drying/kelp_to_dried_kelp.json`. The built-in drying recipes are `clay_to_terracotta`, `kelp_to_dried_kelp`, `mud_to_dirt`, `rotten_flesh_to_leather`, `saplings_to_dead_bush` and `wet_sponge_to_sponge`.
+
 Example trapping recipe (`data/yourpack/recipes/trapping/custom_recipe.json`):
 ```json
 {
@@ -144,6 +161,23 @@ All three recipe types accept the following optional fields:
 - **`tier`** (int, default `0`) - Restricts which stations can run the recipe. Higher tiers require the corresponding higher-tier station upgrade.
 - **`priority`** (int, default `0`) - Sort order for recipe selection and JEI / EMI display. Lower values sort first.
 - **`hungerCost`** (float, default `0.0`) - On manual stations (Hand Grindstone, Chopping Block), this value is added to the player's food exhaustion every chop or turn, on top of the existing config baseline. Has no effect on horse-powered stations. JEI and EMI display a "Hunger" line on the manual category when the value is greater than zero.
+
+### KubeJS
+
+Every recipe type can be added through KubeJS with `event.custom`, using the same JSON as the datapack examples above. Put this in `kubejs/server_scripts/`:
+```js
+ServerEvents.recipes(event => {
+  event.custom({
+    type: 'horsepowered:drying',
+    ingredient: { item: 'minecraft:beef' },
+    result: { item: 'minecraft:cooked_beef', count: 1 },
+    time: 1200
+  }).id('yourpack:drying/beef_jerky')
+
+  event.remove({ id: 'horsepowered:drying/clay_to_terracotta' })
+})
+```
+The `remove` line drops one built-in recipe by its ID. To clear every drying recipe and add your own set instead, use `event.remove({ type: 'horsepowered:drying' })`. Run `/reload` after editing the script.
 
 ### Custom Worker Mobs
 
