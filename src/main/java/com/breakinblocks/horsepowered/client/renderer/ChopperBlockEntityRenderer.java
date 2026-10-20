@@ -14,6 +14,8 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -21,6 +23,7 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
 
     private static final float BLADE_MIN_Y = 0.5F;
     private static final float BLADE_MAX_Y = 1.25F;
+    private static final double BASE_TOP = 6.0D / 16.0D;
 
     private final ItemRenderer itemRenderer;
     private final Font font;
@@ -50,13 +53,25 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
         renderBlade(blockEntity, poseStack, bufferSource, packedLight, packedOverlay, rotation);
 
         // Log stands upright on the chopping surface so the blade cleaves it like a real axe chop.
-        RenderUtils.renderStandingItem(poseStack, bufferSource, itemRenderer, font,
-                blockEntity.getItem(0), 0.5, 0.71, 0.5, 0.6F, rotation, packedLight, packedOverlay,
-                blockEntity.getLevel(), 1.05);
+        ItemStack input = blockEntity.getItem(0);
+        ItemStack output = blockEntity.getItem(1);
+        Level level = blockEntity.getLevel();
 
-        RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer, font,
-                blockEntity.getItem(1), 0.5, 0.3, 0.5, 0.4F, rotation + 45, packedLight, packedOverlay,
-                blockEntity.getLevel(), 0.55);
+        RenderUtils.renderStandingItem(poseStack, bufferSource, itemRenderer,
+                input, 0.5, 0.71, 0.5, 0.6F, rotation, packedLight, packedOverlay,
+                level);
+
+        RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer,
+                output, 0.5, 0.3, 0.5, 0.4F, rotation + 45, packedLight, packedOverlay,
+                level);
+
+        if (RenderUtils.shouldShowItemCounts(blockEntity)) {
+            double countY = input.isEmpty()
+                    ? Math.max(RenderUtils.itemTop(itemRenderer, output, level, 0.3, 0.4F, false), BASE_TOP)
+                    : RenderUtils.itemTop(itemRenderer, input, level, 0.71, 0.6F, true);
+            countY = RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, input.getCount(), 0.5, countY, 0.5);
+            RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, output.getCount(), 0.5, countY, 0.5);
+        }
     }
 
     private void renderBlade(ChopperBlockEntity blockEntity, PoseStack poseStack,

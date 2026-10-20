@@ -8,8 +8,11 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.world.item.ItemStack;
 
 public class GrindstoneBlockEntityRenderer implements BlockEntityRenderer<GrindstoneBlockEntity> {
+
+    private static final double GRINDER_TOP = 0.5D;
 
     private final ItemRenderer itemRenderer;
     private final Font font;
@@ -26,17 +29,28 @@ public class GrindstoneBlockEntityRenderer implements BlockEntityRenderer<Grinds
         GhostWorkerRenderer.render(blockEntity, partialTick, poseStack, bufferSource, packedLight);
         LeadRenderer.renderLead(blockEntity, partialTick, poseStack, bufferSource);
 
-        RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer, font,
-                blockEntity.getItem(0), 0.5, 1.1, 0.5, 0.5F, 0, packedLight, packedOverlay,
-                blockEntity.getLevel(), 1.4);
+        ItemStack input = blockEntity.getItem(0);
+        ItemStack output = blockEntity.getItem(1);
+        ItemStack secondary = blockEntity.getItem(2);
 
-        RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer, font,
-                blockEntity.getItem(1), 0.5, 0.3, 0.25, 0.3F, 0, packedLight, packedOverlay,
-                blockEntity.getLevel(), 0.55);
+        RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer,
+                input, 0.5, 1.1, 0.5, 0.5F, 0, packedLight, packedOverlay,
+                blockEntity.getLevel());
 
-        RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer, font,
-                blockEntity.getItem(2), 0.5, 0.3, 0.75, 0.3F, 0, packedLight, packedOverlay,
-                blockEntity.getLevel(), 0.55);
+        RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer,
+                output, 0.5, 0.3, 0.25, 0.3F, 0, packedLight, packedOverlay,
+                blockEntity.getLevel());
+
+        RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer,
+                secondary, 0.5, 0.3, 0.75, 0.3F, 0, packedLight, packedOverlay,
+                blockEntity.getLevel());
+
+        if (RenderUtils.shouldShowItemCounts(blockEntity)) {
+            double countY = RenderUtils.itemTop(itemRenderer, input, blockEntity.getLevel(), 1.1, 0.5F, false);
+            RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, input.getCount(), 0.5, countY, 0.5);
+            RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, output.getCount(), 0.5, GRINDER_TOP, 0.25);
+            RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, secondary.getCount(), 0.5, GRINDER_TOP, 0.75);
+        }
     }
 
     @Override

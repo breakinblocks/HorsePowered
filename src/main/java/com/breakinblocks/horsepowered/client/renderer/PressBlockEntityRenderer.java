@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.fluids.FluidStack;
@@ -23,6 +24,7 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
 
     private static final float PLUNGER_MAX_Y = 0.7F;
     private static final float PLUNGER_MIN_Y = 0.2F;
+    private static final double FRAME_TOP = 19.0D / 16.0D;
 
     private final ItemRenderer itemRenderer;
     private final Font font;
@@ -40,13 +42,21 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
         LeadRenderer.renderLead(blockEntity, partialTick, poseStack, bufferSource);
         renderPlunger(blockEntity, poseStack, bufferSource, packedLight, packedOverlay);
 
-        RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer, font,
-                blockEntity.getItem(0), 0.5, 0.35, 0.5, 0.5F, 0, packedLight, packedOverlay,
-                blockEntity.getLevel(), 0.65);
+        ItemStack input = blockEntity.getItem(0);
+        ItemStack output = blockEntity.getItem(1);
 
-        RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer, font,
-                blockEntity.getItem(1), 0.5, 0.3, 0.5, 0.35F, 0, packedLight, packedOverlay,
-                blockEntity.getLevel(), 0.55);
+        RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer,
+                input, 0.5, 0.35, 0.5, 0.5F, 0, packedLight, packedOverlay,
+                blockEntity.getLevel());
+
+        RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer,
+                output, 0.5, 0.3, 0.5, 0.35F, 0, packedLight, packedOverlay,
+                blockEntity.getLevel());
+
+        if (RenderUtils.shouldShowItemCounts(blockEntity)) {
+            double countY = RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, input.getCount(), 0.5, FRAME_TOP, 0.5);
+            RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, output.getCount(), 0.5, countY, 0.5);
+        }
 
         FluidStack inputFluid = blockEntity.getInputTank().getFluid();
         if (!inputFluid.isEmpty()) {
