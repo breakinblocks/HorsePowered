@@ -2,6 +2,7 @@ package com.breakinblocks.horsepowered.compat.jei;
 
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.recipes.PressRecipe;
+import java.util.List;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
@@ -12,8 +13,9 @@ import mezz.jei.api.recipe.types.IRecipeType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.core.Holder;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.display.SlotDisplayContext;
 import net.neoforged.neoforge.fluids.FluidStack;
 
 public class HorsePowerPressCategory extends BaseHPCategory<PressRecipe> {
@@ -43,14 +45,7 @@ public class HorsePowerPressCategory extends BaseHPCategory<PressRecipe> {
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, PressRecipe recipe, IFocusGroup focuses) {
         builder.addSlot(RecipeIngredientRole.INPUT, 1, 1)
-                .addItemStacks(recipe.getIngredient().getValues().stream()
-                        .map(Holder::value)
-                        .map(item -> {
-                            ItemStack stack = new ItemStack(item);
-                            stack.setCount(recipe.getInputCount());
-                            return stack;
-                        })
-                        .toList())
+                .addItemStacks(resolveInputs(recipe))
                 .setBackground(slot, -1, -1);
 
         recipe.getFluidInput()
@@ -71,6 +66,14 @@ public class HorsePowerPressCategory extends BaseHPCategory<PressRecipe> {
                     .add(recipe.createResult())
                     .setBackground(slot, -1, -1);
         }
+    }
+
+    private static List<ItemStack> resolveInputs(PressRecipe recipe) {
+        ClientLevel level = Minecraft.getInstance().level;
+        if (level == null) return List.of();
+        return recipe.getIngredient().display().resolveForStacks(SlotDisplayContext.fromLevel(level)).stream()
+                .map(stack -> stack.copyWithCount(recipe.getInputCount()))
+                .toList();
     }
 
     @Override

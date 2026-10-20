@@ -3,7 +3,6 @@ package com.breakinblocks.horsepowered.recipes;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.core.Holder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -13,6 +12,8 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeBookCategory;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.display.SlotDisplayContext;
+import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.fluids.FluidStack;
 
 public class BottlingRecipe extends BaseHPRecipe {
@@ -69,12 +70,8 @@ public class BottlingRecipe extends BaseHPRecipe {
         return ItemStack.isSameItemSameComponents(stack, createResult());
     }
 
-    public ItemStack getEmptyContainer() {
-        return ingredient.getValues().stream()
-                .findFirst()
-                .map(Holder::value)
-                .map(ItemStack::new)
-                .orElse(ItemStack.EMPTY);
+    public ItemStack getEmptyContainer(Level level) {
+        return ingredient.display().resolveForFirstStack(SlotDisplayContext.fromLevel(level));
     }
 
     public static final MapCodec<BottlingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(

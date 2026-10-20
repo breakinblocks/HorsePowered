@@ -71,7 +71,7 @@ public class BlockPress extends BlockHPBase {
             if (level instanceof ServerLevel serverLevel) {
                 BottlingRecipe bottling = findBottlingRecipe(serverLevel, press, stack);
                 if (bottling != null) {
-                    return applyBottling(press, bottling, stack, player, hand)
+                    return applyBottling(serverLevel, press, bottling, stack, player, hand)
                             ? InteractionResult.SUCCESS
                             : InteractionResult.CONSUME;
                 }
@@ -126,12 +126,17 @@ public class BlockPress extends BlockHPBase {
     }
 
     private static boolean applyBottling(
-            PressBlockEntity press, BottlingRecipe recipe, ItemStack stack, Player player, InteractionHand hand) {
+            ServerLevel level,
+            PressBlockEntity press,
+            BottlingRecipe recipe,
+            ItemStack stack,
+            Player player,
+            InteractionHand hand) {
         boolean emptying = recipe.matchesResult(stack);
         ItemStack given;
         if (emptying) {
             if (!press.fillInput(recipe.getFluid())) return false;
-            given = recipe.getEmptyContainer();
+            given = recipe.getEmptyContainer(level);
         } else {
             if (!press.drainOutput(recipe.getFluid())) return false;
             given = recipe.createResult();

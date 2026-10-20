@@ -204,8 +204,13 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
 
     @Override
     public int getInventoryStackLimit(ItemStack stack) {
-        return this.<PressRecipe>findRecipe(HPRecipes.PRESSING_TYPE.get(), stack)
-                .map(r -> r.value().getInputCount())
+        RecipeMap recipes = recipeMap();
+        if (recipes == null) return getInventoryStackLimit();
+        return recipes.byType(HPRecipes.PRESSING_TYPE.get()).stream()
+                .map(RecipeHolder::value)
+                .filter(r -> r.getIngredient().test(stack))
+                .mapToInt(PressRecipe::getInputCount)
+                .max()
                 .orElse(getInventoryStackLimit());
     }
 
