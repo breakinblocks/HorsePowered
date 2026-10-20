@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.world.item.ItemStack;
 
 public class ManualChopperBlockEntityRenderer implements BlockEntityRenderer<ManualChopperBlockEntity> {
 
@@ -24,8 +25,14 @@ public class ManualChopperBlockEntityRenderer implements BlockEntityRenderer<Man
                        MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
         // Chopping surface is at y=9/16=0.5625. Stand the log upright with its base on the surface.
         // FIXED scale of 0.5 means a scale of 0.6 yields ~0.3 block height — center at ~0.71.
-        RenderUtils.renderStandingItem(poseStack, bufferSource, itemRenderer, font,
-                blockEntity.getItem(0), 0.5, 0.71, 0.5, 0.6F, 0, packedLight, packedOverlay,
-                blockEntity.getLevel(), 1.05);
+        ItemStack input = blockEntity.getItem(0);
+        RenderUtils.renderStandingItem(poseStack, bufferSource, itemRenderer,
+                input, 0.5, 0.71, 0.5, 0.6F, 0, packedLight, packedOverlay,
+                blockEntity.getLevel());
+
+        if (RenderUtils.shouldShowItemCounts(blockEntity)) {
+            double countY = RenderUtils.itemTop(itemRenderer, input, blockEntity.getLevel(), 0.71, 0.6F, true);
+            RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, input.getCount(), 0.5, countY, 0.5);
+        }
     }
 }

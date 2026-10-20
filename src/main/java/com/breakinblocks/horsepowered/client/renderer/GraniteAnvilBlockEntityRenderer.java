@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.world.item.ItemStack;
 
 public class GraniteAnvilBlockEntityRenderer implements BlockEntityRenderer<GraniteAnvilBlockEntity> {
 
@@ -22,8 +23,14 @@ public class GraniteAnvilBlockEntityRenderer implements BlockEntityRenderer<Gran
     @Override
     public void render(GraniteAnvilBlockEntity be, float partialTick, PoseStack poseStack,
                        MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
-        RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer, font,
-                be.getItem(0), 0.5, 0.84, 0.5, 1.375F, 0F, packedLight, packedOverlay,
-                be.getLevel(), 1.2);
+        ItemStack input = be.getItem(0);
+        RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer,
+                input, 0.5, 0.84, 0.5, 1.375F, 0F, packedLight, packedOverlay,
+                be.getLevel());
+
+        if (RenderUtils.shouldShowItemCounts(be)) {
+            double countY = RenderUtils.itemTop(itemRenderer, input, be.getLevel(), 0.84, 1.375F, false);
+            RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, input.getCount(), 0.5, countY, 0.5);
+        }
     }
 }

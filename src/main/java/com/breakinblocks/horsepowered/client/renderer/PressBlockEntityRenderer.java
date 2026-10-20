@@ -1,7 +1,6 @@
 package com.breakinblocks.horsepowered.client.renderer;
 
 import com.breakinblocks.horsepowered.blockentity.PressBlockEntity;
-import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
@@ -36,6 +35,8 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
     // Plunger position constants
     private static final float PLUNGER_MAX_Y = 0.7F;     // Highest position (not pressing)
     private static final float PLUNGER_MIN_Y = 0.2F;     // Lowest position (fully pressed into basin)
+
+    private static final double FRAME_TOP = 19.0D / 16.0D;
 
     private final ItemRenderer itemRenderer;
     private final Font font;
@@ -74,10 +75,6 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
             itemRenderer.renderStatic(input, ItemDisplayContext.FIXED, packedLight, packedOverlay,
                     poseStack, bufferSource, blockEntity.getLevel(), 0);
             poseStack.popPose();
-
-            if (input.getCount() > 1 && HorsePowerConfig.renderItemAmount.get()) {
-                RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, input.getCount(), 0.5D, 0.65D, 0.5D);
-            }
         }
 
         // Render output item
@@ -90,10 +87,11 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
             itemRenderer.renderStatic(output, ItemDisplayContext.FIXED, packedLight, packedOverlay,
                     poseStack, bufferSource, blockEntity.getLevel(), 0);
             poseStack.popPose();
+        }
 
-            if (output.getCount() > 1 && HorsePowerConfig.renderItemAmount.get()) {
-                RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, output.getCount(), 0.5D, 0.55D, 0.5D);
-            }
+        if (RenderUtils.shouldShowItemCounts(blockEntity)) {
+            double countY = RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, input.getCount(), 0.5D, FRAME_TOP, 0.5D);
+            RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, output.getCount(), 0.5D, countY, 0.5D);
         }
 
         // Render input fluid in the left half, output fluid in the right half.

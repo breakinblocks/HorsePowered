@@ -1,5 +1,6 @@
 package com.breakinblocks.horsepowered.client.renderer;
 
+import com.breakinblocks.horsepowered.blockentity.FillerBlockEntity;
 import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -11,22 +12,29 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import org.joml.Matrix4f;
 
 public final class RenderUtils {
+
+    private static final float COUNT_SCALE = 0.025F;
+    private static final double COUNT_GAP = 0.03D;
 
     private RenderUtils() {
     }
 
     public static void renderFlatItem(PoseStack poseStack, MultiBufferSource bufferSource,
-                                       ItemRenderer itemRenderer, Font font, ItemStack stack,
+                                       ItemRenderer itemRenderer, ItemStack stack,
                                        double x, double y, double z, float scale, float yRotation,
-                                       int packedLight, int packedOverlay, Level level, double countY) {
+                                       int packedLight, int packedOverlay, Level level) {
         if (stack.isEmpty()) return;
 
         poseStack.pushPose();
@@ -41,11 +49,6 @@ public final class RenderUtils {
                 poseStack, bufferSource, level, 0);
 
         poseStack.popPose();
-
-        if (stack.getCount() > 1 && HorsePowerConfig.renderItemAmount.get()) {
-            renderItemCountBillboard(poseStack, bufferSource, font, packedLight,
-                    stack.getCount(), x, countY, z);
-        }
     }
 
     public static void renderFlatItemFading(PoseStack poseStack, MultiBufferSource bufferSource,
@@ -70,9 +73,9 @@ public final class RenderUtils {
     }
 
     public static void renderStandingItem(PoseStack poseStack, MultiBufferSource bufferSource,
-                                           ItemRenderer itemRenderer, Font font, ItemStack stack,
+                                           ItemRenderer itemRenderer, ItemStack stack,
                                            double x, double y, double z, float scale, float yRotation,
-                                           int packedLight, int packedOverlay, Level level, double countY) {
+                                           int packedLight, int packedOverlay, Level level) {
         if (stack.isEmpty()) return;
 
         poseStack.pushPose();
@@ -86,11 +89,31 @@ public final class RenderUtils {
                 poseStack, bufferSource, level, 0);
 
         poseStack.popPose();
+    }
 
-        if (stack.getCount() > 1 && HorsePowerConfig.renderItemAmount.get()) {
-            renderItemCountBillboard(poseStack, bufferSource, font, packedLight,
-                    stack.getCount(), x, countY, z);
+    public static boolean shouldShowItemCounts(BlockEntity blockEntity) {
+        if (!HorsePowerConfig.renderItemAmount.get()) return false;
+        if (!HorsePowerConfig.mustLookAtBlock.get()) return true;
+        if (!(Minecraft.getInstance().hitResult instanceof BlockHitResult hit) || hit.getType() != HitResult.Type.BLOCK) {
+            return false;
         }
+        BlockPos pos = hit.getBlockPos();
+        if (pos.equals(blockEntity.getBlockPos())) return true;
+        Level level = blockEntity.getLevel();
+        return level != null && level.getBlockEntity(pos) instanceof FillerBlockEntity filler
+                && filler.getFilledTileEntity() == blockEntity;
+    }
+
+    public static double itemTop(ItemRenderer itemRenderer, ItemStack stack, Level level,
+                                 double y, float scale, boolean standing) {
+        if (stack.isEmpty()) return y;
+        double halfHeight;
+        if (itemRenderer.getModel(stack, level, null, 0).isGui3d()) {
+            halfHeight = 0.25D;
+        } else {
+            halfHeight = standing ? 0.5D : 0.03125D;
+        }
+        return y + halfHeight * scale;
     }
 
     /**
@@ -105,32 +128,30 @@ public final class RenderUtils {
      * @param y            Y offset from block origin
      * @param z            Z offset from block origin
      */
-    public static void renderItemCountBillboard(PoseStack poseStack, MultiBufferSource bufferSource, Font font,
-                                                int packedLight, int count, double x, double y, double z) {
+    public static double renderItemCountBillboard(PoseStack poseStack, MultiBufferSource bufferSource, Font font,
+                                                  int packedLight, int count, double x, double y, double z) {
+        if (count <= 1) return y;
+
         poseStack.pushPose();
-        poseStack.translate(x, y, z);
+        poseStack.translate(x, y + COUNT_GAP, z);
 
         // Billboard rotation - face the camera
         poseStack.mulPose(Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation());
 
         // Scale down for text
-        poseStack.scale(0.025F, -0.025F, 0.025F);
+        poseStack.scale(COUNT_SCALE, -COUNT_SCALE, COUNT_SCALE);
 
         Component text = Component.literal(Integer.toString(count));
         float textX = -font.width(text) / 2.0F;
 
         Matrix4f matrix = poseStack.last().pose();
 
-        // Matches how vanilla draws name tags: a translucent see-through pass carrying the
-        // background, then an opaque pass in front, with the background alpha taken from the
-        // Text Background accessibility option instead of a fixed value.
         int background = (int) (Minecraft.getInstance().options.getBackgroundOpacity(0.25F) * 255.0F) << 24;
-        font.drawInBatch(text, textX, 0, 553648127, false, matrix, bufferSource,
-                Font.DisplayMode.SEE_THROUGH, background, packedLight);
-        font.drawInBatch(text, textX, 0, -1, false, matrix, bufferSource,
-                Font.DisplayMode.NORMAL, 0, packedLight);
+        font.drawInBatch(text, textX, -font.lineHeight, -1, false, matrix, bufferSource,
+                Font.DisplayMode.NORMAL, background, packedLight);
 
         poseStack.popPose();
+        return y + COUNT_GAP + (font.lineHeight + 1) * COUNT_SCALE;
     }
 
     /**

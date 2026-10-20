@@ -2,7 +2,6 @@ package com.breakinblocks.horsepowered.client.renderer;
 
 import com.breakinblocks.horsepowered.blockentity.ChopperBlockEntity;
 import com.breakinblocks.horsepowered.blocks.BlockChopper;
-import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
@@ -20,6 +19,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import org.joml.Matrix4f;
@@ -36,6 +36,8 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
     // Blade position constants
     private static final float BLADE_MIN_Y = 0.5F;     // Lowest position (at chopping surface - top of oak slab)
     private static final float BLADE_MAX_Y = 1.25F;    // Highest position (raised)
+
+    private static final double BASE_TOP = 6.0D / 16.0D;
 
     private final ItemRenderer itemRenderer;
     private final Font font;
@@ -76,9 +78,9 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
         float rotation = getRotation(facing);
 
         // Log stands upright on the chopping surface so the blade cleaves it like a real axe chop.
-        RenderUtils.renderStandingItem(poseStack, bufferSource, itemRenderer, font,
+        RenderUtils.renderStandingItem(poseStack, bufferSource, itemRenderer,
                 input, 0.5, 0.71, 0.5, 0.6F, rotation, packedLight, packedOverlay,
-                blockEntity.getLevel(), 1.05);
+                blockEntity.getLevel());
 
         // Render output item
         if (!output.isEmpty()) {
@@ -91,10 +93,15 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
             itemRenderer.renderStatic(output, ItemDisplayContext.FIXED, packedLight, packedOverlay,
                     poseStack, bufferSource, blockEntity.getLevel(), 0);
             poseStack.popPose();
+        }
 
-            if (output.getCount() > 1 && HorsePowerConfig.renderItemAmount.get()) {
-                RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, output.getCount(), 0.5D, 0.55D, 0.5D);
-            }
+        if (RenderUtils.shouldShowItemCounts(blockEntity)) {
+            Level level = blockEntity.getLevel();
+            double countY = input.isEmpty()
+                    ? Math.max(RenderUtils.itemTop(itemRenderer, output, level, 0.3D, 0.4F, false), BASE_TOP)
+                    : RenderUtils.itemTop(itemRenderer, input, level, 0.71D, 0.6F, true);
+            countY = RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, input.getCount(), 0.5D, countY, 0.5D);
+            RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, output.getCount(), 0.5D, countY, 0.5D);
         }
     }
 

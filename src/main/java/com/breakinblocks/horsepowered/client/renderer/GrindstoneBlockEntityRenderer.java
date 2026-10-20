@@ -1,7 +1,6 @@
 package com.breakinblocks.horsepowered.client.renderer;
 
 import com.breakinblocks.horsepowered.blockentity.GrindstoneBlockEntity;
-import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
@@ -16,6 +15,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 
 public class GrindstoneBlockEntityRenderer implements BlockEntityRenderer<GrindstoneBlockEntity> {
+
+    private static final double GRINDER_TOP = 0.5D;
 
     private final ItemRenderer itemRenderer;
     private final Font font;
@@ -41,6 +42,7 @@ public class GrindstoneBlockEntityRenderer implements BlockEntityRenderer<Grinds
         ItemStack input = blockEntity.getItem(0);
         ItemStack output = blockEntity.getItem(1);
         ItemStack secondary = blockEntity.getItem(2);
+        boolean showCounts = RenderUtils.shouldShowItemCounts(blockEntity);
 
         // Render input item on top
         if (!input.isEmpty()) {
@@ -54,8 +56,9 @@ public class GrindstoneBlockEntityRenderer implements BlockEntityRenderer<Grinds
             poseStack.popPose();
 
             // Render count billboard-style above the item
-            if (input.getCount() > 1 && HorsePowerConfig.renderItemAmount.get()) {
-                RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, input.getCount(), 0.5D, 1.4D, 0.5D);
+            if (showCounts) {
+                double countY = RenderUtils.itemTop(itemRenderer, input, blockEntity.getLevel(), 1.1D, 0.5F, false);
+                RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, input.getCount(), 0.5D, countY, 0.5D);
             }
         }
 
@@ -70,8 +73,8 @@ public class GrindstoneBlockEntityRenderer implements BlockEntityRenderer<Grinds
                     poseStack, bufferSource, blockEntity.getLevel(), 0);
             poseStack.popPose();
 
-            if (output.getCount() > 1 && HorsePowerConfig.renderItemAmount.get()) {
-                RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, output.getCount(), 0.5D, 0.55D, 0.25D);
+            if (showCounts) {
+                RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, output.getCount(), 0.5D, GRINDER_TOP, 0.25D);
             }
         }
 
@@ -86,8 +89,8 @@ public class GrindstoneBlockEntityRenderer implements BlockEntityRenderer<Grinds
                     poseStack, bufferSource, blockEntity.getLevel(), 0);
             poseStack.popPose();
 
-            if (secondary.getCount() > 1 && HorsePowerConfig.renderItemAmount.get()) {
-                RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, secondary.getCount(), 0.5D, 0.55D, 0.75D);
+            if (showCounts) {
+                RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, secondary.getCount(), 0.5D, GRINDER_TOP, 0.75D);
             }
         }
     }

@@ -36,6 +36,7 @@ public class DryingRackBlockEntityRenderer implements BlockEntityRenderer<Drying
         Direction facing = state.getValue(BlockDryingRack.FACING);
         Direction rightDir = facing.getClockWise();
         double y = 14.5 / 16.0;
+        boolean showCounts = RenderUtils.shouldShowItemCounts(be);
 
         for (int slot = 0; slot < DryingRackBlockEntity.SLOT_COUNT; slot++) {
             ItemStack stack = be.getItem(slot);
@@ -59,16 +60,14 @@ public class DryingRackBlockEntityRenderer implements BlockEntityRenderer<Drying
             boolean finished = be.isFinished(slot);
 
             if (finished || progress <= 0 || time <= 0) {
-                RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer, font, stack,
-                        x, y, z, 0.45F, 0F, packedLight, packedOverlay, be.getLevel(), y + 0.05);
+                renderStill(be, poseStack, bufferSource, packedLight, packedOverlay, stack, x, y, z, showCounts);
                 continue;
             }
 
             float effectiveProgress = Math.min((float) time, (float) progress + partialTick);
             float ratio = effectiveProgress / (float) time;
             if (ratio < FADE_START) {
-                RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer, font, stack,
-                        x, y, z, 0.45F, 0F, packedLight, packedOverlay, be.getLevel(), y + 0.05);
+                renderStill(be, poseStack, bufferSource, packedLight, packedOverlay, stack, x, y, z, showCounts);
                 continue;
             }
 
@@ -83,6 +82,17 @@ public class DryingRackBlockEntityRenderer implements BlockEntityRenderer<Drying
                 RenderUtils.renderFlatItemFading(poseStack, bufferSource, itemRenderer, output,
                         x, y, z, 0.45F, 0F, packedLight, packedOverlay, be.getLevel(), outputAlpha);
             }
+        }
+    }
+
+    private void renderStill(DryingRackBlockEntity be, PoseStack poseStack, MultiBufferSource bufferSource,
+                             int packedLight, int packedOverlay, ItemStack stack,
+                             double x, double y, double z, boolean showCount) {
+        RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer, stack,
+                x, y, z, 0.45F, 0F, packedLight, packedOverlay, be.getLevel());
+        if (showCount) {
+            double countY = RenderUtils.itemTop(itemRenderer, stack, be.getLevel(), y, 0.45F, false);
+            RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, stack.getCount(), x, countY, z);
         }
     }
 
