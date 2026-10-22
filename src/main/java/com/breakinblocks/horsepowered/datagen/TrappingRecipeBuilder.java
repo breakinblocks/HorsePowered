@@ -2,6 +2,8 @@ package com.breakinblocks.horsepowered.datagen;
 
 import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.recipes.TrappingRecipe;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -13,6 +15,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 
 public class TrappingRecipeBuilder {
@@ -22,6 +25,7 @@ public class TrappingRecipeBuilder {
     private int time = 1200;
     private int priority = 0;
     private Optional<TagKey<Biome>> biome = Optional.empty();
+    private final List<ResourceKey<Level>> dimensions = new ArrayList<>();
     private boolean waterlogged = false;
     private boolean baitConsumed = false;
     private double baitConsumeChance = 100.0D;
@@ -49,6 +53,11 @@ public class TrappingRecipeBuilder {
 
     public TrappingRecipeBuilder biome(TagKey<Biome> biome) {
         this.biome = Optional.of(biome);
+        return this;
+    }
+
+    public TrappingRecipeBuilder dimension(ResourceKey<Level> dimension) {
+        this.dimensions.add(dimension);
         return this;
     }
 
@@ -87,6 +96,7 @@ public class TrappingRecipeBuilder {
                         time,
                         priority,
                         biome,
+                        dimensions,
                         waterlogged,
                         baitConsumed,
                         baitConsumeChance,

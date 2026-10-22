@@ -4,22 +4,27 @@ import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.recipes.TrappingRecipe;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
+import mezz.jei.api.gui.builder.ITooltipBuilder;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.types.IRecipeType;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 public class HorsePowerTrappingCategory extends BaseHPCategory<TrappingRecipe> {
 
     private static final int WIDTH = 160;
-    private static final int HEIGHT = 104;
+    private static final int HEIGHT = 114;
+    private static final int CONDITIONS_Y = 84;
 
     public HorsePowerTrappingCategory(IGuiHelper guiHelper) {
         super(guiHelper, ModBlocks.ANIMAL_TRAP.get(), "trapping");
@@ -82,13 +87,19 @@ public class HorsePowerTrappingCategory extends BaseHPCategory<TrappingRecipe> {
 
         Component baitText = baitConsumedLabel(recipe);
         guiGraphics.text(font, baitText, (WIDTH - font.width(baitText)) / 2, y, 0xFF808080, false);
-        y += 10;
+        y = CONDITIONS_Y;
 
         if (recipe.getBiome().isPresent()) {
             Component biomeText = Component.translatable(
                     "gui." + HorsePowerMod.MOD_ID + ".jei.trap_biome",
                     biomeLabel(recipe.getBiome().get().location()));
             guiGraphics.text(font, biomeText, (WIDTH - font.width(biomeText)) / 2, y, 0xFF6688AA, false);
+            y += 10;
+        }
+
+        if (!recipe.getDimensions().isEmpty()) {
+            Component dimensionText = dimensionText(recipe);
+            guiGraphics.text(font, dimensionText, (WIDTH - font.width(dimensionText)) / 2, y, 0xFF6688AA, false);
             y += 10;
         }
 
@@ -112,6 +123,40 @@ public class HorsePowerTrappingCategory extends BaseHPCategory<TrappingRecipe> {
             return String.format("%d", (long) chance);
         }
         return String.format("%.2f", chance);
+    }
+
+    @Override
+    public void getTooltip(
+            ITooltipBuilder tooltip,
+            TrappingRecipe recipe,
+            IRecipeSlotsView recipeSlotsView,
+            double mouseX,
+            double mouseY) {
+        if (recipe.getDimensions().size() < 2) return;
+        Font font = Minecraft.getInstance().font;
+        int width = font.width(dimensionText(recipe));
+        int left = (WIDTH - width) / 2;
+        int top = CONDITIONS_Y + (recipe.getBiome().isPresent() ? 10 : 0);
+        if (mouseX < left || mouseX >= left + width || mouseY < top || mouseY >= top + font.lineHeight) return;
+        tooltip.add(Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.trap_dimensions"));
+        for (ResourceKey<Level> dimension : recipe.getDimensions()) {
+            tooltip.add(Component.literal(dimensionLabel(dimension)).withStyle(ChatFormatting.GRAY));
+        }
+    }
+
+    private static Component dimensionText(TrappingRecipe recipe) {
+        String label = dimensionLabel(recipe.getDimensions().getFirst());
+        if (recipe.getDimensions().size() > 1) label += "...";
+        return Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.trap_dimension", label);
+    }
+
+    private static String dimensionLabel(ResourceKey<Level> dimension) {
+        Identifier id = dimension.identifier();
+        String key = "dimension." + id.getNamespace() + "." + id.getPath();
+        String resolved = Component.translatable(key).getString();
+        if (!resolved.equals(key)) return resolved;
+        String path = id.getPath().replace('_', ' ');
+        return Character.toUpperCase(path.charAt(0)) + path.substring(1);
     }
 
     private static String biomeLabel(Identifier id) {

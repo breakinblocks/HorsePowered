@@ -2,6 +2,8 @@ package com.breakinblocks.horsepowered.blockentity;
 
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
 import com.breakinblocks.horsepowered.recipes.TrappingRecipe;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -21,7 +23,6 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
@@ -138,17 +139,22 @@ public class AnimalTrapBlockEntity extends HPBlockEntityBase {
     }
 
     public Optional<RecipeHolder<TrappingRecipe>> findTrappingRecipe(ItemStack stack) {
-        return findRecipe(HPRecipes.TRAPPING_TYPE.get(), stack);
+        if (level == null) return Optional.empty();
+        List<RecipeHolder<TrappingRecipe>> candidates = findRecipes(HPRecipes.TRAPPING_TYPE.get(), stack).stream()
+                .sorted(Comparator.comparingInt(
+                        (RecipeHolder<TrappingRecipe> h) -> h.value().getPriority()))
+                .toList();
+        BlockState state = getBlockState();
+        return candidates.stream()
+                .filter(h -> h.value().conditionsMet(level, worldPosition, state))
+                .findFirst()
+                .or(() -> candidates.stream().findFirst());
     }
 
     private Optional<RecipeHolder<TrappingRecipe>> findFeedingRecipe(ItemStack stack) {
         if (capturedEntityTypeId == null) return Optional.empty();
-        Optional<RecipeHolder<TrappingRecipe>> recipe = findRecipe(HPRecipes.TRAPPING_TYPE.get(), stack);
-        if (recipe.isPresent()
-                && capturedEntityTypeId.equals(recipe.get().value().getEntityId())) {
-            return recipe;
-        }
-        return Optional.empty();
+        return findRecipe(
+                HPRecipes.TRAPPING_TYPE.get(), stack, recipe -> capturedEntityTypeId.equals(recipe.getEntityId()));
     }
 
     private boolean capturedEntityRequiresBait() {
@@ -234,7 +240,7 @@ public class AnimalTrapBlockEntity extends HPBlockEntityBase {
         }
 
         if (level.getGameTime() % CATCH_ROLL_INTERVAL_TICKS != 0) return;
-        if (!be.recipeConditionsMet(recipe.get().value(), state)) return;
+        if (!recipe.get().value().conditionsMet(level, pos, state)) return;
         if (level.getRandom().nextFloat() < CATCH_CHANCE) {
             be.capture(recipe.get().value());
         }
@@ -250,20 +256,6 @@ public class AnimalTrapBlockEntity extends HPBlockEntityBase {
         double remaining = Math.max(0, be.trapTime - be.trapProgress);
         double accel = be.capturedEntityTag != null ? 1000.0 / 200.0 : 1000.0 / (200.0 + remaining);
         be.spin = (be.spin + accel) % 360.0;
-    }
-
-    public boolean recipeConditionsMet(TrappingRecipe recipe, BlockState state) {
-        if (level == null) return false;
-        if (recipe.getBiome().isPresent()
-                && !level.getBiome(worldPosition).is(recipe.getBiome().get())) {
-            return false;
-        }
-        if (recipe.isWaterlogged()
-                && state.hasProperty(BlockStateProperties.WATERLOGGED)
-                && !state.getValue(BlockStateProperties.WATERLOGGED)) {
-            return false;
-        }
-        return true;
     }
 
     private void capture(TrappingRecipe recipe) {

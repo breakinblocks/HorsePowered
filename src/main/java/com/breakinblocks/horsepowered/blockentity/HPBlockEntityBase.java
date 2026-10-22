@@ -3,6 +3,7 @@ package com.breakinblocks.horsepowered.blockentity;
 import com.breakinblocks.horsepowered.events.HPDatapackSync;
 import com.breakinblocks.horsepowered.recipes.HPRecipeInput;
 import com.mojang.logging.LogUtils;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import net.minecraft.core.BlockPos;
@@ -310,6 +311,18 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
         } catch (Exception e) {
             LOGGER.error("[HorsePowered] Recipe lookup failed for type {} with input {}", type, input, e);
             return Optional.empty();
+        }
+    }
+
+    protected <T extends Recipe<HPRecipeInput>> List<RecipeHolder<T>> findRecipes(RecipeType<T> type, ItemStack input) {
+        RecipeMap recipes = recipeMap();
+        if (recipes == null) return List.of();
+        try {
+            return recipes.<HPRecipeInput, T>getRecipesFor(type, new HPRecipeInput(input), level)
+                    .toList();
+        } catch (Exception e) {
+            LOGGER.error("[HorsePowered] Recipe lookup failed for type {} with input {}", type, input, e);
+            return List.of();
         }
     }
 
