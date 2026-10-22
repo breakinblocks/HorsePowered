@@ -1,12 +1,15 @@
 package com.breakinblocks.horsepowered.recipes;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
@@ -21,8 +24,12 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraftforge.common.ForgeSpawnEggItem;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class TrappingRecipe implements Recipe<Container> {
@@ -33,6 +40,7 @@ public class TrappingRecipe implements Recipe<Container> {
     private final int time;
     private final int priority;
     private final Optional<TagKey<Biome>> biome;
+    private final List<ResourceKey<Level>> dimensions;
     private final boolean waterlogged;
     private final boolean baitConsumed;
     private final double baitConsumeChance;
@@ -40,7 +48,8 @@ public class TrappingRecipe implements Recipe<Container> {
     private final Optional<ResourceLocation> icon;
 
     public TrappingRecipe(ResourceLocation id, Ingredient bait, ResourceLocation entityId,
-                          int time, int priority, Optional<TagKey<Biome>> biome, boolean waterlogged,
+                          int time, int priority, Optional<TagKey<Biome>> biome,
+                          List<ResourceKey<Level>> dimensions, boolean waterlogged,
                           boolean baitConsumed, double baitConsumeChance,
                           Optional<String> title, Optional<ResourceLocation> icon) {
         this.id = id;
@@ -49,6 +58,7 @@ public class TrappingRecipe implements Recipe<Container> {
         this.time = Math.max(1, time);
         this.priority = priority;
         this.biome = biome;
+        this.dimensions = List.copyOf(dimensions);
         this.waterlogged = waterlogged;
         this.baitConsumed = baitConsumed;
         this.baitConsumeChance = Math.max(0.01D, Math.min(100.0D, baitConsumeChance));
@@ -103,11 +113,30 @@ public class TrappingRecipe implements Recipe<Container> {
     public int getTime() { return time; }
     public int getPriority() { return priority; }
     public Optional<TagKey<Biome>> getBiome() { return biome; }
+    public List<ResourceKey<Level>> getDimensions() { return dimensions; }
     public boolean isWaterlogged() { return waterlogged; }
     public boolean isBaitConsumed() { return baitConsumed; }
     public double getBaitConsumeChance() { return baitConsumeChance; }
     public Optional<String> getTitle() { return title; }
     public Optional<ResourceLocation> getIcon() { return icon; }
+
+    public boolean biomeMatches(Level level, BlockPos pos) {
+        return biome.isEmpty() || level.getBiome(pos).is(biome.get());
+    }
+
+    public boolean dimensionMatches(Level level) {
+        return dimensions.isEmpty() || dimensions.contains(level.dimension());
+    }
+
+    public boolean waterloggedMatches(BlockState state) {
+        return !waterlogged
+                || !state.hasProperty(BlockStateProperties.WATERLOGGED)
+                || state.getValue(BlockStateProperties.WATERLOGGED);
+    }
+
+    public boolean conditionsMet(Level level, BlockPos pos, BlockState state) {
+        return biomeMatches(level, pos) && dimensionMatches(level) && waterloggedMatches(state);
+    }
 
     public ItemStack getDisplayIcon() {
         if (icon.isPresent() && BuiltInRegistries.ITEM.containsKey(icon.get())) {
@@ -151,6 +180,17 @@ public class TrappingRecipe implements Recipe<Container> {
                 if (biomeStr.startsWith("#")) biomeStr = biomeStr.substring(1);
                 biome = Optional.of(TagKey.create(Registries.BIOME, new ResourceLocation(biomeStr)));
             }
+            List<ResourceKey<Level>> dimensions = new ArrayList<>();
+            if (json.has("dimension")) {
+                JsonElement element = json.get("dimension");
+                if (element.isJsonArray()) {
+                    for (JsonElement entry : element.getAsJsonArray()) {
+                        dimensions.add(dimensionKey(GsonHelper.convertToString(entry, "dimension")));
+                    }
+                } else {
+                    dimensions.add(dimensionKey(GsonHelper.getAsString(json, "dimension")));
+                }
+            }
             boolean waterlogged = GsonHelper.getAsBoolean(json, "waterlogged", false);
             boolean baitConsumed = GsonHelper.getAsBoolean(json, "baitConsumed", false);
             double baitConsumeChance = GsonHelper.getAsDouble(json, "baitConsumeChance", 100.0D);
@@ -160,8 +200,12 @@ public class TrappingRecipe implements Recipe<Container> {
             Optional<ResourceLocation> icon = json.has("icon")
                     ? Optional.of(new ResourceLocation(GsonHelper.getAsString(json, "icon")))
                     : Optional.empty();
-            return new TrappingRecipe(recipeId, bait, entityId, time, priority, biome, waterlogged,
+            return new TrappingRecipe(recipeId, bait, entityId, time, priority, biome, dimensions, waterlogged,
                     baitConsumed, baitConsumeChance, title, icon);
+        }
+
+        private static ResourceKey<Level> dimensionKey(String id) {
+            return ResourceKey.create(Registries.DIMENSION, new ResourceLocation(id));
         }
 
         @Override
@@ -173,6 +217,7 @@ public class TrappingRecipe implements Recipe<Container> {
             Optional<TagKey<Biome>> biome = buffer.readBoolean()
                     ? Optional.of(TagKey.create(Registries.BIOME, buffer.readResourceLocation()))
                     : Optional.empty();
+            List<ResourceKey<Level>> dimensions = buffer.readList(buf -> ResourceKey.create(Registries.DIMENSION, buf.readResourceLocation()));
             boolean waterlogged = buffer.readBoolean();
             boolean baitConsumed = buffer.readBoolean();
             double baitConsumeChance = buffer.readDouble();
@@ -180,7 +225,7 @@ public class TrappingRecipe implements Recipe<Container> {
             Optional<ResourceLocation> icon = buffer.readBoolean()
                     ? Optional.of(buffer.readResourceLocation())
                     : Optional.empty();
-            return new TrappingRecipe(recipeId, bait, entityId, time, priority, biome, waterlogged,
+            return new TrappingRecipe(recipeId, bait, entityId, time, priority, biome, dimensions, waterlogged,
                     baitConsumed, baitConsumeChance, title, icon);
         }
 
@@ -192,6 +237,7 @@ public class TrappingRecipe implements Recipe<Container> {
             buffer.writeVarInt(recipe.priority);
             buffer.writeBoolean(recipe.biome.isPresent());
             recipe.biome.ifPresent(tag -> buffer.writeResourceLocation(tag.location()));
+            buffer.writeCollection(recipe.dimensions, (buf, key) -> buf.writeResourceLocation(key.location()));
             buffer.writeBoolean(recipe.waterlogged);
             buffer.writeBoolean(recipe.baitConsumed);
             buffer.writeDouble(recipe.baitConsumeChance);

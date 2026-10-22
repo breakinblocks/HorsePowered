@@ -73,7 +73,7 @@ Horse Powered uses data-driven JSON recipes that can be added or modified via da
 - `horsepowered:chopping` - Chopping block recipes
 - `horsepowered:pressing` - Press recipes (supports item and fluid outputs)
 - `horsepowered:drying` - Drying rack recipes (1 input -> 1 output over time)
-- `horsepowered:trapping` - Animal trap recipes (bait + entity, with optional biome/waterlog gates, per-recipe bait consumption, and an overridable display name and icon)
+- `horsepowered:trapping` - Animal trap recipes (bait + entity, with optional biome/dimension/waterlog gates, per-recipe bait consumption, and an overridable display name and icon)
 - `horsepowered:bottling` - Press bottle-filling recipes (fluid to item, and the reverse)
 
 Example grinding recipe (`data/yourpack/recipes/grinding/custom_recipe.json`):
@@ -115,6 +115,7 @@ Example trapping recipe (`data/yourpack/recipes/trapping/custom_recipe.json`):
   "time": 1500,
   "priority": 0,
   "biome": "#horsepowered:fish_habitat",
+  "dimension": "minecraft:overworld",
   "waterlogged": true,
   "baitConsumed": true,
   "baitConsumeChance": 10.0,
@@ -125,8 +126,9 @@ Example trapping recipe (`data/yourpack/recipes/trapping/custom_recipe.json`):
 - `bait` - Ingredient. The item that triggers the recipe.
 - `entity` - ResourceLocation of the entity to capture. Any mob can be specified.
 - `time` - Optional minimum wait in ticks before the catch dice roll begins (default `1200`).
-- `priority` - Optional integer; lower values display first in JEI/EMI (default `0`).
+- `priority` - Optional integer; lower values display first in JEI/EMI (default `0`). When several recipes share the same bait, the trap picks the lowest-priority one whose `biome`, `dimension` and `waterlogged` conditions are met where it stands.
 - `biome` - Optional biome tag the trap must sit inside before the dice roll counts.
+- `dimension` - Optional dimension ID, or a list of them (`["minecraft:overworld", "minecraft:the_nether"]`), the trap must be in before the dice roll counts. With more than one, JEI and EMI show the first followed by "..." and list them all in a tooltip when hovered. The dimension name comes from the lang key `dimension.<namespace>.<path>` (for example `dimension.minecraft.the_nether`). Horse Powered ships names for the three vanilla dimensions; for a modded dimension without that key, add it to a resource pack or the pack's lang file, otherwise the ID's path is shown with the first letter capitalised.
 - `waterlogged` - Optional boolean; when `true` the trap must be waterlogged before the dice roll counts.
 - `baitConsumed` - Optional boolean (default `false`). When `true` the trap requires bait to generate each drop cycle after capture. When the bait slot is empty the drop timer pauses until matching bait is supplied. Hoppers may continue feeding bait into a captured trap.
 - `baitConsumeChance` - Optional percent (`0.01`-`100.00`, default `100.0`). Only applies when `baitConsumed` is `true`. Rolled each time drops are generated; on success one bait is consumed. All built-in trapping recipes ship with `baitConsumed: true` and `baitConsumeChance: 10.0`.

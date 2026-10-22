@@ -35,10 +35,15 @@
   "gui.horsepowered.jei.trap_time": "Min wait: %s",
   "gui.horsepowered.jei.trap_chance": "5%% Chance/sec",
   "gui.horsepowered.jei.trap_biome": "Biome: %s",
+  "gui.horsepowered.jei.trap_dimension": "Dimension: %s",
+  "gui.horsepowered.jei.trap_dimensions": "Valid dimensions:",
   "gui.horsepowered.jei.trap_waterlogged": "Requires water",
   "gui.horsepowered.jei.trap_bait_consumed_none": "Bait consumed: No",
   "gui.horsepowered.jei.trap_bait_consumed_chance": "Bait consumed: %s%% Chance",
   "biome.horsepowered.fish_habitat": "Rivers and Oceans",
+  "dimension.minecraft.overworld": "Overworld",
+  "dimension.minecraft.the_nether": "The Nether",
+  "dimension.minecraft.the_end": "The End",
 
   "emi.category.horsepowered.grinding": "Horse Grinding",
   "emi.category.horsepowered.grinding_hand": "Hand Grinding",
@@ -88,5 +93,6 @@
   "jade.horsepowered.trap_caught": "Caught: %s",
   "jade.horsepowered.trap_next_drop": "Next drop: %s",
   "jade.horsepowered.trap_wrong_biome": "Wrong biome",
+  "jade.horsepowered.trap_wrong_dimension": "Wrong dimension",
   "jade.horsepowered.trap_needs_water": "Needs water"
 }

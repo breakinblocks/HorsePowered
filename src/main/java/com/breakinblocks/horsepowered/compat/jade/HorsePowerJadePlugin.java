@@ -28,7 +28,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.fluids.FluidStack;
 import snownee.jade.api.BlockAccessor;
@@ -63,6 +62,7 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
     private static final String KEY_AT_HAS_ENTITY = "at_has_entity";
     private static final String KEY_AT_ENTITY_ID = "at_entity_id";
     private static final String KEY_AT_BIOME_OK = "at_biome_ok";
+    private static final String KEY_AT_DIMENSION_OK = "at_dimension_ok";
     private static final String KEY_AT_WATER_OK = "at_water_ok";
     private static final String KEY_AT_HAS_BAIT = "at_has_bait";
 
@@ -110,14 +110,9 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
                 data.putBoolean(KEY_AT_HAS_BAIT, !bait.isEmpty());
                 if (!bait.isEmpty()) {
                     te.findTrappingRecipe(bait).ifPresent(recipe -> {
-                        BlockState state = accessor.getBlockState();
-                        boolean biomeOk = recipe.getBiome().isEmpty()
-                                || accessor.getLevel().getBiome(accessor.getPosition()).is(recipe.getBiome().get());
-                        boolean waterOk = !recipe.isWaterlogged()
-                                || (state.hasProperty(BlockStateProperties.WATERLOGGED)
-                                        && state.getValue(BlockStateProperties.WATERLOGGED));
-                        data.putBoolean(KEY_AT_BIOME_OK, biomeOk);
-                        data.putBoolean(KEY_AT_WATER_OK, waterOk);
+                        data.putBoolean(KEY_AT_BIOME_OK, recipe.biomeMatches(accessor.getLevel(), accessor.getPosition()));
+                        data.putBoolean(KEY_AT_DIMENSION_OK, recipe.dimensionMatches(accessor.getLevel()));
+                        data.putBoolean(KEY_AT_WATER_OK, recipe.waterloggedMatches(accessor.getBlockState()));
                     });
                 }
             }
@@ -330,6 +325,10 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
 
                 if (data.contains(KEY_AT_BIOME_OK) && !data.getBoolean(KEY_AT_BIOME_OK)) {
                     tooltip.add(Component.translatable("jade." + Reference.MODID + ".trap_wrong_biome")
+                            .withStyle(style -> style.withColor(0xFF5555)));
+                }
+                if (data.contains(KEY_AT_DIMENSION_OK) && !data.getBoolean(KEY_AT_DIMENSION_OK)) {
+                    tooltip.add(Component.translatable("jade." + Reference.MODID + ".trap_wrong_dimension")
                             .withStyle(style -> style.withColor(0xFF5555)));
                 }
                 if (data.contains(KEY_AT_WATER_OK) && !data.getBoolean(KEY_AT_WATER_OK)) {

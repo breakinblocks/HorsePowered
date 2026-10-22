@@ -6,17 +6,24 @@ import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class EmiTrappingRecipe extends BasicEmiRecipe {
 
     private final int time;
     private final Optional<TagKey<Biome>> biome;
+    private final List<ResourceKey<Level>> dimensions;
     private final boolean waterlogged;
     private final boolean baitConsumed;
     private final double baitConsumeChance;
@@ -26,6 +33,7 @@ public class EmiTrappingRecipe extends BasicEmiRecipe {
         super(category, recipe.getId(), 160, heightFor(recipe));
         this.time = recipe.getTime();
         this.biome = recipe.getBiome();
+        this.dimensions = recipe.getDimensions();
         this.waterlogged = recipe.isWaterlogged();
         this.baitConsumed = recipe.isBaitConsumed();
         this.baitConsumeChance = recipe.getBaitConsumeChance();
@@ -37,6 +45,7 @@ public class EmiTrappingRecipe extends BasicEmiRecipe {
     private static int heightFor(TrappingRecipe recipe) {
         int lines = 4;
         if (recipe.getBiome().isPresent()) lines++;
+        if (!recipe.getDimensions().isEmpty()) lines++;
         if (recipe.isWaterlogged()) lines++;
         return 26 + lines * 10;
     }
@@ -70,6 +79,21 @@ public class EmiTrappingRecipe extends BasicEmiRecipe {
                     0, y, 0x6688AA, false);
             y += 10;
         }
+        if (!dimensions.isEmpty()) {
+            String label = dimensionLabel(dimensions.get(0));
+            if (dimensions.size() > 1) label += "...";
+            Component dimensionText = Component.translatable("gui.horsepowered.jei.trap_dimension", label);
+            widgets.addText(dimensionText, 0, y, 0x6688AA, false);
+            if (dimensions.size() > 1) {
+                List<Component> tooltip = new ArrayList<>();
+                tooltip.add(Component.translatable("gui.horsepowered.jei.trap_dimensions"));
+                for (ResourceKey<Level> dimension : dimensions) {
+                    tooltip.add(Component.literal(dimensionLabel(dimension)).withStyle(ChatFormatting.GRAY));
+                }
+                widgets.addTooltipText(tooltip, 0, y, Minecraft.getInstance().font.width(dimensionText), 10);
+            }
+            y += 10;
+        }
         if (waterlogged) {
             widgets.addText(
                     Component.translatable("gui.horsepowered.jei.trap_waterlogged"),
@@ -90,6 +114,15 @@ public class EmiTrappingRecipe extends BasicEmiRecipe {
             return String.format("%d", (long) chance);
         }
         return String.format("%.2f", chance);
+    }
+
+    private static String dimensionLabel(ResourceKey<Level> dimension) {
+        ResourceLocation id = dimension.location();
+        String key = "dimension." + id.getNamespace() + "." + id.getPath();
+        String resolved = Component.translatable(key).getString();
+        if (!resolved.equals(key)) return resolved;
+        String path = id.getPath().replace('_', ' ');
+        return Character.toUpperCase(path.charAt(0)) + path.substring(1);
     }
 
     private static String biomeLabel(ResourceLocation id) {
