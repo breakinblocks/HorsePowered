@@ -73,11 +73,11 @@ The damage source used is generic, so drops are always in their raw form. Cooked
 * Hoppers below the trap pull only from the five drop slots. The bait slot is extraction-locked even while empty, so an automated bait-pulling setup is not possible.
 * The block is fully waterloggable, so a hopper or pipe can sit in flowing water under a fish trap without breaking the water column.
 
-## Biome and Waterlog Conditions
+## Biome, Dimension and Waterlog Conditions
 
-When a recipe specifies a biome tag or a waterlogged requirement, the trap only counts dice rolls when those conditions are met. The bait stays, the timer keeps running, but no animal is ever caught until you relocate or waterlog the trap.
+When a recipe specifies a biome tag, a dimension or a waterlogged requirement, the trap only counts dice rolls when those conditions are met. The bait stays, the timer keeps running, but no animal is ever caught until you relocate or waterlog the trap. If one bait has recipes for different places, the trap uses the one that matches where it stands.
 
-Jade calls this out in red as `Wrong biome` or `Needs water` when bait is loaded but the conditions are not satisfied.
+Jade calls this out in red as `Wrong biome`, `Wrong dimension` or `Needs water` when bait is loaded but the conditions are not satisfied.
 
 ## Crafting Recipe
 

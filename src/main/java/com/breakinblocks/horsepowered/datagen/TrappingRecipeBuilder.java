@@ -4,13 +4,17 @@ import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.recipes.TrappingRecipe;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class TrappingRecipeBuilder {
@@ -20,6 +24,7 @@ public class TrappingRecipeBuilder {
     private int time = 1200;
     private int priority = 0;
     private Optional<TagKey<Biome>> biome = Optional.empty();
+    private final List<ResourceKey<Level>> dimensions = new ArrayList<>();
     private boolean waterlogged = false;
     private boolean baitConsumed = false;
     private double baitConsumeChance = 100.0D;
@@ -50,6 +55,11 @@ public class TrappingRecipeBuilder {
         return this;
     }
 
+    public TrappingRecipeBuilder dimension(ResourceKey<Level> dimension) {
+        this.dimensions.add(dimension);
+        return this;
+    }
+
     public TrappingRecipeBuilder waterlogged() {
         this.waterlogged = true;
         return this;
@@ -77,6 +87,6 @@ public class TrappingRecipeBuilder {
 
     public void save(RecipeOutput output, String name) {
         ResourceLocation id = HorsePowerMod.id("trapping/" + name);
-        output.accept(id, new TrappingRecipe(bait, entityId, time, priority, biome, waterlogged, baitConsumed, baitConsumeChance, title, icon), null);
+        output.accept(id, new TrappingRecipe(bait, entityId, time, priority, biome, dimensions, waterlogged, baitConsumed, baitConsumeChance, title, icon), null);
     }
 }
