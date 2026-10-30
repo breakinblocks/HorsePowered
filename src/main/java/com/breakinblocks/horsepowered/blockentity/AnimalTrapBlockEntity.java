@@ -14,6 +14,8 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -23,6 +25,7 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.event.ForgeEventFactory;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
@@ -236,6 +239,15 @@ public class AnimalTrapBlockEntity extends HPBlockEntityBase {
         EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.get(recipe.getEntityId());
         Entity proto = type.create(sl);
         if (proto == null) return;
+
+        // Initialize new catches once, before their state is saved for display, loot, and release.
+        proto.moveTo(worldPosition.getX() + 0.5, worldPosition.getY(), worldPosition.getZ() + 0.5);
+        if (proto instanceof Mob mob) {
+            ForgeEventFactory.onFinalizeSpawn(mob, sl, sl.getCurrentDifficultyAt(worldPosition),
+                    MobSpawnType.MOB_SUMMONED, null, null);
+            // The prototype is stored instead of added to the world, so honor cancellation here.
+            if (mob.isSpawnCancelled()) return;
+        }
 
         CompoundTag tag = new CompoundTag();
         proto.saveWithoutId(tag);
