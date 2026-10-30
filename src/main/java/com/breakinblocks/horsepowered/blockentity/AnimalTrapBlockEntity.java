@@ -18,6 +18,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
@@ -32,6 +33,7 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.event.EventHooks;
 import org.jspecify.annotations.Nullable;
 
 public class AnimalTrapBlockEntity extends HPBlockEntityBase {
@@ -262,8 +264,17 @@ public class AnimalTrapBlockEntity extends HPBlockEntityBase {
         if (!(level instanceof ServerLevel sl)) return;
         if (!BuiltInRegistries.ENTITY_TYPE.containsKey(recipe.getEntityId())) return;
         EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.getValue(recipe.getEntityId());
-        Entity proto = type.create(sl, EntitySpawnReason.LOAD);
+        Entity proto = type.create(sl, EntitySpawnReason.MOB_SUMMONED);
         if (proto == null) return;
+
+        // Initialize new catches once, before their state is saved for display, loot, and release.
+        proto.snapTo(worldPosition.getX() + 0.5, worldPosition.getY(), worldPosition.getZ() + 0.5, 0F, 0F);
+        if (proto instanceof Mob mob) {
+            EventHooks.finalizeMobSpawn(
+                    mob, sl, sl.getCurrentDifficultyAt(worldPosition), EntitySpawnReason.MOB_SUMMONED, null);
+            // The prototype is stored instead of added to the world, so honor cancellation here.
+            if (mob.isSpawnCancelled()) return;
+        }
 
         TagValueOutput output = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, sl.registryAccess());
         proto.saveAsPassenger(output);
