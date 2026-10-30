@@ -57,6 +57,7 @@ replay_pid*
 *.swp
 *~
 local.properties
+/tools/
 
 *.bat
 !gradlew.bat
