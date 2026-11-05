@@ -44,6 +44,7 @@ public class GraniteAnvilBlockEntity extends HPBlockEntityBase {
         } else {
             currentItemCrushAmount = 0;
             totalItemCrushAmount = 1;
+            lastInputType = ItemStack.EMPTY;
         }
     }
 

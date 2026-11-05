@@ -44,6 +44,7 @@ public class ManualChopperBlockEntity extends HPBlockEntityBase {
         } else {
             currentItemChopAmount = 0;
             totalItemChopAmount = 1;
+            lastInputType = ItemStack.EMPTY;
         }
     }
 
@@ -70,7 +71,7 @@ public class ManualChopperBlockEntity extends HPBlockEntityBase {
 
             if (currentItemChopAmount >= totalItemChopAmount) {
                 currentItemChopAmount = 0;
-                totalItemChopAmount = getRecipeTime();
+                totalItemChopAmount = getRecipeTime() * HorsePowerConfig.choppingMultiplier.get();
                 chopItem(player);
                 return true;
             }
