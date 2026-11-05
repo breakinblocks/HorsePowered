@@ -68,7 +68,7 @@ public class ManualChopperBlockEntity extends HPBlockEntityBase {
 
             if (currentItemChopAmount >= totalItemChopAmount) {
                 currentItemChopAmount = 0;
-                totalItemChopAmount = getRecipeTime();
+                totalItemChopAmount = getRecipeTime() * Configs.choppingMultiplier.get();
                 chopItem(player);
                 return true;
             }

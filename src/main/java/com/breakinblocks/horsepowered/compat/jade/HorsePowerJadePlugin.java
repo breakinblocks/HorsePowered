@@ -207,6 +207,11 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
                 if (accessor.getBlockEntity() instanceof ManualChopperBlockEntity te) {
                     appendItemInfo(tooltip, te.getItem(0), "input");
                     appendItemInfo(tooltip, te.getItem(1), "output");
+                    if (!te.getItem(0).isEmpty()) {
+                        int remaining = Math.max(0, te.getTotalChopAmount() - te.getCurrentChopAmount());
+                        tooltip.add(Component.translatable(
+                                "jade." + Reference.MODID + ".strikes_remaining", remaining));
+                    }
                 }
             }
 
