@@ -5,13 +5,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.WorldlyContainerHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.WorldlyContainer;
-import net.minecraft.world.WorldlyContainerHolder;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
@@ -82,7 +82,13 @@ public class BlockFiller extends Block implements EntityBlock, WorldlyContainerH
     }
 
     @Override
-    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+    public BlockState updateShape(
+            BlockState state,
+            Direction direction,
+            BlockState neighborState,
+            LevelAccessor level,
+            BlockPos pos,
+            BlockPos neighborPos) {
         Direction facing = state.getValue(FACING);
         if (direction == facing && !(neighborState.getBlock() instanceof BlockHPBase)) {
             return Blocks.AIR.defaultBlockState();
@@ -91,7 +97,8 @@ public class BlockFiller extends Block implements EntityBlock, WorldlyContainerH
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    public InteractionResult use(
+            BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         BlockPos filledPos = pos.relative(state.getValue(FACING));
         BlockState filledState = level.getBlockState(filledPos);
         if (validateFilled(level, pos, state)) {
@@ -111,8 +118,7 @@ public class BlockFiller extends Block implements EntityBlock, WorldlyContainerH
     }
 
     @Override
-    public void spawnDestroyParticles(Level level, Player player, BlockPos pos, BlockState state) {
-    }
+    public void spawnDestroyParticles(Level level, Player player, BlockPos pos, BlockState state) {}
 
     @Override
     public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {

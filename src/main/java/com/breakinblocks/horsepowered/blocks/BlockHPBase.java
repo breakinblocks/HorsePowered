@@ -1,9 +1,7 @@
 package com.breakinblocks.horsepowered.blocks;
 
-import com.breakinblocks.horsepowered.Configs;
 import com.breakinblocks.horsepowered.blockentity.HPBlockEntityBase;
 import com.breakinblocks.horsepowered.blockentity.HPBlockEntityHorseBase;
-import com.breakinblocks.horsepowered.util.Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
@@ -20,12 +18,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 public abstract class BlockHPBase extends Block implements EntityBlock {
 
@@ -44,15 +39,16 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
         return -1;
     }
 
-    public void onWorkerAttached(Player player, PathfinderMob creature) {
-    }
+    public void onWorkerAttached(Player player, PathfinderMob creature) {}
 
     @Nullable
-    protected abstract <T extends BlockEntity> BlockEntityTicker<T> createTicker(Level level, BlockState state, BlockEntityType<T> type);
+    protected abstract <T extends BlockEntity> BlockEntityTicker<T> createTicker(
+            Level level, BlockState state, BlockEntityType<T> type);
 
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(
+            Level level, BlockState state, BlockEntityType<T> type) {
         return createTicker(level, state, type);
     }
 
@@ -81,7 +77,8 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    public InteractionResult use(
+            BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         ItemStack stack = player.getItemInHand(hand);
         BlockEntity blockEntity = level.getBlockEntity(pos);
 
@@ -97,7 +94,9 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
             return InteractionResult.sidedSuccess(level.isClientSide);
         }
 
-        if (horseTE != null && WorkerInteraction.tryAttachLeashed(level, pos, player, horseTE.getVirtualWorker(), this::onWorkerAttached)) {
+        if (horseTE != null
+                && WorkerInteraction.tryAttachLeashed(
+                        level, pos, player, horseTE.getVirtualWorker(), this::onWorkerAttached)) {
             return InteractionResult.sidedSuccess(level.isClientSide);
         }
 
@@ -134,7 +133,9 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
         }
 
         // Handle extracting items
-        int slot = getSlot(state, (float) hit.getLocation().x - pos.getX(),
+        int slot = getSlot(
+                state,
+                (float) hit.getLocation().x - pos.getX(),
                 (float) hit.getLocation().y - pos.getY(),
                 (float) hit.getLocation().z - pos.getZ());
 
@@ -144,8 +145,11 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
             if (slot > -1) {
                 extracts = !te.getItem(slot).isEmpty();
             } else if (slot > -2) {
-                extracts = !te.getItem(1).isEmpty() || !te.getItem(2).isEmpty()
-                        || (stack.isEmpty() && hand != InteractionHand.OFF_HAND && !te.getItem(0).isEmpty());
+                extracts = !te.getItem(1).isEmpty()
+                        || !te.getItem(2).isEmpty()
+                        || (stack.isEmpty()
+                                && hand != InteractionHand.OFF_HAND
+                                && !te.getItem(0).isEmpty());
             } else {
                 extracts = false;
             }

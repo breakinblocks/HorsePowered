@@ -86,15 +86,21 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase implement
     @Override
     public AABB getRenderBoundingBox() {
         return new AABB(
-                worldPosition.getX() - 3, worldPosition.getY(), worldPosition.getZ() - 3,
-                worldPosition.getX() + 4, worldPosition.getY() + 4, worldPosition.getZ() + 4);
+                worldPosition.getX() - 3,
+                worldPosition.getY(),
+                worldPosition.getZ() - 3,
+                worldPosition.getX() + 4,
+                worldPosition.getY() + 4,
+                worldPosition.getZ() + 4);
     }
 
-    public static <T extends HPBlockEntityHorseBase> void serverTick(Level level, BlockPos pos, BlockState state, T blockEntity) {
+    public static <T extends HPBlockEntityHorseBase> void serverTick(
+            Level level, BlockPos pos, BlockState state, T blockEntity) {
         blockEntity.tickServer();
     }
 
-    public static <T extends HPBlockEntityHorseBase> void clientTick(Level level, BlockPos pos, BlockState state, T blockEntity) {
+    public static <T extends HPBlockEntityHorseBase> void clientTick(
+            Level level, BlockPos pos, BlockState state, T blockEntity) {
         blockEntity.tickClient();
     }
 

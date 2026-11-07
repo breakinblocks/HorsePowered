@@ -21,7 +21,8 @@ public class BlockWoodenHopper extends HopperBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    public InteractionResult use(
+            BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         return InteractionResult.PASS;
     }
 
@@ -31,7 +32,10 @@ public class BlockWoodenHopper extends HopperBlock {
     }
 
     @Override
-    public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        return level.isClientSide ? null : createTickerHelper(type, ModBlocks.WOODEN_HOPPER_BE.get(), WoodenHopperBlockEntity::pushItemsTick);
+    public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(
+            Level level, BlockState state, BlockEntityType<T> type) {
+        return level.isClientSide
+                ? null
+                : createTickerHelper(type, ModBlocks.WOODEN_HOPPER_BE.get(), WoodenHopperBlockEntity::pushItemsTick);
     }
 }

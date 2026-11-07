@@ -27,8 +27,8 @@ public class LeadRenderer {
      * @param poseStack     The pose stack
      * @param bufferSource  The buffer source
      */
-    public static void renderLead(WorkerHost blockEntity, float partialTick,
-                                   PoseStack poseStack, MultiBufferSource bufferSource) {
+    public static void renderLead(
+            WorkerHost blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource) {
         VirtualWorker worker = blockEntity.getVirtualWorker();
         if (!worker.hasWorker()) {
             return;
@@ -62,8 +62,7 @@ public class LeadRenderer {
         Matrix4f matrix = poseStack.last().pose();
 
         // Render the lead segments (catenary curve)
-        renderLeadSegments(matrix, vertexConsumer, dx, dy, dz,
-                blockLight, skyLight, workerBlockLight, workerSkyLight);
+        renderLeadSegments(matrix, vertexConsumer, dx, dy, dz, blockLight, skyLight, workerBlockLight, workerSkyLight);
 
         poseStack.popPose();
     }
@@ -71,16 +70,22 @@ public class LeadRenderer {
     /**
      * Renders the lead as a series of connected segments forming a catenary curve.
      */
-    private static void renderLeadSegments(Matrix4f matrix, VertexConsumer vertexConsumer,
-                                            double dx, double dy, double dz,
-                                            int blockLight, int skyLight,
-                                            int workerBlockLight, int workerSkyLight) {
-        float horizontalDist = Mth.sqrt((float)(dx * dx + dz * dz));
-        float totalDist = Mth.sqrt((float)(dx * dx + dy * dy + dz * dz));
+    private static void renderLeadSegments(
+            Matrix4f matrix,
+            VertexConsumer vertexConsumer,
+            double dx,
+            double dy,
+            double dz,
+            int blockLight,
+            int skyLight,
+            int workerBlockLight,
+            int workerSkyLight) {
+        float horizontalDist = Mth.sqrt((float) (dx * dx + dz * dz));
+        float totalDist = Mth.sqrt((float) (dx * dx + dy * dy + dz * dz));
 
         // Calculate rotation
-        float yaw = (float)(Mth.atan2(dz, dx));
-        float pitch = (float)(Mth.atan2(dy, horizontalDist));
+        float yaw = (float) (Mth.atan2(dz, dx));
+        float pitch = (float) (Mth.atan2(dy, horizontalDist));
 
         // Lead color (brownish like vanilla)
         float r1 = 0.553F;
@@ -112,26 +117,56 @@ public class LeadRenderer {
 
             // Interpolate light
             int light1 = LightTexture.pack(
-                    (int) Mth.lerp(t1, blockLight, workerBlockLight),
-                    (int) Mth.lerp(t1, skyLight, workerSkyLight));
+                    (int) Mth.lerp(t1, blockLight, workerBlockLight), (int) Mth.lerp(t1, skyLight, workerSkyLight));
             int light2 = LightTexture.pack(
-                    (int) Mth.lerp(t2, blockLight, workerBlockLight),
-                    (int) Mth.lerp(t2, skyLight, workerSkyLight));
+                    (int) Mth.lerp(t2, blockLight, workerBlockLight), (int) Mth.lerp(t2, skyLight, workerSkyLight));
 
             // Render quad for this segment (top surface)
             float width = 0.025F;
 
             // Top surface
-            vertexConsumer.vertex(matrix, x1 - width, y1, z1).color(r1, g1, b1, 1.0F).uv2(light1).endVertex();
-            vertexConsumer.vertex(matrix, x2 - width, y2, z2).color(r1, g1, b1, 1.0F).uv2(light2).endVertex();
-            vertexConsumer.vertex(matrix, x2 + width, y2, z2).color(r1, g1, b1, 1.0F).uv2(light2).endVertex();
-            vertexConsumer.vertex(matrix, x1 + width, y1, z1).color(r1, g1, b1, 1.0F).uv2(light1).endVertex();
+            vertexConsumer
+                    .vertex(matrix, x1 - width, y1, z1)
+                    .color(r1, g1, b1, 1.0F)
+                    .uv2(light1)
+                    .endVertex();
+            vertexConsumer
+                    .vertex(matrix, x2 - width, y2, z2)
+                    .color(r1, g1, b1, 1.0F)
+                    .uv2(light2)
+                    .endVertex();
+            vertexConsumer
+                    .vertex(matrix, x2 + width, y2, z2)
+                    .color(r1, g1, b1, 1.0F)
+                    .uv2(light2)
+                    .endVertex();
+            vertexConsumer
+                    .vertex(matrix, x1 + width, y1, z1)
+                    .color(r1, g1, b1, 1.0F)
+                    .uv2(light1)
+                    .endVertex();
 
             // Bottom surface (darker)
-            vertexConsumer.vertex(matrix, x1 - width, y1 - width, z1).color(r2, g2, b2, 1.0F).uv2(light1).endVertex();
-            vertexConsumer.vertex(matrix, x2 - width, y2 - width, z2).color(r2, g2, b2, 1.0F).uv2(light2).endVertex();
-            vertexConsumer.vertex(matrix, x2 + width, y2 - width, z2).color(r2, g2, b2, 1.0F).uv2(light2).endVertex();
-            vertexConsumer.vertex(matrix, x1 + width, y1 - width, z1).color(r2, g2, b2, 1.0F).uv2(light1).endVertex();
+            vertexConsumer
+                    .vertex(matrix, x1 - width, y1 - width, z1)
+                    .color(r2, g2, b2, 1.0F)
+                    .uv2(light1)
+                    .endVertex();
+            vertexConsumer
+                    .vertex(matrix, x2 - width, y2 - width, z2)
+                    .color(r2, g2, b2, 1.0F)
+                    .uv2(light2)
+                    .endVertex();
+            vertexConsumer
+                    .vertex(matrix, x2 + width, y2 - width, z2)
+                    .color(r2, g2, b2, 1.0F)
+                    .uv2(light2)
+                    .endVertex();
+            vertexConsumer
+                    .vertex(matrix, x1 + width, y1 - width, z1)
+                    .color(r2, g2, b2, 1.0F)
+                    .uv2(light1)
+                    .endVertex();
         }
     }
 

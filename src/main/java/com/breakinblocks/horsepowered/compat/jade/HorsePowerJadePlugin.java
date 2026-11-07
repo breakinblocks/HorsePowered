@@ -1,17 +1,16 @@
 package com.breakinblocks.horsepowered.compat.jade;
 
+import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.blockentity.AnimalTrapBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.ChopperBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.DryingRackBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.GraniteAnvilBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.GrindstoneBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.HandGrindstoneBlockEntity;
-import com.breakinblocks.horsepowered.HorsePowerMod;
-import com.breakinblocks.horsepowered.blockentity.HPBlockEntityHorseBase;
-import com.breakinblocks.horsepowered.blockentity.VirtualWorker;
-import com.breakinblocks.horsepowered.blockentity.WorkerHost;
 import com.breakinblocks.horsepowered.blockentity.ManualChopperBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.PressBlockEntity;
+import com.breakinblocks.horsepowered.blockentity.VirtualWorker;
+import com.breakinblocks.horsepowered.blockentity.WorkerHost;
 import com.breakinblocks.horsepowered.blocks.BlockAnimalTrap;
 import com.breakinblocks.horsepowered.blocks.BlockChopper;
 import com.breakinblocks.horsepowered.blocks.BlockChoppingBlock;
@@ -71,57 +70,66 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
         if (HorsePowerMod.CREATE_LOADED) {
             HorseEngineJadeSupport.register(registration);
         }
-        registration.registerBlockDataProvider(new IServerDataProvider<BlockAccessor>() {
-            @Override
-            public void appendServerData(CompoundTag data, BlockAccessor accessor) {
-                BlockState state = accessor.getBlockState();
-                BlockPos pos = accessor.getPosition();
-                DryingRackBlockEntity main = BlockDryingRack.getMainBlockEntity(accessor.getLevel(), state, pos);
-                if (main == null) return;
-                BlockHitResult hit = accessor.getHitResult();
-                int slot = BlockDryingRack.slotForHit(state, pos, hit);
-                if (slot < 0) return;
-                data.putInt(KEY_DR_SLOT, slot);
-                data.putInt(KEY_DR_PROGRESS, main.getProgress(slot));
-                data.putInt(KEY_DR_TIME, main.getRecipeTime(slot));
-                data.putBoolean(KEY_DR_FINISHED, main.isFinished(slot));
-            }
+        registration.registerBlockDataProvider(
+                new IServerDataProvider<BlockAccessor>() {
+                    @Override
+                    public void appendServerData(CompoundTag data, BlockAccessor accessor) {
+                        BlockState state = accessor.getBlockState();
+                        BlockPos pos = accessor.getPosition();
+                        DryingRackBlockEntity main =
+                                BlockDryingRack.getMainBlockEntity(accessor.getLevel(), state, pos);
+                        if (main == null) return;
+                        BlockHitResult hit = accessor.getHitResult();
+                        int slot = BlockDryingRack.slotForHit(state, pos, hit);
+                        if (slot < 0) return;
+                        data.putInt(KEY_DR_SLOT, slot);
+                        data.putInt(KEY_DR_PROGRESS, main.getProgress(slot));
+                        data.putInt(KEY_DR_TIME, main.getRecipeTime(slot));
+                        data.putBoolean(KEY_DR_FINISHED, main.isFinished(slot));
+                    }
 
-            @Override
-            public ResourceLocation getUid() {
-                return DRYING_RACK;
-            }
-        }, DryingRackBlockEntity.class);
+                    @Override
+                    public ResourceLocation getUid() {
+                        return DRYING_RACK;
+                    }
+                },
+                DryingRackBlockEntity.class);
 
-        registration.registerBlockDataProvider(new IServerDataProvider<BlockAccessor>() {
-            @Override
-            public void appendServerData(CompoundTag data, BlockAccessor accessor) {
-                if (!(accessor.getBlockEntity() instanceof AnimalTrapBlockEntity te)) return;
-                data.putInt(KEY_AT_PROGRESS, te.getTrapProgress());
-                data.putInt(KEY_AT_TIME, te.getTrapTime());
-                data.putInt(KEY_AT_DROP_TIMER, te.getDropTimer());
-                data.putBoolean(KEY_AT_HAS_ENTITY, te.hasCapturedEntity());
-                if (te.getCapturedEntityType() != null) {
-                    data.putString(KEY_AT_ENTITY_ID,
-                            net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE
-                                    .getKey(te.getCapturedEntityType()).toString());
-                }
-                ItemStack bait = te.getItem(AnimalTrapBlockEntity.BAIT_SLOT);
-                data.putBoolean(KEY_AT_HAS_BAIT, !bait.isEmpty());
-                if (!bait.isEmpty()) {
-                    te.findTrappingRecipe(bait).ifPresent(recipe -> {
-                        data.putBoolean(KEY_AT_BIOME_OK, recipe.biomeMatches(accessor.getLevel(), accessor.getPosition()));
-                        data.putBoolean(KEY_AT_DIMENSION_OK, recipe.dimensionMatches(accessor.getLevel()));
-                        data.putBoolean(KEY_AT_WATER_OK, recipe.waterloggedMatches(accessor.getBlockState()));
-                    });
-                }
-            }
+        registration.registerBlockDataProvider(
+                new IServerDataProvider<BlockAccessor>() {
+                    @Override
+                    public void appendServerData(CompoundTag data, BlockAccessor accessor) {
+                        if (!(accessor.getBlockEntity() instanceof AnimalTrapBlockEntity te)) return;
+                        data.putInt(KEY_AT_PROGRESS, te.getTrapProgress());
+                        data.putInt(KEY_AT_TIME, te.getTrapTime());
+                        data.putInt(KEY_AT_DROP_TIMER, te.getDropTimer());
+                        data.putBoolean(KEY_AT_HAS_ENTITY, te.hasCapturedEntity());
+                        if (te.getCapturedEntityType() != null) {
+                            data.putString(
+                                    KEY_AT_ENTITY_ID,
+                                    net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE
+                                            .getKey(te.getCapturedEntityType())
+                                            .toString());
+                        }
+                        ItemStack bait = te.getItem(AnimalTrapBlockEntity.BAIT_SLOT);
+                        data.putBoolean(KEY_AT_HAS_BAIT, !bait.isEmpty());
+                        if (!bait.isEmpty()) {
+                            te.findTrappingRecipe(bait).ifPresent(recipe -> {
+                                data.putBoolean(
+                                        KEY_AT_BIOME_OK,
+                                        recipe.biomeMatches(accessor.getLevel(), accessor.getPosition()));
+                                data.putBoolean(KEY_AT_DIMENSION_OK, recipe.dimensionMatches(accessor.getLevel()));
+                                data.putBoolean(KEY_AT_WATER_OK, recipe.waterloggedMatches(accessor.getBlockState()));
+                            });
+                        }
+                    }
 
-            @Override
-            public ResourceLocation getUid() {
-                return ANIMAL_TRAP;
-            }
-        }, AnimalTrapBlockEntity.class);
+                    @Override
+                    public ResourceLocation getUid() {
+                        return ANIMAL_TRAP;
+                    }
+                },
+                AnimalTrapBlockEntity.class);
     }
 
     @Override
@@ -129,224 +137,248 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
         if (HorsePowerMod.CREATE_LOADED) {
             HorseEngineJadeSupport.registerClient(registration);
         }
-        registration.registerBlockComponent(new IBlockComponentProvider() {
-            @Override
-            public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
-                if (accessor.getBlockEntity() instanceof GrindstoneBlockEntity te) {
-                    appendItemInfo(tooltip, te.getItem(0), "input");
-                    appendItemInfo(tooltip, te.getItem(1), "output");
-                    appendItemInfo(tooltip, te.getItem(2), "secondary");
-                    appendProgress(tooltip, te.getCurrentMillTime(), te.getTotalMillTime());
-                    appendWorkerInfo(tooltip, te);
-                }
-            }
-
-            @Override
-            public ResourceLocation getUid() {
-                return GRINDSTONE;
-            }
-        }, BlockGrindstone.class);
-
-        registration.registerBlockComponent(new IBlockComponentProvider() {
-            @Override
-            public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
-                if (accessor.getBlockEntity() instanceof ChopperBlockEntity te) {
-                    appendItemInfo(tooltip, te.getItem(0), "input");
-                    appendItemInfo(tooltip, te.getItem(1), "output");
-                    appendProgress(tooltip, te.getCurrentChopTime(), te.getTotalChopTime());
-                    appendWorkerInfo(tooltip, te);
-                }
-            }
-
-            @Override
-            public ResourceLocation getUid() {
-                return CHOPPER;
-            }
-        }, BlockChopper.class);
-
-        registration.registerBlockComponent(new IBlockComponentProvider() {
-            @Override
-            public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
-                if (accessor.getBlockEntity() instanceof PressBlockEntity te) {
-                    appendItemInfo(tooltip, te.getItem(0), "input");
-                    appendItemInfo(tooltip, te.getItem(1), "output");
-                    appendFluidInfo(tooltip, te.getInputTank().getFluid(), te.getInputTank().getCapacity(), "fluid_input");
-                    appendFluidInfo(tooltip, te.getOutputTank().getFluid(), te.getOutputTank().getCapacity(), "fluid_output");
-                    appendWorkerInfo(tooltip, te);
-                }
-            }
-
-            @Override
-            public ResourceLocation getUid() {
-                return PRESS;
-            }
-        }, BlockPress.class);
-
-        registration.registerBlockComponent(new IBlockComponentProvider() {
-            @Override
-            public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
-                if (accessor.getBlockEntity() instanceof HandGrindstoneBlockEntity te) {
-                    appendItemInfo(tooltip, te.getItem(0), "input");
-                    appendItemInfo(tooltip, te.getItem(1), "output");
-                    appendItemInfo(tooltip, te.getItem(2), "secondary");
-                } else if (accessor.getBlockEntity() instanceof ManualChopperBlockEntity te) {
-                    appendItemInfo(tooltip, te.getItem(0), "input");
-                    appendItemInfo(tooltip, te.getItem(1), "output");
-                }
-            }
-
-            @Override
-            public ResourceLocation getUid() {
-                return MANUAL;
-            }
-        }, BlockHandGrindstone.class);
-
-        registration.registerBlockComponent(new IBlockComponentProvider() {
-            @Override
-            public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
-                if (accessor.getBlockEntity() instanceof ManualChopperBlockEntity te) {
-                    appendItemInfo(tooltip, te.getItem(0), "input");
-                    appendItemInfo(tooltip, te.getItem(1), "output");
-                    if (!te.getItem(0).isEmpty()) {
-                        int remaining = Math.max(0, te.getTotalChopAmount() - te.getCurrentChopAmount());
-                        tooltip.add(Component.translatable(
-                                "jade." + Reference.MODID + ".strikes_remaining", remaining));
-                    }
-                }
-            }
-
-            @Override
-            public ResourceLocation getUid() {
-                return MANUAL;
-            }
-        }, BlockChoppingBlock.class);
-
-        registration.registerBlockComponent(new IBlockComponentProvider() {
-            @Override
-            public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
-                BlockState state = accessor.getBlockState();
-                BlockPos pos = accessor.getPosition();
-                DryingRackBlockEntity main = BlockDryingRack.getMainBlockEntity(accessor.getLevel(), state, pos);
-                if (main == null) return;
-
-                CompoundTag data = accessor.getServerData();
-                if (!data.contains(KEY_DR_SLOT)) return;
-
-                int slot = data.getInt(KEY_DR_SLOT);
-                ItemStack stack = main.getItem(slot);
-                if (stack.isEmpty()) {
-                    tooltip.add(Component.translatable("jade." + Reference.MODID + ".drying_empty"));
-                    return;
-                }
-
-                if (data.getBoolean(KEY_DR_FINISHED)) {
-                    tooltip.add(Component.translatable("jade." + Reference.MODID + ".drying_done",
-                            stack.getHoverName()));
-                    return;
-                }
-
-                int progress = data.getInt(KEY_DR_PROGRESS);
-                int time = data.getInt(KEY_DR_TIME);
-                if (time <= 0) return;
-                int percent = (progress * 100) / time;
-                int remainingTicks = Math.max(0, time - progress);
-                String remaining = formatTime(remainingTicks);
-                tooltip.add(Component.translatable("jade." + Reference.MODID + ".drying",
-                        stack.getHoverName(), percent, remaining));
-            }
-
-            @Override
-            public ResourceLocation getUid() {
-                return DRYING_RACK;
-            }
-        }, BlockDryingRack.class);
-
-        registration.registerBlockComponent(new IBlockComponentProvider() {
-            @Override
-            public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
-                if (accessor.getBlockEntity() instanceof GraniteAnvilBlockEntity te) {
-                    appendItemInfo(tooltip, te.getItem(0), "input");
-                    appendItemInfo(tooltip, te.getItem(1), "output");
-                    if (!te.getItem(0).isEmpty()) {
-                        int remaining = Math.max(0, te.getTotalCrushAmount() - te.getCurrentCrushAmount());
-                        tooltip.add(Component.translatable(
-                                "jade." + Reference.MODID + ".strikes_remaining", remaining));
-                    }
-                }
-            }
-
-            @Override
-            public ResourceLocation getUid() {
-                return GRANITE_ANVIL;
-            }
-        }, BlockGraniteAnvil.class);
-
-        registration.registerBlockComponent(new IBlockComponentProvider() {
-            @Override
-            public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
-                if (!(accessor.getBlockEntity() instanceof AnimalTrapBlockEntity te)) return;
-                CompoundTag data = accessor.getServerData();
-
-                for (int slot = 0; slot < AnimalTrapBlockEntity.INVENTORY_SIZE; slot++) {
-                    ItemStack stack = te.getItem(slot);
-                    String key = slot == AnimalTrapBlockEntity.BAIT_SLOT ? "input" : "output";
-                    appendItemInfo(tooltip, stack, key);
-                }
-
-                if (data.getBoolean(KEY_AT_HAS_ENTITY)) {
-                    Component entityName = Component.literal("?");
-                    String id = data.getString(KEY_AT_ENTITY_ID);
-                    if (!id.isEmpty()) {
-                        ResourceLocation rl = ResourceLocation.tryParse(id);
-                        if (rl != null) {
-                            net.minecraft.world.entity.EntityType<?> type =
-                                    net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.get(rl);
-                            if (type != null) entityName = Component.translatable(type.getDescriptionId());
+        registration.registerBlockComponent(
+                new IBlockComponentProvider() {
+                    @Override
+                    public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
+                        if (accessor.getBlockEntity() instanceof GrindstoneBlockEntity te) {
+                            appendItemInfo(tooltip, te.getItem(0), "input");
+                            appendItemInfo(tooltip, te.getItem(1), "output");
+                            appendItemInfo(tooltip, te.getItem(2), "secondary");
+                            appendProgress(tooltip, te.getCurrentMillTime(), te.getTotalMillTime());
+                            appendWorkerInfo(tooltip, te);
                         }
                     }
-                    tooltip.add(Component.translatable(
-                            "jade." + Reference.MODID + ".trap_caught", entityName));
-                    int nextDropTicks = Math.max(0,
-                            AnimalTrapBlockEntity.DROP_INTERVAL_TICKS - data.getInt(KEY_AT_DROP_TIMER));
-                    tooltip.add(Component.translatable(
-                            "jade." + Reference.MODID + ".trap_next_drop", formatTime(nextDropTicks)));
-                    return;
-                }
 
-                if (!data.getBoolean(KEY_AT_HAS_BAIT)) {
-                    tooltip.add(Component.translatable("jade." + Reference.MODID + ".trap_empty"));
-                    return;
-                }
+                    @Override
+                    public ResourceLocation getUid() {
+                        return GRINDSTONE;
+                    }
+                },
+                BlockGrindstone.class);
 
-                int progress = data.getInt(KEY_AT_PROGRESS);
-                int time = data.getInt(KEY_AT_TIME);
-                if (time > 0 && progress < time) {
-                    int remaining = Math.max(0, time - progress);
-                    tooltip.add(Component.translatable(
-                            "jade." + Reference.MODID + ".trap_progress", formatTime(remaining)));
-                } else {
-                    tooltip.add(Component.translatable("jade." + Reference.MODID + ".trap_set"));
-                }
+        registration.registerBlockComponent(
+                new IBlockComponentProvider() {
+                    @Override
+                    public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
+                        if (accessor.getBlockEntity() instanceof ChopperBlockEntity te) {
+                            appendItemInfo(tooltip, te.getItem(0), "input");
+                            appendItemInfo(tooltip, te.getItem(1), "output");
+                            appendProgress(tooltip, te.getCurrentChopTime(), te.getTotalChopTime());
+                            appendWorkerInfo(tooltip, te);
+                        }
+                    }
 
-                if (data.contains(KEY_AT_BIOME_OK) && !data.getBoolean(KEY_AT_BIOME_OK)) {
-                    tooltip.add(Component.translatable("jade." + Reference.MODID + ".trap_wrong_biome")
-                            .withStyle(style -> style.withColor(0xFF5555)));
-                }
-                if (data.contains(KEY_AT_DIMENSION_OK) && !data.getBoolean(KEY_AT_DIMENSION_OK)) {
-                    tooltip.add(Component.translatable("jade." + Reference.MODID + ".trap_wrong_dimension")
-                            .withStyle(style -> style.withColor(0xFF5555)));
-                }
-                if (data.contains(KEY_AT_WATER_OK) && !data.getBoolean(KEY_AT_WATER_OK)) {
-                    tooltip.add(Component.translatable("jade." + Reference.MODID + ".trap_needs_water")
-                            .withStyle(style -> style.withColor(0xFF5555)));
-                }
-            }
+                    @Override
+                    public ResourceLocation getUid() {
+                        return CHOPPER;
+                    }
+                },
+                BlockChopper.class);
 
-            @Override
-            public ResourceLocation getUid() {
-                return ANIMAL_TRAP;
-            }
-        }, BlockAnimalTrap.class);
+        registration.registerBlockComponent(
+                new IBlockComponentProvider() {
+                    @Override
+                    public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
+                        if (accessor.getBlockEntity() instanceof PressBlockEntity te) {
+                            appendItemInfo(tooltip, te.getItem(0), "input");
+                            appendItemInfo(tooltip, te.getItem(1), "output");
+                            appendFluidInfo(
+                                    tooltip,
+                                    te.getInputTank().getFluid(),
+                                    te.getInputTank().getCapacity(),
+                                    "fluid_input");
+                            appendFluidInfo(
+                                    tooltip,
+                                    te.getOutputTank().getFluid(),
+                                    te.getOutputTank().getCapacity(),
+                                    "fluid_output");
+                            appendWorkerInfo(tooltip, te);
+                        }
+                    }
+
+                    @Override
+                    public ResourceLocation getUid() {
+                        return PRESS;
+                    }
+                },
+                BlockPress.class);
+
+        registration.registerBlockComponent(
+                new IBlockComponentProvider() {
+                    @Override
+                    public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
+                        if (accessor.getBlockEntity() instanceof HandGrindstoneBlockEntity te) {
+                            appendItemInfo(tooltip, te.getItem(0), "input");
+                            appendItemInfo(tooltip, te.getItem(1), "output");
+                            appendItemInfo(tooltip, te.getItem(2), "secondary");
+                        } else if (accessor.getBlockEntity() instanceof ManualChopperBlockEntity te) {
+                            appendItemInfo(tooltip, te.getItem(0), "input");
+                            appendItemInfo(tooltip, te.getItem(1), "output");
+                        }
+                    }
+
+                    @Override
+                    public ResourceLocation getUid() {
+                        return MANUAL;
+                    }
+                },
+                BlockHandGrindstone.class);
+
+        registration.registerBlockComponent(
+                new IBlockComponentProvider() {
+                    @Override
+                    public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
+                        if (accessor.getBlockEntity() instanceof ManualChopperBlockEntity te) {
+                            appendItemInfo(tooltip, te.getItem(0), "input");
+                            appendItemInfo(tooltip, te.getItem(1), "output");
+                            if (!te.getItem(0).isEmpty()) {
+                                int remaining = Math.max(0, te.getTotalChopAmount() - te.getCurrentChopAmount());
+                                tooltip.add(Component.translatable(
+                                        "jade." + Reference.MODID + ".strikes_remaining", remaining));
+                            }
+                        }
+                    }
+
+                    @Override
+                    public ResourceLocation getUid() {
+                        return MANUAL;
+                    }
+                },
+                BlockChoppingBlock.class);
+
+        registration.registerBlockComponent(
+                new IBlockComponentProvider() {
+                    @Override
+                    public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
+                        BlockState state = accessor.getBlockState();
+                        BlockPos pos = accessor.getPosition();
+                        DryingRackBlockEntity main =
+                                BlockDryingRack.getMainBlockEntity(accessor.getLevel(), state, pos);
+                        if (main == null) return;
+
+                        CompoundTag data = accessor.getServerData();
+                        if (!data.contains(KEY_DR_SLOT)) return;
+
+                        int slot = data.getInt(KEY_DR_SLOT);
+                        ItemStack stack = main.getItem(slot);
+                        if (stack.isEmpty()) {
+                            tooltip.add(Component.translatable("jade." + Reference.MODID + ".drying_empty"));
+                            return;
+                        }
+
+                        if (data.getBoolean(KEY_DR_FINISHED)) {
+                            tooltip.add(Component.translatable(
+                                    "jade." + Reference.MODID + ".drying_done", stack.getHoverName()));
+                            return;
+                        }
+
+                        int progress = data.getInt(KEY_DR_PROGRESS);
+                        int time = data.getInt(KEY_DR_TIME);
+                        if (time <= 0) return;
+                        int percent = (progress * 100) / time;
+                        int remainingTicks = Math.max(0, time - progress);
+                        String remaining = formatTime(remainingTicks);
+                        tooltip.add(Component.translatable(
+                                "jade." + Reference.MODID + ".drying", stack.getHoverName(), percent, remaining));
+                    }
+
+                    @Override
+                    public ResourceLocation getUid() {
+                        return DRYING_RACK;
+                    }
+                },
+                BlockDryingRack.class);
+
+        registration.registerBlockComponent(
+                new IBlockComponentProvider() {
+                    @Override
+                    public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
+                        if (accessor.getBlockEntity() instanceof GraniteAnvilBlockEntity te) {
+                            appendItemInfo(tooltip, te.getItem(0), "input");
+                            appendItemInfo(tooltip, te.getItem(1), "output");
+                            if (!te.getItem(0).isEmpty()) {
+                                int remaining = Math.max(0, te.getTotalCrushAmount() - te.getCurrentCrushAmount());
+                                tooltip.add(Component.translatable(
+                                        "jade." + Reference.MODID + ".strikes_remaining", remaining));
+                            }
+                        }
+                    }
+
+                    @Override
+                    public ResourceLocation getUid() {
+                        return GRANITE_ANVIL;
+                    }
+                },
+                BlockGraniteAnvil.class);
+
+        registration.registerBlockComponent(
+                new IBlockComponentProvider() {
+                    @Override
+                    public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
+                        if (!(accessor.getBlockEntity() instanceof AnimalTrapBlockEntity te)) return;
+                        CompoundTag data = accessor.getServerData();
+
+                        for (int slot = 0; slot < AnimalTrapBlockEntity.INVENTORY_SIZE; slot++) {
+                            ItemStack stack = te.getItem(slot);
+                            String key = slot == AnimalTrapBlockEntity.BAIT_SLOT ? "input" : "output";
+                            appendItemInfo(tooltip, stack, key);
+                        }
+
+                        if (data.getBoolean(KEY_AT_HAS_ENTITY)) {
+                            Component entityName = Component.literal("?");
+                            String id = data.getString(KEY_AT_ENTITY_ID);
+                            if (!id.isEmpty()) {
+                                ResourceLocation rl = ResourceLocation.tryParse(id);
+                                if (rl != null) {
+                                    net.minecraft.world.entity.EntityType<?> type =
+                                            net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.get(rl);
+                                    if (type != null) entityName = Component.translatable(type.getDescriptionId());
+                                }
+                            }
+                            tooltip.add(Component.translatable("jade." + Reference.MODID + ".trap_caught", entityName));
+                            int nextDropTicks = Math.max(
+                                    0, AnimalTrapBlockEntity.DROP_INTERVAL_TICKS - data.getInt(KEY_AT_DROP_TIMER));
+                            tooltip.add(Component.translatable(
+                                    "jade." + Reference.MODID + ".trap_next_drop", formatTime(nextDropTicks)));
+                            return;
+                        }
+
+                        if (!data.getBoolean(KEY_AT_HAS_BAIT)) {
+                            tooltip.add(Component.translatable("jade." + Reference.MODID + ".trap_empty"));
+                            return;
+                        }
+
+                        int progress = data.getInt(KEY_AT_PROGRESS);
+                        int time = data.getInt(KEY_AT_TIME);
+                        if (time > 0 && progress < time) {
+                            int remaining = Math.max(0, time - progress);
+                            tooltip.add(Component.translatable(
+                                    "jade." + Reference.MODID + ".trap_progress", formatTime(remaining)));
+                        } else {
+                            tooltip.add(Component.translatable("jade." + Reference.MODID + ".trap_set"));
+                        }
+
+                        if (data.contains(KEY_AT_BIOME_OK) && !data.getBoolean(KEY_AT_BIOME_OK)) {
+                            tooltip.add(Component.translatable("jade." + Reference.MODID + ".trap_wrong_biome")
+                                    .withStyle(style -> style.withColor(0xFF5555)));
+                        }
+                        if (data.contains(KEY_AT_DIMENSION_OK) && !data.getBoolean(KEY_AT_DIMENSION_OK)) {
+                            tooltip.add(Component.translatable("jade." + Reference.MODID + ".trap_wrong_dimension")
+                                    .withStyle(style -> style.withColor(0xFF5555)));
+                        }
+                        if (data.contains(KEY_AT_WATER_OK) && !data.getBoolean(KEY_AT_WATER_OK)) {
+                            tooltip.add(Component.translatable("jade." + Reference.MODID + ".trap_needs_water")
+                                    .withStyle(style -> style.withColor(0xFF5555)));
+                        }
+                    }
+
+                    @Override
+                    public ResourceLocation getUid() {
+                        return ANIMAL_TRAP;
+                    }
+                },
+                BlockAnimalTrap.class);
     }
 
     private static String formatTime(int ticks) {
@@ -362,15 +394,15 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
 
     private static void appendItemInfo(ITooltip tooltip, ItemStack stack, String type) {
         if (!stack.isEmpty()) {
-            tooltip.add(Component.translatable("jade." + Reference.MODID + "." + type,
-                    stack.getHoverName(), stack.getCount()));
+            tooltip.add(Component.translatable(
+                    "jade." + Reference.MODID + "." + type, stack.getHoverName(), stack.getCount()));
         }
     }
 
     private static void appendFluidInfo(ITooltip tooltip, FluidStack fluid, int capacity, String key) {
         if (!fluid.isEmpty()) {
-            tooltip.add(Component.translatable("jade." + Reference.MODID + "." + key,
-                    fluid.getDisplayName(), fluid.getAmount(), capacity));
+            tooltip.add(Component.translatable(
+                    "jade." + Reference.MODID + "." + key, fluid.getDisplayName(), fluid.getAmount(), capacity));
         }
     }
 
@@ -386,8 +418,7 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
         if (te.hasWorker()) {
             String name = te.getWorkerDisplayName();
             if (name != null && !name.isEmpty()) {
-                tooltip.add(Component.translatable("jade." + Reference.MODID + ".worker",
-                        Component.literal(name)));
+                tooltip.add(Component.translatable("jade." + Reference.MODID + ".worker", Component.literal(name)));
             } else {
                 tooltip.add(Component.translatable("jade." + Reference.MODID + ".worker_attached"));
             }

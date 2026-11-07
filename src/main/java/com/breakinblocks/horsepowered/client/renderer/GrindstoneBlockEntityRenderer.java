@@ -23,8 +23,13 @@ public class GrindstoneBlockEntityRenderer implements BlockEntityRenderer<Grinds
     }
 
     @Override
-    public void render(GrindstoneBlockEntity blockEntity, float partialTick, PoseStack poseStack,
-                       MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
+    public void render(
+            GrindstoneBlockEntity blockEntity,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            int packedLight,
+            int packedOverlay) {
         WorkingAreaRenderer.renderIfActive(blockEntity, poseStack, bufferSource);
         GhostWorkerRenderer.render(blockEntity, partialTick, poseStack, bufferSource, packedLight);
         LeadRenderer.renderLead(blockEntity, partialTick, poseStack, bufferSource);
@@ -33,23 +38,56 @@ public class GrindstoneBlockEntityRenderer implements BlockEntityRenderer<Grinds
         ItemStack output = blockEntity.getItem(1);
         ItemStack secondary = blockEntity.getItem(2);
 
-        RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer,
-                input, 0.5, 1.1, 0.5, 0.5F, 0, packedLight, packedOverlay,
+        RenderUtils.renderFlatItem(
+                poseStack,
+                bufferSource,
+                itemRenderer,
+                input,
+                0.5,
+                1.1,
+                0.5,
+                0.5F,
+                0,
+                packedLight,
+                packedOverlay,
                 blockEntity.getLevel());
 
-        RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer,
-                output, 0.5, 0.3, 0.25, 0.3F, 0, packedLight, packedOverlay,
+        RenderUtils.renderFlatItem(
+                poseStack,
+                bufferSource,
+                itemRenderer,
+                output,
+                0.5,
+                0.3,
+                0.25,
+                0.3F,
+                0,
+                packedLight,
+                packedOverlay,
                 blockEntity.getLevel());
 
-        RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer,
-                secondary, 0.5, 0.3, 0.75, 0.3F, 0, packedLight, packedOverlay,
+        RenderUtils.renderFlatItem(
+                poseStack,
+                bufferSource,
+                itemRenderer,
+                secondary,
+                0.5,
+                0.3,
+                0.75,
+                0.3F,
+                0,
+                packedLight,
+                packedOverlay,
                 blockEntity.getLevel());
 
         if (RenderUtils.shouldShowItemCounts(blockEntity)) {
             double countY = RenderUtils.itemTop(itemRenderer, input, blockEntity.getLevel(), 1.1, 0.5F, false);
-            RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, input.getCount(), 0.5, countY, 0.5);
-            RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, output.getCount(), 0.5, GRINDER_TOP, 0.25);
-            RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, secondary.getCount(), 0.5, GRINDER_TOP, 0.75);
+            RenderUtils.renderItemCountBillboard(
+                    poseStack, bufferSource, font, packedLight, input.getCount(), 0.5, countY, 0.5);
+            RenderUtils.renderItemCountBillboard(
+                    poseStack, bufferSource, font, packedLight, output.getCount(), 0.5, GRINDER_TOP, 0.25);
+            RenderUtils.renderItemCountBillboard(
+                    poseStack, bufferSource, font, packedLight, secondary.getCount(), 0.5, GRINDER_TOP, 0.75);
         }
     }
 

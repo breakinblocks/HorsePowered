@@ -4,6 +4,7 @@ import com.breakinblocks.horsepowered.Configs;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.recipes.CrushingRecipe;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
+import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
@@ -13,8 +14,6 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-
-import java.util.Optional;
 
 public class GraniteAnvilBlockEntity extends HPBlockEntityBase {
 
@@ -52,8 +51,7 @@ public class GraniteAnvilBlockEntity extends HPBlockEntityBase {
         if (level == null) return false;
 
         SimpleContainer container = new SimpleContainer(stack);
-        return level.getRecipeManager()
-                .getAllRecipesFor(HPRecipes.CRUSHING_TYPE.get()).stream()
+        return level.getRecipeManager().getAllRecipesFor(HPRecipes.CRUSHING_TYPE.get()).stream()
                 .anyMatch(r -> r.matches(container, level));
     }
 
@@ -84,7 +82,8 @@ public class GraniteAnvilBlockEntity extends HPBlockEntityBase {
         if (!level.isClientSide) {
             ItemStack result = getRecipeOutput();
             if (Configs.graniteAnvilDrop.get()) {
-                Containers.dropItemStack(level, worldPosition.getX(), worldPosition.getY() + 0.5, worldPosition.getZ(), result.copy());
+                Containers.dropItemStack(
+                        level, worldPosition.getX(), worldPosition.getY() + 0.5, worldPosition.getZ(), result.copy());
             } else {
                 mergeOutput(1, result);
             }
@@ -108,8 +107,7 @@ public class GraniteAnvilBlockEntity extends HPBlockEntityBase {
     public Optional<CrushingRecipe> getRecipe() {
         if (level == null) return Optional.empty();
         SimpleContainer container = new SimpleContainer(getItem(0));
-        return level.getRecipeManager()
-                .getAllRecipesFor(HPRecipes.CRUSHING_TYPE.get()).stream()
+        return level.getRecipeManager().getAllRecipesFor(HPRecipes.CRUSHING_TYPE.get()).stream()
                 .filter(r -> r.matches(container, level))
                 .findFirst();
     }

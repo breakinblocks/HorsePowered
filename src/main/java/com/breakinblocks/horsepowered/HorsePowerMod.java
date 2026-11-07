@@ -1,8 +1,8 @@
 package com.breakinblocks.horsepowered;
 
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
-import com.breakinblocks.horsepowered.items.ModItems;
 import com.breakinblocks.horsepowered.compat.create.CreateCompat;
+import com.breakinblocks.horsepowered.items.ModItems;
 import com.breakinblocks.horsepowered.lib.Reference;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
 import com.mojang.logging.LogUtils;
@@ -31,8 +31,9 @@ public class HorsePowerMod {
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS =
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, Reference.MODID);
 
-    public static final RegistryObject<CreativeModeTab> CREATIVE_TAB = CREATIVE_MODE_TABS.register("main", () ->
-            CreativeModeTab.builder()
+    public static final RegistryObject<CreativeModeTab> CREATIVE_TAB = CREATIVE_MODE_TABS.register(
+            "main",
+            () -> CreativeModeTab.builder()
                     .title(Component.translatable("itemGroup." + Reference.MODID))
                     .icon(() -> new ItemStack(ModBlocks.HAND_GRINDSTONE.get()))
                     .displayItems((parameters, output) -> {
@@ -55,8 +56,7 @@ public class HorsePowerMod {
                             CreateCompat.addToCreativeTab(output);
                         }
                     })
-                    .build()
-    );
+                    .build());
 
     public HorsePowerMod() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();

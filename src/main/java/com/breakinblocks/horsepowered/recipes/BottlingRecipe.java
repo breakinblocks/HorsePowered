@@ -26,8 +26,7 @@ public class BottlingRecipe implements Recipe<Container> {
     private final ItemStack result;
     private final int priority;
 
-    public BottlingRecipe(ResourceLocation id, Ingredient container, FluidStack fluid,
-                          ItemStack result, int priority) {
+    public BottlingRecipe(ResourceLocation id, Ingredient container, FluidStack fluid, ItemStack result, int priority) {
         this.id = id;
         this.container = container;
         this.fluid = fluid;
@@ -123,9 +122,8 @@ public class BottlingRecipe implements Recipe<Container> {
             ResourceLocation fluidId = new ResourceLocation(GsonHelper.getAsString(fluidJson, "id"));
             Fluid fluidType = BuiltInRegistries.FLUID.get(fluidId);
             int amount = GsonHelper.getAsInt(fluidJson, "amount", 250);
-            FluidStack fluid = BuiltInRegistries.FLUID.containsKey(fluidId)
-                    ? new FluidStack(fluidType, amount)
-                    : FluidStack.EMPTY;
+            FluidStack fluid =
+                    BuiltInRegistries.FLUID.containsKey(fluidId) ? new FluidStack(fluidType, amount) : FluidStack.EMPTY;
 
             ItemStack result = CraftingHelper.getItemStack(GsonHelper.getAsJsonObject(json, "result"), true);
             int priority = GsonHelper.getAsInt(json, "priority", 0);

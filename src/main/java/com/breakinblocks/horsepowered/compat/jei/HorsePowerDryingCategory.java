@@ -34,7 +34,8 @@ public class HorsePowerDryingCategory implements IRecipeCategory<DryingRackRecip
 
     public HorsePowerDryingCategory(IGuiHelper guiHelper) {
         this.background = guiHelper.createBlankDrawable(WIDTH, HEIGHT);
-        this.icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(ModBlocks.DRYING_RACK.get()));
+        this.icon =
+                guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(ModBlocks.DRYING_RACK.get()));
         this.slot = guiHelper.getSlotDrawable();
         this.arrow = guiHelper.getRecipeArrow();
         this.title = Component.translatable("gui." + Reference.MODID + ".jei.drying");
@@ -72,11 +73,17 @@ public class HorsePowerDryingCategory implements IRecipeCategory<DryingRackRecip
     }
 
     @Override
-    public void draw(DryingRackRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+    public void draw(
+            DryingRackRecipe recipe,
+            IRecipeSlotsView recipeSlotsView,
+            GuiGraphics guiGraphics,
+            double mouseX,
+            double mouseY) {
         arrow.draw(guiGraphics, 26, 1);
 
         Font font = Minecraft.getInstance().font;
-        Component timeText = Component.translatable("gui." + Reference.MODID + ".jei.time", formatTime(recipe.getTime()));
+        Component timeText =
+                Component.translatable("gui." + Reference.MODID + ".jei.time", formatTime(recipe.getTime()));
         int textWidth = font.width(timeText);
         guiGraphics.drawString(font, timeText, (WIDTH - textWidth) / 2, 24, 0x808080, false);
     }

@@ -4,6 +4,7 @@ import com.breakinblocks.horsepowered.blocks.WorkerInteraction;
 import com.simibubi.create.content.kinetics.base.KineticBlock;
 import com.simibubi.create.content.kinetics.simpleRelays.ICogWheel;
 import com.simibubi.create.foundation.block.IBE;
+import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -23,13 +24,9 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-import java.util.List;
-
 public class HorseEngineBlock extends KineticBlock implements IBE<HorseEngineBlockEntity>, ICogWheel {
 
-    private static final VoxelShape SHAPE = Shapes.or(
-            Block.box(0, 0, 0, 16, 6, 16),
-            Block.box(2, 6, 2, 14, 16, 14));
+    private static final VoxelShape SHAPE = Shapes.or(Block.box(0, 0, 0, 16, 6, 16), Block.box(2, 6, 2, 14, 16, 14));
 
     public HorseEngineBlock(Properties properties) {
         super(properties);
@@ -51,8 +48,8 @@ public class HorseEngineBlock extends KineticBlock implements IBE<HorseEngineBlo
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand,
-                                 BlockHitResult hit) {
+    public InteractionResult use(
+            BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         HorseEngineBlockEntity engine = getBlockEntity(level, pos);
         if (engine == null) {
             return InteractionResult.PASS;
@@ -65,8 +62,8 @@ public class HorseEngineBlock extends KineticBlock implements IBE<HorseEngineBlo
             return InteractionResult.sidedSuccess(level.isClientSide);
         }
 
-        if (WorkerInteraction.tryAttachLeashed(level, pos, player, engine.getVirtualWorker(),
-                (p, mob) -> engine.onWorkerAttached(mob))) {
+        if (WorkerInteraction.tryAttachLeashed(
+                level, pos, player, engine.getVirtualWorker(), (p, mob) -> engine.onWorkerAttached(mob))) {
             return InteractionResult.sidedSuccess(level.isClientSide);
         }
 

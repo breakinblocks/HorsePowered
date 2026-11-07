@@ -3,6 +3,7 @@ package com.breakinblocks.horsepowered.compat.jei;
 import com.breakinblocks.horsepowered.Configs;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.recipes.CrushingRecipe;
+import java.util.List;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -21,8 +22,6 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 
-import java.util.List;
-
 public class HorsePowerCrushingCategory implements IRecipeCategory<CrushingRecipe> {
 
     private static final int WIDTH = 100;
@@ -37,7 +36,8 @@ public class HorsePowerCrushingCategory implements IRecipeCategory<CrushingRecip
 
     public HorsePowerCrushingCategory(IGuiHelper guiHelper) {
         this.background = guiHelper.createBlankDrawable(WIDTH, HEIGHT);
-        this.icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(ModBlocks.GRANITE_ANVIL.get()));
+        this.icon = guiHelper.createDrawableIngredient(
+                VanillaTypes.ITEM_STACK, new ItemStack(ModBlocks.GRANITE_ANVIL.get()));
         this.slot = guiHelper.getSlotDrawable();
         this.arrow = guiHelper.getRecipeArrow();
         this.title = Component.translatable("gui.horsepowered.jei.crushing");
@@ -85,7 +85,12 @@ public class HorsePowerCrushingCategory implements IRecipeCategory<CrushingRecip
     }
 
     @Override
-    public void draw(CrushingRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+    public void draw(
+            CrushingRecipe recipe,
+            IRecipeSlotsView recipeSlotsView,
+            GuiGraphics guiGraphics,
+            double mouseX,
+            double mouseY) {
         arrow.draw(guiGraphics, 38, 26);
 
         Font font = Minecraft.getInstance().font;
@@ -95,8 +100,8 @@ public class HorsePowerCrushingCategory implements IRecipeCategory<CrushingRecip
         guiGraphics.drawString(font, strikeText, (WIDTH - strikeWidth) / 2, 48, 0x808080, false);
 
         if (recipe.getHungerCost() > 0.0F) {
-            Component hungerText = Component.translatable("gui.horsepowered.jei.hunger",
-                    String.format("%.2f", recipe.getHungerCost()));
+            Component hungerText = Component.translatable(
+                    "gui.horsepowered.jei.hunger", String.format("%.2f", recipe.getHungerCost()));
             int hungerWidth = font.width(hungerText);
             guiGraphics.drawString(font, hungerText, (WIDTH - hungerWidth) / 2, 58, 0x808080, false);
         }

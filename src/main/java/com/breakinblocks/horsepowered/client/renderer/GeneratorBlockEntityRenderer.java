@@ -8,12 +8,16 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 
 public class GeneratorBlockEntityRenderer implements BlockEntityRenderer<GeneratorBlockEntity> {
 
-    public GeneratorBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
-    }
+    public GeneratorBlockEntityRenderer(BlockEntityRendererProvider.Context context) {}
 
     @Override
-    public void render(GeneratorBlockEntity blockEntity, float partialTick, PoseStack poseStack,
-                       MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
+    public void render(
+            GeneratorBlockEntity blockEntity,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            int packedLight,
+            int packedOverlay) {
         WorkingAreaRenderer.renderIfActive(blockEntity, poseStack, bufferSource);
         GhostWorkerRenderer.render(blockEntity, partialTick, poseStack, bufferSource, packedLight);
         LeadRenderer.renderLead(blockEntity, partialTick, poseStack, bufferSource);

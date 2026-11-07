@@ -4,14 +4,13 @@ import com.breakinblocks.horsepowered.Configs;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.recipes.GrindstoneRecipe;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
+import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-
-import java.util.Optional;
 
 public class HandGrindstoneBlockEntity extends HPBlockEntityBase {
 
@@ -73,8 +72,7 @@ public class HandGrindstoneBlockEntity extends HPBlockEntityBase {
     public Optional<GrindstoneRecipe> getRecipe() {
         if (level == null) return Optional.empty();
         SimpleContainer container = new SimpleContainer(getItem(0));
-        return level.getRecipeManager()
-                .getAllRecipesFor(HPRecipes.GRINDING_TYPE.get()).stream()
+        return level.getRecipeManager().getAllRecipesFor(HPRecipes.GRINDING_TYPE.get()).stream()
                 .filter(r -> r.getTier().allowsHand())
                 .filter(r -> r.matches(container, level))
                 .findFirst();
@@ -118,8 +116,7 @@ public class HandGrindstoneBlockEntity extends HPBlockEntityBase {
         if (level == null) return false;
 
         SimpleContainer container = new SimpleContainer(stack);
-        return level.getRecipeManager()
-                .getAllRecipesFor(HPRecipes.GRINDING_TYPE.get()).stream()
+        return level.getRecipeManager().getAllRecipesFor(HPRecipes.GRINDING_TYPE.get()).stream()
                 .filter(r -> r.getTier().allowsHand())
                 .anyMatch(r -> r.matches(container, level));
     }

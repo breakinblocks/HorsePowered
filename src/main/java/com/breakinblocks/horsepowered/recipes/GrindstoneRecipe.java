@@ -27,7 +27,16 @@ public class GrindstoneRecipe implements Recipe<Container> {
     private final int priority;
     private final float hungerCost;
 
-    public GrindstoneRecipe(ResourceLocation id, Ingredient ingredient, ItemStack result, ItemStack secondary, int secondaryChance, int time, RecipeTier tier, int priority, float hungerCost) {
+    public GrindstoneRecipe(
+            ResourceLocation id,
+            Ingredient ingredient,
+            ItemStack result,
+            ItemStack secondary,
+            int secondaryChance,
+            int time,
+            RecipeTier tier,
+            int priority,
+            float hungerCost) {
         this.id = id;
         this.ingredient = ingredient;
         this.result = result;
@@ -121,14 +130,15 @@ public class GrindstoneRecipe implements Recipe<Container> {
             Ingredient ingredient = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "ingredient"));
             ItemStack result = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "result"));
             ItemStack secondary = json.has("secondary")
-                ? ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "secondary"))
-                : ItemStack.EMPTY;
+                    ? ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "secondary"))
+                    : ItemStack.EMPTY;
             int secondaryChance = GsonHelper.getAsInt(json, "secondaryChance", 0);
             int time = GsonHelper.getAsInt(json, "time");
             RecipeTier tier = RecipeTier.fromString(GsonHelper.getAsString(json, "tier", "any"));
             int priority = GsonHelper.getAsInt(json, "priority", 0);
             float hungerCost = GsonHelper.getAsFloat(json, "hungerCost", 0.0F);
-            return new GrindstoneRecipe(recipeId, ingredient, result, secondary, secondaryChance, time, tier, priority, hungerCost);
+            return new GrindstoneRecipe(
+                    recipeId, ingredient, result, secondary, secondaryChance, time, tier, priority, hungerCost);
         }
 
         @Override
@@ -141,7 +151,8 @@ public class GrindstoneRecipe implements Recipe<Container> {
             RecipeTier tier = buffer.readEnum(RecipeTier.class);
             int priority = buffer.readInt();
             float hungerCost = buffer.readFloat();
-            return new GrindstoneRecipe(recipeId, ingredient, result, secondary, secondaryChance, time, tier, priority, hungerCost);
+            return new GrindstoneRecipe(
+                    recipeId, ingredient, result, secondary, secondaryChance, time, tier, priority, hungerCost);
         }
 
         @Override

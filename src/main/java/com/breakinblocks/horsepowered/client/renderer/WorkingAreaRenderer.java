@@ -8,6 +8,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import java.util.List;
+import java.util.Map;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -15,9 +17,6 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.AABB;
 import org.joml.Matrix4f;
-
-import java.util.List;
-import java.util.Map;
 
 public class WorkingAreaRenderer {
 
@@ -29,7 +28,8 @@ public class WorkingAreaRenderer {
 
     public static void render(WorkerHost blockEntity, PoseStack poseStack, MultiBufferSource bufferSource) {
         BlockPos blockPos = blockEntity.getBlockPos();
-        List<Map.Entry<BlockPos, Boolean>> positions = blockEntity.getVirtualWorker().getWorkingAreaPositions();
+        List<Map.Entry<BlockPos, Boolean>> positions =
+                blockEntity.getVirtualWorker().getWorkingAreaPositions();
 
         if (positions.isEmpty()) {
             return;
@@ -41,7 +41,8 @@ public class WorkingAreaRenderer {
 
     // Uses raw Tesselator rather than RenderType so the faces stay additive/transparent — RenderType.translucent
     // would respect depth-sort and occlude against itself when boxes overlap.
-    private static void renderFilledBoxes(List<Map.Entry<BlockPos, Boolean>> positions, BlockPos blockPos, PoseStack poseStack) {
+    private static void renderFilledBoxes(
+            List<Map.Entry<BlockPos, Boolean>> positions, BlockPos blockPos, PoseStack poseStack) {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.disableCull();
@@ -77,8 +78,11 @@ public class WorkingAreaRenderer {
         RenderSystem.disableBlend();
     }
 
-    private static void renderWireframes(List<Map.Entry<BlockPos, Boolean>> positions, BlockPos blockPos,
-                                          PoseStack poseStack, MultiBufferSource bufferSource) {
+    private static void renderWireframes(
+            List<Map.Entry<BlockPos, Boolean>> positions,
+            BlockPos blockPos,
+            PoseStack poseStack,
+            MultiBufferSource bufferSource) {
         VertexConsumer lineConsumer = bufferSource.getBuffer(RenderType.lines());
 
         for (Map.Entry<BlockPos, Boolean> entry : positions) {
@@ -97,10 +101,19 @@ public class WorkingAreaRenderer {
         }
     }
 
-    private static void renderFilledBox(BufferBuilder buffer, Matrix4f matrix,
-                                         float x1, float y1, float z1,
-                                         float x2, float y2, float z2,
-                                         int r, int g, int b, int a) {
+    private static void renderFilledBox(
+            BufferBuilder buffer,
+            Matrix4f matrix,
+            float x1,
+            float y1,
+            float z1,
+            float x2,
+            float y2,
+            float z2,
+            int r,
+            int g,
+            int b,
+            int a) {
         buffer.vertex(matrix, x1, y1, z1).color(r, g, b, a).endVertex();
         buffer.vertex(matrix, x2, y1, z1).color(r, g, b, a).endVertex();
         buffer.vertex(matrix, x2, y1, z2).color(r, g, b, a).endVertex();

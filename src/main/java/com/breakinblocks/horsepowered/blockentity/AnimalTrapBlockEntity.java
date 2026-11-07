@@ -3,6 +3,10 @@ package com.breakinblocks.horsepowered.blockentity;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
 import com.breakinblocks.horsepowered.recipes.TrappingRecipe;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -28,19 +32,14 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.ForgeEventFactory;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
-
 public class AnimalTrapBlockEntity extends HPBlockEntityBase {
 
     public static final int INVENTORY_SIZE = 6;
     public static final int BAIT_SLOT = 0;
     public static final int FIRST_DROP_SLOT = 1;
     public static final int LAST_DROP_SLOT = 5;
-    private static final int[] DROP_SLOTS = { 1, 2, 3, 4, 5 };
-    private static final int[] BAIT_ONLY = { 0 };
+    private static final int[] DROP_SLOTS = {1, 2, 3, 4, 5};
+    private static final int[] BAIT_ONLY = {0};
 
     public static final int DROP_INTERVAL_TICKS = 3000;
     public static final int CATCH_ROLL_INTERVAL_TICKS = 20;
@@ -52,15 +51,19 @@ public class AnimalTrapBlockEntity extends HPBlockEntityBase {
 
     @Nullable
     private CompoundTag capturedEntityTag;
+
     @Nullable
     private ResourceLocation capturedEntityTypeId;
+
     @Nullable
     private EntityType<?> capturedEntityType;
 
     private double spin;
     private double oSpin;
+
     @Nullable
     private Entity displayEntity;
+
     @Nullable
     private CompoundTag displayEntitySourceTag;
 
@@ -68,20 +71,49 @@ public class AnimalTrapBlockEntity extends HPBlockEntityBase {
         super(ModBlocks.ANIMAL_TRAP_BE.get(), pos, state, INVENTORY_SIZE);
     }
 
-    public int getTrapProgress() { return trapProgress; }
-    public int getTrapTime() { return trapTime; }
-    public int getDropTimer() { return dropTimer; }
-    public boolean hasCapturedEntity() { return capturedEntityTag != null; }
-    @Nullable public EntityType<?> getCapturedEntityType() { return capturedEntityType; }
-    @Nullable public CompoundTag getCapturedEntityTag() { return capturedEntityTag == null ? null : capturedEntityTag.copy(); }
-    public double getSpin() { return spin; }
-    public double getOSpin() { return oSpin; }
+    public int getTrapProgress() {
+        return trapProgress;
+    }
+
+    public int getTrapTime() {
+        return trapTime;
+    }
+
+    public int getDropTimer() {
+        return dropTimer;
+    }
+
+    public boolean hasCapturedEntity() {
+        return capturedEntityTag != null;
+    }
+
+    @Nullable
+    public EntityType<?> getCapturedEntityType() {
+        return capturedEntityType;
+    }
+
+    @Nullable
+    public CompoundTag getCapturedEntityTag() {
+        return capturedEntityTag == null ? null : capturedEntityTag.copy();
+    }
+
+    public double getSpin() {
+        return spin;
+    }
+
+    public double getOSpin() {
+        return oSpin;
+    }
 
     @Override
-    public int getInventoryStackLimit() { return 64; }
+    public int getInventoryStackLimit() {
+        return 64;
+    }
 
     @Override
-    public int getOutputSlot() { return 1; }
+    public int getOutputSlot() {
+        return 1;
+    }
 
     @Override
     public boolean isItemValidForSlot(int index, ItemStack stack) {
@@ -122,8 +154,7 @@ public class AnimalTrapBlockEntity extends HPBlockEntityBase {
 
     private List<TrappingRecipe> matchingRecipes(ItemStack stack) {
         SimpleContainer container = new SimpleContainer(stack);
-        return level.getRecipeManager()
-                .getAllRecipesFor(HPRecipes.TRAPPING_TYPE.get()).stream()
+        return level.getRecipeManager().getAllRecipesFor(HPRecipes.TRAPPING_TYPE.get()).stream()
                 .filter(r -> r.matches(container, level))
                 .sorted(Comparator.comparingInt(TrappingRecipe::getPriority))
                 .toList();
@@ -139,8 +170,7 @@ public class AnimalTrapBlockEntity extends HPBlockEntityBase {
     private boolean capturedEntityRequiresBait() {
         if (level == null || capturedEntityTypeId == null) return false;
         try {
-            return level.getRecipeManager()
-                    .getAllRecipesFor(HPRecipes.TRAPPING_TYPE.get()).stream()
+            return level.getRecipeManager().getAllRecipesFor(HPRecipes.TRAPPING_TYPE.get()).stream()
                     .anyMatch(r -> capturedEntityTypeId.equals(r.getEntityId()) && r.isBaitConsumed());
         } catch (Exception e) {
             return false;
@@ -224,12 +254,11 @@ public class AnimalTrapBlockEntity extends HPBlockEntityBase {
     public static void clientTick(Level level, BlockPos pos, BlockState state, AnimalTrapBlockEntity be) {
         if (!level.isClientSide) return;
         be.oSpin = be.spin;
-        boolean hasDisplay = be.capturedEntityTag != null || !be.getItem(BAIT_SLOT).isEmpty();
+        boolean hasDisplay =
+                be.capturedEntityTag != null || !be.getItem(BAIT_SLOT).isEmpty();
         if (!hasDisplay) return;
         double remaining = Math.max(0, be.trapTime - be.trapProgress);
-        double accel = be.capturedEntityTag != null
-                ? 1000.0 / 200.0
-                : 1000.0 / (200.0 + remaining);
+        double accel = be.capturedEntityTag != null ? 1000.0 / 200.0 : 1000.0 / (200.0 + remaining);
         be.spin = (be.spin + accel) % 360.0;
     }
 
@@ -243,8 +272,8 @@ public class AnimalTrapBlockEntity extends HPBlockEntityBase {
         // Initialize new catches once, before their state is saved for display, loot, and release.
         proto.moveTo(worldPosition.getX() + 0.5, worldPosition.getY(), worldPosition.getZ() + 0.5);
         if (proto instanceof Mob mob) {
-            ForgeEventFactory.onFinalizeSpawn(mob, sl, sl.getCurrentDifficultyAt(worldPosition),
-                    MobSpawnType.MOB_SUMMONED, null, null);
+            ForgeEventFactory.onFinalizeSpawn(
+                    mob, sl, sl.getCurrentDifficultyAt(worldPosition), MobSpawnType.MOB_SUMMONED, null, null);
             // The prototype is stored instead of added to the world, so honor cancellation here.
             if (mob.isSpawnCancelled()) return;
         }
@@ -284,7 +313,8 @@ public class AnimalTrapBlockEntity extends HPBlockEntityBase {
         LootParams params = new LootParams.Builder(sl)
                 .withParameter(LootContextParams.THIS_ENTITY, living)
                 .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(worldPosition))
-                .withParameter(LootContextParams.DAMAGE_SOURCE, sl.damageSources().generic())
+                .withParameter(
+                        LootContextParams.DAMAGE_SOURCE, sl.damageSources().generic())
                 .create(LootContextParamSets.ENTITY);
         table.getRandomItems(params, this::depositDrop);
         living.discard();
@@ -326,7 +356,8 @@ public class AnimalTrapBlockEntity extends HPBlockEntityBase {
         for (int slot = 0; slot < INVENTORY_SIZE; slot++) {
             ItemStack stack = getItem(slot);
             if (!stack.isEmpty()) {
-                Containers.dropItemStack(level,
+                Containers.dropItemStack(
+                        level,
                         worldPosition.getX() + 0.5,
                         worldPosition.getY() + 0.5,
                         worldPosition.getZ() + 0.5,
@@ -354,11 +385,7 @@ public class AnimalTrapBlockEntity extends HPBlockEntityBase {
         }
 
         float yaw = sl.getRandom().nextFloat() * 360F;
-        entity.moveTo(
-                worldPosition.getX() + 0.5,
-                worldPosition.getY() + 1.0,
-                worldPosition.getZ() + 0.5,
-                yaw, 0F);
+        entity.moveTo(worldPosition.getX() + 0.5, worldPosition.getY() + 1.0, worldPosition.getZ() + 0.5, yaw, 0F);
         sl.addFreshEntity(entity);
 
         capturedEntityTag = null;

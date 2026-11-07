@@ -39,12 +39,12 @@ public class ClientHandler {
 
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
-        event.enqueueWork(() ->
-                ItemProperties.register(ModItems.WORK_SADDLE.get(),
-                        new ResourceLocation(Reference.MODID, "carrying"),
-                        (stack, level, entity, seed) -> {
-                            CompoundTag tag = stack.getTag();
-                            return (tag != null && tag.contains("CarriedEntity")) ? 1.0F : 0.0F;
-                        }));
+        event.enqueueWork(() -> ItemProperties.register(
+                ModItems.WORK_SADDLE.get(),
+                new ResourceLocation(Reference.MODID, "carrying"),
+                (stack, level, entity, seed) -> {
+                    CompoundTag tag = stack.getTag();
+                    return (tag != null && tag.contains("CarriedEntity")) ? 1.0F : 0.0F;
+                }));
     }
 }

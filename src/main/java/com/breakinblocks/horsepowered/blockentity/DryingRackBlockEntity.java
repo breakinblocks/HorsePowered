@@ -5,6 +5,8 @@ import com.breakinblocks.horsepowered.blocks.DryingRackPart;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.recipes.DryingRackRecipe;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
+import java.util.Optional;
+import java.util.function.Consumer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
@@ -26,9 +28,6 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Optional;
-import java.util.function.Consumer;
 
 public class DryingRackBlockEntity extends BlockEntity {
 
@@ -133,7 +132,9 @@ public class DryingRackBlockEntity extends BlockEntity {
             if (be.progress[slot] >= time) {
                 Optional<DryingRackRecipe> recipe = be.findRecipe(be.items.get(slot));
                 if (recipe.isPresent()) {
-                    be.items.set(slot, recipe.get().assemble(new SimpleContainer(be.items.get(slot)), level.registryAccess()));
+                    be.items.set(
+                            slot,
+                            recipe.get().assemble(new SimpleContainer(be.items.get(slot)), level.registryAccess()));
                     be.progress[slot] = FINISHED;
                     be.recipeTime[slot] = 0;
                     dirty = true;
@@ -212,15 +213,22 @@ public class DryingRackBlockEntity extends BlockEntity {
         maxX = Math.max(maxX, rightDir.getStepX());
         minZ = Math.min(minZ, rightDir.getStepZ());
         maxZ = Math.max(maxZ, rightDir.getStepZ());
-        return new AABB(pos.getX() + minX, pos.getY(), pos.getZ() + minZ,
-                pos.getX() + maxX + 1, pos.getY() + 1, pos.getZ() + maxZ + 1);
+        return new AABB(
+                pos.getX() + minX,
+                pos.getY(),
+                pos.getZ() + minZ,
+                pos.getX() + maxX + 1,
+                pos.getY() + 1,
+                pos.getZ() + maxZ + 1);
     }
 
     @Override
     public <T> @NotNull LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
         if (cap == ForgeCapabilities.ITEM_HANDLER) {
             BlockState state = getBlockState();
-            if (state.hasProperty(BlockDryingRack.PART) && state.getValue(BlockDryingRack.PART) != DryingRackPart.MAIN && level != null) {
+            if (state.hasProperty(BlockDryingRack.PART)
+                    && state.getValue(BlockDryingRack.PART) != DryingRackPart.MAIN
+                    && level != null) {
                 BlockPos mainPos = BlockDryingRack.getMainPos(state, worldPosition);
                 BlockEntity mainBe = level.getBlockEntity(mainPos);
                 if (mainBe instanceof DryingRackBlockEntity main && main != this) {

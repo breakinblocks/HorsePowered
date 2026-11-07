@@ -1,7 +1,7 @@
 package com.breakinblocks.horsepowered.client.renderer;
 
-import com.breakinblocks.horsepowered.blocks.BlockChopper;
 import com.breakinblocks.horsepowered.blockentity.ChopperBlockEntity;
+import com.breakinblocks.horsepowered.blocks.BlockChopper;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
@@ -34,8 +34,13 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
     }
 
     @Override
-    public void render(ChopperBlockEntity blockEntity, float partialTick, PoseStack poseStack,
-                       MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
+    public void render(
+            ChopperBlockEntity blockEntity,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            int packedLight,
+            int packedOverlay) {
         BlockState state = blockEntity.getBlockState();
         // On the frame after removal the state can already be AIR (no FACING property); skipping avoids
         // a missing-texture particle burst from getValue throwing.
@@ -57,25 +62,52 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
         ItemStack output = blockEntity.getItem(1);
         Level level = blockEntity.getLevel();
 
-        RenderUtils.renderStandingItem(poseStack, bufferSource, itemRenderer,
-                input, 0.5, 0.71, 0.5, 0.6F, rotation, packedLight, packedOverlay,
+        RenderUtils.renderStandingItem(
+                poseStack,
+                bufferSource,
+                itemRenderer,
+                input,
+                0.5,
+                0.71,
+                0.5,
+                0.6F,
+                rotation,
+                packedLight,
+                packedOverlay,
                 level);
 
-        RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer,
-                output, 0.5, 0.3, 0.5, 0.4F, rotation + 45, packedLight, packedOverlay,
+        RenderUtils.renderFlatItem(
+                poseStack,
+                bufferSource,
+                itemRenderer,
+                output,
+                0.5,
+                0.3,
+                0.5,
+                0.4F,
+                rotation + 45,
+                packedLight,
+                packedOverlay,
                 level);
 
         if (RenderUtils.shouldShowItemCounts(blockEntity)) {
             double countY = input.isEmpty()
                     ? Math.max(RenderUtils.itemTop(itemRenderer, output, level, 0.3, 0.4F, false), BASE_TOP)
                     : RenderUtils.itemTop(itemRenderer, input, level, 0.71, 0.6F, true);
-            countY = RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, input.getCount(), 0.5, countY, 0.5);
-            RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, output.getCount(), 0.5, countY, 0.5);
+            countY = RenderUtils.renderItemCountBillboard(
+                    poseStack, bufferSource, font, packedLight, input.getCount(), 0.5, countY, 0.5);
+            RenderUtils.renderItemCountBillboard(
+                    poseStack, bufferSource, font, packedLight, output.getCount(), 0.5, countY, 0.5);
         }
     }
 
-    private void renderBlade(ChopperBlockEntity blockEntity, PoseStack poseStack,
-                             MultiBufferSource bufferSource, int packedLight, int packedOverlay, float rotation) {
+    private void renderBlade(
+            ChopperBlockEntity blockEntity,
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            int packedLight,
+            int packedOverlay,
+            float rotation) {
         // visualWindup is -0.74 (fully wound down) .. 0 (raised); map to [BLADE_MIN_Y..BLADE_MAX_Y].
         float visualWindup = blockEntity.getVisualWindup();
         float bladeTravel = BLADE_MAX_Y - BLADE_MIN_Y;
@@ -103,9 +135,17 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
         float bladeMinZ = 0.5F - (bladeThickness / 2);
         float bladeMaxZ = 0.5F + (bladeThickness / 2);
 
-        RenderUtils.renderTexturedBox(poseStack, builder, sprite, packedLight,
-                bladeMinX, bladeY, bladeMinZ,
-                bladeMaxX, bladeY + bladeHeight, bladeMaxZ);
+        RenderUtils.renderTexturedBox(
+                poseStack,
+                builder,
+                sprite,
+                packedLight,
+                bladeMinX,
+                bladeY,
+                bladeMinZ,
+                bladeMaxX,
+                bladeY + bladeHeight,
+                bladeMaxZ);
 
         poseStack.popPose();
     }

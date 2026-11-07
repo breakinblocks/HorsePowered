@@ -8,10 +8,10 @@ import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.network.chat.Component;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -25,24 +25,25 @@ public final class RenderUtils {
     private static final float COUNT_SCALE = 0.025F;
     private static final double COUNT_GAP = 0.03D;
 
-    private RenderUtils() {
-    }
+    private RenderUtils() {}
 
     public static boolean shouldShowItemCounts(BlockEntity blockEntity) {
         if (!Configs.renderItemAmount.get()) return false;
         if (!Configs.mustLookAtBlock.get()) return true;
-        if (!(Minecraft.getInstance().hitResult instanceof BlockHitResult hit) || hit.getType() != HitResult.Type.BLOCK) {
+        if (!(Minecraft.getInstance().hitResult instanceof BlockHitResult hit)
+                || hit.getType() != HitResult.Type.BLOCK) {
             return false;
         }
         BlockPos pos = hit.getBlockPos();
         if (pos.equals(blockEntity.getBlockPos())) return true;
         Level level = blockEntity.getLevel();
-        return level != null && level.getBlockEntity(pos) instanceof FillerBlockEntity filler
+        return level != null
+                && level.getBlockEntity(pos) instanceof FillerBlockEntity filler
                 && filler.getFilledTileEntity() == blockEntity;
     }
 
-    public static double itemTop(ItemRenderer itemRenderer, ItemStack stack, Level level,
-                                 double y, float scale, boolean standing) {
+    public static double itemTop(
+            ItemRenderer itemRenderer, ItemStack stack, Level level, double y, float scale, boolean standing) {
         if (stack.isEmpty()) return y;
         double halfHeight;
         if (itemRenderer.getModel(stack, level, null, 0).isGui3d()) {
@@ -53,8 +54,15 @@ public final class RenderUtils {
         return y + halfHeight * scale;
     }
 
-    public static double renderItemCountBillboard(PoseStack poseStack, MultiBufferSource bufferSource, Font font,
-                                                  int packedLight, int count, double x, double y, double z) {
+    public static double renderItemCountBillboard(
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            Font font,
+            int packedLight,
+            int count,
+            double x,
+            double y,
+            double z) {
         if (count <= 1) return y;
 
         poseStack.pushPose();
@@ -69,17 +77,35 @@ public final class RenderUtils {
         Matrix4f matrix = poseStack.last().pose();
 
         int background = (int) (Minecraft.getInstance().options.getBackgroundOpacity(0.25F) * 255.0F) << 24;
-        font.drawInBatch(text, textX, -font.lineHeight, -1, false, matrix, bufferSource,
-                Font.DisplayMode.NORMAL, background, packedLight);
+        font.drawInBatch(
+                text,
+                textX,
+                -font.lineHeight,
+                -1,
+                false,
+                matrix,
+                bufferSource,
+                Font.DisplayMode.NORMAL,
+                background,
+                packedLight);
 
         poseStack.popPose();
         return y + COUNT_GAP + (font.lineHeight + 1) * COUNT_SCALE;
     }
 
-    public static void renderFlatItem(PoseStack poseStack, MultiBufferSource bufferSource,
-                                       ItemRenderer itemRenderer, ItemStack stack,
-                                       double x, double y, double z, float scale, float yRotation,
-                                       int packedLight, int packedOverlay, Level level) {
+    public static void renderFlatItem(
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            ItemRenderer itemRenderer,
+            ItemStack stack,
+            double x,
+            double y,
+            double z,
+            float scale,
+            float yRotation,
+            int packedLight,
+            int packedOverlay,
+            Level level) {
         if (stack.isEmpty()) return;
 
         poseStack.pushPose();
@@ -90,16 +116,26 @@ public final class RenderUtils {
         }
         poseStack.mulPose(Axis.XP.rotationDegrees(90));
 
-        itemRenderer.renderStatic(stack, ItemDisplayContext.FIXED, packedLight, packedOverlay,
-                poseStack, bufferSource, level, 0);
+        itemRenderer.renderStatic(
+                stack, ItemDisplayContext.FIXED, packedLight, packedOverlay, poseStack, bufferSource, level, 0);
 
         poseStack.popPose();
     }
 
-    public static void renderFlatItemFading(PoseStack poseStack, MultiBufferSource bufferSource,
-                                            ItemRenderer itemRenderer, ItemStack stack,
-                                            double x, double y, double z, float scale, float yRotation,
-                                            int packedLight, int packedOverlay, Level level, float alpha) {
+    public static void renderFlatItemFading(
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            ItemRenderer itemRenderer,
+            ItemStack stack,
+            double x,
+            double y,
+            double z,
+            float scale,
+            float yRotation,
+            int packedLight,
+            int packedOverlay,
+            Level level,
+            float alpha) {
         if (stack.isEmpty() || alpha <= 0F) return;
 
         poseStack.pushPose();
@@ -111,16 +147,25 @@ public final class RenderUtils {
         poseStack.mulPose(Axis.XP.rotationDegrees(90));
 
         MultiBufferSource alphaSource = new TransparentMultiBufferSource(bufferSource, alpha);
-        itemRenderer.renderStatic(stack, ItemDisplayContext.FIXED, packedLight, packedOverlay,
-                poseStack, alphaSource, level, 0);
+        itemRenderer.renderStatic(
+                stack, ItemDisplayContext.FIXED, packedLight, packedOverlay, poseStack, alphaSource, level, 0);
 
         poseStack.popPose();
     }
 
-    public static void renderStandingItem(PoseStack poseStack, MultiBufferSource bufferSource,
-                                           ItemRenderer itemRenderer, ItemStack stack,
-                                           double x, double y, double z, float scale, float yRotation,
-                                           int packedLight, int packedOverlay, Level level) {
+    public static void renderStandingItem(
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            ItemRenderer itemRenderer,
+            ItemStack stack,
+            double x,
+            double y,
+            double z,
+            float scale,
+            float yRotation,
+            int packedLight,
+            int packedOverlay,
+            Level level) {
         if (stack.isEmpty()) return;
 
         poseStack.pushPose();
@@ -130,15 +175,24 @@ public final class RenderUtils {
             poseStack.mulPose(Axis.YP.rotationDegrees(yRotation));
         }
 
-        itemRenderer.renderStatic(stack, ItemDisplayContext.FIXED, packedLight, packedOverlay,
-                poseStack, bufferSource, level, 0);
+        itemRenderer.renderStatic(
+                stack, ItemDisplayContext.FIXED, packedLight, packedOverlay, poseStack, bufferSource, level, 0);
 
         poseStack.popPose();
     }
 
-    public static void addVertex(VertexConsumer builder, Matrix4f pose,
-                                 float x, float y, float z, float u, float v,
-                                 float nx, float ny, float nz, int packedLight) {
+    public static void addVertex(
+            VertexConsumer builder,
+            Matrix4f pose,
+            float x,
+            float y,
+            float z,
+            float u,
+            float v,
+            float nx,
+            float ny,
+            float nz,
+            int packedLight) {
         builder.vertex(pose, x, y, z)
                 .color(255, 255, 255, 255)
                 .uv(u, v)
@@ -147,9 +201,17 @@ public final class RenderUtils {
                 .endVertex();
     }
 
-    public static void renderTexturedBox(PoseStack poseStack, VertexConsumer builder, TextureAtlasSprite sprite,
-                                         int packedLight, float minX, float minY, float minZ,
-                                         float maxX, float maxY, float maxZ) {
+    public static void renderTexturedBox(
+            PoseStack poseStack,
+            VertexConsumer builder,
+            TextureAtlasSprite sprite,
+            int packedLight,
+            float minX,
+            float minY,
+            float minZ,
+            float maxX,
+            float maxY,
+            float maxZ) {
         Matrix4f pose = poseStack.last().pose();
 
         float u0 = sprite.getU0();

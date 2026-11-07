@@ -41,19 +41,22 @@ public class BlockGraniteAnvil extends BlockHPBase {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    public InteractionResult use(
+            BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         BlockEntity be = level.getBlockEntity(pos);
         if (be instanceof GraniteAnvilBlockEntity anvil) {
             ItemStack held = player.getItemInHand(hand);
 
             if (held.is(ItemTags.PICKAXES) && held.isCorrectToolForDrops(state) && anvil.canWork()) {
                 if (!level.isClientSide) {
-                    float recipeHunger = anvil.getRecipe().map(CrushingRecipe::getHungerCost).orElse(0.0F);
+                    float recipeHunger =
+                            anvil.getRecipe().map(CrushingRecipe::getHungerCost).orElse(0.0F);
                     anvil.crush(player, held);
                     if (Configs.shouldDamageGraniteAnvilPickaxe.get()) {
                         held.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(hand));
                     }
-                    player.causeFoodExhaustion(Configs.graniteAnvilExhaustion.get().floatValue() + recipeHunger);
+                    player.causeFoodExhaustion(
+                            Configs.graniteAnvilExhaustion.get().floatValue() + recipeHunger);
                     playStrikeFeedback(level, pos);
                 }
                 return InteractionResult.sidedSuccess(level.isClientSide);
@@ -79,8 +82,14 @@ public class BlockGraniteAnvil extends BlockHPBase {
         if (level instanceof ServerLevel serverLevel) {
             serverLevel.sendParticles(
                     new BlockParticleOption(ParticleTypes.BLOCK, Blocks.STONE.defaultBlockState()),
-                    pos.getX() + 0.5, pos.getY() + 0.6, pos.getZ() + 0.5,
-                    6, 0.2, 0.05, 0.2, 0.0);
+                    pos.getX() + 0.5,
+                    pos.getY() + 0.6,
+                    pos.getZ() + 0.5,
+                    6,
+                    0.2,
+                    0.05,
+                    0.2,
+                    0.0);
         }
     }
 
@@ -90,14 +99,19 @@ public class BlockGraniteAnvil extends BlockHPBase {
         if (level instanceof ServerLevel serverLevel) {
             serverLevel.sendParticles(
                     new BlockParticleOption(ParticleTypes.BLOCK, Blocks.STONE.defaultBlockState()),
-                    pos.getX() + 0.5, pos.getY() + 0.6, pos.getZ() + 0.5,
-                    8, 0.25, 0.1, 0.25, 0.0);
+                    pos.getX() + 0.5,
+                    pos.getY() + 0.6,
+                    pos.getZ() + 0.5,
+                    8,
+                    0.25,
+                    0.1,
+                    0.25,
+                    0.0);
         }
     }
 
     @Override
-    public void emptiedOutput(Level level, BlockPos pos) {
-    }
+    public void emptiedOutput(Level level, BlockPos pos) {}
 
     @Nullable
     @Override
@@ -107,7 +121,8 @@ public class BlockGraniteAnvil extends BlockHPBase {
 
     @Nullable
     @Override
-    protected <T extends BlockEntity> BlockEntityTicker<T> createTicker(Level level, BlockState state, BlockEntityType<T> type) {
+    protected <T extends BlockEntity> BlockEntityTicker<T> createTicker(
+            Level level, BlockState state, BlockEntityType<T> type) {
         return null;
     }
 }

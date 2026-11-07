@@ -4,10 +4,12 @@ import com.breakinblocks.horsepowered.blockentity.HPBlockEntityHorseBase;
 import com.breakinblocks.horsepowered.blockentity.PressBlockEntity;
 import com.breakinblocks.horsepowered.recipes.BottlingRecipe;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
+import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -18,14 +20,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 public class BlockPress extends BlockHPBase {
 
@@ -41,7 +40,8 @@ public class BlockPress extends BlockHPBase {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    public InteractionResult use(
+            BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if (level.getBlockEntity(pos) instanceof PressBlockEntity press) {
             ItemStack stack = player.getItemInHand(hand);
             if (FluidUtil.getFluidHandler(stack).isPresent()) {
@@ -73,9 +73,7 @@ public class BlockPress extends BlockHPBase {
     @Nullable
     private static BottlingRecipe findBottlingRecipe(Level level, PressBlockEntity press, ItemStack stack) {
         if (stack.isEmpty()) return null;
-        List<BottlingRecipe> recipes = level.getRecipeManager()
-                .getAllRecipesFor(HPRecipes.BOTTLING_TYPE.get())
-                .stream()
+        List<BottlingRecipe> recipes = level.getRecipeManager().getAllRecipesFor(HPRecipes.BOTTLING_TYPE.get()).stream()
                 .filter(BottlingRecipe::isValid)
                 .toList();
 
@@ -101,8 +99,8 @@ public class BlockPress extends BlockHPBase {
         return inputTank.fill(fluid.copy(), IFluidHandler.FluidAction.SIMULATE) == fluid.getAmount();
     }
 
-    private static boolean applyBottling(PressBlockEntity press, BottlingRecipe recipe, ItemStack stack,
-                                         Player player, InteractionHand hand) {
+    private static boolean applyBottling(
+            PressBlockEntity press, BottlingRecipe recipe, ItemStack stack, Player player, InteractionHand hand) {
         boolean emptying = recipe.matchesResult(stack);
         ItemStack given;
         if (emptying) {
@@ -139,7 +137,8 @@ public class BlockPress extends BlockHPBase {
 
     @Nullable
     @Override
-    protected <T extends BlockEntity> BlockEntityTicker<T> createTicker(Level level, BlockState state, BlockEntityType<T> type) {
+    protected <T extends BlockEntity> BlockEntityTicker<T> createTicker(
+            Level level, BlockState state, BlockEntityType<T> type) {
         if (level.isClientSide) {
             return checkType(type, ModBlocks.PRESS_BE.get(), HPBlockEntityHorseBase::clientTick);
         }

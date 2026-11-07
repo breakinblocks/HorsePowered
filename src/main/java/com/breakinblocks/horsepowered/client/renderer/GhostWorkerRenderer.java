@@ -1,9 +1,10 @@
 package com.breakinblocks.horsepowered.client.renderer;
 
-import com.breakinblocks.horsepowered.lib.Reference;
 import com.breakinblocks.horsepowered.blockentity.VirtualWorker;
 import com.breakinblocks.horsepowered.blockentity.WorkerHost;
+import com.breakinblocks.horsepowered.lib.Reference;
 import com.mojang.blaze3d.vertex.PoseStack;
+import java.util.Optional;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
@@ -21,15 +22,17 @@ import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-import java.util.Optional;
-
 @Mod.EventBusSubscriber(modid = Reference.MODID, value = Dist.CLIENT)
 public class GhostWorkerRenderer {
 
     private static Entity forcedNameTagEntity;
 
-    public static void render(WorkerHost blockEntity, float partialTick,
-                              PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+    public static void render(
+            WorkerHost blockEntity,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            int packedLight) {
         VirtualWorker worker = blockEntity.getVirtualWorker();
         if (!worker.hasWorker()) return;
         Entity entity = worker.getCachedRenderEntity();

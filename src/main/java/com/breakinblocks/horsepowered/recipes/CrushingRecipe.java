@@ -24,7 +24,8 @@ public class CrushingRecipe implements Recipe<Container> {
     private final int priority;
     private final float hungerCost;
 
-    public CrushingRecipe(ResourceLocation id, Ingredient ingredient, ItemStack result, int time, int priority, float hungerCost) {
+    public CrushingRecipe(
+            ResourceLocation id, Ingredient ingredient, ItemStack result, int time, int priority, float hungerCost) {
         this.id = id;
         this.ingredient = ingredient;
         this.result = result;

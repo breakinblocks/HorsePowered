@@ -2,6 +2,9 @@ package com.breakinblocks.horsepowered.items;
 
 import com.breakinblocks.horsepowered.client.renderer.WorkSaddleItemRenderer;
 import com.breakinblocks.horsepowered.lib.Reference;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.core.BlockPos;
@@ -31,10 +34,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Consumer;
-
 public class WorkSaddleItem extends Item {
 
     public static final TagKey<EntityType<?>> VALID_WORKER =
@@ -46,7 +45,8 @@ public class WorkSaddleItem extends Item {
         super(properties);
     }
 
-    public static InteractionResult tryCapture(ItemStack stack, Player player, LivingEntity target, InteractionHand hand) {
+    public static InteractionResult tryCapture(
+            ItemStack stack, Player player, LivingEntity target, InteractionHand hand) {
         Level level = target.level();
         CompoundTag tag = stack.getTag();
         if (tag != null && tag.contains(NBT_KEY)) {
@@ -100,9 +100,8 @@ public class WorkSaddleItem extends Item {
         BlockPos clickedPos = context.getClickedPos();
         Direction face = context.getClickedFace();
         BlockState clickedState = level.getBlockState(clickedPos);
-        BlockPos spawnPos = clickedState.getCollisionShape(level, clickedPos).isEmpty()
-                ? clickedPos
-                : clickedPos.relative(face);
+        BlockPos spawnPos =
+                clickedState.getCollisionShape(level, clickedPos).isEmpty() ? clickedPos : clickedPos.relative(face);
 
         CompoundTag entityTag = tag.getCompound(NBT_KEY);
         Optional<Entity> created = EntityType.create(entityTag, serverLevel);
@@ -187,8 +186,8 @@ public class WorkSaddleItem extends Item {
         EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.get(id);
         if (type == null) return;
 
-        tooltip.add(Component.translatable("item.horsepowered.work_saddle.contains",
-                Component.translatable(type.getDescriptionId()))
+        tooltip.add(Component.translatable(
+                        "item.horsepowered.work_saddle.contains", Component.translatable(type.getDescriptionId()))
                 .withStyle(ChatFormatting.GRAY));
     }
 }

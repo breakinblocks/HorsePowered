@@ -2,6 +2,11 @@ package com.breakinblocks.horsepowered.blockentity;
 
 import com.breakinblocks.horsepowered.Configs;
 import com.google.common.collect.Lists;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -17,12 +22,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class VirtualWorker {
 
@@ -151,7 +150,8 @@ public class VirtualWorker {
             double pathZ = base.getZ() + 0.5 + PATH[i][1] * 2;
             BlockPos pos = new BlockPos((int) Math.floor(pathX), floorY, (int) Math.floor(pathZ));
             if (!seen.add(pos)) continue;
-            ResourceLocation id = BuiltInRegistries.BLOCK.getKey(level.getBlockState(pos).getBlock());
+            ResourceLocation id =
+                    BuiltInRegistries.BLOCK.getKey(level.getBlockState(pos).getBlock());
             sum += Configs.getPathSpeedMultiplier(id);
             count++;
         }
@@ -235,13 +235,15 @@ public class VirtualWorker {
         CompoundTag data = new CompoundTag();
         if (!newWorker.saveAsPassenger(data)) return;
         workerEntityData = data;
-        workerEntityTypeId = BuiltInRegistries.ENTITY_TYPE.getKey(newWorker.getType()).toString();
+        workerEntityTypeId =
+                BuiltInRegistries.ENTITY_TYPE.getKey(newWorker.getType()).toString();
         workerEntityHeight = newWorker.getBbHeight();
         hasVirtualWorker = true;
 
         String name = newWorker.getDisplayName().getString();
-        workerDisplayName = (name != null && !name.isEmpty()) ? name :
-                BuiltInRegistries.ENTITY_TYPE.getKey(newWorker.getType()).getPath();
+        workerDisplayName = (name != null && !name.isEmpty())
+                ? name
+                : BuiltInRegistries.ENTITY_TYPE.getKey(newWorker.getType()).getPath();
 
         virtualX = newWorker.getX();
         virtualZ = newWorker.getZ();
@@ -330,14 +332,37 @@ public class VirtualWorker {
         return running && valid && hasVirtualWorker;
     }
 
-    public double getVirtualX() { return virtualX; }
-    public double getVirtualZ() { return virtualZ; }
-    public float getVirtualYRot() { return virtualYRot; }
-    public double getPrevVirtualX() { return prevVirtualX; }
-    public double getPrevVirtualZ() { return prevVirtualZ; }
-    public float getPrevVirtualYRot() { return prevVirtualYRot; }
-    public double getVirtualY() { return pos().getY() + host.getPositionOffset(); }
-    public float getWorkerEntityHeight() { return workerEntityHeight; }
+    public double getVirtualX() {
+        return virtualX;
+    }
+
+    public double getVirtualZ() {
+        return virtualZ;
+    }
+
+    public float getVirtualYRot() {
+        return virtualYRot;
+    }
+
+    public double getPrevVirtualX() {
+        return prevVirtualX;
+    }
+
+    public double getPrevVirtualZ() {
+        return prevVirtualZ;
+    }
+
+    public float getPrevVirtualYRot() {
+        return prevVirtualYRot;
+    }
+
+    public double getVirtualY() {
+        return pos().getY() + host.getPositionOffset();
+    }
+
+    public float getWorkerEntityHeight() {
+        return workerEntityHeight;
+    }
 
     @Nullable
     public Entity getCachedRenderEntity() {

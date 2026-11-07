@@ -21,20 +21,36 @@ public class ManualChopperBlockEntityRenderer implements BlockEntityRenderer<Man
     }
 
     @Override
-    public void render(ManualChopperBlockEntity blockEntity, float partialTick, PoseStack poseStack,
-                       MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
+    public void render(
+            ManualChopperBlockEntity blockEntity,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            int packedLight,
+            int packedOverlay) {
         // Chopping surface is at y=9/16=0.5625. Stand the log upright with its
         // base on the surface so it reads as "a log to be chopped". FIXED scale
         // of 0.5 means a scale of 0.6 yields ~0.3 block height — base at 0.5625,
         // center at ~0.71.
         ItemStack input = blockEntity.getItem(0);
-        RenderUtils.renderStandingItem(poseStack, bufferSource, itemRenderer,
-                input, 0.5, 0.71, 0.5, 0.6F, 0, packedLight, packedOverlay,
+        RenderUtils.renderStandingItem(
+                poseStack,
+                bufferSource,
+                itemRenderer,
+                input,
+                0.5,
+                0.71,
+                0.5,
+                0.6F,
+                0,
+                packedLight,
+                packedOverlay,
                 blockEntity.getLevel());
 
         if (RenderUtils.shouldShowItemCounts(blockEntity)) {
             double countY = RenderUtils.itemTop(itemRenderer, input, blockEntity.getLevel(), 0.71, 0.6F, true);
-            RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, input.getCount(), 0.5, countY, 0.5);
+            RenderUtils.renderItemCountBillboard(
+                    poseStack, bufferSource, font, packedLight, input.getCount(), 0.5, countY, 0.5);
         }
     }
 }

@@ -14,7 +14,6 @@ import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 
@@ -30,7 +29,8 @@ public class HorsePowerChoppingCategory implements IRecipeCategory<ChoppingRecip
     private final IDrawable arrow;
     private final Component title;
 
-    public HorsePowerChoppingCategory(IGuiHelper guiHelper, RecipeType<ChoppingRecipe> recipeType, Block iconBlock, String titleKey) {
+    public HorsePowerChoppingCategory(
+            IGuiHelper guiHelper, RecipeType<ChoppingRecipe> recipeType, Block iconBlock, String titleKey) {
         this.recipeType = recipeType;
         this.manual = recipeType == HorsePowerPlugin.CHOPPING_HAND_TYPE;
         this.background = guiHelper.createBlankDrawable(WIDTH, manual ? 46 : 36);
@@ -72,7 +72,12 @@ public class HorsePowerChoppingCategory implements IRecipeCategory<ChoppingRecip
     }
 
     @Override
-    public void draw(ChoppingRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+    public void draw(
+            ChoppingRecipe recipe,
+            IRecipeSlotsView recipeSlotsView,
+            GuiGraphics guiGraphics,
+            double mouseX,
+            double mouseY) {
         arrow.draw(guiGraphics, 26, 1);
 
         int chops = manual ? recipe.getTime() * Configs.choppingMultiplier.get() : recipe.getTime();
@@ -80,8 +85,8 @@ public class HorsePowerChoppingCategory implements IRecipeCategory<ChoppingRecip
         guiGraphics.drawString(Minecraft.getInstance().font, chopText, 26, 24, 0x808080, false);
 
         if (manual && recipe.getHungerCost() > 0.0F) {
-            Component hungerText = Component.translatable("gui.horsepowered.jei.hunger",
-                    String.format("%.2f", recipe.getHungerCost()));
+            Component hungerText = Component.translatable(
+                    "gui.horsepowered.jei.hunger", String.format("%.2f", recipe.getHungerCost()));
             guiGraphics.drawString(Minecraft.getInstance().font, hungerText, 26, 34, 0x808080, false);
         }
     }

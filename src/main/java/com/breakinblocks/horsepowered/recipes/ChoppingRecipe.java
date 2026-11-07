@@ -25,7 +25,14 @@ public class ChoppingRecipe implements Recipe<Container> {
     private final int priority;
     private final float hungerCost;
 
-    public ChoppingRecipe(ResourceLocation id, Ingredient ingredient, ItemStack result, int time, RecipeTier tier, int priority, float hungerCost) {
+    public ChoppingRecipe(
+            ResourceLocation id,
+            Ingredient ingredient,
+            ItemStack result,
+            int time,
+            RecipeTier tier,
+            int priority,
+            float hungerCost) {
         this.id = id;
         this.ingredient = ingredient;
         this.result = result;

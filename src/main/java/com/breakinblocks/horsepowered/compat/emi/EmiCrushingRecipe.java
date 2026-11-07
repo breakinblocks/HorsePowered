@@ -29,15 +29,15 @@ public class EmiCrushingRecipe extends BasicEmiRecipe {
         widgets.addSlot(outputs.get(0), 60, 0).recipeContext(this);
 
         int strikes = time * Configs.crushingMultiplier.get();
-        widgets.addText(
-                Component.translatable("gui.horsepowered.jei.strikes", strikes),
-                26, 20, 0x808080, false);
+        widgets.addText(Component.translatable("gui.horsepowered.jei.strikes", strikes), 26, 20, 0x808080, false);
 
         if (hungerCost > 0.0F) {
             widgets.addText(
-                    Component.translatable("gui.horsepowered.jei.hunger",
-                            String.format("%.2f", hungerCost)),
-                    26, 30, 0x808080, false);
+                    Component.translatable("gui.horsepowered.jei.hunger", String.format("%.2f", hungerCost)),
+                    26,
+                    30,
+                    0x808080,
+                    false);
         }
     }
 }

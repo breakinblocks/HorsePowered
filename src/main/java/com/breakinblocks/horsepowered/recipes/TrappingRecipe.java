@@ -2,6 +2,9 @@ package com.breakinblocks.horsepowered.recipes;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
@@ -28,10 +31,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraftforge.common.ForgeSpawnEggItem;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 public class TrappingRecipe implements Recipe<Container> {
 
     private final ResourceLocation id;
@@ -47,11 +46,19 @@ public class TrappingRecipe implements Recipe<Container> {
     private final Optional<String> title;
     private final Optional<ResourceLocation> icon;
 
-    public TrappingRecipe(ResourceLocation id, Ingredient bait, ResourceLocation entityId,
-                          int time, int priority, Optional<TagKey<Biome>> biome,
-                          List<ResourceKey<Level>> dimensions, boolean waterlogged,
-                          boolean baitConsumed, double baitConsumeChance,
-                          Optional<String> title, Optional<ResourceLocation> icon) {
+    public TrappingRecipe(
+            ResourceLocation id,
+            Ingredient bait,
+            ResourceLocation entityId,
+            int time,
+            int priority,
+            Optional<TagKey<Biome>> biome,
+            List<ResourceKey<Level>> dimensions,
+            boolean waterlogged,
+            boolean baitConsumed,
+            double baitConsumeChance,
+            Optional<String> title,
+            Optional<ResourceLocation> icon) {
         this.id = id;
         this.bait = bait;
         this.entityId = entityId;
@@ -108,17 +115,49 @@ public class TrappingRecipe implements Recipe<Container> {
         return HPRecipes.TRAPPING_TYPE.get();
     }
 
-    public Ingredient getBait() { return bait; }
-    public ResourceLocation getEntityId() { return entityId; }
-    public int getTime() { return time; }
-    public int getPriority() { return priority; }
-    public Optional<TagKey<Biome>> getBiome() { return biome; }
-    public List<ResourceKey<Level>> getDimensions() { return dimensions; }
-    public boolean isWaterlogged() { return waterlogged; }
-    public boolean isBaitConsumed() { return baitConsumed; }
-    public double getBaitConsumeChance() { return baitConsumeChance; }
-    public Optional<String> getTitle() { return title; }
-    public Optional<ResourceLocation> getIcon() { return icon; }
+    public Ingredient getBait() {
+        return bait;
+    }
+
+    public ResourceLocation getEntityId() {
+        return entityId;
+    }
+
+    public int getTime() {
+        return time;
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+
+    public Optional<TagKey<Biome>> getBiome() {
+        return biome;
+    }
+
+    public List<ResourceKey<Level>> getDimensions() {
+        return dimensions;
+    }
+
+    public boolean isWaterlogged() {
+        return waterlogged;
+    }
+
+    public boolean isBaitConsumed() {
+        return baitConsumed;
+    }
+
+    public double getBaitConsumeChance() {
+        return baitConsumeChance;
+    }
+
+    public Optional<String> getTitle() {
+        return title;
+    }
+
+    public Optional<ResourceLocation> getIcon() {
+        return icon;
+    }
 
     public boolean biomeMatches(Level level, BlockPos pos) {
         return biome.isEmpty() || level.getBiome(pos).is(biome.get());
@@ -147,8 +186,8 @@ public class TrappingRecipe implements Recipe<Container> {
             SpawnEggItem egg = ForgeSpawnEggItem.fromEntityType(type);
             if (egg != null) return new ItemStack(egg);
         }
-        ResourceLocation conventional = new ResourceLocation(
-                entityId.getNamespace(), entityId.getPath() + "_spawn_egg");
+        ResourceLocation conventional =
+                new ResourceLocation(entityId.getNamespace(), entityId.getPath() + "_spawn_egg");
         if (BuiltInRegistries.ITEM.containsKey(conventional)) {
             return new ItemStack(BuiltInRegistries.ITEM.get(conventional));
         }
@@ -194,14 +233,24 @@ public class TrappingRecipe implements Recipe<Container> {
             boolean waterlogged = GsonHelper.getAsBoolean(json, "waterlogged", false);
             boolean baitConsumed = GsonHelper.getAsBoolean(json, "baitConsumed", false);
             double baitConsumeChance = GsonHelper.getAsDouble(json, "baitConsumeChance", 100.0D);
-            Optional<String> title = json.has("title")
-                    ? Optional.of(GsonHelper.getAsString(json, "title"))
-                    : Optional.empty();
+            Optional<String> title =
+                    json.has("title") ? Optional.of(GsonHelper.getAsString(json, "title")) : Optional.empty();
             Optional<ResourceLocation> icon = json.has("icon")
                     ? Optional.of(new ResourceLocation(GsonHelper.getAsString(json, "icon")))
                     : Optional.empty();
-            return new TrappingRecipe(recipeId, bait, entityId, time, priority, biome, dimensions, waterlogged,
-                    baitConsumed, baitConsumeChance, title, icon);
+            return new TrappingRecipe(
+                    recipeId,
+                    bait,
+                    entityId,
+                    time,
+                    priority,
+                    biome,
+                    dimensions,
+                    waterlogged,
+                    baitConsumed,
+                    baitConsumeChance,
+                    title,
+                    icon);
         }
 
         private static ResourceKey<Level> dimensionKey(String id) {
@@ -217,16 +266,27 @@ public class TrappingRecipe implements Recipe<Container> {
             Optional<TagKey<Biome>> biome = buffer.readBoolean()
                     ? Optional.of(TagKey.create(Registries.BIOME, buffer.readResourceLocation()))
                     : Optional.empty();
-            List<ResourceKey<Level>> dimensions = buffer.readList(buf -> ResourceKey.create(Registries.DIMENSION, buf.readResourceLocation()));
+            List<ResourceKey<Level>> dimensions =
+                    buffer.readList(buf -> ResourceKey.create(Registries.DIMENSION, buf.readResourceLocation()));
             boolean waterlogged = buffer.readBoolean();
             boolean baitConsumed = buffer.readBoolean();
             double baitConsumeChance = buffer.readDouble();
             Optional<String> title = buffer.readBoolean() ? Optional.of(buffer.readUtf()) : Optional.empty();
-            Optional<ResourceLocation> icon = buffer.readBoolean()
-                    ? Optional.of(buffer.readResourceLocation())
-                    : Optional.empty();
-            return new TrappingRecipe(recipeId, bait, entityId, time, priority, biome, dimensions, waterlogged,
-                    baitConsumed, baitConsumeChance, title, icon);
+            Optional<ResourceLocation> icon =
+                    buffer.readBoolean() ? Optional.of(buffer.readResourceLocation()) : Optional.empty();
+            return new TrappingRecipe(
+                    recipeId,
+                    bait,
+                    entityId,
+                    time,
+                    priority,
+                    biome,
+                    dimensions,
+                    waterlogged,
+                    baitConsumed,
+                    baitConsumeChance,
+                    title,
+                    icon);
         }
 
         @Override

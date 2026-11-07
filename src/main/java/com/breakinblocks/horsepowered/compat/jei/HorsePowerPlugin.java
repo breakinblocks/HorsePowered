@@ -10,6 +10,8 @@ import com.breakinblocks.horsepowered.recipes.GrindstoneRecipe;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
 import com.breakinblocks.horsepowered.recipes.PressRecipe;
 import com.breakinblocks.horsepowered.recipes.TrappingRecipe;
+import java.util.Comparator;
+import java.util.List;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.helpers.IGuiHelper;
@@ -21,9 +23,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeManager;
-
-import java.util.Comparator;
-import java.util.List;
 
 @JeiPlugin
 public class HorsePowerPlugin implements IModPlugin {
@@ -65,71 +64,98 @@ public class HorsePowerPlugin implements IModPlugin {
         IGuiHelper guiHelper = registration.getJeiHelpers().getGuiHelper();
 
         registration.addRecipeCategories(
-                new HorsePowerGrindingCategory(guiHelper, GRINDING_TYPE, ModBlocks.GRINDSTONE.get(), "gui.horsepowered.jei.grinding"),
-                new HorsePowerGrindingCategory(guiHelper, GRINDING_HAND_TYPE, ModBlocks.HAND_GRINDSTONE.get(), "gui.horsepowered.jei.grinding_hand"),
-                new HorsePowerChoppingCategory(guiHelper, CHOPPING_TYPE, ModBlocks.CHOPPER.get(), "gui.horsepowered.jei.chopping"),
-                new HorsePowerChoppingCategory(guiHelper, CHOPPING_HAND_TYPE, ModBlocks.CHOPPING_BLOCK.get(), "gui.horsepowered.jei.chopping_hand"),
+                new HorsePowerGrindingCategory(
+                        guiHelper, GRINDING_TYPE, ModBlocks.GRINDSTONE.get(), "gui.horsepowered.jei.grinding"),
+                new HorsePowerGrindingCategory(
+                        guiHelper,
+                        GRINDING_HAND_TYPE,
+                        ModBlocks.HAND_GRINDSTONE.get(),
+                        "gui.horsepowered.jei.grinding_hand"),
+                new HorsePowerChoppingCategory(
+                        guiHelper, CHOPPING_TYPE, ModBlocks.CHOPPER.get(), "gui.horsepowered.jei.chopping"),
+                new HorsePowerChoppingCategory(
+                        guiHelper,
+                        CHOPPING_HAND_TYPE,
+                        ModBlocks.CHOPPING_BLOCK.get(),
+                        "gui.horsepowered.jei.chopping_hand"),
                 new HorsePowerPressCategory(guiHelper),
                 new HorsePowerDryingCategory(guiHelper),
                 new HorsePowerCrushingCategory(guiHelper),
                 new HorsePowerTrappingCategory(guiHelper),
-                new HorsePowerBottlingCategory(guiHelper)
-        );
+                new HorsePowerBottlingCategory(guiHelper));
     }
 
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
         RecipeManager recipeManager = Minecraft.getInstance().level.getRecipeManager();
 
-        Comparator<GrindstoneRecipe> grindingOrder = Comparator
-                .comparingInt(GrindstoneRecipe::getPriority)
+        Comparator<GrindstoneRecipe> grindingOrder = Comparator.comparingInt(GrindstoneRecipe::getPriority)
                 .thenComparing(r -> r.getId().toString());
-        Comparator<ChoppingRecipe> choppingOrder = Comparator
-                .comparingInt(ChoppingRecipe::getPriority)
+        Comparator<ChoppingRecipe> choppingOrder = Comparator.comparingInt(ChoppingRecipe::getPriority)
                 .thenComparing(r -> r.getId().toString());
-        Comparator<PressRecipe> pressingOrder = Comparator
-                .comparingInt(PressRecipe::getPriority)
+        Comparator<PressRecipe> pressingOrder = Comparator.comparingInt(PressRecipe::getPriority)
                 .thenComparing(r -> r.getId().toString());
-        Comparator<CrushingRecipe> crushingOrder = Comparator
-                .comparingInt(CrushingRecipe::getPriority)
+        Comparator<CrushingRecipe> crushingOrder = Comparator.comparingInt(CrushingRecipe::getPriority)
                 .thenComparing(r -> r.getId().toString());
 
         List<GrindstoneRecipe> allGrinding = recipeManager.getAllRecipesFor(HPRecipes.GRINDING_TYPE.get());
-        registration.addRecipes(GRINDING_TYPE, allGrinding.stream()
-                .filter(r -> r.getTier().allowsHorse()).sorted(grindingOrder).toList());
-        registration.addRecipes(GRINDING_HAND_TYPE, allGrinding.stream()
-                .filter(r -> r.getTier().allowsHand()).sorted(grindingOrder).toList());
+        registration.addRecipes(
+                GRINDING_TYPE,
+                allGrinding.stream()
+                        .filter(r -> r.getTier().allowsHorse())
+                        .sorted(grindingOrder)
+                        .toList());
+        registration.addRecipes(
+                GRINDING_HAND_TYPE,
+                allGrinding.stream()
+                        .filter(r -> r.getTier().allowsHand())
+                        .sorted(grindingOrder)
+                        .toList());
 
         List<ChoppingRecipe> allChopping = recipeManager.getAllRecipesFor(HPRecipes.CHOPPING_TYPE.get());
-        registration.addRecipes(CHOPPING_TYPE, allChopping.stream()
-                .filter(r -> r.getTier().allowsHorse()).sorted(choppingOrder).toList());
-        registration.addRecipes(CHOPPING_HAND_TYPE, allChopping.stream()
-                .filter(r -> r.getTier().allowsHand()).sorted(choppingOrder).toList());
+        registration.addRecipes(
+                CHOPPING_TYPE,
+                allChopping.stream()
+                        .filter(r -> r.getTier().allowsHorse())
+                        .sorted(choppingOrder)
+                        .toList());
+        registration.addRecipes(
+                CHOPPING_HAND_TYPE,
+                allChopping.stream()
+                        .filter(r -> r.getTier().allowsHand())
+                        .sorted(choppingOrder)
+                        .toList());
 
-        registration.addRecipes(PRESSING_TYPE,
+        registration.addRecipes(
+                PRESSING_TYPE,
                 recipeManager.getAllRecipesFor(HPRecipes.PRESSING_TYPE.get()).stream()
-                        .sorted(pressingOrder).toList());
+                        .sorted(pressingOrder)
+                        .toList());
 
-        registration.addRecipes(DRYING_TYPE,
-                recipeManager.getAllRecipesFor(HPRecipes.DRYING_TYPE.get()));
+        registration.addRecipes(DRYING_TYPE, recipeManager.getAllRecipesFor(HPRecipes.DRYING_TYPE.get()));
 
-        registration.addRecipes(CRUSHING_TYPE,
+        registration.addRecipes(
+                CRUSHING_TYPE,
                 recipeManager.getAllRecipesFor(HPRecipes.CRUSHING_TYPE.get()).stream()
-                        .sorted(crushingOrder).toList());
+                        .sorted(crushingOrder)
+                        .toList());
 
-        Comparator<TrappingRecipe> trapOrder = Comparator
-                .comparingInt(TrappingRecipe::getPriority)
+        Comparator<TrappingRecipe> trapOrder = Comparator.comparingInt(TrappingRecipe::getPriority)
                 .thenComparing(r -> r.getId().toString());
-        registration.addRecipes(TRAPPING_TYPE,
+        registration.addRecipes(
+                TRAPPING_TYPE,
                 recipeManager.getAllRecipesFor(HPRecipes.TRAPPING_TYPE.get()).stream()
-                        .sorted(trapOrder).toList());
+                        .sorted(trapOrder)
+                        .toList());
 
-        Comparator<BottlingRecipe> bottleOrder = Comparator
-                .comparingInt(BottlingRecipe::getPriority)
+        Comparator<BottlingRecipe> bottleOrder = Comparator.comparingInt(BottlingRecipe::getPriority)
                 .thenComparing(r -> r.getId().toString());
-        registration.addRecipes(BOTTLING_TYPE,
+        registration.addRecipes(
+                BOTTLING_TYPE,
                 recipeManager.getAllRecipesFor(HPRecipes.BOTTLING_TYPE.get()).stream()
-                        .filter(BottlingRecipe::isValid).sorted(bottleOrder).toList());
+                        .filter(BottlingRecipe::isValid)
+                        .sorted(bottleOrder)
+                        .toList());
     }
 
     @Override

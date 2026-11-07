@@ -19,8 +19,13 @@ public class HorseEngineRenderer extends KineticBlockEntityRenderer<HorseEngineB
     }
 
     @Override
-    protected void renderSafe(HorseEngineBlockEntity be, float partialTicks, PoseStack ms,
-                              MultiBufferSource buffer, int light, int overlay) {
+    protected void renderSafe(
+            HorseEngineBlockEntity be,
+            float partialTicks,
+            PoseStack ms,
+            MultiBufferSource buffer,
+            int light,
+            int overlay) {
         WorkingAreaRenderer.renderIfActive(be, ms, buffer);
         GhostWorkerRenderer.render(be, partialTicks, ms, buffer, light);
         LeadRenderer.renderLead(be, partialTicks, ms, buffer);

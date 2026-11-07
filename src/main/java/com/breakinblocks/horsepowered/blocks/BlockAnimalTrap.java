@@ -1,7 +1,7 @@
 package com.breakinblocks.horsepowered.blocks;
 
 import com.breakinblocks.horsepowered.blockentity.AnimalTrapBlockEntity;
-import com.breakinblocks.horsepowered.blocks.ModBlocks;
+import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -31,8 +31,6 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-
 public class BlockAnimalTrap extends Block implements EntityBlock, SimpleWaterloggedBlock {
 
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
@@ -60,8 +58,13 @@ public class BlockAnimalTrap extends Block implements EntityBlock, SimpleWaterlo
     }
 
     @Override
-    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState,
-                                  LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+    public BlockState updateShape(
+            BlockState state,
+            Direction direction,
+            BlockState neighborState,
+            LevelAccessor level,
+            BlockPos pos,
+            BlockPos neighborPos) {
         if (state.getValue(WATERLOGGED)) {
             level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
@@ -69,8 +72,8 @@ public class BlockAnimalTrap extends Block implements EntityBlock, SimpleWaterlo
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
-                                 InteractionHand hand, BlockHitResult hit) {
+    public InteractionResult use(
+            BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if (!(level.getBlockEntity(pos) instanceof AnimalTrapBlockEntity trap)) {
             return InteractionResult.PASS;
         }
@@ -86,8 +89,7 @@ public class BlockAnimalTrap extends Block implements EntityBlock, SimpleWaterlo
             return InteractionResult.PASS;
         }
 
-        if (!held.isEmpty()
-                && trap.getItem(AnimalTrapBlockEntity.BAIT_SLOT).isEmpty()) {
+        if (!held.isEmpty() && trap.getItem(AnimalTrapBlockEntity.BAIT_SLOT).isEmpty()) {
             if (level.isClientSide) return InteractionResult.sidedSuccess(true);
             if (trap.tryInsertBait(held)) {
                 if (!player.getAbilities().instabuild) held.shrink(1);
@@ -128,7 +130,8 @@ public class BlockAnimalTrap extends Block implements EntityBlock, SimpleWaterlo
 
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(
+            Level level, BlockState state, BlockEntityType<T> type) {
         if (type != ModBlocks.ANIMAL_TRAP_BE.get()) return null;
         @SuppressWarnings("unchecked")
         BlockEntityTicker<T> ticker = level.isClientSide

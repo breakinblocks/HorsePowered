@@ -35,8 +35,13 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
     }
 
     @Override
-    public void render(PressBlockEntity blockEntity, float partialTick, PoseStack poseStack,
-                       MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
+    public void render(
+            PressBlockEntity blockEntity,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            int packedLight,
+            int packedOverlay) {
         WorkingAreaRenderer.renderIfActive(blockEntity, poseStack, bufferSource);
         GhostWorkerRenderer.render(blockEntity, partialTick, poseStack, bufferSource, packedLight);
         LeadRenderer.renderLead(blockEntity, partialTick, poseStack, bufferSource);
@@ -45,31 +50,69 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
         ItemStack input = blockEntity.getItem(0);
         ItemStack output = blockEntity.getItem(1);
 
-        RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer,
-                input, 0.5, 0.35, 0.5, 0.5F, 0, packedLight, packedOverlay,
+        RenderUtils.renderFlatItem(
+                poseStack,
+                bufferSource,
+                itemRenderer,
+                input,
+                0.5,
+                0.35,
+                0.5,
+                0.5F,
+                0,
+                packedLight,
+                packedOverlay,
                 blockEntity.getLevel());
 
-        RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer,
-                output, 0.5, 0.3, 0.5, 0.35F, 0, packedLight, packedOverlay,
+        RenderUtils.renderFlatItem(
+                poseStack,
+                bufferSource,
+                itemRenderer,
+                output,
+                0.5,
+                0.3,
+                0.5,
+                0.35F,
+                0,
+                packedLight,
+                packedOverlay,
                 blockEntity.getLevel());
 
         if (RenderUtils.shouldShowItemCounts(blockEntity)) {
-            double countY = RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, input.getCount(), 0.5, FRAME_TOP, 0.5);
-            RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, output.getCount(), 0.5, countY, 0.5);
+            double countY = RenderUtils.renderItemCountBillboard(
+                    poseStack, bufferSource, font, packedLight, input.getCount(), 0.5, FRAME_TOP, 0.5);
+            RenderUtils.renderItemCountBillboard(
+                    poseStack, bufferSource, font, packedLight, output.getCount(), 0.5, countY, 0.5);
         }
 
         FluidStack inputFluid = blockEntity.getInputTank().getFluid();
         if (!inputFluid.isEmpty()) {
-            renderFluidHalf(poseStack, bufferSource, packedLight, inputFluid, blockEntity.getInputTank().getCapacity(), true);
+            renderFluidHalf(
+                    poseStack,
+                    bufferSource,
+                    packedLight,
+                    inputFluid,
+                    blockEntity.getInputTank().getCapacity(),
+                    true);
         }
         FluidStack outputFluid = blockEntity.getOutputTank().getFluid();
         if (!outputFluid.isEmpty()) {
-            renderFluidHalf(poseStack, bufferSource, packedLight, outputFluid, blockEntity.getOutputTank().getCapacity(), false);
+            renderFluidHalf(
+                    poseStack,
+                    bufferSource,
+                    packedLight,
+                    outputFluid,
+                    blockEntity.getOutputTank().getCapacity(),
+                    false);
         }
     }
 
-    private void renderPlunger(PressBlockEntity blockEntity, PoseStack poseStack,
-                               MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
+    private void renderPlunger(
+            PressBlockEntity blockEntity,
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            int packedLight,
+            int packedOverlay) {
         int currentPress = blockEntity.getCurrentPressStatus();
         int totalPress = Configs.pointsForPress.get();
         if (totalPress <= 0) totalPress = 1;
@@ -93,22 +136,37 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
         float plungerMaxZ = 0.85F;
         float plungerHeight = 0.15F;
 
-        RenderUtils.renderTexturedBox(poseStack, builder, sprite, packedLight,
-                plungerMinX, plungerY, plungerMinZ,
-                plungerMaxX, plungerY + plungerHeight, plungerMaxZ);
+        RenderUtils.renderTexturedBox(
+                poseStack,
+                builder,
+                sprite,
+                packedLight,
+                plungerMinX,
+                plungerY,
+                plungerMinZ,
+                plungerMaxX,
+                plungerY + plungerHeight,
+                plungerMaxZ);
 
         poseStack.popPose();
     }
 
-    private void renderFluidHalf(PoseStack poseStack, MultiBufferSource bufferSource, int packedLight,
-                                 FluidStack fluidStack, int capacity, boolean leftHalf) {
+    private void renderFluidHalf(
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            int packedLight,
+            FluidStack fluidStack,
+            int capacity,
+            boolean leftHalf) {
         if (fluidStack.isEmpty() || capacity <= 0) return;
 
         IClientFluidTypeExtensions fluidTypeExtensions = IClientFluidTypeExtensions.of(fluidStack.getFluid());
         ResourceLocation stillTexture = fluidTypeExtensions.getStillTexture(fluidStack);
         if (stillTexture == null) return;
 
-        TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(stillTexture);
+        TextureAtlasSprite sprite = Minecraft.getInstance()
+                .getTextureAtlas(InventoryMenu.BLOCK_ATLAS)
+                .apply(stillTexture);
         int color = fluidTypeExtensions.getTintColor(fluidStack);
 
         float fillPercentage = (float) fluidStack.getAmount() / capacity;
@@ -134,10 +192,30 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
         float v1 = sprite.getV0();
         float v2 = sprite.getV1();
 
-        builder.vertex(matrix, 0, fluidHeight, 0).color(r, g, b, a).uv(u1, v1).uv2(packedLight).normal(0, 1, 0).endVertex();
-        builder.vertex(matrix, 0, fluidHeight, depth).color(r, g, b, a).uv(u1, v2).uv2(packedLight).normal(0, 1, 0).endVertex();
-        builder.vertex(matrix, width, fluidHeight, depth).color(r, g, b, a).uv(u2, v2).uv2(packedLight).normal(0, 1, 0).endVertex();
-        builder.vertex(matrix, width, fluidHeight, 0).color(r, g, b, a).uv(u2, v1).uv2(packedLight).normal(0, 1, 0).endVertex();
+        builder.vertex(matrix, 0, fluidHeight, 0)
+                .color(r, g, b, a)
+                .uv(u1, v1)
+                .uv2(packedLight)
+                .normal(0, 1, 0)
+                .endVertex();
+        builder.vertex(matrix, 0, fluidHeight, depth)
+                .color(r, g, b, a)
+                .uv(u1, v2)
+                .uv2(packedLight)
+                .normal(0, 1, 0)
+                .endVertex();
+        builder.vertex(matrix, width, fluidHeight, depth)
+                .color(r, g, b, a)
+                .uv(u2, v2)
+                .uv2(packedLight)
+                .normal(0, 1, 0)
+                .endVertex();
+        builder.vertex(matrix, width, fluidHeight, 0)
+                .color(r, g, b, a)
+                .uv(u2, v1)
+                .uv2(packedLight)
+                .normal(0, 1, 0)
+                .endVertex();
 
         poseStack.popPose();
     }

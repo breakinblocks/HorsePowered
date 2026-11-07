@@ -35,15 +35,15 @@ public class EmiChoppingRecipe extends BasicEmiRecipe {
         widgets.addSlot(outputs.get(0), 60, 0).recipeContext(this);
 
         int chops = manual ? time * Configs.choppingMultiplier.get() : time;
-        widgets.addText(
-                Component.translatable("gui.horsepowered.jei.chops", chops),
-                26, 20, 0x808080, false);
+        widgets.addText(Component.translatable("gui.horsepowered.jei.chops", chops), 26, 20, 0x808080, false);
 
         if (manual && hungerCost > 0.0F) {
             widgets.addText(
-                    Component.translatable("gui.horsepowered.jei.hunger",
-                            String.format("%.2f", hungerCost)),
-                    26, 30, 0x808080, false);
+                    Component.translatable("gui.horsepowered.jei.hunger", String.format("%.2f", hungerCost)),
+                    26,
+                    30,
+                    0x808080,
+                    false);
         }
     }
 }

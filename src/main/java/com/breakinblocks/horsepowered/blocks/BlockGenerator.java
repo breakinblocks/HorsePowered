@@ -2,6 +2,7 @@ package com.breakinblocks.horsepowered.blocks;
 
 import com.breakinblocks.horsepowered.blockentity.GeneratorBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.HPBlockEntityHorseBase;
+import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
@@ -21,8 +22,6 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 public class BlockGenerator extends BlockHPBase {
 
@@ -52,8 +51,7 @@ public class BlockGenerator extends BlockHPBase {
     }
 
     @Override
-    public void emptiedOutput(Level level, BlockPos pos) {
-    }
+    public void emptiedOutput(Level level, BlockPos pos) {}
 
     @Override
     public List<ItemStack> getDrops(BlockState state, LootParams.Builder params) {
@@ -82,7 +80,8 @@ public class BlockGenerator extends BlockHPBase {
 
     @Nullable
     @Override
-    protected <T extends BlockEntity> BlockEntityTicker<T> createTicker(Level level, BlockState state, BlockEntityType<T> type) {
+    protected <T extends BlockEntity> BlockEntityTicker<T> createTicker(
+            Level level, BlockState state, BlockEntityType<T> type) {
         if (level.isClientSide) {
             return checkType(type, ModBlocks.GENERATOR_BE.get(), HPBlockEntityHorseBase::clientTick);
         }

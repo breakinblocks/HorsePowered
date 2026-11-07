@@ -25,8 +25,13 @@ public class AnimalTrapBlockEntityRenderer implements BlockEntityRenderer<Animal
     }
 
     @Override
-    public void render(AnimalTrapBlockEntity be, float partialTick, PoseStack poseStack,
-                       MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
+    public void render(
+            AnimalTrapBlockEntity be,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            int packedLight,
+            int packedOverlay) {
         if (be.hasCapturedEntity()) {
             Entity entity = be.getOrBuildDisplayEntity();
             if (entity != null) {
@@ -41,8 +46,13 @@ public class AnimalTrapBlockEntityRenderer implements BlockEntityRenderer<Animal
         }
     }
 
-    private void renderEntity(Entity entity, float partialTick, PoseStack poseStack,
-                              MultiBufferSource bufferSource, int packedLight, AnimalTrapBlockEntity be) {
+    private void renderEntity(
+            Entity entity,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            int packedLight,
+            AnimalTrapBlockEntity be) {
         poseStack.pushPose();
         poseStack.translate(0.5F, 0.0F, 0.5F);
 
@@ -56,22 +66,26 @@ public class AnimalTrapBlockEntityRenderer implements BlockEntityRenderer<Animal
         poseStack.mulPose(Axis.XP.rotationDegrees(-30.0F));
         poseStack.scale(baseScale, baseScale, baseScale);
 
-        entityRenderDispatcher.render(entity, 0.0, 0.0, 0.0, 0.0F, partialTick,
-                poseStack, bufferSource, packedLight);
+        entityRenderDispatcher.render(entity, 0.0, 0.0, 0.0, 0.0F, partialTick, poseStack, bufferSource, packedLight);
 
         poseStack.popPose();
     }
 
-    private void renderBait(ItemStack bait, float partialTick, PoseStack poseStack,
-                            MultiBufferSource bufferSource, int packedLight, int packedOverlay,
-                            AnimalTrapBlockEntity be) {
+    private void renderBait(
+            ItemStack bait,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            int packedLight,
+            int packedOverlay,
+            AnimalTrapBlockEntity be) {
         poseStack.pushPose();
         poseStack.translate(0.5F, 0.5F, 0.5F);
         poseStack.mulPose(Axis.YP.rotationDegrees((float) Mth.lerp(partialTick, be.getOSpin(), be.getSpin()) * 10.0F));
         poseStack.scale(0.5F, 0.5F, 0.5F);
 
-        itemRenderer.renderStatic(bait, ItemDisplayContext.GROUND, packedLight, packedOverlay,
-                poseStack, bufferSource, be.getLevel(), 0);
+        itemRenderer.renderStatic(
+                bait, ItemDisplayContext.GROUND, packedLight, packedOverlay, poseStack, bufferSource, be.getLevel(), 0);
 
         poseStack.popPose();
     }

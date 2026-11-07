@@ -3,6 +3,7 @@ package com.breakinblocks.horsepowered.compat.jei;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.lib.Reference;
 import com.breakinblocks.horsepowered.recipes.BottlingRecipe;
+import java.util.Arrays;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.forge.ForgeTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
@@ -19,8 +20,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-
-import java.util.Arrays;
 
 public class HorsePowerBottlingCategory implements IRecipeCategory<BottlingRecipe> {
 
@@ -79,7 +78,12 @@ public class HorsePowerBottlingCategory implements IRecipeCategory<BottlingRecip
     }
 
     @Override
-    public void draw(BottlingRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+    public void draw(
+            BottlingRecipe recipe,
+            IRecipeSlotsView recipeSlotsView,
+            GuiGraphics guiGraphics,
+            double mouseX,
+            double mouseY) {
         arrow.draw(guiGraphics, 66, 9);
 
         Font font = Minecraft.getInstance().font;

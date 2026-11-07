@@ -28,7 +28,13 @@ public class PressRecipe implements Recipe<Container> {
     private final FluidStack fluidResult;
     private final int priority;
 
-    public PressRecipe(ResourceLocation id, Ingredient ingredient, int inputCount, ItemStack result, FluidStack fluidResult, int priority) {
+    public PressRecipe(
+            ResourceLocation id,
+            Ingredient ingredient,
+            int inputCount,
+            ItemStack result,
+            FluidStack fluidResult,
+            int priority) {
         this.id = id;
         this.ingredient = ingredient;
         this.inputCount = inputCount;
@@ -112,8 +118,8 @@ public class PressRecipe implements Recipe<Container> {
             Ingredient ingredient = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "ingredient"));
             int inputCount = GsonHelper.getAsInt(json, "inputCount", 1);
             ItemStack result = json.has("result")
-                ? ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "result"))
-                : ItemStack.EMPTY;
+                    ? ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "result"))
+                    : ItemStack.EMPTY;
             FluidStack fluidResult = FluidStack.EMPTY;
             if (json.has("fluidResult")) {
                 JsonObject fluidJson = GsonHelper.getAsJsonObject(json, "fluidResult");

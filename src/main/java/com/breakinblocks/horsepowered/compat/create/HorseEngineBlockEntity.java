@@ -9,10 +9,10 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Containers;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 
@@ -28,9 +28,8 @@ public class HorseEngineBlockEntity extends GeneratingKineticBlockEntity impleme
     }
 
     public static float capacityPerRpm(double jumpStrength) {
-        return (float) (jumpStrength * 10.0
-                * Configs.horseEngineStressPerJumpPoint.get()
-                / Configs.horseEngineRpm.get());
+        return (float)
+                (jumpStrength * 10.0 * Configs.horseEngineStressPerJumpPoint.get() / Configs.horseEngineRpm.get());
     }
 
     public static double resolveJumpStrength(PathfinderMob mob) {
@@ -135,7 +134,11 @@ public class HorseEngineBlockEntity extends GeneratingKineticBlockEntity impleme
         super.destroy();
         if (level != null && !level.isClientSide && worker.hasWorker()) {
             worker.releaseWorkerToWorld();
-            Containers.dropItemStack(level, worldPosition.getX(), worldPosition.getY() + 1, worldPosition.getZ(),
+            Containers.dropItemStack(
+                    level,
+                    worldPosition.getX(),
+                    worldPosition.getY() + 1,
+                    worldPosition.getZ(),
                     new ItemStack(Items.LEAD));
         }
     }
@@ -143,7 +146,6 @@ public class HorseEngineBlockEntity extends GeneratingKineticBlockEntity impleme
     @Override
     protected AABB createRenderBoundingBox() {
         BlockPos pos = getBlockPos();
-        return new AABB(pos.getX() - 3, pos.getY(), pos.getZ() - 3,
-                pos.getX() + 4, pos.getY() + 4, pos.getZ() + 4);
+        return new AABB(pos.getX() - 3, pos.getY(), pos.getZ() - 3, pos.getX() + 4, pos.getY() + 4, pos.getZ() + 4);
     }
 }

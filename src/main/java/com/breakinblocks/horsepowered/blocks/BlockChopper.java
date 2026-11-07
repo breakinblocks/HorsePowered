@@ -44,17 +44,22 @@ public class BlockChopper extends BlockHPBase {
         BlockPos pos = context.getClickedPos();
         Level level = context.getLevel();
         // Check if there's room for the filler block above
-        if (pos.getY() < level.getMaxBuildHeight() - 1 && level.getBlockState(pos.above()).canBeReplaced(context)) {
-            return defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
+        if (pos.getY() < level.getMaxBuildHeight() - 1
+                && level.getBlockState(pos.above()).canBeReplaced(context)) {
+            return defaultBlockState()
+                    .setValue(FACING, context.getHorizontalDirection().getOpposite());
         }
         return null; // Can't place - no room for top block
     }
 
     @Override
-    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+    public void setPlacedBy(
+            Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
         // Place the filler block above
         BlockPos fillerPos = pos.above();
-        BlockState fillerState = ModBlocks.FILLER.get().defaultBlockState()
+        BlockState fillerState = ModBlocks.FILLER
+                .get()
+                .defaultBlockState()
                 .setValue(BlockFiller.FACING, Direction.DOWN); // Points down to main block
         level.setBlock(fillerPos, fillerState, 3);
 
@@ -89,7 +94,8 @@ public class BlockChopper extends BlockHPBase {
 
     @Nullable
     @Override
-    protected <T extends BlockEntity> BlockEntityTicker<T> createTicker(Level level, BlockState state, BlockEntityType<T> type) {
+    protected <T extends BlockEntity> BlockEntityTicker<T> createTicker(
+            Level level, BlockState state, BlockEntityType<T> type) {
         if (level.isClientSide) {
             return checkType(type, ModBlocks.CHOPPER_BE.get(), HPBlockEntityHorseBase::clientTick);
         }
