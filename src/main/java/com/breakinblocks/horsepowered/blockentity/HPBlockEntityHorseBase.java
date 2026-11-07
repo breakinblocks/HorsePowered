@@ -23,7 +23,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.LeverBlock;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.TagValueInput;
@@ -119,9 +118,7 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
         int obstructions = 0;
         int tolerance = HorsePowerConfig.pathObstructionTolerance.get();
         for (BlockPos pos : searchPos) {
-            BlockState state = level.getBlockState(pos);
-            if (state.getBlock() instanceof LeverBlock) continue;
-            if (!state.canBeReplaced()) {
+            if (!isClearSpace(pos)) {
                 obstructions++;
                 if (obstructions > tolerance) {
                     return false;
@@ -135,6 +132,11 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
         }
         pathSpeedMultiplier = computePathSpeedMultiplier();
         return true;
+    }
+
+    private boolean isClearSpace(BlockPos pos) {
+        BlockState state = level.getBlockState(pos);
+        return state.canBeReplaced() || state.getCollisionShape(level, pos).isEmpty();
     }
 
     private boolean isValidFloor(BlockPos pos) {
@@ -458,9 +460,7 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
 
         if (searchPos != null) {
             for (BlockPos pos : searchPos) {
-                BlockState state = level.getBlockState(pos);
-                boolean isClear = state.canBeReplaced() || state.getBlock() instanceof LeverBlock;
-                positions.add(Map.entry(pos, isClear));
+                positions.add(Map.entry(pos, isClearSpace(pos)));
             }
         }
         if (floorPos != null) {

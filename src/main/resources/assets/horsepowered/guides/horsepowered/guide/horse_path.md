@@ -13,7 +13,7 @@ Every horse-powered block (grindstone, chopper, press, generator) needs a 7x7 wo
 
 - A 7x7 ring (the center 3x3 is occupied by the block and a small buffer) must be clear at the block's level and one block above.
 - The 7x7 square one block below must be sturdy floor. Dirt paths, and any other block listed in the path speed config, also count as floor.
-- Levers placed inside the ring are always allowed, useful for hosting redstone toggles right on the floor (handy for the Generator).
+- Any block a mob can walk through (torches, levers, buttons, signs, flowers, redstone dust, open gates and so on) is allowed inside the ring, so you can light it or host redstone toggles right on the floor (handy for the Generator).
 - Shift + right-click any horse-powered block with an empty hand to visualize the area. Green = clear, Red = obstructed.
 
 ## Obstruction Tolerance

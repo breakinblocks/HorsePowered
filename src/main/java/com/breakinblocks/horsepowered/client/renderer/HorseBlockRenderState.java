@@ -26,6 +26,7 @@ public class HorseBlockRenderState extends BlockEntityRenderState {
     public Entity renderEntity;
     public double entityOffsetX, entityOffsetY, entityOffsetZ;
     public float entityYRot;
+    public boolean forceNameTag;
 
     public static void extractWorkerState(
             HPBlockEntityHorseBase blockEntity, HorseBlockRenderState state, float partialTick) {
@@ -60,10 +61,15 @@ public class HorseBlockRenderState extends BlockEntityRenderState {
 
             // Get the cached render entity
             state.renderEntity = blockEntity.getCachedRenderEntity();
+            if (state.renderEntity != null) {
+                state.renderEntity.setPos(interpX, interpY, interpZ);
+            }
+            state.forceNameTag = VirtualWorkerRenderer.isLookedAt(state.renderEntity);
         } else {
             state.hasWorker = false;
             state.workerOffset = null;
             state.renderEntity = null;
+            state.forceNameTag = false;
         }
 
         state.showHighlight = blockEntity.shouldShowHighlight();
@@ -84,7 +90,8 @@ public class HorseBlockRenderState extends BlockEntityRenderState {
                         poseStack,
                         collector,
                         camera,
-                        state.lightCoords);
+                        state.lightCoords,
+                        state.forceNameTag);
             }
 
             if (state.workerOffset != null) {
