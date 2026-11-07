@@ -14,7 +14,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.LeverBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -112,9 +111,7 @@ public class VirtualWorker {
         int obstructions = 0;
         int tolerance = Configs.pathObstructionTolerance.get();
         for (BlockPos pos : searchPos) {
-            BlockState state = level.getBlockState(pos);
-            if (state.getBlock() instanceof LeverBlock) continue;
-            if (!state.canBeReplaced()) {
+            if (!isClearSpace(level, pos)) {
                 obstructions++;
                 if (obstructions > tolerance) {
                     return false;
@@ -128,6 +125,11 @@ public class VirtualWorker {
         }
         pathSpeedMultiplier = computePathSpeedMultiplier();
         return true;
+    }
+
+    private static boolean isClearSpace(Level level, BlockPos pos) {
+        BlockState state = level.getBlockState(pos);
+        return state.canBeReplaced() || state.getCollisionShape(level, pos).isEmpty();
     }
 
     private static boolean isValidFloor(Level level, BlockPos pos) {
@@ -384,9 +386,7 @@ public class VirtualWorker {
 
         if (searchPos != null) {
             for (BlockPos pos : searchPos) {
-                BlockState state = level.getBlockState(pos);
-                boolean isClear = state.canBeReplaced() || state.getBlock() instanceof LeverBlock;
-                positions.add(Map.entry(pos, isClear));
+                positions.add(Map.entry(pos, isClearSpace(level, pos)));
             }
         }
         if (floorPos != null) {
