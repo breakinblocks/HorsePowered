@@ -3,10 +3,9 @@ package com.breakinblocks.horsepowered.blocks;
 import com.breakinblocks.horsepowered.blockentity.GeneratorBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.HPBlockEntityHorseBase;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -70,7 +69,7 @@ public class BlockGenerator extends BlockHPBase {
         tag.putInt("energy", stored);
         for (ItemStack drop : drops) {
             if (drop.is(this.asItem())) {
-                drop.set(DataComponents.BLOCK_ENTITY_DATA, CustomData.of(tag));
+                BlockItem.setBlockEntityData(drop, generator.getType(), tag);
                 break;
             }
         }

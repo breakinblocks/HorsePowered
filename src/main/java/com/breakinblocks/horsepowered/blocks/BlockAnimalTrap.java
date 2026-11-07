@@ -3,7 +3,6 @@ package com.breakinblocks.horsepowered.blocks;
 import com.breakinblocks.horsepowered.blockentity.AnimalTrapBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -11,6 +10,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
@@ -27,7 +27,6 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
@@ -127,9 +126,7 @@ public class BlockAnimalTrap extends Block implements EntityBlock, SimpleWaterlo
         if (be instanceof AnimalTrapBlockEntity trap) {
             ItemStack stack = new ItemStack(this);
             CompoundTag beTag = trap.writeBlockEntityComponent(params.getLevel().registryAccess());
-            if (!beTag.isEmpty()) {
-                stack.set(DataComponents.BLOCK_ENTITY_DATA, CustomData.of(beTag));
-            }
+            BlockItem.setBlockEntityData(stack, trap.getType(), beTag);
             return List.of(stack);
         }
         return super.getDrops(state, params);
