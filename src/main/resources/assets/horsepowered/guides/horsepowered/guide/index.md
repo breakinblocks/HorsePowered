@@ -49,6 +49,6 @@ Start by crafting a [Hand Grindstone](hand_grindstone.md) for manual grinding, o
 - Horses and other creatures can be attached to horse-powered blocks by leading them with a lead and right-clicking the block
 - Horse-powered blocks require a clear 7x7 working area around them with a sturdy floor below
 - A small number of obstructions (chests, hoppers, gears) are tolerated inside the ring; see [Horse Path & Speed](horse_path.md) for details
-- Levers placed inside the working area are allowed, so you can host redstone toggles right on the floor (useful for the Generator)
+- Any block a mob can walk through (torches, levers, buttons, signs, flowers, redstone dust, open gates and so on) is allowed inside the working area, so you can light it or host redstone toggles right on the floor (useful for the Generator)
 - The floor blocks under the path scale the worker's speed: dirt and grass slow it down, dirt paths run at full speed, packed ice doubles it. See [Horse Path & Speed](horse_path.md) for the full list and configuration
 - Shift+Right-click a horse-powered block with an empty hand to see its required working area

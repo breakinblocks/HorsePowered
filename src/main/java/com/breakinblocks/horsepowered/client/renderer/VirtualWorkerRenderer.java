@@ -1,5 +1,6 @@
 package com.breakinblocks.horsepowered.client.renderer;
 
+import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.blockentity.VirtualWorker;
 import com.breakinblocks.horsepowered.blockentity.WorkerHost;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -10,12 +11,25 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.RenderNameTagEvent;
+import net.neoforged.neoforge.common.util.TriState;
+import java.util.Optional;
 
 /**
  * Renders a virtual (non-world) entity from within a block entity renderer.
  * Uses EntityRenderDispatcher to render the entity at a given offset from the block position.
  */
+@EventBusSubscriber(modid = HorsePowerMod.MOD_ID, value = Dist.CLIENT)
 public class VirtualWorkerRenderer {
+
+    private static Entity forcedNameTagEntity;
 
     /**
      * Renders the virtual worker for a horse-powered block entity.
@@ -47,7 +61,40 @@ public class VirtualWorkerRenderer {
         while (diff > 180) diff -= 360;
         float interpYRot = prevYRot + diff * partialTick;
 
-        renderEntity(entity, offsetX, offsetY, offsetZ, interpYRot, partialTick, poseStack, bufferSource, packedLight);
+        entity.setPos(workerX, worker.getVirtualY(), workerZ);
+        forcedNameTagEntity = isLookedAt(entity) ? entity : null;
+        try {
+            renderEntity(entity, offsetX, offsetY, offsetZ, interpYRot, partialTick, poseStack, bufferSource, packedLight);
+        } finally {
+            forcedNameTagEntity = null;
+        }
+    }
+
+    private static boolean isLookedAt(Entity entity) {
+        if (!entity.hasCustomName() || !Minecraft.renderNames()) return false;
+        Minecraft mc = Minecraft.getInstance();
+        Player player = mc.player;
+        if (player == null || entity.isInvisibleTo(player)) return false;
+
+        Vec3 eye = player.getEyePosition();
+        double range = player.entityInteractionRange();
+        Vec3 end = eye.add(player.getViewVector(1.0F).scale(range));
+        AABB box = entity.getBoundingBox().inflate(entity.getPickRadius());
+        Optional<Vec3> hit = box.contains(eye) ? Optional.of(eye) : box.clip(eye, end);
+        if (hit.isEmpty()) return false;
+
+        HitResult blockHit = mc.hitResult;
+        if (blockHit != null && blockHit.getType() == HitResult.Type.BLOCK) {
+            return blockHit.getLocation().distanceToSqr(eye) >= hit.get().distanceToSqr(eye);
+        }
+        return true;
+    }
+
+    @SubscribeEvent
+    public static void onRenderNameTag(RenderNameTagEvent event) {
+        if (forcedNameTagEntity != null && event.getEntity() == forcedNameTagEntity) {
+            event.setCanRender(TriState.TRUE);
+        }
     }
 
     /**
