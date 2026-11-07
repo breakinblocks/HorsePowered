@@ -29,13 +29,13 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
     private static final ResourceLocation BLADE_TEXTURE = ResourceLocation.withDefaultNamespace("block/iron_block");
 
     // Blade dimensions (in blocks)
-    private static final float BLADE_WIDTH = 0.625F;   // 10/16
-    private static final float BLADE_DEPTH = 0.125F;   // 2/16
+    private static final float BLADE_WIDTH = 0.625F; // 10/16
+    private static final float BLADE_DEPTH = 0.125F; // 2/16
     private static final float BLADE_HEIGHT = 0.1875F; // 3/16
 
     // Blade position constants
-    private static final float BLADE_MIN_Y = 0.5F;     // Lowest position (at chopping surface - top of oak slab)
-    private static final float BLADE_MAX_Y = 1.25F;    // Highest position (raised)
+    private static final float BLADE_MIN_Y = 0.5F; // Lowest position (at chopping surface - top of oak slab)
+    private static final float BLADE_MAX_Y = 1.25F; // Highest position (raised)
 
     private static final double BASE_TOP = 6.0D / 16.0D;
 
@@ -48,8 +48,13 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
     }
 
     @Override
-    public void render(ChopperBlockEntity blockEntity, float partialTick, PoseStack poseStack,
-                       MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
+    public void render(
+            ChopperBlockEntity blockEntity,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            int packedLight,
+            int packedOverlay) {
 
         BlockState state = blockEntity.getBlockState();
         // Skip the last-frame render when the BE is being destroyed — the state
@@ -78,8 +83,18 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
         float rotation = getRotation(facing);
 
         // Log stands upright on the chopping surface so the blade cleaves it like a real axe chop.
-        RenderUtils.renderStandingItem(poseStack, bufferSource, itemRenderer,
-                input, 0.5, 0.71, 0.5, 0.6F, rotation, packedLight, packedOverlay,
+        RenderUtils.renderStandingItem(
+                poseStack,
+                bufferSource,
+                itemRenderer,
+                input,
+                0.5,
+                0.71,
+                0.5,
+                0.6F,
+                rotation,
+                packedLight,
+                packedOverlay,
                 blockEntity.getLevel());
 
         // Render output item
@@ -90,8 +105,15 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
             poseStack.mulPose(Axis.YP.rotationDegrees(rotation + 45));
             poseStack.mulPose(Axis.XP.rotationDegrees(90));
 
-            itemRenderer.renderStatic(output, ItemDisplayContext.FIXED, packedLight, packedOverlay,
-                    poseStack, bufferSource, blockEntity.getLevel(), 0);
+            itemRenderer.renderStatic(
+                    output,
+                    ItemDisplayContext.FIXED,
+                    packedLight,
+                    packedOverlay,
+                    poseStack,
+                    bufferSource,
+                    blockEntity.getLevel(),
+                    0);
             poseStack.popPose();
         }
 
@@ -100,8 +122,10 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
             double countY = input.isEmpty()
                     ? Math.max(RenderUtils.itemTop(itemRenderer, output, level, 0.3D, 0.4F, false), BASE_TOP)
                     : RenderUtils.itemTop(itemRenderer, input, level, 0.71D, 0.6F, true);
-            countY = RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, input.getCount(), 0.5D, countY, 0.5D);
-            RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, output.getCount(), 0.5D, countY, 0.5D);
+            countY = RenderUtils.renderItemCountBillboard(
+                    poseStack, bufferSource, font, packedLight, input.getCount(), 0.5D, countY, 0.5D);
+            RenderUtils.renderItemCountBillboard(
+                    poseStack, bufferSource, font, packedLight, output.getCount(), 0.5D, countY, 0.5D);
         }
     }
 
@@ -116,8 +140,12 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
     }
 
     @SuppressWarnings("deprecation")
-    private void renderBlade(ChopperBlockEntity blockEntity, PoseStack poseStack,
-                             MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
+    private void renderBlade(
+            ChopperBlockEntity blockEntity,
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            int packedLight,
+            int packedOverlay) {
         // Get the visual windup progress (-0.74 to 0, where 0 is fully raised)
         float windup = blockEntity.getVisualWindup();
 
@@ -126,7 +154,9 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
         float progress = (windup + 0.74F) / 0.74F;
         float bladeY = BLADE_MIN_Y + (BLADE_MAX_Y - BLADE_MIN_Y) * progress;
 
-        TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(BLADE_TEXTURE);
+        TextureAtlasSprite sprite = Minecraft.getInstance()
+                .getTextureAtlas(TextureAtlas.LOCATION_BLOCKS)
+                .apply(BLADE_TEXTURE);
         VertexConsumer builder = bufferSource.getBuffer(RenderType.solid());
 
         poseStack.pushPose();
@@ -209,7 +239,6 @@ public class ChopperBlockEntityRenderer implements BlockEntityRenderer<ChopperBl
     @Override
     public AABB getRenderBoundingBox(ChopperBlockEntity blockEntity) {
         BlockPos pos = blockEntity.getBlockPos();
-        return new AABB(pos.getX() - 3, pos.getY(), pos.getZ() - 3,
-                        pos.getX() + 4, pos.getY() + 4, pos.getZ() + 4);
+        return new AABB(pos.getX() - 3, pos.getY(), pos.getZ() - 3, pos.getX() + 4, pos.getY() + 4, pos.getZ() + 4);
     }
 }

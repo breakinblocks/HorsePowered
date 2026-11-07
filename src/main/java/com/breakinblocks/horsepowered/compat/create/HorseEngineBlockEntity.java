@@ -27,13 +27,15 @@ public class HorseEngineBlockEntity extends GeneratingKineticBlockEntity impleme
     }
 
     public static float capacityPerRpm(double jumpStrength) {
-        return (float) (jumpStrength * 10.0
+        return (float) (jumpStrength
+                * 10.0
                 * HorsePowerConfig.horseEngineStressPerJumpPoint.get()
                 / HorsePowerConfig.horseEngineRpm.get());
     }
 
     public static double resolveJumpStrength(PathfinderMob mob) {
-        ResourceKey<EntityType<?>> key = BuiltInRegistries.ENTITY_TYPE.getResourceKey(mob.getType()).orElse(null);
+        ResourceKey<EntityType<?>> key =
+                BuiltInRegistries.ENTITY_TYPE.getResourceKey(mob.getType()).orElse(null);
         if (key != null) {
             Double override = BuiltInRegistries.ENTITY_TYPE.getData(CreateCompat.JUMP_STRENGTH, key);
             if (override != null) {
@@ -140,7 +142,6 @@ public class HorseEngineBlockEntity extends GeneratingKineticBlockEntity impleme
     @Override
     protected AABB createRenderBoundingBox() {
         BlockPos pos = getBlockPos();
-        return new AABB(pos.getX() - 3, pos.getY(), pos.getZ() - 3,
-                pos.getX() + 4, pos.getY() + 4, pos.getZ() + 4);
+        return new AABB(pos.getX() - 3, pos.getY(), pos.getZ() - 3, pos.getX() + 4, pos.getY() + 4, pos.getZ() + 4);
     }
 }

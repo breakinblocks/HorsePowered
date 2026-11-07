@@ -5,6 +5,7 @@ import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import com.breakinblocks.horsepowered.recipes.HPRecipeInput;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
 import com.breakinblocks.horsepowered.recipes.PressRecipe;
+import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -14,8 +15,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
-
-import java.util.Optional;
 
 public class PressBlockEntity extends HPBlockEntityHorseBase {
 
@@ -90,13 +89,10 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
 
     private boolean matchesAnyRecipeOutput(FluidStack fluid) {
         if (level == null || fluid.isEmpty()) return false;
-        return level.getRecipeManager()
-                .getAllRecipesFor(HPRecipes.PRESSING_TYPE.get())
-                .stream()
+        return level.getRecipeManager().getAllRecipesFor(HPRecipes.PRESSING_TYPE.get()).stream()
                 .anyMatch(r -> {
                     PressRecipe rec = r.value();
-                    return rec.hasFluidOutput()
-                            && FluidStack.isSameFluidSameComponents(rec.getFluidResult(), fluid);
+                    return rec.hasFluidOutput() && FluidStack.isSameFluidSameComponents(rec.getFluidResult(), fluid);
                 });
     }
 
@@ -127,8 +123,7 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
     public Optional<RecipeHolder<PressRecipe>> getRecipe() {
         if (level == null) return Optional.empty();
         HPRecipeInput input = new HPRecipeInput(getItem(0));
-        return level.getRecipeManager()
-                .getRecipeFor(HPRecipes.PRESSING_TYPE.get(), input, level);
+        return level.getRecipeManager().getRecipeFor(HPRecipes.PRESSING_TYPE.get(), input, level);
     }
 
     @Override
@@ -185,12 +180,14 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
             // Fluid output: item slot must be empty, output tank must have room for the result.
             return output.isEmpty()
                     && (outputTank.getFluidAmount() == 0
-                        || outputTank.fill(fluidOutput.copy(), IFluidHandler.FluidAction.SIMULATE) >= fluidOutput.getAmount());
+                            || outputTank.fill(fluidOutput.copy(), IFluidHandler.FluidAction.SIMULATE)
+                                    >= fluidOutput.getAmount());
         } else {
             // Item output: output tank must be empty, output slot must have room.
             return outputTank.getFluidAmount() == 0
-                    && (output.isEmpty() || (ItemStack.isSameItemSameComponents(output, result)
-                            && output.getCount() + result.getCount() <= output.getMaxStackSize()));
+                    && (output.isEmpty()
+                            || (ItemStack.isSameItemSameComponents(output, result)
+                                    && output.getCount() + result.getCount() <= output.getMaxStackSize()));
         }
     }
 
@@ -198,9 +195,7 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
     public int getInventoryStackLimit(ItemStack stack) {
         if (level == null) return getInventoryStackLimit();
 
-        return level.getRecipeManager()
-                .getAllRecipesFor(HPRecipes.PRESSING_TYPE.get())
-                .stream()
+        return level.getRecipeManager().getAllRecipesFor(HPRecipes.PRESSING_TYPE.get()).stream()
                 .map(RecipeHolder::value)
                 .filter(r -> r.getIngredient().test(stack))
                 .mapToInt(PressRecipe::getInputCount)
@@ -219,9 +214,7 @@ public class PressBlockEntity extends HPBlockEntityHorseBase {
         if (currentPressStatus != 0 && !getItem(0).isEmpty()) return false;
         if (level == null) return false;
 
-        return level.getRecipeManager()
-                .getAllRecipesFor(HPRecipes.PRESSING_TYPE.get())
-                .stream()
+        return level.getRecipeManager().getAllRecipesFor(HPRecipes.PRESSING_TYPE.get()).stream()
                 .anyMatch(recipe -> recipe.value().getIngredient().test(stack));
     }
 

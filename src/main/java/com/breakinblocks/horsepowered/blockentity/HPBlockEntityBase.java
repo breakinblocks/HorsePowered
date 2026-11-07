@@ -96,8 +96,7 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
         }
 
         if (slot == 0 && !stack.isEmpty()) {
-            boolean sameAsLast = !lastInputType.isEmpty()
-                    && ItemStack.isSameItemSameComponents(stack, lastInputType);
+            boolean sameAsLast = !lastInputType.isEmpty() && ItemStack.isSameItemSameComponents(stack, lastInputType);
             if (!sameAsLast) {
                 onInputChanged();
             }
@@ -133,7 +132,9 @@ public abstract class HPBlockEntityBase extends BlockEntity implements Container
         if (level == null || level.getBlockEntity(worldPosition) != this) {
             return false;
         }
-        return player.distanceToSqr(worldPosition.getX() + 0.5D, worldPosition.getY() + 0.5D, worldPosition.getZ() + 0.5D) <= 64.0D;
+        return player.distanceToSqr(
+                        worldPosition.getX() + 0.5D, worldPosition.getY() + 0.5D, worldPosition.getZ() + 0.5D)
+                <= 64.0D;
     }
 
     @Override

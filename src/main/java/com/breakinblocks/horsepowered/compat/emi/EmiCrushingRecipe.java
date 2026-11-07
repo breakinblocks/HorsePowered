@@ -36,13 +36,19 @@ public class EmiCrushingRecipe extends BasicEmiRecipe {
         int strikes = time * HorsePowerConfig.crushingMultiplier.get();
         widgets.addText(
                 Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.strikes", strikes),
-                26, 20, 0x808080, false);
+                26,
+                20,
+                0x808080,
+                false);
 
         if (hungerCost > 0.0F) {
             widgets.addText(
-                    Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.hunger",
-                            String.format("%.2f", hungerCost)),
-                    26, 30, 0x808080, false);
+                    Component.translatable(
+                            "gui." + HorsePowerMod.MOD_ID + ".jei.hunger", String.format("%.2f", hungerCost)),
+                    26,
+                    30,
+                    0x808080,
+                    false);
         }
     }
 }

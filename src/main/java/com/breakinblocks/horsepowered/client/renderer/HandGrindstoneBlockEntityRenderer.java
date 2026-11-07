@@ -27,8 +27,13 @@ public class HandGrindstoneBlockEntityRenderer implements BlockEntityRenderer<Ha
     }
 
     @Override
-    public void render(HandGrindstoneBlockEntity blockEntity, float partialTick, PoseStack poseStack,
-                       MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
+    public void render(
+            HandGrindstoneBlockEntity blockEntity,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            int packedLight,
+            int packedOverlay) {
         Direction front = blockEntity.getBlockState().getValue(BlockHandGrindstone.FACING);
         Direction inputSide = front.getClockWise();
         Direction outputSide = front.getCounterClockWise();
@@ -37,9 +42,19 @@ public class HandGrindstoneBlockEntityRenderer implements BlockEntityRenderer<Ha
         ItemStack output = blockEntity.getItem(1);
         ItemStack secondary = blockEntity.getItem(2);
 
-        RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer,
-                input, 0.5, 0.9, 0.5, 0.4F, blockEntity.getVisibleRotation(),
-                packedLight, packedOverlay, blockEntity.getLevel());
+        RenderUtils.renderFlatItem(
+                poseStack,
+                bufferSource,
+                itemRenderer,
+                input,
+                0.5,
+                0.9,
+                0.5,
+                0.4F,
+                blockEntity.getVisibleRotation(),
+                packedLight,
+                packedOverlay,
+                blockEntity.getLevel());
 
         renderSide(blockEntity, poseStack, bufferSource, packedLight, packedOverlay, input, inputSide);
         renderSide(blockEntity, poseStack, bufferSource, packedLight, packedOverlay, output, outputSide);
@@ -47,23 +62,40 @@ public class HandGrindstoneBlockEntityRenderer implements BlockEntityRenderer<Ha
 
         if (RenderUtils.shouldShowItemCounts(blockEntity)) {
             double countY = RenderUtils.itemTop(itemRenderer, input, blockEntity.getLevel(), 0.9, 0.4F, false);
-            RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, input.getCount(), 0.5, countY, 0.5);
+            RenderUtils.renderItemCountBillboard(
+                    poseStack, bufferSource, font, packedLight, input.getCount(), 0.5, countY, 0.5);
             renderSideCount(poseStack, bufferSource, packedLight, output.getCount(), outputSide);
             renderSideCount(poseStack, bufferSource, packedLight, secondary.getCount(), front);
         }
     }
 
-    private void renderSide(HandGrindstoneBlockEntity blockEntity, PoseStack poseStack, MultiBufferSource bufferSource,
-                            int packedLight, int packedOverlay, ItemStack stack, Direction side) {
+    private void renderSide(
+            HandGrindstoneBlockEntity blockEntity,
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            int packedLight,
+            int packedOverlay,
+            ItemStack stack,
+            Direction side) {
         double x = 0.5 + side.getStepX() * 0.25;
         double z = 0.5 + side.getStepZ() * 0.25;
-        RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer,
-                stack, x, SIDE_Y, z, SIDE_SCALE, 0,
-                packedLight, packedOverlay, blockEntity.getLevel());
+        RenderUtils.renderFlatItem(
+                poseStack,
+                bufferSource,
+                itemRenderer,
+                stack,
+                x,
+                SIDE_Y,
+                z,
+                SIDE_SCALE,
+                0,
+                packedLight,
+                packedOverlay,
+                blockEntity.getLevel());
     }
 
-    private void renderSideCount(PoseStack poseStack, MultiBufferSource bufferSource, int packedLight,
-                                 int count, Direction side) {
+    private void renderSideCount(
+            PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int count, Direction side) {
         double x = 0.5 + side.getStepX() * 0.25;
         double z = 0.5 + side.getStepZ() * 0.25;
         RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, count, x, SIDE_COUNT_Y, z);

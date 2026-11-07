@@ -27,8 +27,13 @@ public class GrindstoneBlockEntityRenderer implements BlockEntityRenderer<Grinds
     }
 
     @Override
-    public void render(GrindstoneBlockEntity blockEntity, float partialTick, PoseStack poseStack,
-                       MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
+    public void render(
+            GrindstoneBlockEntity blockEntity,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            int packedLight,
+            int packedOverlay) {
 
         // Render working area highlight if active
         WorkingAreaRenderer.renderIfActive(blockEntity, poseStack, bufferSource);
@@ -51,14 +56,22 @@ public class GrindstoneBlockEntityRenderer implements BlockEntityRenderer<Grinds
             poseStack.scale(0.5F, 0.5F, 0.5F);
             poseStack.mulPose(Axis.XP.rotationDegrees(90));
 
-            itemRenderer.renderStatic(input, ItemDisplayContext.FIXED, packedLight, packedOverlay,
-                    poseStack, bufferSource, blockEntity.getLevel(), 0);
+            itemRenderer.renderStatic(
+                    input,
+                    ItemDisplayContext.FIXED,
+                    packedLight,
+                    packedOverlay,
+                    poseStack,
+                    bufferSource,
+                    blockEntity.getLevel(),
+                    0);
             poseStack.popPose();
 
             // Render count billboard-style above the item
             if (showCounts) {
                 double countY = RenderUtils.itemTop(itemRenderer, input, blockEntity.getLevel(), 1.1D, 0.5F, false);
-                RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, input.getCount(), 0.5D, countY, 0.5D);
+                RenderUtils.renderItemCountBillboard(
+                        poseStack, bufferSource, font, packedLight, input.getCount(), 0.5D, countY, 0.5D);
             }
         }
 
@@ -69,12 +82,20 @@ public class GrindstoneBlockEntityRenderer implements BlockEntityRenderer<Grinds
             poseStack.scale(0.3F, 0.3F, 0.3F);
             poseStack.mulPose(Axis.XP.rotationDegrees(90));
 
-            itemRenderer.renderStatic(output, ItemDisplayContext.FIXED, packedLight, packedOverlay,
-                    poseStack, bufferSource, blockEntity.getLevel(), 0);
+            itemRenderer.renderStatic(
+                    output,
+                    ItemDisplayContext.FIXED,
+                    packedLight,
+                    packedOverlay,
+                    poseStack,
+                    bufferSource,
+                    blockEntity.getLevel(),
+                    0);
             poseStack.popPose();
 
             if (showCounts) {
-                RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, output.getCount(), 0.5D, GRINDER_TOP, 0.25D);
+                RenderUtils.renderItemCountBillboard(
+                        poseStack, bufferSource, font, packedLight, output.getCount(), 0.5D, GRINDER_TOP, 0.25D);
             }
         }
 
@@ -85,12 +106,20 @@ public class GrindstoneBlockEntityRenderer implements BlockEntityRenderer<Grinds
             poseStack.scale(0.3F, 0.3F, 0.3F);
             poseStack.mulPose(Axis.XP.rotationDegrees(90));
 
-            itemRenderer.renderStatic(secondary, ItemDisplayContext.FIXED, packedLight, packedOverlay,
-                    poseStack, bufferSource, blockEntity.getLevel(), 0);
+            itemRenderer.renderStatic(
+                    secondary,
+                    ItemDisplayContext.FIXED,
+                    packedLight,
+                    packedOverlay,
+                    poseStack,
+                    bufferSource,
+                    blockEntity.getLevel(),
+                    0);
             poseStack.popPose();
 
             if (showCounts) {
-                RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, secondary.getCount(), 0.5D, GRINDER_TOP, 0.75D);
+                RenderUtils.renderItemCountBillboard(
+                        poseStack, bufferSource, font, packedLight, secondary.getCount(), 0.5D, GRINDER_TOP, 0.75D);
             }
         }
     }
@@ -109,7 +138,6 @@ public class GrindstoneBlockEntityRenderer implements BlockEntityRenderer<Grinds
     @Override
     public AABB getRenderBoundingBox(GrindstoneBlockEntity blockEntity) {
         BlockPos pos = blockEntity.getBlockPos();
-        return new AABB(pos.getX() - 3, pos.getY(), pos.getZ() - 3,
-                        pos.getX() + 4, pos.getY() + 4, pos.getZ() + 4);
+        return new AABB(pos.getX() - 3, pos.getY(), pos.getZ() - 3, pos.getX() + 4, pos.getY() + 4, pos.getZ() + 4);
     }
 }

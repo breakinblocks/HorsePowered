@@ -6,12 +6,11 @@ import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
+import java.util.Arrays;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.FluidStack;
-
-import java.util.Arrays;
 
 public class EmiPressRecipe extends BasicEmiRecipe {
 
@@ -29,14 +28,13 @@ public class EmiPressRecipe extends BasicEmiRecipe {
 
         EmiIngredient input = EmiIngredient.of(recipe.getIngredient());
         if (inputCount > 1) {
-            input = EmiIngredient.of(
-                    Arrays.stream(recipe.getIngredient().getItems())
-                            .map(stack -> {
-                                ItemStack copy = stack.copy();
-                                copy.setCount(inputCount);
-                                return EmiStack.of(copy);
-                            })
-                            .toList());
+            input = EmiIngredient.of(Arrays.stream(recipe.getIngredient().getItems())
+                    .map(stack -> {
+                        ItemStack copy = stack.copy();
+                        copy.setCount(inputCount);
+                        return EmiStack.of(copy);
+                    })
+                    .toList());
         }
         this.inputs.add(input);
 

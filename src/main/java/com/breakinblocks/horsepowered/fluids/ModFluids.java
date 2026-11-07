@@ -23,11 +23,12 @@ public class ModFluids {
             DeferredRegister.create(Registries.FLUID, HorsePowerMod.MOD_ID);
 
     // Seed oil - viscous plant-based oil
-    public static final DeferredHolder<FluidType, FluidType> SEED_OIL_TYPE = FLUID_TYPES.register("seed_oil",
+    public static final DeferredHolder<FluidType, FluidType> SEED_OIL_TYPE = FLUID_TYPES.register(
+            "seed_oil",
             () -> new FluidType(FluidType.Properties.create()
                     .descriptionId("fluid_type." + HorsePowerMod.MOD_ID + ".seed_oil")
-                    .density(920)       // Lighter than water
-                    .viscosity(3000)    // 3x more viscous than water
+                    .density(920) // Lighter than water
+                    .viscosity(3000) // 3x more viscous than water
                     .temperature(300)
                     .fallDistanceModifier(0F)
                     .canExtinguish(false)
@@ -36,14 +37,13 @@ public class ModFluids {
                     .supportsBoating(true)
                     .sound(SoundActions.BUCKET_FILL, SoundEvents.BUCKET_FILL)
                     .sound(SoundActions.BUCKET_EMPTY, SoundEvents.BUCKET_EMPTY)
-                    .sound(SoundActions.FLUID_VAPORIZE, SoundEvents.FIRE_EXTINGUISH)
-            ));
+                    .sound(SoundActions.FLUID_VAPORIZE, SoundEvents.FIRE_EXTINGUISH)));
 
-    public static final DeferredHolder<Fluid, FlowingFluid> SEED_OIL_SOURCE = FLUIDS.register("seed_oil",
-            () -> new BaseFlowingFluid.Source(seedOilProperties()));
+    public static final DeferredHolder<Fluid, FlowingFluid> SEED_OIL_SOURCE =
+            FLUIDS.register("seed_oil", () -> new BaseFlowingFluid.Source(seedOilProperties()));
 
-    public static final DeferredHolder<Fluid, FlowingFluid> SEED_OIL_FLOWING = FLUIDS.register("flowing_seed_oil",
-            () -> new BaseFlowingFluid.Flowing(seedOilProperties()));
+    public static final DeferredHolder<Fluid, FlowingFluid> SEED_OIL_FLOWING =
+            FLUIDS.register("flowing_seed_oil", () -> new BaseFlowingFluid.Flowing(seedOilProperties()));
 
     private static BaseFlowingFluid.Properties seedOilProperties() {
         return new BaseFlowingFluid.Properties(SEED_OIL_TYPE, SEED_OIL_SOURCE, SEED_OIL_FLOWING)

@@ -1,6 +1,8 @@
 package com.breakinblocks.horsepowered.items;
 
 import com.breakinblocks.horsepowered.HorsePowerMod;
+import java.util.List;
+import java.util.Optional;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -29,9 +31,6 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.List;
-import java.util.Optional;
-
 public class WorkSaddleItem extends Item {
 
     public static final TagKey<EntityType<?>> VALID_WORKER =
@@ -41,7 +40,8 @@ public class WorkSaddleItem extends Item {
         super(properties);
     }
 
-    public static InteractionResult tryCapture(ItemStack stack, Player player, LivingEntity target, InteractionHand hand) {
+    public static InteractionResult tryCapture(
+            ItemStack stack, Player player, LivingEntity target, InteractionHand hand) {
         Level level = target.level();
         CustomData stored = stack.get(DataComponents.ENTITY_DATA);
         if (stored != null && !stored.isEmpty()) {
@@ -95,9 +95,8 @@ public class WorkSaddleItem extends Item {
         BlockPos clickedPos = context.getClickedPos();
         Direction face = context.getClickedFace();
         BlockState clickedState = level.getBlockState(clickedPos);
-        BlockPos spawnPos = clickedState.getCollisionShape(level, clickedPos).isEmpty()
-                ? clickedPos
-                : clickedPos.relative(face);
+        BlockPos spawnPos =
+                clickedState.getCollisionShape(level, clickedPos).isEmpty() ? clickedPos : clickedPos.relative(face);
 
         CompoundTag tag = stored.copyTag();
         Optional<Entity> created = EntityType.create(tag, serverLevel);
@@ -142,7 +141,8 @@ public class WorkSaddleItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(
+            ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, context, tooltip, flag);
         CustomData stored = stack.get(DataComponents.ENTITY_DATA);
         if (stored == null || stored.isEmpty()) return;
@@ -156,8 +156,8 @@ public class WorkSaddleItem extends Item {
         EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.get(id);
         if (type == null) return;
 
-        tooltip.add(Component.translatable("item.horsepowered.work_saddle.contains",
-                Component.translatable(type.getDescriptionId()))
+        tooltip.add(Component.translatable(
+                        "item.horsepowered.work_saddle.contains", Component.translatable(type.getDescriptionId()))
                 .withStyle(ChatFormatting.GRAY));
     }
 }

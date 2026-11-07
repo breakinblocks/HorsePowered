@@ -5,7 +5,6 @@ import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.recipes.GrindstoneRecipe;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
-import mezz.jei.api.gui.builder.ITooltipBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
@@ -32,7 +31,8 @@ public class HorsePowerGrindingCategory implements IRecipeCategory<GrindstoneRec
     private final Component title;
 
     public HorsePowerGrindingCategory(IGuiHelper guiHelper) {
-        this.icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(ModBlocks.GRINDSTONE.get()));
+        this.icon =
+                guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(ModBlocks.GRINDSTONE.get()));
         this.slot = guiHelper.getSlotDrawable();
         this.arrow = guiHelper.getRecipeArrow();
         this.title = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.grinding");
@@ -81,14 +81,19 @@ public class HorsePowerGrindingCategory implements IRecipeCategory<GrindstoneRec
                     .addItemStack(recipe.getSecondary())
                     .setBackground(slot, -1, -1)
                     .addRichTooltipCallback((slotView, tooltip) -> {
-                        tooltip.add(Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.chance",
-                                recipe.getSecondaryChance()));
+                        tooltip.add(Component.translatable(
+                                "gui." + HorsePowerMod.MOD_ID + ".jei.chance", recipe.getSecondaryChance()));
                     });
         }
     }
 
     @Override
-    public void draw(GrindstoneRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+    public void draw(
+            GrindstoneRecipe recipe,
+            IRecipeSlotsView recipeSlotsView,
+            GuiGraphics guiGraphics,
+            double mouseX,
+            double mouseY) {
         // Draw arrow between input and output
         arrow.draw(guiGraphics, 26, 1);
 

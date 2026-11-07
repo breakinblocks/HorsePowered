@@ -44,31 +44,35 @@ public class HorsePowerClient {
     @SubscribeEvent
     public static void registerClientExtensions(RegisterClientExtensionsEvent event) {
         // Color is baked into the texture — no tint needed
-        event.registerFluidType(new IClientFluidTypeExtensions() {
-            @Override
-            public ResourceLocation getStillTexture() {
-                return HorsePowerMod.id("block/seed_oil_still");
-            }
+        event.registerFluidType(
+                new IClientFluidTypeExtensions() {
+                    @Override
+                    public ResourceLocation getStillTexture() {
+                        return HorsePowerMod.id("block/seed_oil_still");
+                    }
 
-            @Override
-            public ResourceLocation getFlowingTexture() {
-                return HorsePowerMod.id("block/seed_oil_flow");
-            }
+                    @Override
+                    public ResourceLocation getFlowingTexture() {
+                        return HorsePowerMod.id("block/seed_oil_flow");
+                    }
 
-            @Override
-            public ResourceLocation getOverlayTexture() {
-                return HorsePowerMod.id("block/seed_oil_still");
-            }
-        }, ModFluids.SEED_OIL_TYPE.get());
+                    @Override
+                    public ResourceLocation getOverlayTexture() {
+                        return HorsePowerMod.id("block/seed_oil_still");
+                    }
+                },
+                ModFluids.SEED_OIL_TYPE.get());
 
         Minecraft mc = Minecraft.getInstance();
         WorkSaddleItemRenderer workSaddleRenderer =
                 new WorkSaddleItemRenderer(mc.getBlockEntityRenderDispatcher(), mc.getEntityModels());
-        event.registerItem(new IClientItemExtensions() {
-            @Override
-            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                return workSaddleRenderer;
-            }
-        }, ModItems.WORK_SADDLE.get());
+        event.registerItem(
+                new IClientItemExtensions() {
+                    @Override
+                    public BlockEntityWithoutLevelRenderer getCustomRenderer() {
+                        return workSaddleRenderer;
+                    }
+                },
+                ModItems.WORK_SADDLE.get());
     }
 }

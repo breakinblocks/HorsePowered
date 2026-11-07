@@ -56,9 +56,7 @@ public class GeneratorBlockEntity extends HPBlockEntityHorseBase {
             if (stored <= 0) return;
 
             IEnergyStorage neighbor = level.getCapability(
-                    Capabilities.EnergyStorage.BLOCK,
-                    worldPosition.relative(dir),
-                    dir.getOpposite());
+                    Capabilities.EnergyStorage.BLOCK, worldPosition.relative(dir), dir.getOpposite());
             if (neighbor == null || !neighbor.canReceive()) continue;
 
             int simulated = neighbor.receiveEnergy(stored, true);

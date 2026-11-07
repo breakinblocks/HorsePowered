@@ -5,7 +5,6 @@ import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.recipes.BottlingRecipe;
 import com.breakinblocks.horsepowered.recipes.ChoppingRecipe;
 import com.breakinblocks.horsepowered.recipes.CrushingRecipe;
-import com.breakinblocks.horsepowered.recipes.DryingRackRecipe;
 import com.breakinblocks.horsepowered.recipes.GrindstoneRecipe;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
 import com.breakinblocks.horsepowered.recipes.PressRecipe;
@@ -15,12 +14,11 @@ import dev.emi.emi.api.EmiPlugin;
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiStack;
+import java.util.Comparator;
+import java.util.List;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
-
-import java.util.Comparator;
-import java.util.List;
 
 @EmiEntrypoint
 public class HorsePoweredEmiPlugin implements EmiPlugin {
@@ -82,22 +80,33 @@ public class HorsePoweredEmiPlugin implements EmiPlugin {
         Comparator<PressRecipe> pressOrder = Comparator.comparingInt(PressRecipe::getPriority);
         Comparator<CrushingRecipe> crushOrder = Comparator.comparingInt(CrushingRecipe::getPriority);
 
-        List<GrindstoneRecipe> allGrinding = rm.getAllRecipesFor(HPRecipes.GRINDING_TYPE.get())
-                .stream().map(RecipeHolder::value).toList();
-        allGrinding.stream().filter(r -> r.getTier().allowsHorse()).sorted(grindOrder)
+        List<GrindstoneRecipe> allGrinding = rm.getAllRecipesFor(HPRecipes.GRINDING_TYPE.get()).stream()
+                .map(RecipeHolder::value)
+                .toList();
+        allGrinding.stream()
+                .filter(r -> r.getTier().allowsHorse())
+                .sorted(grindOrder)
                 .forEach(r -> registry.addRecipe(new EmiGrindingRecipe(GRINDING, r)));
-        allGrinding.stream().filter(r -> r.getTier().allowsHand()).sorted(grindOrder)
+        allGrinding.stream()
+                .filter(r -> r.getTier().allowsHand())
+                .sorted(grindOrder)
                 .forEach(r -> registry.addRecipe(new EmiGrindingRecipe(MANUAL_GRINDING, r)));
 
-        List<ChoppingRecipe> allChopping = rm.getAllRecipesFor(HPRecipes.CHOPPING_TYPE.get())
-                .stream().map(RecipeHolder::value).toList();
-        allChopping.stream().filter(r -> r.getTier().allowsHorse()).sorted(chopOrder)
+        List<ChoppingRecipe> allChopping = rm.getAllRecipesFor(HPRecipes.CHOPPING_TYPE.get()).stream()
+                .map(RecipeHolder::value)
+                .toList();
+        allChopping.stream()
+                .filter(r -> r.getTier().allowsHorse())
+                .sorted(chopOrder)
                 .forEach(r -> registry.addRecipe(new EmiChoppingRecipe(CHOPPING, r)));
-        allChopping.stream().filter(r -> r.getTier().allowsHand()).sorted(chopOrder)
+        allChopping.stream()
+                .filter(r -> r.getTier().allowsHand())
+                .sorted(chopOrder)
                 .forEach(r -> registry.addRecipe(new EmiChoppingRecipe(MANUAL_CHOPPING, r)));
 
         rm.getAllRecipesFor(HPRecipes.PRESSING_TYPE.get()).stream()
-                .map(RecipeHolder::value).sorted(pressOrder)
+                .map(RecipeHolder::value)
+                .sorted(pressOrder)
                 .forEach(r -> registry.addRecipe(new EmiPressRecipe(PRESSING, r)));
 
         rm.getAllRecipesFor(HPRecipes.DRYING_TYPE.get()).stream()
@@ -105,17 +114,21 @@ public class HorsePoweredEmiPlugin implements EmiPlugin {
                 .forEach(r -> registry.addRecipe(new EmiDryingRecipe(DRYING, r)));
 
         rm.getAllRecipesFor(HPRecipes.CRUSHING_TYPE.get()).stream()
-                .map(RecipeHolder::value).sorted(crushOrder)
+                .map(RecipeHolder::value)
+                .sorted(crushOrder)
                 .forEach(r -> registry.addRecipe(new EmiCrushingRecipe(CRUSHING, r)));
 
         Comparator<TrappingRecipe> trapOrder = Comparator.comparingInt(TrappingRecipe::getPriority);
         rm.getAllRecipesFor(HPRecipes.TRAPPING_TYPE.get()).stream()
-                .map(RecipeHolder::value).sorted(trapOrder)
+                .map(RecipeHolder::value)
+                .sorted(trapOrder)
                 .forEach(r -> registry.addRecipe(new EmiTrappingRecipe(TRAPPING, r)));
 
         Comparator<BottlingRecipe> bottleOrder = Comparator.comparingInt(BottlingRecipe::getPriority);
         rm.getAllRecipesFor(HPRecipes.BOTTLING_TYPE.get()).stream()
-                .map(RecipeHolder::value).filter(BottlingRecipe::isValid).sorted(bottleOrder)
+                .map(RecipeHolder::value)
+                .filter(BottlingRecipe::isValid)
+                .sorted(bottleOrder)
                 .forEach(r -> registry.addRecipe(new EmiBottlingRecipe(BOTTLING, r)));
     }
 }

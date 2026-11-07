@@ -26,7 +26,15 @@ public class GrindstoneRecipe implements Recipe<HPRecipeInput> {
     private final int priority;
     private final float hungerCost;
 
-    public GrindstoneRecipe(Ingredient ingredient, ItemStack result, ItemStack secondary, int secondaryChance, int time, RecipeTier tier, int priority, float hungerCost) {
+    public GrindstoneRecipe(
+            Ingredient ingredient,
+            ItemStack result,
+            ItemStack secondary,
+            int secondaryChance,
+            int time,
+            RecipeTier tier,
+            int priority,
+            float hungerCost) {
         this.ingredient = ingredient;
         this.result = result;
         this.secondary = secondary;
@@ -108,18 +116,18 @@ public class GrindstoneRecipe implements Recipe<HPRecipeInput> {
 
     public static class Serializer implements RecipeSerializer<GrindstoneRecipe> {
 
-        public static final MapCodec<GrindstoneRecipe> CODEC = RecordCodecBuilder.mapCodec(instance ->
-                instance.group(
+        public static final MapCodec<GrindstoneRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
                         Ingredient.CODEC_NONEMPTY.fieldOf("ingredient").forGetter(GrindstoneRecipe::getIngredient),
                         ItemStack.STRICT_CODEC.fieldOf("result").forGetter(GrindstoneRecipe::getResult),
-                        ItemStack.OPTIONAL_CODEC.optionalFieldOf("secondary", ItemStack.EMPTY).forGetter(GrindstoneRecipe::getSecondary),
+                        ItemStack.OPTIONAL_CODEC
+                                .optionalFieldOf("secondary", ItemStack.EMPTY)
+                                .forGetter(GrindstoneRecipe::getSecondary),
                         Codec.INT.optionalFieldOf("secondaryChance", 0).forGetter(GrindstoneRecipe::getSecondaryChance),
                         Codec.INT.fieldOf("time").forGetter(GrindstoneRecipe::getTime),
                         RecipeTier.CODEC.optionalFieldOf("tier", RecipeTier.ANY).forGetter(GrindstoneRecipe::getTier),
                         Codec.INT.optionalFieldOf("priority", 0).forGetter(GrindstoneRecipe::getPriority),
-                        Codec.FLOAT.optionalFieldOf("hungerCost", 0.0F).forGetter(GrindstoneRecipe::getHungerCost)
-                ).apply(instance, GrindstoneRecipe::new)
-        );
+                        Codec.FLOAT.optionalFieldOf("hungerCost", 0.0F).forGetter(GrindstoneRecipe::getHungerCost))
+                .apply(instance, GrindstoneRecipe::new));
 
         public static final StreamCodec<RegistryFriendlyByteBuf, GrindstoneRecipe> STREAM_CODEC = new StreamCodec<>() {
             @Override
@@ -132,7 +140,8 @@ public class GrindstoneRecipe implements Recipe<HPRecipeInput> {
                 RecipeTier tier = RecipeTier.STREAM_CODEC.decode(buf);
                 int priority = ByteBufCodecs.VAR_INT.decode(buf);
                 float hungerCost = ByteBufCodecs.FLOAT.decode(buf);
-                return new GrindstoneRecipe(ingredient, result, secondary, secondaryChance, time, tier, priority, hungerCost);
+                return new GrindstoneRecipe(
+                        ingredient, result, secondary, secondaryChance, time, tier, priority, hungerCost);
             }
 
             @Override

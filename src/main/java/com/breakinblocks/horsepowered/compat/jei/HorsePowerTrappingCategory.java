@@ -36,7 +36,8 @@ public class HorsePowerTrappingCategory implements IRecipeCategory<TrappingRecip
     private final Component title;
 
     public HorsePowerTrappingCategory(IGuiHelper guiHelper) {
-        this.icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(ModBlocks.ANIMAL_TRAP.get()));
+        this.icon =
+                guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(ModBlocks.ANIMAL_TRAP.get()));
         this.slot = guiHelper.getSlotDrawable();
         this.arrow = guiHelper.getRecipeArrow();
         this.title = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.trapping");
@@ -83,7 +84,12 @@ public class HorsePowerTrappingCategory implements IRecipeCategory<TrappingRecip
     }
 
     @Override
-    public void draw(TrappingRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+    public void draw(
+            TrappingRecipe recipe,
+            IRecipeSlotsView recipeSlotsView,
+            GuiGraphics guiGraphics,
+            double mouseX,
+            double mouseY) {
         arrow.draw(guiGraphics, 24, 22);
         var font = Minecraft.getInstance().font;
         int y = 42;
@@ -106,7 +112,8 @@ public class HorsePowerTrappingCategory implements IRecipeCategory<TrappingRecip
         y = CONDITIONS_Y;
 
         if (recipe.getBiome().isPresent()) {
-            Component biomeText = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.trap_biome",
+            Component biomeText = Component.translatable(
+                    "gui." + HorsePowerMod.MOD_ID + ".jei.trap_biome",
                     biomeLabel(recipe.getBiome().get().location()));
             guiGraphics.drawString(font, biomeText, (WIDTH - font.width(biomeText)) / 2, y, 0xFF6688AA, false);
             y += 10;
@@ -125,7 +132,12 @@ public class HorsePowerTrappingCategory implements IRecipeCategory<TrappingRecip
     }
 
     @Override
-    public void getTooltip(ITooltipBuilder tooltip, TrappingRecipe recipe, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
+    public void getTooltip(
+            ITooltipBuilder tooltip,
+            TrappingRecipe recipe,
+            IRecipeSlotsView recipeSlotsView,
+            double mouseX,
+            double mouseY) {
         if (recipe.getDimensions().size() < 2) return;
         var font = Minecraft.getInstance().font;
         int width = font.width(dimensionText(recipe));
@@ -157,7 +169,8 @@ public class HorsePowerTrappingCategory implements IRecipeCategory<TrappingRecip
         if (!recipe.isBaitConsumed()) {
             return Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.trap_bait_consumed_none");
         }
-        return Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.trap_bait_consumed_chance",
+        return Component.translatable(
+                "gui." + HorsePowerMod.MOD_ID + ".jei.trap_bait_consumed_chance",
                 formatChance(recipe.getBaitConsumeChance()));
     }
 

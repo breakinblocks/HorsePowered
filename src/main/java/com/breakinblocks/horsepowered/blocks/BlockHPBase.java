@@ -39,15 +39,16 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
         return -1;
     }
 
-    public void onWorkerAttached(Player player, PathfinderMob creature) {
-    }
+    public void onWorkerAttached(Player player, PathfinderMob creature) {}
 
     @Nullable
-    protected abstract <T extends BlockEntity> BlockEntityTicker<T> createTicker(Level level, BlockState state, BlockEntityType<T> type);
+    protected abstract <T extends BlockEntity> BlockEntityTicker<T> createTicker(
+            Level level, BlockState state, BlockEntityType<T> type);
 
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(
+            Level level, BlockState state, BlockEntityType<T> type) {
         return createTicker(level, state, type);
     }
 
@@ -76,7 +77,14 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    protected ItemInteractionResult useItemOn(
+            ItemStack stack,
+            BlockState state,
+            Level level,
+            BlockPos pos,
+            Player player,
+            InteractionHand hand,
+            BlockHitResult hit) {
         BlockEntity blockEntity = level.getBlockEntity(pos);
 
         if (!(blockEntity instanceof HPBlockEntityBase te)) {
@@ -85,7 +93,9 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
 
         HPBlockEntityHorseBase horseTE = te instanceof HPBlockEntityHorseBase ? (HPBlockEntityHorseBase) te : null;
 
-        if (horseTE != null && WorkerInteraction.tryAttachLeashed(level, pos, player, horseTE.getVirtualWorker(), this::onWorkerAttached)) {
+        if (horseTE != null
+                && WorkerInteraction.tryAttachLeashed(
+                        level, pos, player, horseTE.getVirtualWorker(), this::onWorkerAttached)) {
             return ItemInteractionResult.sidedSuccess(level.isClientSide);
         }
 
@@ -129,7 +139,8 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+    protected InteractionResult useWithoutItem(
+            BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         BlockEntity blockEntity = level.getBlockEntity(pos);
 
         if (!(blockEntity instanceof HPBlockEntityBase te)) {
@@ -146,7 +157,9 @@ public abstract class BlockHPBase extends Block implements EntityBlock {
 
         boolean emptyHanded = player.getMainHandItem().isEmpty();
 
-        int slot = getSlot(state, (float) hit.getLocation().x - pos.getX(),
+        int slot = getSlot(
+                state,
+                (float) hit.getLocation().x - pos.getX(),
                 (float) hit.getLocation().y - pos.getY(),
                 (float) hit.getLocation().z - pos.getZ());
         int takeSlot = findTakeSlot(te, slot, emptyHanded);

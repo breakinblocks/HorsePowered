@@ -26,10 +26,12 @@ public class BlockCreativeBattery extends Block implements EntityBlock {
     @SuppressWarnings("unchecked")
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(
+            Level level, BlockState state, BlockEntityType<T> type) {
         if (level.isClientSide) return null;
         return type == ModBlocks.CREATIVE_BATTERY_BE.get()
-                ? (BlockEntityTicker<T>) (BlockEntityTicker<CreativeBatteryBlockEntity>) CreativeBatteryBlockEntity::serverTick
+                ? (BlockEntityTicker<T>)
+                        (BlockEntityTicker<CreativeBatteryBlockEntity>) CreativeBatteryBlockEntity::serverTick
                 : null;
     }
 }

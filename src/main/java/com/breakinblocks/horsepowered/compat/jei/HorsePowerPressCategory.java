@@ -3,6 +3,7 @@ package com.breakinblocks.horsepowered.compat.jei;
 import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.recipes.PressRecipe;
+import java.util.Arrays;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -19,8 +20,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-
-import java.util.Arrays;
 
 public class HorsePowerPressCategory implements IRecipeCategory<PressRecipe> {
 
@@ -90,7 +89,12 @@ public class HorsePowerPressCategory implements IRecipeCategory<PressRecipe> {
     }
 
     @Override
-    public void draw(PressRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+    public void draw(
+            PressRecipe recipe,
+            IRecipeSlotsView recipeSlotsView,
+            GuiGraphics guiGraphics,
+            double mouseX,
+            double mouseY) {
         arrow.draw(guiGraphics, 26, 1);
 
         if (recipe.hasFluidOutput()) {

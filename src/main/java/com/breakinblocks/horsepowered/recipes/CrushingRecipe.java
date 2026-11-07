@@ -90,15 +90,13 @@ public class CrushingRecipe implements Recipe<HPRecipeInput> {
 
     public static class Serializer implements RecipeSerializer<CrushingRecipe> {
 
-        public static final MapCodec<CrushingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance ->
-                instance.group(
+        public static final MapCodec<CrushingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
                         Ingredient.CODEC_NONEMPTY.fieldOf("ingredient").forGetter(CrushingRecipe::getIngredient),
                         ItemStack.STRICT_CODEC.fieldOf("result").forGetter(CrushingRecipe::getResult),
                         Codec.INT.fieldOf("time").forGetter(CrushingRecipe::getTime),
                         Codec.INT.optionalFieldOf("priority", 0).forGetter(CrushingRecipe::getPriority),
-                        Codec.FLOAT.optionalFieldOf("hungerCost", 0.0F).forGetter(CrushingRecipe::getHungerCost)
-                ).apply(instance, CrushingRecipe::new)
-        );
+                        Codec.FLOAT.optionalFieldOf("hungerCost", 0.0F).forGetter(CrushingRecipe::getHungerCost))
+                .apply(instance, CrushingRecipe::new));
 
         public static final StreamCodec<RegistryFriendlyByteBuf, CrushingRecipe> STREAM_CODEC = new StreamCodec<>() {
             @Override

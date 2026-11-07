@@ -27,16 +27,15 @@ public class GearRenderer {
 
     private static final int TEETH = 8;
 
-    public static void renderGear(PoseStack poseStack, MultiBufferSource bufferSource, float yRotDegrees, int packedLight) {
+    public static void renderGear(
+            PoseStack poseStack, MultiBufferSource bufferSource, float yRotDegrees, int packedLight) {
         TextureAtlasSprite sprite = Minecraft.getInstance()
-                .getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(TEXTURE);
+                .getTextureAtlas(TextureAtlas.LOCATION_BLOCKS)
+                .apply(TEXTURE);
         VertexConsumer builder = bufferSource.getBuffer(RenderType.cutout());
 
         Matrix4f pose = poseStack.last().pose();
-        box(builder, pose, sprite,
-                HUB_MIN, GEAR_BOTTOM, HUB_MIN,
-                HUB_MAX, GEAR_TOP, HUB_MAX,
-                packedLight);
+        box(builder, pose, sprite, HUB_MIN, GEAR_BOTTOM, HUB_MIN, HUB_MAX, GEAR_TOP, HUB_MAX, packedLight);
 
         for (int i = 0; i < TEETH; i++) {
             float toothAngle = yRotDegrees + i * (360f / TEETH);
@@ -46,19 +45,33 @@ public class GearRenderer {
             poseStack.mulPose(Axis.YP.rotationDegrees(toothAngle));
 
             Matrix4f toothPose = poseStack.last().pose();
-            box(builder, toothPose, sprite,
-                    TOOTH_INNER, GEAR_BOTTOM, -TOOTH_HALF_THICK,
-                    TOOTH_OUTER, GEAR_TOP,    TOOTH_HALF_THICK,
+            box(
+                    builder,
+                    toothPose,
+                    sprite,
+                    TOOTH_INNER,
+                    GEAR_BOTTOM,
+                    -TOOTH_HALF_THICK,
+                    TOOTH_OUTER,
+                    GEAR_TOP,
+                    TOOTH_HALF_THICK,
                     packedLight);
 
             poseStack.popPose();
         }
     }
 
-    private static void box(VertexConsumer builder, Matrix4f pose, TextureAtlasSprite sprite,
-                            float minX, float minY, float minZ,
-                            float maxX, float maxY, float maxZ,
-                            int packedLight) {
+    private static void box(
+            VertexConsumer builder,
+            Matrix4f pose,
+            TextureAtlasSprite sprite,
+            float minX,
+            float minY,
+            float minZ,
+            float maxX,
+            float maxY,
+            float maxZ,
+            int packedLight) {
         float u0 = sprite.getU0();
         float u1 = sprite.getU1();
         float v0 = sprite.getV0();

@@ -31,26 +31,28 @@ public final class CreateCompat {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES =
             DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, HorsePowerMod.MOD_ID);
 
-    public static final DataMapType<EntityType<?>, Double> JUMP_STRENGTH = DataMapType
-            .builder(HorsePowerMod.id("horse_engine_jump_strength"), Registries.ENTITY_TYPE, Codec.DOUBLE)
+    public static final DataMapType<EntityType<?>, Double> JUMP_STRENGTH = DataMapType.builder(
+                    HorsePowerMod.id("horse_engine_jump_strength"), Registries.ENTITY_TYPE, Codec.DOUBLE)
             .build();
 
-    public static final DeferredBlock<HorseEngineBlock> HORSE_ENGINE = BLOCKS.register("horse_engine",
+    public static final DeferredBlock<HorseEngineBlock> HORSE_ENGINE = BLOCKS.register(
+            "horse_engine",
             () -> new HorseEngineBlock(BlockBehaviour.Properties.of()
                     .mapColor(MapColor.STONE)
                     .strength(3.5F)
                     .requiresCorrectToolForDrops()
                     .noOcclusion()));
 
-    public static final DeferredItem<BlockItem> HORSE_ENGINE_ITEM = ITEMS.register("horse_engine",
-            () -> new BlockItem(HORSE_ENGINE.get(), new Item.Properties()));
+    public static final DeferredItem<BlockItem> HORSE_ENGINE_ITEM =
+            ITEMS.register("horse_engine", () -> new BlockItem(HORSE_ENGINE.get(), new Item.Properties()));
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<HorseEngineBlockEntity>> HORSE_ENGINE_BE =
-            BLOCK_ENTITIES.register("horse_engine", () ->
-                    BlockEntityType.Builder.of(HorseEngineBlockEntity::new, HORSE_ENGINE.get()).build(null));
+            BLOCK_ENTITIES.register(
+                    "horse_engine",
+                    () -> BlockEntityType.Builder.of(HorseEngineBlockEntity::new, HORSE_ENGINE.get())
+                            .build(null));
 
-    private CreateCompat() {
-    }
+    private CreateCompat() {}
 
     public static void init(IEventBus modBus, Dist dist) {
         BLOCKS.register(modBus);
@@ -70,9 +72,10 @@ public final class CreateCompat {
 
     private static void commonSetup(FMLCommonSetupEvent event) {
         Block block = HORSE_ENGINE.get();
-        BlockStressValues.RPM.register(block,
-                new BlockStressValues.GeneratedRpm(HorsePowerConfig.horseEngineRpm.get(), false));
-        BlockStressValues.CAPACITIES.register(block,
+        BlockStressValues.RPM.register(
+                block, new BlockStressValues.GeneratedRpm(HorsePowerConfig.horseEngineRpm.get(), false));
+        BlockStressValues.CAPACITIES.register(
+                block,
                 () -> HorseEngineBlockEntity.capacityPerRpm(HorsePowerConfig.horseEngineDefaultJumpStrength.get()));
     }
 

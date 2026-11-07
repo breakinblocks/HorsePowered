@@ -87,11 +87,13 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase implement
         return worker.shouldShowHighlight();
     }
 
-    public static <T extends HPBlockEntityHorseBase> void serverTick(Level level, BlockPos pos, BlockState state, T blockEntity) {
+    public static <T extends HPBlockEntityHorseBase> void serverTick(
+            Level level, BlockPos pos, BlockState state, T blockEntity) {
         blockEntity.tickServer();
     }
 
-    public static <T extends HPBlockEntityHorseBase> void clientTick(Level level, BlockPos pos, BlockState state, T blockEntity) {
+    public static <T extends HPBlockEntityHorseBase> void clientTick(
+            Level level, BlockPos pos, BlockState state, T blockEntity) {
         blockEntity.tickClient();
     }
 

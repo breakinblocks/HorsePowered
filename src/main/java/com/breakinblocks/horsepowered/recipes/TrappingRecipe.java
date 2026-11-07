@@ -4,6 +4,8 @@ import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import java.util.List;
+import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
@@ -28,9 +30,6 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
-import java.util.List;
-import java.util.Optional;
-
 public class TrappingRecipe implements Recipe<HPRecipeInput> {
 
     private final Ingredient bait;
@@ -45,10 +44,18 @@ public class TrappingRecipe implements Recipe<HPRecipeInput> {
     private final Optional<String> title;
     private final Optional<ResourceLocation> icon;
 
-    public TrappingRecipe(Ingredient bait, ResourceLocation entityId, int time, int priority,
-                          Optional<TagKey<Biome>> biome, List<ResourceKey<Level>> dimensions, boolean waterlogged,
-                          boolean baitConsumed, double baitConsumeChance,
-                          Optional<String> title, Optional<ResourceLocation> icon) {
+    public TrappingRecipe(
+            Ingredient bait,
+            ResourceLocation entityId,
+            int time,
+            int priority,
+            Optional<TagKey<Biome>> biome,
+            List<ResourceKey<Level>> dimensions,
+            boolean waterlogged,
+            boolean baitConsumed,
+            double baitConsumeChance,
+            Optional<String> title,
+            Optional<ResourceLocation> icon) {
         this.bait = bait;
         this.entityId = entityId;
         this.time = Math.max(1, time);
@@ -169,8 +176,8 @@ public class TrappingRecipe implements Recipe<HPRecipeInput> {
             SpawnEggItem egg = SpawnEggItem.byId(BuiltInRegistries.ENTITY_TYPE.get(entityId));
             if (egg != null) return new ItemStack(egg);
         }
-        ResourceLocation conventional = ResourceLocation.fromNamespaceAndPath(
-                entityId.getNamespace(), entityId.getPath() + "_spawn_egg");
+        ResourceLocation conventional =
+                ResourceLocation.fromNamespaceAndPath(entityId.getNamespace(), entityId.getPath() + "_spawn_egg");
         if (BuiltInRegistries.ITEM.containsKey(conventional)) {
             return new ItemStack(BuiltInRegistries.ITEM.get(conventional));
         }
@@ -196,29 +203,35 @@ public class TrappingRecipe implements Recipe<HPRecipeInput> {
         private static final StreamCodec<RegistryFriendlyByteBuf, Optional<ResourceLocation>> OPTIONAL_ID =
                 ResourceLocation.STREAM_CODEC.apply(ByteBufCodecs::optional).cast();
 
-        private static final Codec<List<ResourceKey<Level>>> DIMENSIONS_CODEC =
-                Codec.either(ResourceKey.codec(Registries.DIMENSION), ResourceKey.codec(Registries.DIMENSION).listOf())
-                        .xmap(either -> either.map(List::of, list -> list),
-                                list -> list.size() == 1 ? Either.left(list.getFirst()) : Either.right(list));
+        private static final Codec<List<ResourceKey<Level>>> DIMENSIONS_CODEC = Codec.either(
+                        ResourceKey.codec(Registries.DIMENSION),
+                        ResourceKey.codec(Registries.DIMENSION).listOf())
+                .xmap(
+                        either -> either.map(List::of, list -> list),
+                        list -> list.size() == 1 ? Either.left(list.getFirst()) : Either.right(list));
 
         private static final StreamCodec<RegistryFriendlyByteBuf, List<ResourceKey<Level>>> DIMENSIONS_STREAM_CODEC =
-                ResourceKey.streamCodec(Registries.DIMENSION).apply(ByteBufCodecs.list()).cast();
+                ResourceKey.streamCodec(Registries.DIMENSION)
+                        .apply(ByteBufCodecs.list())
+                        .cast();
 
-        public static final MapCodec<TrappingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance ->
-                instance.group(
+        public static final MapCodec<TrappingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
                         Ingredient.CODEC_NONEMPTY.fieldOf("bait").forGetter(TrappingRecipe::getBait),
                         ResourceLocation.CODEC.fieldOf("entity").forGetter(TrappingRecipe::getEntityId),
                         Codec.INT.optionalFieldOf("time", 1200).forGetter(TrappingRecipe::getTime),
                         Codec.INT.optionalFieldOf("priority", 0).forGetter(TrappingRecipe::getPriority),
                         TagKey.codec(Registries.BIOME).optionalFieldOf("biome").forGetter(TrappingRecipe::getBiome),
-                        DIMENSIONS_CODEC.optionalFieldOf("dimension", List.of()).forGetter(TrappingRecipe::getDimensions),
+                        DIMENSIONS_CODEC
+                                .optionalFieldOf("dimension", List.of())
+                                .forGetter(TrappingRecipe::getDimensions),
                         Codec.BOOL.optionalFieldOf("waterlogged", false).forGetter(TrappingRecipe::isWaterlogged),
                         Codec.BOOL.optionalFieldOf("baitConsumed", false).forGetter(TrappingRecipe::isBaitConsumed),
-                        Codec.doubleRange(0.01D, 100.0D).optionalFieldOf("baitConsumeChance", 100.0D).forGetter(TrappingRecipe::getBaitConsumeChance),
+                        Codec.doubleRange(0.01D, 100.0D)
+                                .optionalFieldOf("baitConsumeChance", 100.0D)
+                                .forGetter(TrappingRecipe::getBaitConsumeChance),
                         Codec.STRING.optionalFieldOf("title").forGetter(TrappingRecipe::getTitle),
-                        ResourceLocation.CODEC.optionalFieldOf("icon").forGetter(TrappingRecipe::getIcon)
-                ).apply(instance, TrappingRecipe::new)
-        );
+                        ResourceLocation.CODEC.optionalFieldOf("icon").forGetter(TrappingRecipe::getIcon))
+                .apply(instance, TrappingRecipe::new));
 
         public static final StreamCodec<RegistryFriendlyByteBuf, TrappingRecipe> STREAM_CODEC = new StreamCodec<>() {
             @Override
@@ -236,7 +249,18 @@ public class TrappingRecipe implements Recipe<HPRecipeInput> {
                 double baitConsumeChance = ByteBufCodecs.DOUBLE.decode(buf);
                 Optional<String> title = OPTIONAL_STRING.decode(buf);
                 Optional<ResourceLocation> icon = OPTIONAL_ID.decode(buf);
-                return new TrappingRecipe(bait, entityId, time, priority, biome, dimensions, waterlogged, baitConsumed, baitConsumeChance, title, icon);
+                return new TrappingRecipe(
+                        bait,
+                        entityId,
+                        time,
+                        priority,
+                        biome,
+                        dimensions,
+                        waterlogged,
+                        baitConsumed,
+                        baitConsumeChance,
+                        title,
+                        icon);
             }
 
             @Override

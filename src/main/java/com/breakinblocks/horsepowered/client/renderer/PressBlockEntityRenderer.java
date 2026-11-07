@@ -28,13 +28,13 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
     private static final ResourceLocation PLANK_TEXTURE = ResourceLocation.withDefaultNamespace("block/oak_planks");
 
     // Plunger dimensions (in blocks) - wide flat lid that presses down
-    private static final float PLUNGER_WIDTH = 0.75F;    // 12/16 - wide to cover press area
-    private static final float PLUNGER_DEPTH = 0.75F;    // 12/16 - deep to cover press area
-    private static final float PLUNGER_HEIGHT = 0.125F;  // 2/16 - thin like a plank lid
+    private static final float PLUNGER_WIDTH = 0.75F; // 12/16 - wide to cover press area
+    private static final float PLUNGER_DEPTH = 0.75F; // 12/16 - deep to cover press area
+    private static final float PLUNGER_HEIGHT = 0.125F; // 2/16 - thin like a plank lid
 
     // Plunger position constants
-    private static final float PLUNGER_MAX_Y = 0.7F;     // Highest position (not pressing)
-    private static final float PLUNGER_MIN_Y = 0.2F;     // Lowest position (fully pressed into basin)
+    private static final float PLUNGER_MAX_Y = 0.7F; // Highest position (not pressing)
+    private static final float PLUNGER_MIN_Y = 0.2F; // Lowest position (fully pressed into basin)
 
     private static final double FRAME_TOP = 19.0D / 16.0D;
 
@@ -47,8 +47,13 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
     }
 
     @Override
-    public void render(PressBlockEntity blockEntity, float partialTick, PoseStack poseStack,
-                       MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
+    public void render(
+            PressBlockEntity blockEntity,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            int packedLight,
+            int packedOverlay) {
 
         // Render working area highlight if active
         WorkingAreaRenderer.renderIfActive(blockEntity, poseStack, bufferSource);
@@ -72,8 +77,15 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
             poseStack.scale(0.5F, 0.5F, 0.5F);
             poseStack.mulPose(Axis.XP.rotationDegrees(90));
 
-            itemRenderer.renderStatic(input, ItemDisplayContext.FIXED, packedLight, packedOverlay,
-                    poseStack, bufferSource, blockEntity.getLevel(), 0);
+            itemRenderer.renderStatic(
+                    input,
+                    ItemDisplayContext.FIXED,
+                    packedLight,
+                    packedOverlay,
+                    poseStack,
+                    bufferSource,
+                    blockEntity.getLevel(),
+                    0);
             poseStack.popPose();
         }
 
@@ -84,36 +96,64 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
             poseStack.scale(0.35F, 0.35F, 0.35F);
             poseStack.mulPose(Axis.XP.rotationDegrees(90));
 
-            itemRenderer.renderStatic(output, ItemDisplayContext.FIXED, packedLight, packedOverlay,
-                    poseStack, bufferSource, blockEntity.getLevel(), 0);
+            itemRenderer.renderStatic(
+                    output,
+                    ItemDisplayContext.FIXED,
+                    packedLight,
+                    packedOverlay,
+                    poseStack,
+                    bufferSource,
+                    blockEntity.getLevel(),
+                    0);
             poseStack.popPose();
         }
 
         if (RenderUtils.shouldShowItemCounts(blockEntity)) {
-            double countY = RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, input.getCount(), 0.5D, FRAME_TOP, 0.5D);
-            RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, output.getCount(), 0.5D, countY, 0.5D);
+            double countY = RenderUtils.renderItemCountBillboard(
+                    poseStack, bufferSource, font, packedLight, input.getCount(), 0.5D, FRAME_TOP, 0.5D);
+            RenderUtils.renderItemCountBillboard(
+                    poseStack, bufferSource, font, packedLight, output.getCount(), 0.5D, countY, 0.5D);
         }
 
         // Render input fluid in the left half, output fluid in the right half.
         FluidStack inputFluid = blockEntity.getInputTank().getFluid();
         if (!inputFluid.isEmpty()) {
-            renderFluidHalf(poseStack, bufferSource, packedLight, inputFluid, blockEntity.getInputTank().getCapacity(), true);
+            renderFluidHalf(
+                    poseStack,
+                    bufferSource,
+                    packedLight,
+                    inputFluid,
+                    blockEntity.getInputTank().getCapacity(),
+                    true);
         }
         FluidStack outputFluid = blockEntity.getOutputTank().getFluid();
         if (!outputFluid.isEmpty()) {
-            renderFluidHalf(poseStack, bufferSource, packedLight, outputFluid, blockEntity.getOutputTank().getCapacity(), false);
+            renderFluidHalf(
+                    poseStack,
+                    bufferSource,
+                    packedLight,
+                    outputFluid,
+                    blockEntity.getOutputTank().getCapacity(),
+                    false);
         }
     }
 
-    private void renderFluidHalf(PoseStack poseStack, MultiBufferSource bufferSource, int packedLight,
-                                 FluidStack fluidStack, int capacity, boolean leftHalf) {
+    private void renderFluidHalf(
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            int packedLight,
+            FluidStack fluidStack,
+            int capacity,
+            boolean leftHalf) {
         if (fluidStack.isEmpty() || capacity <= 0) return;
 
         IClientFluidTypeExtensions fluidTypeExtensions = IClientFluidTypeExtensions.of(fluidStack.getFluid());
         ResourceLocation stillTexture = fluidTypeExtensions.getStillTexture(fluidStack);
         if (stillTexture == null) return;
 
-        TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(stillTexture);
+        TextureAtlasSprite sprite = Minecraft.getInstance()
+                .getTextureAtlas(InventoryMenu.BLOCK_ATLAS)
+                .apply(stillTexture);
         int color = fluidTypeExtensions.getTintColor(fluidStack);
 
         float fillPercentage = (float) fluidStack.getAmount() / capacity;
@@ -141,17 +181,37 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
         float v2 = sprite.getV1();
 
         // Top face
-        builder.addVertex(matrix, 0, fluidHeight, 0).setColor(r, g, b, a).setUv(u1, v1).setLight(packedLight).setNormal(0, 1, 0);
-        builder.addVertex(matrix, 0, fluidHeight, depth).setColor(r, g, b, a).setUv(u1, v2).setLight(packedLight).setNormal(0, 1, 0);
-        builder.addVertex(matrix, width, fluidHeight, depth).setColor(r, g, b, a).setUv(u2, v2).setLight(packedLight).setNormal(0, 1, 0);
-        builder.addVertex(matrix, width, fluidHeight, 0).setColor(r, g, b, a).setUv(u2, v1).setLight(packedLight).setNormal(0, 1, 0);
+        builder.addVertex(matrix, 0, fluidHeight, 0)
+                .setColor(r, g, b, a)
+                .setUv(u1, v1)
+                .setLight(packedLight)
+                .setNormal(0, 1, 0);
+        builder.addVertex(matrix, 0, fluidHeight, depth)
+                .setColor(r, g, b, a)
+                .setUv(u1, v2)
+                .setLight(packedLight)
+                .setNormal(0, 1, 0);
+        builder.addVertex(matrix, width, fluidHeight, depth)
+                .setColor(r, g, b, a)
+                .setUv(u2, v2)
+                .setLight(packedLight)
+                .setNormal(0, 1, 0);
+        builder.addVertex(matrix, width, fluidHeight, 0)
+                .setColor(r, g, b, a)
+                .setUv(u2, v1)
+                .setLight(packedLight)
+                .setNormal(0, 1, 0);
 
         poseStack.popPose();
     }
 
     @SuppressWarnings("deprecation")
-    private void renderPlunger(PressBlockEntity blockEntity, PoseStack poseStack,
-                               MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
+    private void renderPlunger(
+            PressBlockEntity blockEntity,
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            int packedLight,
+            int packedOverlay) {
         // Get the visual progress (0.0 to 1.0, where 1.0 is fully pressed)
         float progress = blockEntity.getVisualProgress();
 
@@ -161,7 +221,9 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
         float plungerY = PLUNGER_MAX_Y - (PLUNGER_MAX_Y - PLUNGER_MIN_Y) * progress;
 
         // Get oak planks texture from block atlas
-        TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(PLANK_TEXTURE);
+        TextureAtlasSprite sprite = Minecraft.getInstance()
+                .getTextureAtlas(TextureAtlas.LOCATION_BLOCKS)
+                .apply(PLANK_TEXTURE);
         VertexConsumer builder = bufferSource.getBuffer(RenderType.solid());
 
         poseStack.pushPose();
@@ -237,7 +299,6 @@ public class PressBlockEntityRenderer implements BlockEntityRenderer<PressBlockE
     @Override
     public AABB getRenderBoundingBox(PressBlockEntity blockEntity) {
         BlockPos pos = blockEntity.getBlockPos();
-        return new AABB(pos.getX() - 3, pos.getY(), pos.getZ() - 3,
-                        pos.getX() + 4, pos.getY() + 4, pos.getZ() + 4);
+        return new AABB(pos.getX() - 3, pos.getY(), pos.getZ() - 3, pos.getX() + 4, pos.getY() + 4, pos.getZ() + 4);
     }
 }

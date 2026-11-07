@@ -60,6 +60,9 @@ public class GrindingRecipeBuilder {
 
     public void save(RecipeOutput output, String name) {
         ResourceLocation id = HorsePowerMod.id("grinding/" + name);
-        output.accept(id, new GrindstoneRecipe(ingredient, result, secondary, secondaryChance, time, tier, priority, hungerCost), null);
+        output.accept(
+                id,
+                new GrindstoneRecipe(ingredient, result, secondary, secondaryChance, time, tier, priority, hungerCost),
+                null);
     }
 }

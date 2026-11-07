@@ -4,7 +4,6 @@ import com.breakinblocks.horsepowered.blocks.BlockFiller;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.Container;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;

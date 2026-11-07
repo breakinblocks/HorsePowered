@@ -2,6 +2,9 @@ package com.breakinblocks.horsepowered.client.renderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -25,30 +28,26 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
-
 public class WorkSaddleItemRenderer extends BlockEntityWithoutLevelRenderer {
 
     private static final ModelResourceLocation SADDLE_MODEL =
             ModelResourceLocation.inventory(ResourceLocation.withDefaultNamespace("saddle"));
 
     private static final int CACHE_LIMIT = 32;
-    private final Map<CompoundTag, Entity> entityCache =
-            new LinkedHashMap<>(16, 0.75f, true) {
-                @Override
-                protected boolean removeEldestEntry(Map.Entry<CompoundTag, Entity> eldest) {
-                    return size() > CACHE_LIMIT;
-                }
-            };
+    private final Map<CompoundTag, Entity> entityCache = new LinkedHashMap<>(16, 0.75f, true) {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<CompoundTag, Entity> eldest) {
+            return size() > CACHE_LIMIT;
+        }
+    };
 
     public WorkSaddleItemRenderer(BlockEntityRenderDispatcher dispatcher, EntityModelSet modelSet) {
         super(dispatcher, modelSet);
     }
 
     @Override
-    public void renderByItem(ItemStack stack, ItemDisplayContext ctx, PoseStack ps, MultiBufferSource buf, int light, int overlay) {
+    public void renderByItem(
+            ItemStack stack, ItemDisplayContext ctx, PoseStack ps, MultiBufferSource buf, int light, int overlay) {
         Minecraft mc = Minecraft.getInstance();
         BakedModel saddleModel = mc.getModelManager().getModel(SADDLE_MODEL);
         ItemStack saddleProxy = new ItemStack(Items.SADDLE);

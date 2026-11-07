@@ -39,7 +39,8 @@ public class BlockGrindstone extends BlockHPBase {
     }
 
     @Override
-    protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+    protected VoxelShape getCollisionShape(
+            BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return COLLISION_SHAPE;
     }
 
@@ -68,7 +69,8 @@ public class BlockGrindstone extends BlockHPBase {
 
     @Nullable
     @Override
-    protected <T extends BlockEntity> BlockEntityTicker<T> createTicker(Level level, BlockState state, BlockEntityType<T> type) {
+    protected <T extends BlockEntity> BlockEntityTicker<T> createTicker(
+            Level level, BlockState state, BlockEntityType<T> type) {
         if (level.isClientSide) {
             return checkType(type, ModBlocks.GRINDSTONE_BE.get(), HPBlockEntityHorseBase::clientTick);
         }

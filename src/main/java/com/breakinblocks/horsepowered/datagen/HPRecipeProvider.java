@@ -3,6 +3,7 @@ package com.breakinblocks.horsepowered.datagen;
 import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.items.ModItems;
+import java.util.concurrent.CompletableFuture;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
@@ -12,20 +13,17 @@ import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.data.recipes.SimpleCookingRecipeBuilder;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.material.Fluids;
-
-import java.util.concurrent.CompletableFuture;
 
 public class HPRecipeProvider extends RecipeProvider {
 
@@ -52,8 +50,7 @@ public class HPRecipeProvider extends RecipeProvider {
                 .save(output, "water_bottle");
     }
 
-    private static final TagKey<Biome> FISH_HABITAT =
-            TagKey.create(Registries.BIOME, HorsePowerMod.id("fish_habitat"));
+    private static final TagKey<Biome> FISH_HABITAT = TagKey.create(Registries.BIOME, HorsePowerMod.id("fish_habitat"));
 
     private void buildTrappingRecipes(RecipeOutput output) {
         trap(output, Ingredient.of(Items.WHEAT), EntityType.COW, 1200, "cow");
@@ -80,8 +77,7 @@ public class HPRecipeProvider extends RecipeProvider {
                 .save(output, "salmon");
     }
 
-    private static void trap(RecipeOutput output, Ingredient bait,
-                             EntityType<?> entity, int time, String name) {
+    private static void trap(RecipeOutput output, Ingredient bait, EntityType<?> entity, int time, String name) {
         TrappingRecipeBuilder.trap(bait, entity)
                 .time(time)
                 .baitConsumed(true)
@@ -204,8 +200,8 @@ public class HPRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_chain", has(Items.CHAIN))
                 .save(output, HorsePowerMod.id("crafting/animal_trap"));
 
-        SimpleCookingRecipeBuilder.smelting(Ingredient.of(ModItems.DOUGH.get()), RecipeCategory.FOOD,
-                        Items.BREAD, 0.35f, 200)
+        SimpleCookingRecipeBuilder.smelting(
+                        Ingredient.of(ModItems.DOUGH.get()), RecipeCategory.FOOD, Items.BREAD, 0.35f, 200)
                 .unlockedBy("has_dough", has(ModItems.DOUGH.get()))
                 .save(output, HorsePowerMod.id("smelting/dough_to_bread"));
     }
@@ -282,8 +278,24 @@ public class HPRecipeProvider extends RecipeProvider {
         grind(output, Ingredient.of(Items.NETHERRACK), Items.NETHER_BRICK, 1, 8, "netherrack_to_nether_brick");
 
         // Sand from sandstone
-        grind(output, Ingredient.of(Items.SANDSTONE, Items.CHISELED_SANDSTONE, Items.CUT_SANDSTONE, Items.SMOOTH_SANDSTONE), Items.SAND, 2, 8, "sandstone_to_sand");
-        grind(output, Ingredient.of(Items.RED_SANDSTONE, Items.CHISELED_RED_SANDSTONE, Items.CUT_RED_SANDSTONE, Items.SMOOTH_RED_SANDSTONE), Items.RED_SAND, 2, 8, "red_sandstone_to_sand");
+        grind(
+                output,
+                Ingredient.of(Items.SANDSTONE, Items.CHISELED_SANDSTONE, Items.CUT_SANDSTONE, Items.SMOOTH_SANDSTONE),
+                Items.SAND,
+                2,
+                8,
+                "sandstone_to_sand");
+        grind(
+                output,
+                Ingredient.of(
+                        Items.RED_SANDSTONE,
+                        Items.CHISELED_RED_SANDSTONE,
+                        Items.CUT_RED_SANDSTONE,
+                        Items.SMOOTH_RED_SANDSTONE),
+                Items.RED_SAND,
+                2,
+                8,
+                "red_sandstone_to_sand");
 
         // Wool to string
         grind(output, Ingredient.of(ItemTags.WOOL), Items.STRING, 4, 8, "wool_to_string");
@@ -294,9 +306,21 @@ public class HPRecipeProvider extends RecipeProvider {
         grind(output, Ingredient.of(Items.CLAY), Items.CLAY_BALL, 4, 8, "clay_to_clay_ball");
         grind(output, Ingredient.of(Items.GLOWSTONE), Items.GLOWSTONE_DUST, 4, 8, "glowstone_to_dust");
         grind(output, Ingredient.of(Items.HONEYCOMB_BLOCK), Items.HONEYCOMB, 4, 8, "honeycomb_block_to_honeycomb");
-        grind(output, Ingredient.of(Items.DRIPSTONE_BLOCK), Items.POINTED_DRIPSTONE, 4, 8, "dripstone_block_to_pointed");
+        grind(
+                output,
+                Ingredient.of(Items.DRIPSTONE_BLOCK),
+                Items.POINTED_DRIPSTONE,
+                4,
+                8,
+                "dripstone_block_to_pointed");
         grind(output, Ingredient.of(Items.PRISMARINE), Items.PRISMARINE_SHARD, 4, 12, "prismarine_to_shard");
-        grind(output, Ingredient.of(Items.PRISMARINE_BRICKS), Items.PRISMARINE_SHARD, 9, 12, "prismarine_bricks_to_shard");
+        grind(
+                output,
+                Ingredient.of(Items.PRISMARINE_BRICKS),
+                Items.PRISMARINE_SHARD,
+                9,
+                12,
+                "prismarine_bricks_to_shard");
         grind(output, Ingredient.of(Items.QUARTZ_BLOCK), Items.QUARTZ, 4, 8, "quartz_block_to_quartz");
 
         // Miscellaneous
@@ -468,6 +492,9 @@ public class HPRecipeProvider extends RecipeProvider {
     }
 
     private void press(RecipeOutput output, Item input, Item result, int count, String name) {
-        PressingRecipeBuilder.pressing(Ingredient.of(input)).inputCount(1).result(result, count).save(output, name);
+        PressingRecipeBuilder.pressing(Ingredient.of(input))
+                .inputCount(1)
+                .result(result, count)
+                .save(output, name);
     }
 }

@@ -97,24 +97,30 @@ public class PressRecipe implements Recipe<HPRecipeInput> {
 
     public static class Serializer implements RecipeSerializer<PressRecipe> {
 
-        public static final MapCodec<PressRecipe> CODEC = RecordCodecBuilder.mapCodec(instance ->
-                instance.group(
+        public static final MapCodec<PressRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
                         Ingredient.CODEC_NONEMPTY.fieldOf("ingredient").forGetter(PressRecipe::getIngredient),
                         Codec.INT.optionalFieldOf("inputCount", 1).forGetter(PressRecipe::getInputCount),
-                        ItemStack.OPTIONAL_CODEC.optionalFieldOf("result", ItemStack.EMPTY).forGetter(PressRecipe::getResult),
-                        FluidStack.OPTIONAL_CODEC.optionalFieldOf("fluidResult", FluidStack.EMPTY).forGetter(PressRecipe::getFluidResult),
-                        Codec.INT.optionalFieldOf("priority", 0).forGetter(PressRecipe::getPriority)
-                ).apply(instance, PressRecipe::new)
-        );
+                        ItemStack.OPTIONAL_CODEC
+                                .optionalFieldOf("result", ItemStack.EMPTY)
+                                .forGetter(PressRecipe::getResult),
+                        FluidStack.OPTIONAL_CODEC
+                                .optionalFieldOf("fluidResult", FluidStack.EMPTY)
+                                .forGetter(PressRecipe::getFluidResult),
+                        Codec.INT.optionalFieldOf("priority", 0).forGetter(PressRecipe::getPriority))
+                .apply(instance, PressRecipe::new));
 
         public static final StreamCodec<RegistryFriendlyByteBuf, PressRecipe> STREAM_CODEC = StreamCodec.composite(
-                Ingredient.CONTENTS_STREAM_CODEC, PressRecipe::getIngredient,
-                ByteBufCodecs.VAR_INT, PressRecipe::getInputCount,
-                ItemStack.OPTIONAL_STREAM_CODEC, PressRecipe::getResult,
-                FluidStack.OPTIONAL_STREAM_CODEC, PressRecipe::getFluidResult,
-                ByteBufCodecs.VAR_INT, PressRecipe::getPriority,
-                PressRecipe::new
-        );
+                Ingredient.CONTENTS_STREAM_CODEC,
+                PressRecipe::getIngredient,
+                ByteBufCodecs.VAR_INT,
+                PressRecipe::getInputCount,
+                ItemStack.OPTIONAL_STREAM_CODEC,
+                PressRecipe::getResult,
+                FluidStack.OPTIONAL_STREAM_CODEC,
+                PressRecipe::getFluidResult,
+                ByteBufCodecs.VAR_INT,
+                PressRecipe::getPriority,
+                PressRecipe::new);
 
         @Override
         public MapCodec<PressRecipe> codec() {

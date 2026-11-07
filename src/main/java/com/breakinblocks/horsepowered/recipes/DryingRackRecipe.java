@@ -78,13 +78,11 @@ public class DryingRackRecipe implements Recipe<HPRecipeInput> {
 
     public static class Serializer implements RecipeSerializer<DryingRackRecipe> {
 
-        public static final MapCodec<DryingRackRecipe> CODEC = RecordCodecBuilder.mapCodec(instance ->
-                instance.group(
+        public static final MapCodec<DryingRackRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
                         Ingredient.CODEC_NONEMPTY.fieldOf("ingredient").forGetter(DryingRackRecipe::getIngredient),
                         ItemStack.STRICT_CODEC.fieldOf("result").forGetter(DryingRackRecipe::getResult),
-                        Codec.INT.fieldOf("time").forGetter(DryingRackRecipe::getTime)
-                ).apply(instance, DryingRackRecipe::new)
-        );
+                        Codec.INT.fieldOf("time").forGetter(DryingRackRecipe::getTime))
+                .apply(instance, DryingRackRecipe::new));
 
         public static final StreamCodec<RegistryFriendlyByteBuf, DryingRackRecipe> STREAM_CODEC = new StreamCodec<>() {
             @Override

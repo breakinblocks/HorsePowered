@@ -27,7 +27,6 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,9 +39,8 @@ public class BlockDryingRack extends Block implements EntityBlock {
 
     public BlockDryingRack(Properties properties) {
         super(properties);
-        registerDefaultState(stateDefinition.any()
-                .setValue(FACING, Direction.NORTH)
-                .setValue(PART, DryingRackPart.MAIN));
+        registerDefaultState(
+                stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(PART, DryingRackPart.MAIN));
     }
 
     @Override
@@ -64,11 +62,13 @@ public class BlockDryingRack extends Block implements EntityBlock {
     }
 
     @Override
-    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+    public void setPlacedBy(
+            Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
         Direction facing = state.getValue(FACING);
         for (DryingRackPart fillerPart : DryingRackPart.FILLERS) {
             BlockPos fillerPos = fillerPart.offsetFromMain(pos, facing);
-            level.setBlock(fillerPos, defaultBlockState().setValue(FACING, facing).setValue(PART, fillerPart), 3);
+            level.setBlock(
+                    fillerPos, defaultBlockState().setValue(FACING, facing).setValue(PART, fillerPart), 3);
         }
     }
 
@@ -89,13 +89,20 @@ public class BlockDryingRack extends Block implements EntityBlock {
     }
 
     @Override
-    protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+    protected VoxelShape getCollisionShape(
+            BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return SHAPE;
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
-                                              Player player, InteractionHand hand, BlockHitResult hit) {
+    protected ItemInteractionResult useItemOn(
+            ItemStack stack,
+            BlockState state,
+            Level level,
+            BlockPos pos,
+            Player player,
+            InteractionHand hand,
+            BlockHitResult hit) {
         if (hand != InteractionHand.MAIN_HAND) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         DryingRackBlockEntity rack = getMainBlockEntity(level, state, pos);
         if (rack == null) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
@@ -114,7 +121,8 @@ public class BlockDryingRack extends Block implements EntityBlock {
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+    protected InteractionResult useWithoutItem(
+            BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         DryingRackBlockEntity rack = getMainBlockEntity(level, state, pos);
         if (rack == null) return InteractionResult.PASS;
 
@@ -200,7 +208,8 @@ public class BlockDryingRack extends Block implements EntityBlock {
 
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(
+            Level level, BlockState state, BlockEntityType<T> type) {
         if (state.getValue(PART) != DryingRackPart.MAIN) return null;
         if (type != ModBlocks.DRYING_RACK_BE.get()) return null;
         @SuppressWarnings("unchecked")

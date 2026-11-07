@@ -4,6 +4,7 @@ import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.blockentity.VirtualWorker;
 import com.breakinblocks.horsepowered.blockentity.WorkerHost;
 import com.mojang.blaze3d.vertex.PoseStack;
+import java.util.Optional;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
@@ -20,7 +21,6 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RenderNameTagEvent;
 import net.neoforged.neoforge.common.util.TriState;
-import java.util.Optional;
 
 /**
  * Renders a virtual (non-world) entity from within a block entity renderer.
@@ -36,8 +36,12 @@ public class VirtualWorkerRenderer {
      * Does nothing if no worker is attached.
      * Call this from the block entity renderer's render() method.
      */
-    public static void renderWorker(WorkerHost blockEntity, float partialTick,
-                                     PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+    public static void renderWorker(
+            WorkerHost blockEntity,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            int packedLight) {
         VirtualWorker worker = blockEntity.getVirtualWorker();
         if (!worker.hasWorker()) return;
 
@@ -64,7 +68,8 @@ public class VirtualWorkerRenderer {
         entity.setPos(workerX, worker.getVirtualY(), workerZ);
         forcedNameTagEntity = isLookedAt(entity) ? entity : null;
         try {
-            renderEntity(entity, offsetX, offsetY, offsetZ, interpYRot, partialTick, poseStack, bufferSource, packedLight);
+            renderEntity(
+                    entity, offsetX, offsetY, offsetZ, interpYRot, partialTick, poseStack, bufferSource, packedLight);
         } finally {
             forcedNameTagEntity = null;
         }
@@ -110,10 +115,16 @@ public class VirtualWorkerRenderer {
      * @param bufferSource Multi-buffer source for rendering
      * @param packedLight Packed light value
      */
-    public static void renderEntity(Entity entity, double offsetX, double offsetY, double offsetZ,
-                                     float yRot, float partialTick,
-                                     PoseStack poseStack, MultiBufferSource bufferSource,
-                                     int packedLight) {
+    public static void renderEntity(
+            Entity entity,
+            double offsetX,
+            double offsetY,
+            double offsetZ,
+            float yRot,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            int packedLight) {
         if (entity == null) return;
 
         try {
@@ -141,7 +152,8 @@ public class VirtualWorkerRenderer {
             poseStack.translate(offsetX, offsetY, offsetZ);
 
             // 1.21.1's EntityRenderDispatcher.render() signature:
-            // render(Entity, double x, double y, double z, float yRot, float partialTick, PoseStack, MultiBufferSource, int packedLight)
+            // render(Entity, double x, double y, double z, float yRot, float partialTick, PoseStack, MultiBufferSource,
+            // int packedLight)
             dispatcher.render(entity, 0, 0, 0, yRot, partialTick, poseStack, bufferSource, packedLight);
 
             poseStack.popPose();

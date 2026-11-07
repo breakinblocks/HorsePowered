@@ -5,14 +5,13 @@ import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import com.breakinblocks.horsepowered.recipes.ChoppingRecipe;
 import com.breakinblocks.horsepowered.recipes.HPRecipeInput;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
+import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.block.state.BlockState;
-
-import java.util.Optional;
 
 public class ChopperBlockEntity extends HPBlockEntityHorseBase {
 
@@ -59,8 +58,7 @@ public class ChopperBlockEntity extends HPBlockEntityHorseBase {
         if (level == null) return false;
 
         HPRecipeInput input = new HPRecipeInput(stack);
-        return level.getRecipeManager()
-                .getAllRecipesFor(HPRecipes.CHOPPING_TYPE.get()).stream()
+        return level.getRecipeManager().getAllRecipesFor(HPRecipes.CHOPPING_TYPE.get()).stream()
                 .filter(r -> r.value().getTier().allowsHorse())
                 .anyMatch(r -> r.value().matches(input, level));
     }
@@ -130,8 +128,7 @@ public class ChopperBlockEntity extends HPBlockEntityHorseBase {
     public Optional<RecipeHolder<ChoppingRecipe>> getRecipe() {
         if (level == null) return Optional.empty();
         HPRecipeInput input = new HPRecipeInput(getItem(0));
-        return level.getRecipeManager()
-                .getAllRecipesFor(HPRecipes.CHOPPING_TYPE.get()).stream()
+        return level.getRecipeManager().getAllRecipesFor(HPRecipes.CHOPPING_TYPE.get()).stream()
                 .filter(r -> r.value().getTier().allowsHorse())
                 .filter(r -> r.value().matches(input, level))
                 .findFirst();

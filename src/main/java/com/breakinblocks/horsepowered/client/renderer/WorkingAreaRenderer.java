@@ -9,6 +9,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -16,11 +20,6 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.AABB;
 import org.joml.Matrix4f;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Shared utility for rendering the working area highlight for horse-powered blocks.
@@ -50,7 +49,8 @@ public class WorkingAreaRenderer {
      */
     public static void render(WorkerHost blockEntity, PoseStack poseStack, MultiBufferSource bufferSource) {
         BlockPos blockPos = blockEntity.getBlockPos();
-        List<Map.Entry<BlockPos, Boolean>> positions = blockEntity.getVirtualWorker().getWorkingAreaPositions();
+        List<Map.Entry<BlockPos, Boolean>> positions =
+                blockEntity.getVirtualWorker().getWorkingAreaPositions();
 
         if (positions.isEmpty()) {
             return;
@@ -63,7 +63,8 @@ public class WorkingAreaRenderer {
         renderWireframes(positions, blockPos, poseStack, bufferSource);
     }
 
-    private static void renderFilledBoxes(List<Map.Entry<BlockPos, Boolean>> positions, BlockPos blockPos, PoseStack poseStack) {
+    private static void renderFilledBoxes(
+            List<Map.Entry<BlockPos, Boolean>> positions, BlockPos blockPos, PoseStack poseStack) {
         // Build a set of all clear positions so we can skip internal faces
         Set<BlockPos> clearPositions = new HashSet<>();
         for (Map.Entry<BlockPos, Boolean> entry : positions) {
@@ -93,14 +94,12 @@ public class WorkingAreaRenderer {
 
             if (isClear) {
                 // Only render faces on the outer boundary of the clear area
-                renderBoundaryFaces(buffer, matrix, pos, clearPositions, x, y, z,
-                        50, 200, 50, 25);
+                renderBoundaryFaces(buffer, matrix, pos, clearPositions, x, y, z, 50, 200, 50, 25);
             } else {
                 // Obstructed blocks render as individual highlighted boxes
-                renderFullBox(buffer, matrix,
-                        x + 0.02f, y + 0.02f, z + 0.02f,
-                        x + 0.98f, y + 0.98f, z + 0.98f,
-                        255, 40, 40, 50);
+                renderFullBox(
+                        buffer, matrix, x + 0.02f, y + 0.02f, z + 0.02f, x + 0.98f, y + 0.98f, z + 0.98f, 255, 40, 40,
+                        50);
             }
         }
 
@@ -115,10 +114,18 @@ public class WorkingAreaRenderer {
      * Renders only the faces of a block that are on the outer boundary of the clear area.
      * A face is rendered only if the neighbor in that direction is NOT in the clear set.
      */
-    private static void renderBoundaryFaces(BufferBuilder buffer, Matrix4f matrix,
-                                             BlockPos pos, Set<BlockPos> clearSet,
-                                             float x, float y, float z,
-                                             int r, int g, int b, int a) {
+    private static void renderBoundaryFaces(
+            BufferBuilder buffer,
+            Matrix4f matrix,
+            BlockPos pos,
+            Set<BlockPos> clearSet,
+            float x,
+            float y,
+            float z,
+            int r,
+            int g,
+            int b,
+            int a) {
         float x0 = x, y0 = y, z0 = z;
         float x1 = x + 1, y1 = y + 1, z1 = z + 1;
 
@@ -160,10 +167,19 @@ public class WorkingAreaRenderer {
         }
     }
 
-    private static void renderFullBox(BufferBuilder buffer, Matrix4f matrix,
-                                       float x0, float y0, float z0,
-                                       float x1, float y1, float z1,
-                                       int r, int g, int b, int a) {
+    private static void renderFullBox(
+            BufferBuilder buffer,
+            Matrix4f matrix,
+            float x0,
+            float y0,
+            float z0,
+            float x1,
+            float y1,
+            float z1,
+            int r,
+            int g,
+            int b,
+            int a) {
         // Bottom
         buffer.addVertex(matrix, x0, y0, z0).setColor(r, g, b, a);
         buffer.addVertex(matrix, x1, y0, z0).setColor(r, g, b, a);
@@ -196,8 +212,11 @@ public class WorkingAreaRenderer {
         buffer.addVertex(matrix, x1, y0, z1).setColor(r, g, b, a);
     }
 
-    private static void renderWireframes(List<Map.Entry<BlockPos, Boolean>> positions, BlockPos blockPos,
-                                          PoseStack poseStack, MultiBufferSource bufferSource) {
+    private static void renderWireframes(
+            List<Map.Entry<BlockPos, Boolean>> positions,
+            BlockPos blockPos,
+            PoseStack poseStack,
+            MultiBufferSource bufferSource) {
         VertexConsumer lineConsumer = bufferSource.getBuffer(RenderType.lines());
 
         // Only wireframe blocked blocks so they stand out clearly
@@ -213,5 +232,4 @@ public class WorkingAreaRenderer {
             LevelRenderer.renderLineBox(poseStack, lineConsumer, box, 1.0f, 0.0f, 0.0f, 1.0f);
         }
     }
-
 }

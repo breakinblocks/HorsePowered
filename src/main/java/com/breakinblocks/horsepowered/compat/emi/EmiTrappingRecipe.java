@@ -7,6 +7,9 @@ import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
@@ -15,10 +18,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 public class EmiTrappingRecipe extends BasicEmiRecipe {
 
@@ -63,26 +62,33 @@ public class EmiTrappingRecipe extends BasicEmiRecipe {
         y += 10;
         widgets.addText(
                 Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.trap_time", seconds + "s"),
-                0, y, 0x808080, false);
+                0,
+                y,
+                0x808080,
+                false);
         y += 10;
         widgets.addText(
-                Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.trap_chance"),
-                0, y, 0x808080, false);
+                Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.trap_chance"), 0, y, 0x808080, false);
         y += 10;
         widgets.addText(baitConsumedLabel(), 0, y, 0x808080, false);
         y += 10;
 
         if (biome.isPresent()) {
             widgets.addText(
-                    Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.trap_biome",
+                    Component.translatable(
+                            "gui." + HorsePowerMod.MOD_ID + ".jei.trap_biome",
                             biomeLabel(biome.get().location())),
-                    0, y, 0x6688AA, false);
+                    0,
+                    y,
+                    0x6688AA,
+                    false);
             y += 10;
         }
         if (!dimensions.isEmpty()) {
             String label = dimensionLabel(dimensions.getFirst());
             if (dimensions.size() > 1) label += "...";
-            Component dimensionText = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.trap_dimension", label);
+            Component dimensionText =
+                    Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.trap_dimension", label);
             widgets.addText(dimensionText, 0, y, 0x6688AA, false);
             if (dimensions.size() > 1) {
                 List<Component> tooltip = new ArrayList<>();
@@ -90,14 +96,18 @@ public class EmiTrappingRecipe extends BasicEmiRecipe {
                 for (ResourceKey<Level> dimension : dimensions) {
                     tooltip.add(Component.literal(dimensionLabel(dimension)).withStyle(ChatFormatting.GRAY));
                 }
-                widgets.addTooltipText(tooltip, 0, y, Minecraft.getInstance().font.width(dimensionText), 10);
+                widgets.addTooltipText(
+                        tooltip, 0, y, Minecraft.getInstance().font.width(dimensionText), 10);
             }
             y += 10;
         }
         if (waterlogged) {
             widgets.addText(
                     Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.trap_waterlogged"),
-                    0, y, 0x6688AA, false);
+                    0,
+                    y,
+                    0x6688AA,
+                    false);
         }
     }
 
@@ -105,8 +115,8 @@ public class EmiTrappingRecipe extends BasicEmiRecipe {
         if (!baitConsumed) {
             return Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.trap_bait_consumed_none");
         }
-        return Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.trap_bait_consumed_chance",
-                formatChance(baitConsumeChance));
+        return Component.translatable(
+                "gui." + HorsePowerMod.MOD_ID + ".jei.trap_bait_consumed_chance", formatChance(baitConsumeChance));
     }
 
     private static String formatChance(double chance) {

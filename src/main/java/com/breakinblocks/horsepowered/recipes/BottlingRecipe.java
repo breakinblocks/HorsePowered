@@ -102,22 +102,23 @@ public class BottlingRecipe implements Recipe<HPRecipeInput> {
 
     public static class Serializer implements RecipeSerializer<BottlingRecipe> {
 
-        public static final MapCodec<BottlingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance ->
-                instance.group(
+        public static final MapCodec<BottlingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
                         Ingredient.CODEC_NONEMPTY.fieldOf("container").forGetter(BottlingRecipe::getContainer),
                         FluidStack.CODEC.fieldOf("fluid").forGetter(BottlingRecipe::getFluid),
                         ItemStack.CODEC.fieldOf("result").forGetter(BottlingRecipe::getResult),
-                        Codec.INT.optionalFieldOf("priority", 0).forGetter(BottlingRecipe::getPriority)
-                ).apply(instance, BottlingRecipe::new)
-        );
+                        Codec.INT.optionalFieldOf("priority", 0).forGetter(BottlingRecipe::getPriority))
+                .apply(instance, BottlingRecipe::new));
 
         public static final StreamCodec<RegistryFriendlyByteBuf, BottlingRecipe> STREAM_CODEC = StreamCodec.composite(
-                Ingredient.CONTENTS_STREAM_CODEC, BottlingRecipe::getContainer,
-                FluidStack.STREAM_CODEC, BottlingRecipe::getFluid,
-                ItemStack.STREAM_CODEC, BottlingRecipe::getResult,
-                ByteBufCodecs.VAR_INT, BottlingRecipe::getPriority,
-                BottlingRecipe::new
-        );
+                Ingredient.CONTENTS_STREAM_CODEC,
+                BottlingRecipe::getContainer,
+                FluidStack.STREAM_CODEC,
+                BottlingRecipe::getFluid,
+                ItemStack.STREAM_CODEC,
+                BottlingRecipe::getResult,
+                ByteBufCodecs.VAR_INT,
+                BottlingRecipe::getPriority,
+                BottlingRecipe::new);
 
         @Override
         public MapCodec<BottlingRecipe> codec() {

@@ -29,8 +29,13 @@ public class DryingRackBlockEntityRenderer implements BlockEntityRenderer<Drying
     }
 
     @Override
-    public void render(DryingRackBlockEntity be, float partialTick, PoseStack poseStack,
-                       MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
+    public void render(
+            DryingRackBlockEntity be,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            int packedLight,
+            int packedOverlay) {
         BlockState state = be.getBlockState();
         if (!state.hasProperty(BlockDryingRack.FACING)) return;
         Direction facing = state.getValue(BlockDryingRack.FACING);
@@ -44,8 +49,8 @@ public class DryingRackBlockEntityRenderer implements BlockEntityRenderer<Drying
 
             int row = slot / 2;
             int col = slot % 2;
-            double[] rowCenters = { 4.0, 12.0, 20.0, 28.0 };
-            double[] colCenters = { 10.0, 22.0 };
+            double[] rowCenters = {4.0, 12.0, 20.0, 28.0};
+            double[] colCenters = {10.0, 22.0};
             double rightPx = colCenters[col];
             double forwardPx = rowCenters[row];
 
@@ -76,23 +81,67 @@ public class DryingRackBlockEntityRenderer implements BlockEntityRenderer<Drying
             float outputAlpha = fade;
             ItemStack output = be.getOutputPreview(slot);
 
-            RenderUtils.renderFlatItemFading(poseStack, bufferSource, itemRenderer, stack,
-                    x, y, z, 0.45F, 0F, packedLight, packedOverlay, be.getLevel(), inputAlpha);
+            RenderUtils.renderFlatItemFading(
+                    poseStack,
+                    bufferSource,
+                    itemRenderer,
+                    stack,
+                    x,
+                    y,
+                    z,
+                    0.45F,
+                    0F,
+                    packedLight,
+                    packedOverlay,
+                    be.getLevel(),
+                    inputAlpha);
             if (!output.isEmpty()) {
-                RenderUtils.renderFlatItemFading(poseStack, bufferSource, itemRenderer, output,
-                        x, y, z, 0.45F, 0F, packedLight, packedOverlay, be.getLevel(), outputAlpha);
+                RenderUtils.renderFlatItemFading(
+                        poseStack,
+                        bufferSource,
+                        itemRenderer,
+                        output,
+                        x,
+                        y,
+                        z,
+                        0.45F,
+                        0F,
+                        packedLight,
+                        packedOverlay,
+                        be.getLevel(),
+                        outputAlpha);
             }
         }
     }
 
-    private void renderStill(DryingRackBlockEntity be, PoseStack poseStack, MultiBufferSource bufferSource,
-                             int packedLight, int packedOverlay, ItemStack stack,
-                             double x, double y, double z, boolean showCount) {
-        RenderUtils.renderFlatItem(poseStack, bufferSource, itemRenderer, stack,
-                x, y, z, 0.45F, 0F, packedLight, packedOverlay, be.getLevel());
+    private void renderStill(
+            DryingRackBlockEntity be,
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            int packedLight,
+            int packedOverlay,
+            ItemStack stack,
+            double x,
+            double y,
+            double z,
+            boolean showCount) {
+        RenderUtils.renderFlatItem(
+                poseStack,
+                bufferSource,
+                itemRenderer,
+                stack,
+                x,
+                y,
+                z,
+                0.45F,
+                0F,
+                packedLight,
+                packedOverlay,
+                be.getLevel());
         if (showCount) {
             double countY = RenderUtils.itemTop(itemRenderer, stack, be.getLevel(), y, 0.45F, false);
-            RenderUtils.renderItemCountBillboard(poseStack, bufferSource, font, packedLight, stack.getCount(), x, countY, z);
+            RenderUtils.renderItemCountBillboard(
+                    poseStack, bufferSource, font, packedLight, stack.getCount(), x, countY, z);
         }
     }
 
@@ -113,7 +162,12 @@ public class DryingRackBlockEntityRenderer implements BlockEntityRenderer<Drying
         maxX = Math.max(maxX, rightDir.getStepX());
         minZ = Math.min(minZ, rightDir.getStepZ());
         maxZ = Math.max(maxZ, rightDir.getStepZ());
-        return new AABB(pos.getX() + minX, pos.getY(), pos.getZ() + minZ,
-                        pos.getX() + maxX + 1, pos.getY() + 1, pos.getZ() + maxZ + 1);
+        return new AABB(
+                pos.getX() + minX,
+                pos.getY(),
+                pos.getZ() + minZ,
+                pos.getX() + maxX + 1,
+                pos.getY() + 1,
+                pos.getZ() + maxZ + 1);
     }
 }

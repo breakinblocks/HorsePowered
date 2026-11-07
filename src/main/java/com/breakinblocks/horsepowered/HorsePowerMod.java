@@ -24,7 +24,6 @@ import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.common.NeoForgeMod;
@@ -45,8 +44,9 @@ public class HorsePowerMod {
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS =
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MOD_ID);
 
-    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> CREATIVE_TAB = CREATIVE_MODE_TABS.register("main", () ->
-            CreativeModeTab.builder()
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> CREATIVE_TAB = CREATIVE_MODE_TABS.register(
+            "main",
+            () -> CreativeModeTab.builder()
                     .title(Component.translatable("itemGroup." + MOD_ID))
                     .icon(() -> new ItemStack(ModBlocks.HAND_GRINDSTONE.get()))
                     .displayItems((parameters, output) -> {
@@ -69,8 +69,7 @@ public class HorsePowerMod {
                         output.accept(ModBlocks.WOODEN_HOPPER.get());
                         output.accept(ModBlocks.CREATIVE_BATTERY.get());
                     })
-                    .build()
-    );
+                    .build());
 
     public static ResourceLocation id(String path) {
         return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
@@ -95,8 +94,10 @@ public class HorsePowerMod {
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::buildCreativeContents);
         modEventBus.addListener(HorsePowerMod::registerCapabilities);
-        modEventBus.addListener((net.neoforged.fml.event.config.ModConfigEvent.Loading e) -> HorsePowerConfig.invalidatePathSpeedCache());
-        modEventBus.addListener((net.neoforged.fml.event.config.ModConfigEvent.Reloading e) -> HorsePowerConfig.invalidatePathSpeedCache());
+        modEventBus.addListener((net.neoforged.fml.event.config.ModConfigEvent.Loading e) ->
+                HorsePowerConfig.invalidatePathSpeedCache());
+        modEventBus.addListener((net.neoforged.fml.event.config.ModConfigEvent.Reloading e) ->
+                HorsePowerConfig.invalidatePathSpeedCache());
 
         // Client-only setup - registration is handled by @EventBusSubscriber in HorsePowerClient
         if (dist.isClient()) {
@@ -116,21 +117,20 @@ public class HorsePowerMod {
             var fire = Blocks.FIRE.defaultBlockState();
 
             // Seed oil + adjacent lava → fire
-            FluidInteractionRegistry.addInteraction(oilType,
-                    new FluidInteractionRegistry.InteractionInformation(
-                            lavaType, fluidState -> fire));
+            FluidInteractionRegistry.addInteraction(
+                    oilType, new FluidInteractionRegistry.InteractionInformation(lavaType, fluidState -> fire));
 
             // Seed oil + adjacent fire block → fire
-            FluidInteractionRegistry.addInteraction(oilType,
+            FluidInteractionRegistry.addInteraction(
+                    oilType,
                     new FluidInteractionRegistry.InteractionInformation(
                             (level, currentPos, relativePos, currentState) ->
                                     level.getBlockState(relativePos).is(Blocks.FIRE),
                             fluidState -> fire));
 
             // Lava + adjacent seed oil → fire
-            FluidInteractionRegistry.addInteraction(lavaType,
-                    new FluidInteractionRegistry.InteractionInformation(
-                            oilType, fluidState -> fire));
+            FluidInteractionRegistry.addInteraction(
+                    lavaType, new FluidInteractionRegistry.InteractionInformation(oilType, fluidState -> fire));
 
             LOGGER.info("Registered seed oil fluid interactions");
         });
@@ -144,44 +144,40 @@ public class HorsePowerMod {
         // Press exposes a directional fluid handler: insertions go to the input tank,
         // extractions drain the output tank. Prevents pipes from contaminating input
         // with arbitrary fluids or stealing reagents mid-process.
-        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK,
-                ModBlocks.PRESS_BE.get(),
-                (be, side) -> be.getFluidHandler());
+        event.registerBlockEntity(
+                Capabilities.FluidHandler.BLOCK, ModBlocks.PRESS_BE.get(), (be, side) -> be.getFluidHandler());
 
         // Filler blocks delegate to the press when they sit above one — pipes can connect
         // to either half of the multi-block.
-        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK,
-                ModBlocks.FILLER_BE.get(),
-                (be, side) -> {
-                    var mainBe = be.getFilledTileEntity();
-                    if (mainBe instanceof PressBlockEntity press) {
-                        return press.getFluidHandler();
-                    }
-                    return null;
-                });
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, ModBlocks.FILLER_BE.get(), (be, side) -> {
+            var mainBe = be.getFilledTileEntity();
+            if (mainBe instanceof PressBlockEntity press) {
+                return press.getFluidHandler();
+            }
+            return null;
+        });
 
-        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK,
-                ModBlocks.GENERATOR_BE.get(),
-                (be, side) -> be.getEnergyHandler());
+        event.registerBlockEntity(
+                Capabilities.EnergyStorage.BLOCK, ModBlocks.GENERATOR_BE.get(), (be, side) -> be.getEnergyHandler());
 
-        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK,
+        event.registerBlockEntity(
+                Capabilities.EnergyStorage.BLOCK,
                 ModBlocks.CREATIVE_BATTERY_BE.get(),
                 (be, side) -> be.getEnergyHandler());
 
-        event.registerBlock(Capabilities.ItemHandler.BLOCK,
+        event.registerBlock(
+                Capabilities.ItemHandler.BLOCK,
                 (level, pos, state, be, side) -> {
                     DryingRackBlockEntity main = BlockDryingRack.getMainBlockEntity(level, state, pos);
                     return main == null ? null : main.getItemHandler();
                 },
                 ModBlocks.DRYING_RACK.get());
 
-        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK,
-                ModBlocks.WOODEN_HOPPER_BE.get(),
-                (be, side) -> new InvWrapper(be));
+        event.registerBlockEntity(
+                Capabilities.ItemHandler.BLOCK, ModBlocks.WOODEN_HOPPER_BE.get(), (be, side) -> new InvWrapper(be));
 
-        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK,
-                ModBlocks.ANIMAL_TRAP_BE.get(),
-                (be, side) -> be.getInventory());
+        event.registerBlockEntity(
+                Capabilities.ItemHandler.BLOCK, ModBlocks.ANIMAL_TRAP_BE.get(), (be, side) -> be.getInventory());
     }
 
     /**

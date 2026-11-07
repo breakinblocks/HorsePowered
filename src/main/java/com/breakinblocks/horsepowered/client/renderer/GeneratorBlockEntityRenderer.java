@@ -11,12 +11,16 @@ import net.minecraft.world.phys.AABB;
 
 public class GeneratorBlockEntityRenderer implements BlockEntityRenderer<GeneratorBlockEntity> {
 
-    public GeneratorBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
-    }
+    public GeneratorBlockEntityRenderer(BlockEntityRendererProvider.Context context) {}
 
     @Override
-    public void render(GeneratorBlockEntity blockEntity, float partialTick, PoseStack poseStack,
-                       MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
+    public void render(
+            GeneratorBlockEntity blockEntity,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            int packedLight,
+            int packedOverlay) {
 
         WorkingAreaRenderer.renderIfActive(blockEntity, poseStack, bufferSource);
         VirtualWorkerRenderer.renderWorker(blockEntity, partialTick, poseStack, bufferSource, packedLight);
@@ -39,7 +43,6 @@ public class GeneratorBlockEntityRenderer implements BlockEntityRenderer<Generat
     @Override
     public AABB getRenderBoundingBox(GeneratorBlockEntity blockEntity) {
         BlockPos pos = blockEntity.getBlockPos();
-        return new AABB(pos.getX() - 3, pos.getY(), pos.getZ() - 3,
-                        pos.getX() + 4, pos.getY() + 4, pos.getZ() + 4);
+        return new AABB(pos.getX() - 3, pos.getY(), pos.getZ() - 3, pos.getX() + 4, pos.getY() + 4, pos.getZ() + 4);
     }
 }

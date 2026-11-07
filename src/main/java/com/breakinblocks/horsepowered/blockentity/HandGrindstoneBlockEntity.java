@@ -5,6 +5,7 @@ import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import com.breakinblocks.horsepowered.recipes.GrindstoneRecipe;
 import com.breakinblocks.horsepowered.recipes.HPRecipeInput;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
+import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -12,8 +13,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-
-import java.util.Optional;
 
 public class HandGrindstoneBlockEntity extends HPBlockEntityBase {
 
@@ -75,8 +74,7 @@ public class HandGrindstoneBlockEntity extends HPBlockEntityBase {
     public Optional<RecipeHolder<GrindstoneRecipe>> getRecipe() {
         if (level == null) return Optional.empty();
         HPRecipeInput input = new HPRecipeInput(getItem(0));
-        return level.getRecipeManager()
-                .getAllRecipesFor(HPRecipes.GRINDING_TYPE.get()).stream()
+        return level.getRecipeManager().getAllRecipesFor(HPRecipes.GRINDING_TYPE.get()).stream()
                 .filter(r -> r.value().getTier().allowsHand())
                 .filter(r -> r.value().matches(input, level))
                 .findFirst();
@@ -120,8 +118,7 @@ public class HandGrindstoneBlockEntity extends HPBlockEntityBase {
         if (level == null) return false;
 
         HPRecipeInput input = new HPRecipeInput(stack);
-        return level.getRecipeManager()
-                .getAllRecipesFor(HPRecipes.GRINDING_TYPE.get()).stream()
+        return level.getRecipeManager().getAllRecipesFor(HPRecipes.GRINDING_TYPE.get()).stream()
                 .filter(r -> r.value().getTier().allowsHand())
                 .anyMatch(r -> r.value().matches(input, level));
     }

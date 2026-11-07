@@ -4,6 +4,7 @@ import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.recipes.DryingRackRecipe;
 import com.breakinblocks.horsepowered.recipes.HPRecipeInput;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
+import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
@@ -20,8 +21,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Optional;
 
 public class DryingRackBlockEntity extends BlockEntity {
 
@@ -128,7 +127,11 @@ public class DryingRackBlockEntity extends BlockEntity {
             if (be.progress[slot] >= time) {
                 Optional<RecipeHolder<DryingRackRecipe>> recipe = be.findRecipe(be.items.get(slot));
                 if (recipe.isPresent()) {
-                    be.items.set(slot, recipe.get().value().assemble(new HPRecipeInput(be.items.get(slot)), level.registryAccess()));
+                    be.items.set(
+                            slot,
+                            recipe.get()
+                                    .value()
+                                    .assemble(new HPRecipeInput(be.items.get(slot)), level.registryAccess()));
                     be.progress[slot] = FINISHED;
                     be.recipeTime[slot] = 0;
                     dirty = true;
@@ -215,7 +218,8 @@ public class DryingRackBlockEntity extends BlockEntity {
                 ItemStack copy = stack.copyWithCount(1);
                 DryingRackBlockEntity.this.items.set(slot, copy);
                 DryingRackBlockEntity.this.progress[slot] = 0;
-                DryingRackBlockEntity.this.recipeTime[slot] = recipe.get().value().getTime();
+                DryingRackBlockEntity.this.recipeTime[slot] =
+                        recipe.get().value().getTime();
                 markDirtyAndSync();
             }
             ItemStack remainder = stack.copy();

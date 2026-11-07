@@ -4,6 +4,7 @@ import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import com.breakinblocks.horsepowered.recipes.ChoppingRecipe;
+import java.util.List;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -21,11 +22,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.ItemStack;
 
-import java.util.List;
-
 public class HorsePowerManualChoppingCategory implements IRecipeCategory<ChoppingRecipe> {
 
-    public static final ResourceLocation UID = ResourceLocation.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "manual_chopping");
+    public static final ResourceLocation UID =
+            ResourceLocation.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "manual_chopping");
 
     private static final int WIDTH = 100;
     private static final int HEIGHT = 66;
@@ -37,14 +37,18 @@ public class HorsePowerManualChoppingCategory implements IRecipeCategory<Choppin
     private final List<ItemStack> axes;
 
     public HorsePowerManualChoppingCategory(IGuiHelper guiHelper) {
-        this.icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(ModBlocks.CHOPPING_BLOCK.get()));
+        this.icon = guiHelper.createDrawableIngredient(
+                VanillaTypes.ITEM_STACK, new ItemStack(ModBlocks.CHOPPING_BLOCK.get()));
         this.slot = guiHelper.getSlotDrawable();
         this.arrow = guiHelper.getRecipeArrow();
         this.title = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.manual_chopping");
 
         // Get all axes from the axes tag
-        this.axes = BuiltInRegistries.ITEM.getTag(ItemTags.AXES)
-                .map(tag -> tag.stream().map(holder -> new ItemStack(holder.value())).toList())
+        this.axes = BuiltInRegistries.ITEM
+                .getTag(ItemTags.AXES)
+                .map(tag -> tag.stream()
+                        .map(holder -> new ItemStack(holder.value()))
+                        .toList())
                 .orElse(List.of());
     }
 
@@ -92,7 +96,12 @@ public class HorsePowerManualChoppingCategory implements IRecipeCategory<Choppin
     }
 
     @Override
-    public void draw(ChoppingRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+    public void draw(
+            ChoppingRecipe recipe,
+            IRecipeSlotsView recipeSlotsView,
+            GuiGraphics guiGraphics,
+            double mouseX,
+            double mouseY) {
         arrow.draw(guiGraphics, 38, 26);
 
         int chops = recipe.getTime() * HorsePowerConfig.choppingMultiplier.get();
@@ -101,10 +110,11 @@ public class HorsePowerManualChoppingCategory implements IRecipeCategory<Choppin
         guiGraphics.drawString(Minecraft.getInstance().font, chopText, (WIDTH - chopWidth) / 2, 48, 0x808080, false);
 
         if (recipe.getHungerCost() > 0.0F) {
-            Component hungerText = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.hunger",
-                    formatHunger(recipe.getHungerCost()));
+            Component hungerText = Component.translatable(
+                    "gui." + HorsePowerMod.MOD_ID + ".jei.hunger", formatHunger(recipe.getHungerCost()));
             int hungerWidth = Minecraft.getInstance().font.width(hungerText);
-            guiGraphics.drawString(Minecraft.getInstance().font, hungerText, (WIDTH - hungerWidth) / 2, 58, 0x808080, false);
+            guiGraphics.drawString(
+                    Minecraft.getInstance().font, hungerText, (WIDTH - hungerWidth) / 2, 58, 0x808080, false);
         }
     }
 

@@ -4,6 +4,10 @@ import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.recipes.HPRecipeInput;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
 import com.breakinblocks.horsepowered.recipes.TrappingRecipe;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -35,11 +39,6 @@ import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
-
 public class AnimalTrapBlockEntity extends BlockEntity {
 
     public static final int INVENTORY_SIZE = 6;
@@ -59,13 +58,16 @@ public class AnimalTrapBlockEntity extends BlockEntity {
 
     @Nullable
     private CompoundTag capturedEntityTag;
+
     @Nullable
     private EntityType<?> capturedEntityType;
 
     private double spin;
     private double oSpin;
+
     @Nullable
     private Entity displayEntity;
+
     @Nullable
     private CompoundTag displayEntitySourceTag;
 
@@ -217,8 +219,8 @@ public class AnimalTrapBlockEntity extends BlockEntity {
         // Initialize new catches once, before their state is saved for display, loot, and release.
         proto.moveTo(worldPosition.getX() + 0.5, worldPosition.getY(), worldPosition.getZ() + 0.5);
         if (proto instanceof Mob mob) {
-            EventHooks.finalizeMobSpawn(mob, sl, sl.getCurrentDifficultyAt(worldPosition),
-                    MobSpawnType.MOB_SUMMONED, null);
+            EventHooks.finalizeMobSpawn(
+                    mob, sl, sl.getCurrentDifficultyAt(worldPosition), MobSpawnType.MOB_SUMMONED, null);
             // The prototype is stored instead of added to the world, so honor cancellation here.
             if (mob.isSpawnCancelled()) return;
         }
@@ -256,7 +258,8 @@ public class AnimalTrapBlockEntity extends BlockEntity {
         LootParams params = new LootParams.Builder(sl)
                 .withParameter(LootContextParams.THIS_ENTITY, living)
                 .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(worldPosition))
-                .withParameter(LootContextParams.DAMAGE_SOURCE, sl.damageSources().generic())
+                .withParameter(
+                        LootContextParams.DAMAGE_SOURCE, sl.damageSources().generic())
                 .create(LootContextParamSets.ENTITY);
         table.getRandomItems(params, this::depositDrop);
         living.discard();
@@ -300,7 +303,8 @@ public class AnimalTrapBlockEntity extends BlockEntity {
         for (int slot = 0; slot < INVENTORY_SIZE; slot++) {
             ItemStack stack = inventory.getStackInSlot(slot);
             if (!stack.isEmpty()) {
-                Containers.dropItemStack(level,
+                Containers.dropItemStack(
+                        level,
                         worldPosition.getX() + 0.5,
                         worldPosition.getY() + 0.5,
                         worldPosition.getZ() + 0.5,
@@ -327,11 +331,7 @@ public class AnimalTrapBlockEntity extends BlockEntity {
         }
 
         float yaw = sl.getRandom().nextFloat() * 360F;
-        entity.moveTo(
-                worldPosition.getX() + 0.5,
-                worldPosition.getY() + 1.0,
-                worldPosition.getZ() + 0.5,
-                yaw, 0F);
+        entity.moveTo(worldPosition.getX() + 0.5, worldPosition.getY() + 1.0, worldPosition.getZ() + 0.5, yaw, 0F);
         sl.addFreshEntity(entity);
 
         capturedEntityTag = null;
@@ -389,8 +389,8 @@ public class AnimalTrapBlockEntity extends BlockEntity {
         if (typeId == null) return false;
         try {
             return level.getRecipeManager().getAllRecipesFor(HPRecipes.TRAPPING_TYPE.get()).stream()
-                    .anyMatch(h -> typeId.equals(h.value().getEntityId())
-                            && h.value().isBaitConsumed());
+                    .anyMatch(h ->
+                            typeId.equals(h.value().getEntityId()) && h.value().isBaitConsumed());
         } catch (Exception e) {
             return false;
         }
@@ -398,9 +398,7 @@ public class AnimalTrapBlockEntity extends BlockEntity {
 
     @Nullable
     private ResourceLocation getCapturedEntityTypeId() {
-        return capturedEntityType == null
-                ? null
-                : BuiltInRegistries.ENTITY_TYPE.getKey(capturedEntityType);
+        return capturedEntityType == null ? null : BuiltInRegistries.ENTITY_TYPE.getKey(capturedEntityType);
     }
 
     public CompoundTag writeBlockEntityComponent(HolderLookup.Provider registries) {

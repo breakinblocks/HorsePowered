@@ -14,8 +14,7 @@ public final class CreateCompatClient {
 
     public static PartialModel COG;
 
-    private CreateCompatClient() {
-    }
+    private CreateCompatClient() {}
 
     public static void init(IEventBus modBus) {
         COG = PartialModel.of(HorsePowerMod.id("block/horse_engine/cog"));

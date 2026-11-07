@@ -4,6 +4,7 @@ import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.blocks.ModBlocks;
 import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import com.breakinblocks.horsepowered.recipes.CrushingRecipe;
+import java.util.List;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -23,8 +24,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TieredItem;
 import net.minecraft.world.item.Tiers;
 
-import java.util.List;
-
 public class HorsePowerCrushingCategory implements IRecipeCategory<CrushingRecipe> {
 
     public static final ResourceLocation UID = ResourceLocation.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "crushing");
@@ -39,12 +38,14 @@ public class HorsePowerCrushingCategory implements IRecipeCategory<CrushingRecip
     private final List<ItemStack> pickaxes;
 
     public HorsePowerCrushingCategory(IGuiHelper guiHelper) {
-        this.icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(ModBlocks.GRANITE_ANVIL.get()));
+        this.icon = guiHelper.createDrawableIngredient(
+                VanillaTypes.ITEM_STACK, new ItemStack(ModBlocks.GRANITE_ANVIL.get()));
         this.slot = guiHelper.getSlotDrawable();
         this.arrow = guiHelper.getRecipeArrow();
         this.title = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.crushing");
 
-        this.pickaxes = BuiltInRegistries.ITEM.getTag(ItemTags.PICKAXES)
+        this.pickaxes = BuiltInRegistries.ITEM
+                .getTag(ItemTags.PICKAXES)
                 .map(tag -> tag.stream()
                         .map(holder -> new ItemStack(holder.value()))
                         .filter(s -> s.getItem() instanceof TieredItem ti
@@ -94,19 +95,26 @@ public class HorsePowerCrushingCategory implements IRecipeCategory<CrushingRecip
     }
 
     @Override
-    public void draw(CrushingRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+    public void draw(
+            CrushingRecipe recipe,
+            IRecipeSlotsView recipeSlotsView,
+            GuiGraphics guiGraphics,
+            double mouseX,
+            double mouseY) {
         arrow.draw(guiGraphics, 38, 26);
 
         int strikes = recipe.getTime() * HorsePowerConfig.crushingMultiplier.get();
         Component strikeText = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.strikes", strikes);
         int strikeWidth = Minecraft.getInstance().font.width(strikeText);
-        guiGraphics.drawString(Minecraft.getInstance().font, strikeText, (WIDTH - strikeWidth) / 2, 48, 0x808080, false);
+        guiGraphics.drawString(
+                Minecraft.getInstance().font, strikeText, (WIDTH - strikeWidth) / 2, 48, 0x808080, false);
 
         if (recipe.getHungerCost() > 0.0F) {
-            Component hungerText = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.hunger",
-                    formatHunger(recipe.getHungerCost()));
+            Component hungerText = Component.translatable(
+                    "gui." + HorsePowerMod.MOD_ID + ".jei.hunger", formatHunger(recipe.getHungerCost()));
             int hungerWidth = Minecraft.getInstance().font.width(hungerText);
-            guiGraphics.drawString(Minecraft.getInstance().font, hungerText, (WIDTH - hungerWidth) / 2, 58, 0x808080, false);
+            guiGraphics.drawString(
+                    Minecraft.getInstance().font, hungerText, (WIDTH - hungerWidth) / 2, 58, 0x808080, false);
         }
     }
 

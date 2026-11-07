@@ -53,25 +53,28 @@ public class EmiGrindingRecipe extends BasicEmiRecipe {
             int turns = Math.max(1, (time + pointsPerTurn - 1) / pointsPerTurn);
             widgets.addText(
                     Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.turns", turns),
-                    0, 20, 0x808080, false);
+                    0,
+                    20,
+                    0x808080,
+                    false);
         } else {
             widgets.addText(
-                    Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.time", time),
-                    0, 20, 0x808080, false);
+                    Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.time", time), 0, 20, 0x808080, false);
         }
 
         if (!secondary.isEmpty()) {
             widgets.addSlot(outputs.get(1), 80, 0).recipeContext(this);
-            widgets.addText(
-                    Component.literal(secondaryChance + "%"),
-                    80, 20, 0x808080, false);
+            widgets.addText(Component.literal(secondaryChance + "%"), 80, 20, 0x808080, false);
         }
 
         if (manual && hungerCost > 0.0F) {
             widgets.addText(
-                    Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.hunger",
-                            String.format("%.2f", hungerCost)),
-                    0, 30, 0x808080, false);
+                    Component.translatable(
+                            "gui." + HorsePowerMod.MOD_ID + ".jei.hunger", String.format("%.2f", hungerCost)),
+                    0,
+                    30,
+                    0x808080,
+                    false);
         }
     }
 }

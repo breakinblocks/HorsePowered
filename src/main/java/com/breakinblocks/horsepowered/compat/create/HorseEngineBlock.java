@@ -25,9 +25,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class HorseEngineBlock extends KineticBlock implements IBE<HorseEngineBlockEntity>, ICogWheel {
 
-    private static final VoxelShape SHAPE = Shapes.or(
-            Block.box(0, 0, 0, 16, 6, 16),
-            Block.box(2, 6, 2, 14, 16, 14));
+    private static final VoxelShape SHAPE = Shapes.or(Block.box(0, 0, 0, 16, 6, 16), Block.box(2, 6, 2, 14, 16, 14));
 
     public HorseEngineBlock(Properties properties) {
         super(properties);
@@ -49,21 +47,28 @@ public class HorseEngineBlock extends KineticBlock implements IBE<HorseEngineBlo
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
-                                              Player player, InteractionHand hand, BlockHitResult hit) {
+    protected ItemInteractionResult useItemOn(
+            ItemStack stack,
+            BlockState state,
+            Level level,
+            BlockPos pos,
+            Player player,
+            InteractionHand hand,
+            BlockHitResult hit) {
         HorseEngineBlockEntity engine = getBlockEntity(level, pos);
         if (engine == null) {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
-        if (WorkerInteraction.tryAttachLeashed(level, pos, player, engine.getVirtualWorker(),
-                (p, mob) -> engine.onWorkerAttached(mob))) {
+        if (WorkerInteraction.tryAttachLeashed(
+                level, pos, player, engine.getVirtualWorker(), (p, mob) -> engine.onWorkerAttached(mob))) {
             return ItemInteractionResult.sidedSuccess(level.isClientSide);
         }
         return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+    protected InteractionResult useWithoutItem(
+            BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         HorseEngineBlockEntity engine = getBlockEntity(level, pos);
         if (engine == null) {
             return InteractionResult.PASS;

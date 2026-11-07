@@ -76,7 +76,12 @@ public class HorsePowerChoppingCategory implements IRecipeCategory<ChoppingRecip
     }
 
     @Override
-    public void draw(ChoppingRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+    public void draw(
+            ChoppingRecipe recipe,
+            IRecipeSlotsView recipeSlotsView,
+            GuiGraphics guiGraphics,
+            double mouseX,
+            double mouseY) {
         // Draw arrow between input and output
         arrow.draw(guiGraphics, 26, 1);
 

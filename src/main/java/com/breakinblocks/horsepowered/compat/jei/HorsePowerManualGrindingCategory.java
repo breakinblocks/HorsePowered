@@ -21,7 +21,8 @@ import net.minecraft.world.item.ItemStack;
 
 public class HorsePowerManualGrindingCategory implements IRecipeCategory<GrindstoneRecipe> {
 
-    public static final ResourceLocation UID = ResourceLocation.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "manual_grinding");
+    public static final ResourceLocation UID =
+            ResourceLocation.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "manual_grinding");
 
     private static final int WIDTH = 100;
     private static final int HEIGHT = 46;
@@ -32,7 +33,8 @@ public class HorsePowerManualGrindingCategory implements IRecipeCategory<Grindst
     private final Component title;
 
     public HorsePowerManualGrindingCategory(IGuiHelper guiHelper) {
-        this.icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(ModBlocks.HAND_GRINDSTONE.get()));
+        this.icon = guiHelper.createDrawableIngredient(
+                VanillaTypes.ITEM_STACK, new ItemStack(ModBlocks.HAND_GRINDSTONE.get()));
         this.slot = guiHelper.getSlotDrawable();
         this.arrow = guiHelper.getRecipeArrow();
         this.title = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.manual_grinding");
@@ -78,14 +80,19 @@ public class HorsePowerManualGrindingCategory implements IRecipeCategory<Grindst
                     .addItemStack(recipe.getSecondary())
                     .setBackground(slot, -1, -1)
                     .addRichTooltipCallback((slotView, tooltip) -> {
-                        tooltip.add(Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.chance",
-                                recipe.getSecondaryChance()));
+                        tooltip.add(Component.translatable(
+                                "gui." + HorsePowerMod.MOD_ID + ".jei.chance", recipe.getSecondaryChance()));
                     });
         }
     }
 
     @Override
-    public void draw(GrindstoneRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+    public void draw(
+            GrindstoneRecipe recipe,
+            IRecipeSlotsView recipeSlotsView,
+            GuiGraphics guiGraphics,
+            double mouseX,
+            double mouseY) {
         arrow.draw(guiGraphics, 26, 1);
 
         int pointsPerTurn = HorsePowerConfig.pointsPerRotation.get();
@@ -99,8 +106,8 @@ public class HorsePowerManualGrindingCategory implements IRecipeCategory<Grindst
         }
 
         if (recipe.getHungerCost() > 0.0F) {
-            Component hungerText = Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.hunger",
-                    String.format("%.2f", recipe.getHungerCost()));
+            Component hungerText = Component.translatable(
+                    "gui." + HorsePowerMod.MOD_ID + ".jei.hunger", String.format("%.2f", recipe.getHungerCost()));
             guiGraphics.drawString(Minecraft.getInstance().font, hungerText, 1, 34, 0x808080, false);
         }
     }

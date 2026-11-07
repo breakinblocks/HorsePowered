@@ -37,14 +37,16 @@ public class EmiChoppingRecipe extends BasicEmiRecipe {
 
         int chops = manual ? time * HorsePowerConfig.choppingMultiplier.get() : time;
         widgets.addText(
-                Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.chops", chops),
-                26, 20, 0x808080, false);
+                Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.chops", chops), 26, 20, 0x808080, false);
 
         if (manual && hungerCost > 0.0F) {
             widgets.addText(
-                    Component.translatable("gui." + HorsePowerMod.MOD_ID + ".jei.hunger",
-                            String.format("%.2f", hungerCost)),
-                    26, 30, 0x808080, false);
+                    Component.translatable(
+                            "gui." + HorsePowerMod.MOD_ID + ".jei.hunger", String.format("%.2f", hungerCost)),
+                    26,
+                    30,
+                    0x808080,
+                    false);
         }
     }
 }
