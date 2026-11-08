@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -283,15 +284,11 @@ public class VirtualWorker {
         Level level = level();
         if (!hasVirtualWorker || level == null || level.isClientSide) return;
 
-        PathfinderMob mob = recreateEntity();
-        if (mob != null) {
-            mob.setPos(virtualX, getVirtualY(), virtualZ);
-            level.addFreshEntity(mob);
-            mob.setLeashedTo(player, true);
-            LOGGER.info("[HorsePowered] setWorkerToPlayer at {}: Released {} to player", pos(), workerDisplayName);
-        }
-
-        clearVirtualWorker();
+        String name = workerDisplayName;
+        PathfinderMob mob = releaseStoredEntity(level);
+        if (mob == null) return;
+        mob.setLeashedTo(player, true);
+        LOGGER.info("[HorsePowered] setWorkerToPlayer at {}: Released {} to player", pos(), name);
         host.markChanged();
     }
 
@@ -299,14 +296,43 @@ public class VirtualWorker {
         Level level = level();
         if (!hasVirtualWorker || level == null || level.isClientSide) return;
 
-        PathfinderMob mob = recreateEntity();
-        if (mob != null) {
-            mob.setPos(virtualX, getVirtualY(), virtualZ);
-            level.addFreshEntity(mob);
-            LOGGER.info("[HorsePowered] spawnStoredEntity at {}: Spawned {} back into world", pos(), workerDisplayName);
+        String name = workerDisplayName;
+        if (releaseStoredEntity(level) != null) {
+            LOGGER.info("[HorsePowered] spawnStoredEntity at {}: Spawned {} back into world", pos(), name);
         }
+    }
 
+    private PathfinderMob releaseStoredEntity(Level level) {
+        PathfinderMob mob = recreateEntity();
+        if (mob == null) {
+            LOGGER.warn(
+                    "[HorsePowered] Could not recreate {} ({}) at {}, so it stays stored in the machine",
+                    workerDisplayName,
+                    workerEntityTypeId,
+                    pos());
+            return null;
+        }
+        mob.setPos(virtualX, getVirtualY(), virtualZ);
+        if (!level.addFreshEntity(mob)) {
+            UUID previous = mob.getUUID();
+            mob.setUUID(UUID.randomUUID());
+            if (!level.addFreshEntity(mob)) {
+                LOGGER.warn(
+                        "[HorsePowered] The world refused {} ({}) at {}, so it stays stored in the machine",
+                        workerDisplayName,
+                        workerEntityTypeId,
+                        pos());
+                return null;
+            }
+            LOGGER.warn(
+                    "[HorsePowered] {} at {} had UUID {}, which another entity already uses, so it was released as {}",
+                    workerDisplayName,
+                    pos(),
+                    previous,
+                    mob.getUUID());
+        }
         clearVirtualWorker();
+        return mob;
     }
 
     private PathfinderMob recreateEntity() {
