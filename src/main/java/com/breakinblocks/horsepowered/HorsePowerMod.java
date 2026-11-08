@@ -10,6 +10,7 @@ import com.breakinblocks.horsepowered.config.HorsePowerConfig;
 import com.breakinblocks.horsepowered.fluids.ModFluids;
 import com.breakinblocks.horsepowered.items.ModItems;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
+import com.breakinblocks.horsepowered.util.WorkerStats;
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -31,6 +32,7 @@ import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.fluids.FluidInteractionRegistry;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.registries.datamaps.RegisterDataMapTypesEvent;
 import net.neoforged.neoforge.transfer.item.VanillaContainerWrapper;
 import net.neoforged.neoforge.transfer.item.WorldlyContainerWrapper;
 import org.slf4j.Logger;
@@ -95,6 +97,7 @@ public class HorsePowerMod {
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::buildCreativeContents);
         modEventBus.addListener(HorsePowerMod::registerCapabilities);
+        modEventBus.addListener((RegisterDataMapTypesEvent e) -> e.register(WorkerStats.JUMP_STRENGTH));
         modEventBus.addListener((net.neoforged.fml.event.config.ModConfigEvent.Loading e) ->
                 HorsePowerConfig.invalidatePathSpeedCache());
         modEventBus.addListener((net.neoforged.fml.event.config.ModConfigEvent.Reloading e) ->

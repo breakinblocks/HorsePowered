@@ -1,6 +1,7 @@
 package com.breakinblocks.horsepowered.blockentity;
 
 import com.breakinblocks.horsepowered.config.HorsePowerConfig;
+import com.breakinblocks.horsepowered.util.WorkerStats;
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -82,6 +83,8 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
     private static final double MOVEMENT_SPEED = 0.12;
 
     protected double pathSpeedMultiplier = 1.0;
+    protected double jumpStrength = -1;
+    protected double workerSpeedMultiplier = 1.0;
 
     public HPBlockEntityHorseBase(BlockEntityType<?> type, BlockPos pos, BlockState state, int inventorySize) {
         super(type, pos, state, inventorySize);
@@ -177,6 +180,8 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
         valid = input.getBooleanOr("valid", false);
         running = input.getBooleanOr("running", true);
         pathSpeedMultiplier = input.getDoubleOr("pathSpeedMultiplier", 1.0);
+        jumpStrength = input.getDoubleOr("jumpStrength", -1);
+        workerSpeedMultiplier = input.getDoubleOr("workerSpeedMultiplier", 1.0);
 
         boolean hadWorkerBefore = hasVirtualWorker;
         String previousTypeId = workerEntityTypeId;
@@ -232,6 +237,10 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
         output.putBoolean("valid", valid);
         output.putBoolean("running", running);
         output.putDouble("pathSpeedMultiplier", pathSpeedMultiplier);
+        output.putDouble("workerSpeedMultiplier", workerSpeedMultiplier);
+        if (jumpStrength >= 0) {
+            output.putDouble("jumpStrength", jumpStrength);
+        }
 
         output.putBoolean("hasVirtualWorker", hasVirtualWorker);
         if (hasVirtualWorker) {
@@ -260,6 +269,8 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
                 BuiltInRegistries.ENTITY_TYPE.getKey(newWorker.getType()).toString();
         workerEntityHeight = newWorker.getBbHeight();
         hasVirtualWorker = true;
+        jumpStrength = WorkerStats.resolveJumpStrength(newWorker);
+        workerSpeedMultiplier = WorkerStats.speedMultiplier(jumpStrength);
 
         String name = newWorker.getDisplayName().getString();
         workerDisplayName = (name != null && !name.isEmpty())
@@ -346,6 +357,8 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
         workerEntityTypeId = null;
         workerDisplayName = null;
         hasVirtualWorker = false;
+        jumpStrength = -1;
+        workerSpeedMultiplier = 1.0;
         target = -1;
         origin = -1;
         running = false;
@@ -367,6 +380,35 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
 
     public boolean isValid() {
         return valid;
+    }
+
+    public double getJumpStrength() {
+        return jumpStrength >= 0 ? jumpStrength : WorkerStats.defaultJumpStrength();
+    }
+
+    public double getWorkerSpeedMultiplier() {
+        return workerSpeedMultiplier;
+    }
+
+    public double getPathSpeedMultiplier() {
+        return pathSpeedMultiplier;
+    }
+
+    private boolean updateWorkerStats() {
+        if (!hasVirtualWorker) return false;
+        boolean changed = false;
+        if (jumpStrength < 0) {
+            PathfinderMob mob = recreateEntity();
+            jumpStrength = mob != null ? WorkerStats.resolveJumpStrength(mob) : WorkerStats.defaultJumpStrength();
+            if (mob != null) mob.discard();
+            changed = true;
+        }
+        double multiplier = WorkerStats.speedMultiplier(jumpStrength);
+        if (Math.abs(multiplier - workerSpeedMultiplier) > 1.0e-6) {
+            workerSpeedMultiplier = multiplier;
+            changed = true;
+        }
+        return changed;
     }
 
     public double getVirtualX() {
@@ -545,13 +587,18 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
     }
 
     protected void tickServer() {
+        if (hasVirtualWorker && jumpStrength < 0 && updateWorkerStats()) {
+            setChanged();
+        }
+
         validationTimer--;
         if (validationTimer <= 0) {
             boolean wasValid = valid;
             double previousMultiplier = pathSpeedMultiplier;
             valid = validateArea();
             validationTimer = valid ? 220 : 60;
-            if (wasValid != valid || Math.abs(previousMultiplier - pathSpeedMultiplier) > 1.0e-6) {
+            boolean statsChanged = updateWorkerStats();
+            if (wasValid != valid || Math.abs(previousMultiplier - pathSpeedMultiplier) > 1.0e-6 || statsChanged) {
                 setChanged();
             }
         }
@@ -632,7 +679,7 @@ public abstract class HPBlockEntityHorseBase extends HPBlockEntityBase {
         double dist = Math.sqrt(dx * dx + dz * dz);
 
         if (dist > 0.1) {
-            double speed = MOVEMENT_SPEED * pathSpeedMultiplier;
+            double speed = Math.min(dist, MOVEMENT_SPEED * pathSpeedMultiplier * workerSpeedMultiplier);
             double stepX = (dx / dist) * speed;
             double stepZ = (dz / dist) * speed;
 

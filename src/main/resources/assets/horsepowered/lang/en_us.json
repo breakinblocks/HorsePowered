@@ -58,6 +58,7 @@
   "config.jade.plugin_horsepowered.drying_rack": "Drying Rack",
   "config.jade.plugin_horsepowered.granite_anvil": "Granite Anvil",
   "config.jade.plugin_horsepowered.animal_trap": "Animal Trap",
+  "config.jade.plugin_horsepowered.worker": "Worker Stats",
 
   "jade.horsepowered.input": "Input: %s x%s",
   "jade.horsepowered.output": "Output: %s x%s",
@@ -71,6 +72,9 @@
   "jade.horsepowered.worker_attached": "Worker attached (loading...)",
   "jade.horsepowered.no_worker": "No worker attached",
   "jade.horsepowered.obstructed": "Area obstructed!",
+  "jade.horsepowered.jump_strength": "Jump strength: %s",
+  "jade.horsepowered.worker_speed": "Worker speed: %sx",
+  "jade.horsepowered.path_speed": "Path speed: %sx",
   "jade.horsepowered.drying": "Drying: %s %s%% (%s left)",
   "jade.horsepowered.drying_done": "Dried: %s",
   "jade.horsepowered.drying_empty": "Slot empty",
