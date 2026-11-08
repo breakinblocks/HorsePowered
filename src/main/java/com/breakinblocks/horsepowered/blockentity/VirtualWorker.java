@@ -1,6 +1,7 @@
 package com.breakinblocks.horsepowered.blockentity;
 
 import com.breakinblocks.horsepowered.config.HorsePowerConfig;
+import com.breakinblocks.horsepowered.util.WorkerStats;
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -77,6 +78,8 @@ public class VirtualWorker {
     private int highlightTimer = 0;
 
     private double pathSpeedMultiplier = 1.0;
+    private double jumpStrength = -1;
+    private double workerSpeedMultiplier = 1.0;
 
     public VirtualWorker(WorkerHost host) {
         this.host = host;
@@ -171,6 +174,8 @@ public class VirtualWorker {
         valid = tag.getBoolean("valid");
         running = tag.getBoolean("running");
         pathSpeedMultiplier = tag.contains("pathSpeedMultiplier") ? tag.getDouble("pathSpeedMultiplier") : 1.0;
+        jumpStrength = tag.contains("jumpStrength") ? tag.getDouble("jumpStrength") : -1;
+        workerSpeedMultiplier = tag.contains("workerSpeedMultiplier") ? tag.getDouble("workerSpeedMultiplier") : 1.0;
 
         boolean hadWorkerBefore = hasVirtualWorker;
         hasVirtualWorker = tag.getBoolean("hasVirtualWorker");
@@ -215,6 +220,10 @@ public class VirtualWorker {
         tag.putBoolean("valid", valid);
         tag.putBoolean("running", running);
         tag.putDouble("pathSpeedMultiplier", pathSpeedMultiplier);
+        tag.putDouble("workerSpeedMultiplier", workerSpeedMultiplier);
+        if (jumpStrength >= 0) {
+            tag.putDouble("jumpStrength", jumpStrength);
+        }
 
         tag.putBoolean("hasVirtualWorker", hasVirtualWorker);
         if (hasVirtualWorker) {
@@ -245,6 +254,8 @@ public class VirtualWorker {
                 BuiltInRegistries.ENTITY_TYPE.getKey(newWorker.getType()).toString();
         workerEntityHeight = newWorker.getBbHeight();
         hasVirtualWorker = true;
+        jumpStrength = WorkerStats.resolveJumpStrength(newWorker);
+        workerSpeedMultiplier = WorkerStats.speedMultiplier(jumpStrength);
 
         String name = newWorker.getDisplayName().getString();
         workerDisplayName = (name != null && !name.isEmpty())
@@ -320,6 +331,8 @@ public class VirtualWorker {
         workerEntityTypeId = null;
         workerDisplayName = null;
         hasVirtualWorker = false;
+        jumpStrength = -1;
+        workerSpeedMultiplier = 1.0;
         target = -1;
         origin = -1;
         running = false;
@@ -346,6 +359,36 @@ public class VirtualWorker {
 
     public boolean isValid() {
         return valid;
+    }
+
+    public double getJumpStrength() {
+        return jumpStrength >= 0 ? jumpStrength : HorsePowerConfig.horseEngineDefaultJumpStrength.get();
+    }
+
+    public double getWorkerSpeedMultiplier() {
+        return workerSpeedMultiplier;
+    }
+
+    public double getPathSpeedMultiplier() {
+        return pathSpeedMultiplier;
+    }
+
+    private boolean updateWorkerStats() {
+        if (!hasVirtualWorker) return false;
+        boolean changed = false;
+        if (jumpStrength < 0) {
+            PathfinderMob mob = recreateEntity();
+            jumpStrength = mob != null
+                    ? WorkerStats.resolveJumpStrength(mob)
+                    : HorsePowerConfig.horseEngineDefaultJumpStrength.get();
+            changed = true;
+        }
+        double multiplier = WorkerStats.speedMultiplier(jumpStrength);
+        if (Math.abs(multiplier - workerSpeedMultiplier) > 1.0e-6) {
+            workerSpeedMultiplier = multiplier;
+            changed = true;
+        }
+        return changed;
     }
 
     public boolean isRunning() {
@@ -516,13 +559,18 @@ public class VirtualWorker {
     }
 
     public void tickServer() {
+        if (hasVirtualWorker && jumpStrength < 0 && updateWorkerStats()) {
+            host.markChanged();
+        }
+
         validationTimer--;
         if (validationTimer <= 0) {
             boolean wasValid = valid;
             double previousMultiplier = pathSpeedMultiplier;
             valid = validateArea();
             validationTimer = valid ? 220 : 60;
-            if (wasValid != valid || Math.abs(previousMultiplier - pathSpeedMultiplier) > 1.0e-6) {
+            boolean statsChanged = updateWorkerStats();
+            if (wasValid != valid || Math.abs(previousMultiplier - pathSpeedMultiplier) > 1.0e-6 || statsChanged) {
                 host.markChanged();
             }
         }
@@ -604,7 +652,7 @@ public class VirtualWorker {
         double dist = Math.sqrt(dx * dx + dz * dz);
 
         if (dist > 0.1) {
-            double speed = MOVEMENT_SPEED * pathSpeedMultiplier;
+            double speed = Math.min(dist, MOVEMENT_SPEED * pathSpeedMultiplier * workerSpeedMultiplier);
             double stepX = (dx / dist) * speed;
             double stepZ = (dz / dist) * speed;
 

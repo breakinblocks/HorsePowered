@@ -11,6 +11,7 @@ import com.breakinblocks.horsepowered.blockentity.HPBlockEntityBase;
 import com.breakinblocks.horsepowered.blockentity.HandGrindstoneBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.ManualChopperBlockEntity;
 import com.breakinblocks.horsepowered.blockentity.PressBlockEntity;
+import com.breakinblocks.horsepowered.blockentity.VirtualWorker;
 import com.breakinblocks.horsepowered.blocks.BlockAnimalTrap;
 import com.breakinblocks.horsepowered.blocks.BlockChopper;
 import com.breakinblocks.horsepowered.blocks.BlockChoppingBlock;
@@ -21,19 +22,24 @@ import com.breakinblocks.horsepowered.blocks.BlockGrindstone;
 import com.breakinblocks.horsepowered.blocks.BlockHandGrindstone;
 import com.breakinblocks.horsepowered.blocks.BlockPress;
 import com.breakinblocks.horsepowered.compat.create.jade.HorseEngineJadeSupport;
+import com.breakinblocks.horsepowered.util.Utils;
+import com.breakinblocks.horsepowered.util.WorkerStats;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.neoforged.neoforge.fluids.FluidStack;
 import snownee.jade.api.BlockAccessor;
+import snownee.jade.api.EntityAccessor;
 import snownee.jade.api.IBlockComponentProvider;
+import snownee.jade.api.IEntityComponentProvider;
 import snownee.jade.api.IServerDataProvider;
 import snownee.jade.api.ITooltip;
 import snownee.jade.api.IWailaClientRegistration;
@@ -58,6 +64,12 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
             ResourceLocation.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "granite_anvil");
     public static final ResourceLocation ANIMAL_TRAP =
             ResourceLocation.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "animal_trap");
+    public static final ResourceLocation WORKER = ResourceLocation.fromNamespaceAndPath(HorsePowerMod.MOD_ID, "worker");
+
+    private static final String KEY_WORKER_SPEED = "hp_worker_speed";
+    private static final String KEY_PATH_SPEED = "hp_path_speed";
+    private static final String KEY_WORKER_JUMP = "hp_worker_jump";
+    private static final String KEY_WORKER_STRESS = "hp_worker_stress";
 
     private static final String KEY_DR_SLOT = "dr_slot";
     private static final String KEY_DR_PROGRESS = "dr_progress";
@@ -108,6 +120,7 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
                                 data.putString(KEY_WORKER_NAME, te.getWorkerDisplayName());
                             }
                             data.putBoolean(KEY_IS_VALID, te.isValid());
+                            putWorkerSpeedData(data, te.getVirtualWorker());
                         }
                     }
 
@@ -130,6 +143,7 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
                                 data.putString(KEY_WORKER_NAME, te.getWorkerDisplayName());
                             }
                             data.putBoolean(KEY_IS_VALID, te.isValid());
+                            putWorkerSpeedData(data, te.getVirtualWorker());
                         }
                     }
 
@@ -152,6 +166,7 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
                                 data.putString(KEY_WORKER_NAME, te.getWorkerDisplayName());
                             }
                             data.putBoolean(KEY_IS_VALID, te.isValid());
+                            putWorkerSpeedData(data, te.getVirtualWorker());
                             appendPressTankData(data, te);
                         }
                     }
@@ -204,6 +219,7 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
                                     data.putString(KEY_WORKER_NAME, te.getWorkerDisplayName());
                                 }
                                 data.putBoolean(KEY_IS_VALID, te.isValid());
+                                putWorkerSpeedData(data, te.getVirtualWorker());
                             } else if (mainTe instanceof PressBlockEntity te) {
                                 data.putInt(KEY_CURRENT, te.getCurrentPressStatus());
                                 data.putInt(KEY_TOTAL, te.getTotalPressPoints());
@@ -212,6 +228,7 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
                                     data.putString(KEY_WORKER_NAME, te.getWorkerDisplayName());
                                 }
                                 data.putBoolean(KEY_IS_VALID, te.isValid());
+                                putWorkerSpeedData(data, te.getVirtualWorker());
                                 appendPressTankData(data, te);
                             } else if (mainTe instanceof GrindstoneBlockEntity te) {
                                 data.putInt(KEY_CURRENT, te.getCurrentMillTime());
@@ -221,6 +238,7 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
                                     data.putString(KEY_WORKER_NAME, te.getWorkerDisplayName());
                                 }
                                 data.putBoolean(KEY_IS_VALID, te.isValid());
+                                putWorkerSpeedData(data, te.getVirtualWorker());
                             }
                         }
                     }
@@ -268,6 +286,26 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
                     }
                 },
                 AnimalTrapBlockEntity.class);
+
+        registration.registerEntityDataProvider(
+                new IServerDataProvider<EntityAccessor>() {
+                    @Override
+                    public void appendServerData(CompoundTag data, EntityAccessor accessor) {
+                        if (!(accessor.getEntity() instanceof PathfinderMob mob) || !Utils.isValidWorker(mob)) return;
+                        double jump = WorkerStats.resolveJumpStrength(mob);
+                        data.putDouble(KEY_WORKER_JUMP, jump);
+                        data.putDouble(KEY_WORKER_SPEED, WorkerStats.speedMultiplier(jump));
+                        if (HorsePowerMod.CREATE_LOADED) {
+                            data.putDouble(KEY_WORKER_STRESS, WorkerStats.engineStress(jump));
+                        }
+                    }
+
+                    @Override
+                    public ResourceLocation getUid() {
+                        return WORKER;
+                    }
+                },
+                PathfinderMob.class);
     }
 
     @Override
@@ -275,6 +313,32 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
         if (HorsePowerMod.CREATE_LOADED) {
             HorseEngineJadeSupport.registerClient(registration);
         }
+        registration.registerEntityComponent(
+                new IEntityComponentProvider() {
+                    @Override
+                    public void appendTooltip(ITooltip tooltip, EntityAccessor accessor, IPluginConfig config) {
+                        if (!Utils.isValidWorker(accessor.getEntity())) return;
+                        CompoundTag data = accessor.getServerData();
+                        if (!data.contains(KEY_WORKER_JUMP)) return;
+                        tooltip.add(Component.translatable(
+                                "jade." + HorsePowerMod.MOD_ID + ".jump_strength",
+                                String.format("%.2f", data.getDouble(KEY_WORKER_JUMP))));
+                        tooltip.add(Component.translatable(
+                                "jade." + HorsePowerMod.MOD_ID + ".worker_speed",
+                                String.format("%.2f", data.getDouble(KEY_WORKER_SPEED))));
+                        if (data.contains(KEY_WORKER_STRESS)) {
+                            tooltip.add(Component.translatable(
+                                    "jade." + HorsePowerMod.MOD_ID + ".engine_stress",
+                                    String.format("%.1f", data.getDouble(KEY_WORKER_STRESS))));
+                        }
+                    }
+
+                    @Override
+                    public ResourceLocation getUid() {
+                        return WORKER;
+                    }
+                },
+                PathfinderMob.class);
         // Horse-powered grindstone
         registration.registerBlockComponent(
                 new IBlockComponentProvider() {
@@ -628,6 +692,12 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
         }
     }
 
+    private static void putWorkerSpeedData(CompoundTag data, VirtualWorker worker) {
+        if (!worker.hasWorker()) return;
+        data.putDouble(KEY_WORKER_SPEED, worker.getWorkerSpeedMultiplier());
+        data.putDouble(KEY_PATH_SPEED, worker.getPathSpeedMultiplier());
+    }
+
     public static void appendWorkerInfoFromData(ITooltip tooltip, CompoundTag data) {
         if (data.contains(KEY_HAS_WORKER)) {
             if (data.getBoolean(KEY_HAS_WORKER)) {
@@ -636,6 +706,16 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
                             "jade." + HorsePowerMod.MOD_ID + ".worker", data.getString(KEY_WORKER_NAME)));
                 } else {
                     tooltip.add(Component.translatable("jade." + HorsePowerMod.MOD_ID + ".worker_attached"));
+                }
+                if (data.contains(KEY_WORKER_SPEED)) {
+                    tooltip.add(Component.translatable(
+                            "jade." + HorsePowerMod.MOD_ID + ".worker_speed",
+                            String.format("%.2f", data.getDouble(KEY_WORKER_SPEED))));
+                }
+                if (data.contains(KEY_PATH_SPEED)) {
+                    tooltip.add(Component.translatable(
+                            "jade." + HorsePowerMod.MOD_ID + ".path_speed",
+                            String.format("%.2f", data.getDouble(KEY_PATH_SPEED))));
                 }
             } else {
                 tooltip.add(Component.translatable("jade." + HorsePowerMod.MOD_ID + ".no_worker"));

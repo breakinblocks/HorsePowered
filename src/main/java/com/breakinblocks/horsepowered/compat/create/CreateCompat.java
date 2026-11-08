@@ -3,10 +3,8 @@ package com.breakinblocks.horsepowered.compat.create;
 import com.breakinblocks.horsepowered.HorsePowerMod;
 import com.breakinblocks.horsepowered.compat.create.client.CreateCompatClient;
 import com.breakinblocks.horsepowered.config.HorsePowerConfig;
-import com.mojang.serialization.Codec;
 import com.simibubi.create.api.stress.BlockStressValues;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -21,8 +19,6 @@ import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import net.neoforged.neoforge.registries.datamaps.DataMapType;
-import net.neoforged.neoforge.registries.datamaps.RegisterDataMapTypesEvent;
 
 public final class CreateCompat {
 
@@ -30,10 +26,6 @@ public final class CreateCompat {
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(HorsePowerMod.MOD_ID);
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES =
             DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, HorsePowerMod.MOD_ID);
-
-    public static final DataMapType<EntityType<?>, Double> JUMP_STRENGTH = DataMapType.builder(
-                    HorsePowerMod.id("horse_engine_jump_strength"), Registries.ENTITY_TYPE, Codec.DOUBLE)
-            .build();
 
     public static final DeferredBlock<HorseEngineBlock> HORSE_ENGINE = BLOCKS.register(
             "horse_engine",
@@ -58,16 +50,11 @@ public final class CreateCompat {
         BLOCKS.register(modBus);
         ITEMS.register(modBus);
         BLOCK_ENTITIES.register(modBus);
-        modBus.addListener(CreateCompat::registerDataMaps);
         modBus.addListener(CreateCompat::commonSetup);
         modBus.addListener(CreateCompat::buildCreativeTab);
         if (dist.isClient()) {
             CreateCompatClient.init(modBus);
         }
-    }
-
-    private static void registerDataMaps(RegisterDataMapTypesEvent event) {
-        event.register(JUMP_STRENGTH);
     }
 
     private static void commonSetup(FMLCommonSetupEvent event) {

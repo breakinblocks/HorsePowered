@@ -59,8 +59,7 @@ public class HorseEngineBlock extends KineticBlock implements IBE<HorseEngineBlo
         if (engine == null) {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
-        if (WorkerInteraction.tryAttachLeashed(
-                level, pos, player, engine.getVirtualWorker(), (p, mob) -> engine.onWorkerAttached(mob))) {
+        if (WorkerInteraction.tryAttachLeashed(level, pos, player, engine.getVirtualWorker(), (p, mob) -> {})) {
             return ItemInteractionResult.sidedSuccess(level.isClientSide);
         }
         return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;

@@ -59,7 +59,7 @@ Pack makers can set a fixed jump strength for any entity type with the `horsepow
 }
 ```
 
-A listed value replaces the mob's own attribute. The value is read when the worker is attached, so re-attach a worker after changing the file.
+A listed value replaces the mob's own attribute and also sets how fast the mob works every other machine. The value is read when the worker is attached, so re-attach a worker after changing the file.
 
 ## Notes
 
