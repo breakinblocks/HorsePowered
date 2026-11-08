@@ -21,16 +21,21 @@ import com.breakinblocks.horsepowered.blocks.BlockHandGrindstone;
 import com.breakinblocks.horsepowered.blocks.BlockPress;
 import com.breakinblocks.horsepowered.compat.create.jade.HorseEngineJadeSupport;
 import com.breakinblocks.horsepowered.lib.Reference;
+import com.breakinblocks.horsepowered.util.Utils;
+import com.breakinblocks.horsepowered.util.WorkerStats;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.fluids.FluidStack;
 import snownee.jade.api.BlockAccessor;
+import snownee.jade.api.EntityAccessor;
 import snownee.jade.api.IBlockComponentProvider;
+import snownee.jade.api.IEntityComponentProvider;
 import snownee.jade.api.IServerDataProvider;
 import snownee.jade.api.ITooltip;
 import snownee.jade.api.IWailaClientRegistration;
@@ -49,6 +54,11 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
     public static final ResourceLocation DRYING_RACK = new ResourceLocation(Reference.MODID, "drying_rack");
     public static final ResourceLocation GRANITE_ANVIL = new ResourceLocation(Reference.MODID, "granite_anvil");
     public static final ResourceLocation ANIMAL_TRAP = new ResourceLocation(Reference.MODID, "animal_trap");
+    public static final ResourceLocation WORKER = new ResourceLocation(Reference.MODID, "worker");
+
+    private static final String KEY_WORKER_JUMP = "hp_worker_jump";
+    private static final String KEY_WORKER_SPEED = "hp_worker_speed";
+    private static final String KEY_WORKER_STRESS = "hp_worker_stress";
 
     private static final String KEY_DR_SLOT = "dr_slot";
     private static final String KEY_DR_PROGRESS = "dr_progress";
@@ -130,6 +140,26 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
                     }
                 },
                 AnimalTrapBlockEntity.class);
+
+        registration.registerEntityDataProvider(
+                new IServerDataProvider<EntityAccessor>() {
+                    @Override
+                    public void appendServerData(CompoundTag data, EntityAccessor accessor) {
+                        if (!(accessor.getEntity() instanceof PathfinderMob mob) || !Utils.isValidWorker(mob)) return;
+                        double jump = WorkerStats.resolveJumpStrength(mob);
+                        data.putDouble(KEY_WORKER_JUMP, jump);
+                        data.putDouble(KEY_WORKER_SPEED, WorkerStats.speedMultiplier(jump));
+                        if (HorsePowerMod.CREATE_LOADED) {
+                            data.putDouble(KEY_WORKER_STRESS, WorkerStats.engineStress(jump));
+                        }
+                    }
+
+                    @Override
+                    public ResourceLocation getUid() {
+                        return WORKER;
+                    }
+                },
+                PathfinderMob.class);
     }
 
     @Override
@@ -137,6 +167,32 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
         if (HorsePowerMod.CREATE_LOADED) {
             HorseEngineJadeSupport.registerClient(registration);
         }
+        registration.registerEntityComponent(
+                new IEntityComponentProvider() {
+                    @Override
+                    public void appendTooltip(ITooltip tooltip, EntityAccessor accessor, IPluginConfig config) {
+                        if (!Utils.isValidWorker(accessor.getEntity())) return;
+                        CompoundTag data = accessor.getServerData();
+                        if (!data.contains(KEY_WORKER_JUMP)) return;
+                        tooltip.add(Component.translatable(
+                                "jade." + Reference.MODID + ".jump_strength",
+                                String.format("%.2f", data.getDouble(KEY_WORKER_JUMP))));
+                        tooltip.add(Component.translatable(
+                                "jade." + Reference.MODID + ".worker_speed",
+                                String.format("%.2f", data.getDouble(KEY_WORKER_SPEED))));
+                        if (data.contains(KEY_WORKER_STRESS)) {
+                            tooltip.add(Component.translatable(
+                                    "jade." + Reference.MODID + ".engine_stress",
+                                    String.format("%.1f", data.getDouble(KEY_WORKER_STRESS))));
+                        }
+                    }
+
+                    @Override
+                    public ResourceLocation getUid() {
+                        return WORKER;
+                    }
+                },
+                PathfinderMob.class);
         registration.registerBlockComponent(
                 new IBlockComponentProvider() {
                     @Override
@@ -414,6 +470,10 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
     }
 
     public static void appendWorkerInfo(ITooltip tooltip, WorkerHost host) {
+        appendWorkerInfo(tooltip, host, true);
+    }
+
+    public static void appendWorkerInfo(ITooltip tooltip, WorkerHost host, boolean showSpeed) {
         VirtualWorker te = host.getVirtualWorker();
         if (te.hasWorker()) {
             String name = te.getWorkerDisplayName();
@@ -421,6 +481,13 @@ public class HorsePowerJadePlugin implements IWailaPlugin {
                 tooltip.add(Component.translatable("jade." + Reference.MODID + ".worker", Component.literal(name)));
             } else {
                 tooltip.add(Component.translatable("jade." + Reference.MODID + ".worker_attached"));
+            }
+            if (showSpeed) {
+                tooltip.add(Component.translatable(
+                        "jade." + Reference.MODID + ".worker_speed",
+                        String.format("%.2f", te.getWorkerSpeedMultiplier())));
+                tooltip.add(Component.translatable(
+                        "jade." + Reference.MODID + ".path_speed", String.format("%.2f", te.getPathSpeedMultiplier())));
             }
         } else {
             tooltip.add(Component.translatable("jade." + Reference.MODID + ".no_worker"));

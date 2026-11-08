@@ -1,4 +1,4 @@
-package com.breakinblocks.horsepowered.compat.create;
+package com.breakinblocks.horsepowered.util;
 
 import com.breakinblocks.horsepowered.lib.Reference;
 import com.google.gson.Gson;

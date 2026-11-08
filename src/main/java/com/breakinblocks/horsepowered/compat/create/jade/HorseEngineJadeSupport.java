@@ -53,7 +53,7 @@ public final class HorseEngineJadeSupport {
                         if (!(accessor.getBlockEntity() instanceof HorseEngineBlockEntity te)) {
                             return;
                         }
-                        HorsePowerJadePlugin.appendWorkerInfo(tooltip, te);
+                        HorsePowerJadePlugin.appendWorkerInfo(tooltip, te, false);
 
                         CompoundTag data = accessor.getServerData();
                         if (te.getVirtualWorker().hasWorker() && data.contains(KEY_JUMP)) {

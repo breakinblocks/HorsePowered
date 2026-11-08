@@ -69,6 +69,7 @@
   "config.jade.plugin_horsepowered.granite_anvil": "Granite Anvil",
   "config.jade.plugin_horsepowered.horse_engine": "Horse Engine",
   "config.jade.plugin_horsepowered.animal_trap": "Animal Trap",
+  "config.jade.plugin_horsepowered.worker": "Worker Stats",
 
   "jade.horsepowered.input": "Input: %s x%s",
   "jade.horsepowered.output": "Output: %s x%s",
@@ -83,6 +84,9 @@
   "jade.horsepowered.no_worker": "No worker attached",
   "jade.horsepowered.stress_output": "Generating: %s su at %s rpm",
   "jade.horsepowered.jump_strength": "Jump strength: %s",
+  "jade.horsepowered.worker_speed": "Worker speed: %sx",
+  "jade.horsepowered.path_speed": "Path speed: %sx",
+  "jade.horsepowered.engine_stress": "Horse engine output: %s su",
   "jade.horsepowered.obstructed": "Area obstructed!",
   "jade.horsepowered.drying": "Drying: %s %s%% (%s left)",
   "jade.horsepowered.drying_done": "Dried: %s",

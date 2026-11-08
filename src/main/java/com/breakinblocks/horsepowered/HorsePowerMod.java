@@ -5,11 +5,14 @@ import com.breakinblocks.horsepowered.compat.create.CreateCompat;
 import com.breakinblocks.horsepowered.items.ModItems;
 import com.breakinblocks.horsepowered.lib.Reference;
 import com.breakinblocks.horsepowered.recipes.HPRecipes;
+import com.breakinblocks.horsepowered.util.JumpStrengthOverrides;
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -70,6 +73,7 @@ public class HorsePowerMod {
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, Configs.CLIENT_SPEC);
 
         modEventBus.addListener(this::commonSetup);
+        MinecraftForge.EVENT_BUS.addListener((AddReloadListenerEvent e) -> e.addListener(new JumpStrengthOverrides()));
         modEventBus.addListener((ModConfigEvent.Loading e) -> Configs.invalidatePathSpeedCache());
         modEventBus.addListener((ModConfigEvent.Reloading e) -> Configs.invalidatePathSpeedCache());
 

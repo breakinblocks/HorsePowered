@@ -5,12 +5,8 @@ import com.breakinblocks.horsepowered.blockentity.VirtualWorker;
 import com.breakinblocks.horsepowered.blockentity.WorkerHost;
 import com.simibubi.create.content.kinetics.base.GeneratingKineticBlockEntity;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Containers;
-import net.minecraft.world.entity.PathfinderMob;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.state.BlockState;
@@ -19,7 +15,6 @@ import net.minecraft.world.phys.AABB;
 public class HorseEngineBlockEntity extends GeneratingKineticBlockEntity implements WorkerHost {
 
     private final VirtualWorker worker = new VirtualWorker(this);
-    private double jumpStrength;
     private float lastGeneratedSpeed;
     private float lastCapacity;
 
@@ -32,25 +27,8 @@ public class HorseEngineBlockEntity extends GeneratingKineticBlockEntity impleme
                 (jumpStrength * 10.0 * Configs.horseEngineStressPerJumpPoint.get() / Configs.horseEngineRpm.get());
     }
 
-    public static double resolveJumpStrength(PathfinderMob mob) {
-        ResourceLocation id = BuiltInRegistries.ENTITY_TYPE.getKey(mob.getType());
-        Double override = JumpStrengthOverrides.lookup(mob.getType(), id);
-        if (override != null) {
-            return override;
-        }
-        if (mob.getAttributes().hasAttribute(Attributes.JUMP_STRENGTH)) {
-            return mob.getAttributeValue(Attributes.JUMP_STRENGTH);
-        }
-        return Configs.horseEngineDefaultJumpStrength.get();
-    }
-
-    public void onWorkerAttached(PathfinderMob mob) {
-        jumpStrength = resolveJumpStrength(mob);
-        notifyUpdate();
-    }
-
     public double getJumpStrength() {
-        return jumpStrength;
+        return worker.getJumpStrength();
     }
 
     public float getStressOutput() {
@@ -89,7 +67,7 @@ public class HorseEngineBlockEntity extends GeneratingKineticBlockEntity impleme
 
     @Override
     public float calculateAddedStressCapacity() {
-        float capacity = capacityPerRpm(jumpStrength);
+        float capacity = capacityPerRpm(getJumpStrength());
         lastCapacityProvided = capacity;
         return capacity;
     }
@@ -107,7 +85,7 @@ public class HorseEngineBlockEntity extends GeneratingKineticBlockEntity impleme
         worker.tickServer();
 
         float speed = getGeneratedSpeed();
-        float capacity = capacityPerRpm(jumpStrength);
+        float capacity = capacityPerRpm(getJumpStrength());
         if (speed != lastGeneratedSpeed || capacity != lastCapacity) {
             lastGeneratedSpeed = speed;
             lastCapacity = capacity;
@@ -119,14 +97,12 @@ public class HorseEngineBlockEntity extends GeneratingKineticBlockEntity impleme
     protected void write(CompoundTag tag, boolean clientPacket) {
         super.write(tag, clientPacket);
         worker.save(tag);
-        tag.putDouble("jumpStrength", jumpStrength);
     }
 
     @Override
     protected void read(CompoundTag tag, boolean clientPacket) {
         super.read(tag, clientPacket);
         worker.read(tag, clientPacket);
-        jumpStrength = tag.getDouble("jumpStrength");
     }
 
     @Override

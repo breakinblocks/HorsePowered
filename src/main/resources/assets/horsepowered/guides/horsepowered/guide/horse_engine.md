@@ -61,7 +61,7 @@ Pack makers can set a fixed jump strength for any entity type with a datapack fi
 }
 ```
 
-A listed value replaces the mob's own attribute. Entries starting with `#` match an entity type tag. The value is read when the worker is attached, so re-attach a worker after changing the file.
+A listed value replaces the mob's own attribute and also sets how fast the mob works every other machine. Entries starting with `#` match an entity type tag. The value is read when the worker is attached, so re-attach a worker after changing the file.
 
 ## Notes
 

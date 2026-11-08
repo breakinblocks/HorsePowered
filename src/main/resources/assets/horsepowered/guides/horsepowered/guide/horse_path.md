@@ -47,6 +47,20 @@ Default multipliers:
 
 A multiplier of `0.0` stops the worker on that block; values above `1.0` accelerate it. Mixed paths average out, so a half-ice, half-dirt-path ring lands around 1.5x.
 
+## Worker Speed
+
+The worker's jump strength also changes how fast it walks, on top of the path speed. A worker at 0.4 jump strength walks at normal speed, and every point above or below that adds or removes the same amount of speed, so a 0.7 horse walks at 1.3x and a 1.0 horse at 1.6x. Mobs without a jump strength use 0.4, and a datapack can set a fixed value per mob (see the Horse Engine page).
+
+The two multiply together: a 1.6x horse on a 2.0x path works at 3.2x. Jade shows both on any machine with a worker attached, and looking at a mob that can be a worker shows its jump strength and speed.
+
+```toml
+[horse_path]
+workerJumpSpeedBaseline = 0.4
+workerJumpSpeedScale = 1.0
+```
+
+Set `workerJumpSpeedScale` to `0` to make every worker walk at the same speed.
+
 ## Configuring Speeds
 
 Add or override entries in `config/horsepowered-common.toml`:

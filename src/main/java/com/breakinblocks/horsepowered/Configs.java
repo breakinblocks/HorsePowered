@@ -34,6 +34,8 @@ public class Configs {
     public static ForgeConfigSpec.IntValue pathObstructionTolerance;
     public static ForgeConfigSpec.DoubleValue pathSpeedDefault;
     public static ForgeConfigSpec.ConfigValue<List<? extends String>> pathSpeedEntries;
+    public static ForgeConfigSpec.DoubleValue workerJumpSpeedBaseline;
+    public static ForgeConfigSpec.DoubleValue workerJumpSpeedScale;
 
     public static ForgeConfigSpec.IntValue horseEngineRpm;
     public static ForgeConfigSpec.DoubleValue horseEngineStressPerJumpPoint;
@@ -140,10 +142,22 @@ public class Configs {
                                     "minecraft:dirt_path=1.0",
                                     "minecraft:packed_ice=2.0"),
                             Configs::isValidSpeedEntry);
+
+            workerJumpSpeedBaseline = builder.comment(
+                            "Jump strength at which a worker walks at normal speed.",
+                            "Workers with a higher jump strength walk faster and workers with a lower one walk slower.")
+                    .defineInRange("workerJumpSpeedBaseline", 0.4D, 0.0D, 32.0D);
+
+            workerJumpSpeedScale = builder.comment(
+                            "How much each point of jump strength above or below the baseline changes worker speed.",
+                            "Worker speed = 1 + (jump strength - baseline) * scale, and never drops below 0.1.",
+                            "With the defaults a 1.0 jump strength horse walks at 1.6x. Set to 0 to make every worker walk at the same speed.",
+                            "This stacks with the path speed from the floor blocks.")
+                    .defineInRange("workerJumpSpeedScale", 1.0D, 0.0D, 100.0D);
         }
         builder.pop();
 
-        builder.comment("Horse engine settings (only used when Create is installed)")
+        builder.comment("Horse engine settings (the engine only exists when Create is installed)")
                 .push("horse_engine");
         {
             horseEngineRpm = builder.comment("Rotation speed in RPM produced by a horse engine while its worker walks.")
@@ -155,6 +169,7 @@ public class Configs {
 
             horseEngineDefaultJumpStrength = builder.comment(
                             "Jump strength used for workers that have no jump strength attribute.",
+                            "Used by every machine for worker speed, and by the horse engine for stress output.",
                             "Per-mob values can be set with datapack files in data/<namespace>/horse_engine_jump_strength/.")
                     .defineInRange("horseEngineDefaultJumpStrength", 0.4D, 0.0D, 32.0D);
         }

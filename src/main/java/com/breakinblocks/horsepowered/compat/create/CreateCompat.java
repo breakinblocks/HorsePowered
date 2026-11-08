@@ -11,8 +11,6 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.loading.FMLEnvironment;
@@ -53,7 +51,6 @@ public final class CreateCompat {
         ITEMS.register(modBus);
         BLOCK_ENTITIES.register(modBus);
         modBus.addListener(CreateCompat::commonSetup);
-        MinecraftForge.EVENT_BUS.addListener(CreateCompat::addReloadListener);
         if (FMLEnvironment.dist.isClient()) {
             CreateCompatClient.init(modBus);
         }
@@ -68,9 +65,5 @@ public final class CreateCompat {
         BlockStressValues.RPM.register(block, new BlockStressValues.GeneratedRpm(Configs.horseEngineRpm.get(), false));
         BlockStressValues.CAPACITIES.register(
                 block, () -> HorseEngineBlockEntity.capacityPerRpm(Configs.horseEngineDefaultJumpStrength.get()));
-    }
-
-    private static void addReloadListener(AddReloadListenerEvent event) {
-        event.addListener(new JumpStrengthOverrides());
     }
 }
